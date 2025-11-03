@@ -1,1 +1,195 @@
+/* === Estilos generales === */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
 
+/* === Encabezado === */
+header {
+  background: #1a1a1a;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav ul li {
+  cursor: pointer;
+  position: relative;
+}
+
+nav ul li::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: white;
+  width: 0%;
+  transition: 0.3s;
+}
+
+nav ul li:hover::after {
+  width: 100%;
+}
+
+/* === Menú desplegable === */
+.menu-btn {
+  font-size: 28px;
+  cursor: pointer;
+  display: none;
+}
+
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: #111;
+  color: white;
+  padding: 20px;
+  transition: 0.4s;
+  z-index: 200;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar h2 {
+  text-align: center;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.sidebar ul li:hover {
+  background: #222;
+}
+
+/* === Carrusel === */
+.carrusel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 15px;
+  padding: 20px;
+}
+
+.carrusel img {
+  height: 160px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.carrusel img:hover {
+  transform: scale(1.05);
+}
+
+/* === Productos === */
+.productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.producto {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 15px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.producto:hover {
+  transform: translateY(-5px);
+}
+
+.producto img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.producto button {
+  background: #0d6efd;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.producto button:hover {
+  background: #0b5ed7;
+}
+
+/* === Carrito === */
+#carrito {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  background: #fff;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#carrito.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  nav ul {
+    display: none;
+  }
+
+  .menu-btn {
+    display: block;
+  }
+
+  .productos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
