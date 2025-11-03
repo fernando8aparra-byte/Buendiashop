@@ -1,1 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar Sesión / Registro - Boutique Buendía</title>
+<style>
+:root {--bg:#fff; --text:#111; --accent:#7c4dff; --muted:#777;}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
+.container{max-width:400px;margin:80px auto;padding:20px;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+h1{text-align:center;margin-bottom:24px;}
+input{width:100%;padding:12px;margin-bottom:14px;border:1px solid #ddd;border-radius:6px;font-size:14px;}
+button{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600;margin-bottom:12px;}
+button:hover{opacity:0.9;}
+.error{color:red;text-align:center;margin-bottom:12px;font-size:14px;}
+.link{display:block;text-align:center;margin-top:12px;color:var(--accent);text-decoration:none;cursor:pointer;}
+.shake{animation:shake 0.4s;}
+@keyframes shake {0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-10px);} 40%,80%{transform:translateX(10px);}}
+</style>
+</head>
+<body>
 
+<div class="container">
+  <h1>Iniciar Sesión</h1>
+  <div id="errorMsg" class="error"></div>
+  <input type="text" id="username" placeholder="Nombre de usuario o correo" required>
+  <input type="password" id="password" placeholder="Contraseña" required>
+  <button id="loginBtn">Iniciar Sesión</button>
+  <div class="link" id="showRegister">¿No tienes cuenta? Regístrate</div>
+
+  <div id="registerForm" style="display:none;margin-top:20px;">
+    <h1>Registro</h1>
+    <div id="errorRegister" class="error"></div>
+    <input type="text" id="regUsername" placeholder="Nombre de usuario o correo">
+    <input type="password" id="regPassword" placeholder="Contraseña">
+    <input type="password" id="regPassword2" placeholder="Repetir contraseña">
+    <label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
+    <button id="registerBtn">Registrarse</button>
+    <div class="link" id="showLogin">Volver a Iniciar Sesión</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
+  authDomain: "buendiashop-f3dcc.firebaseapp.com",
+  projectId: "buendiashop-f3dcc",
+  storageBucket: "buendiashop-f3dcc.appspot.com",
+  messagingSenderId: "181970112547",
+  appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
+  measurementId: "G-MKP6G4V2KW"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const loginBtn = document.getElementById('loginBtn');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const errorMsg = document.getElementById('errorMsg');
+
+const showRegister = document.getElementById('showRegister');
+const registerForm = document.getElementById('registerForm');
+const showLogin = document.getElementById('showLogin');
+const registerBtn = document.getElementById('registerBtn');
+const regUsername = document.getElementById('regUsername');
+const regPassword = document.getElementById('regPassword');
+const regPassword2 = document.getElementById('regPassword2');
+const terms = document.getElementById('terms');
+const errorRegister = document.getElementById('errorRegister');
+
+// Mostrar registro
+showRegister.onclick = () => { registerForm.style.display='block'; };
+showLogin.onclick = () => { registerForm.style.display='none'; };
+
+// Login
+loginBtn.onclick = () => {
+  const user = usernameInput.value.trim();
+  const pass = passwordInput.value.trim();
+  errorMsg.textContent = '';
+  usernameInput.classList.remove('shake');
+  passwordInput.classList.remove('shake');
+
+  if(!user || !pass){
+    errorMsg.textContent = 'Ingresa usuario y contraseña.';
+    return;
+  }
+
+  // Usuario especial para admin
+  if(user==='Buendia*]?~?£u837jwhwi' && pass==='&2)3)8:&?3828&/82$:!'){
+    window.location.href='admin.html';
+    return;
+  }
+
+  // Iniciar sesión normal con Firebase
+  auth.signInWithEmailAndPassword(user, pass)
+    .then(cred => {
+      window.location.href='index.html';
+    })
+    .catch(err => {
+      if(err.code.includes('user')) usernameInput.classList.add('shake');
+      if(err.code.includes('password')) passwordInput.classList.add('shake');
+      errorMsg.textContent = 'Usuario o contraseña incorrectos.';
+    });
+};
+
+// Registro
+registerBtn.onclick = async () => {
+  const user = regUsername.value.trim();
+  const pass = regPassword.value.trim();
+  const pass2 = regPassword2.value.trim();
+  const accept = terms.checked;
+  errorRegister.textContent = '';
+
+  if(!user || !pass || !pass2){ errorRegister.textContent='Completa todos los campos.'; return; }
+  if(pass !== pass2){ errorRegister.textContent='Las contraseñas no coinciden.'; return; }
+  if(!accept){ errorRegister.textContent='Debes aceptar términos y condiciones.'; return; }
+
+  try {
+    // Verificar que no exista usuario
+    const q = await db.collection('usuarios').where('username','==',user).get();
+    if(!q.empty){ errorRegister.textContent='Usuario ya registrado.'; return; }
+
+    const cred = await auth.createUserWithEmailAndPassword(user, pass);
+    await db.collection('usuarios').doc(cred.user.uid).set({
+      username: user,
+      email: user,
+      role: 'user',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert('Registro exitoso, ahora inicia sesión.');
+    registerForm.style.display='none';
+  } catch(err){
+    console.error(err);
+    errorRegister.textContent=err.message;
+  }
+};
+</script>
+</body>
+</html>
