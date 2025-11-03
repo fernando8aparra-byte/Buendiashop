@@ -6,12 +6,7 @@
 <title>Boutique Buendía</title>
 <style>
 :root {
-  --bg: #ffffff;
-  --text: #111;
-  --muted: #777;
-  --card-bg: #fff;
-  --accent: #7c4dff;
-  --shadow: 0 8px 20px rgba(0,0,0,0.08);
+  --bg:#fff; --text:#111; --muted:#777; --card-bg:#fff; --accent:#7c4dff; --shadow:0 8px 20px rgba(0,0,0,0.08);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,sans-serif;}
 body{background:var(--bg);color:var(--text);}
@@ -33,13 +28,13 @@ main{max-width:1200px;margin:auto;padding:20px;}
 .card .price{font-weight:800;font-size:16px;margin-bottom:12px;}
 .card button{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;}
 .card button:hover{opacity:0.9;}
-.cart-panel{position:fixed;top:0;right:-400px;width:340px;height:100%;background:var(--card-bg);
-  box-shadow:-4px 0 20px rgba(0,0,0,0.2);transition:right .3s ease;display:flex;flex-direction:column;z-index:100;}
+.cart-panel{position:fixed;top:0;right:-400px;width:340px;height:100%;background:var(--card-bg);box-shadow:-4px 0 20px rgba(0,0,0,0.2);transition:right .3s ease;display:flex;flex-direction:column;z-index:100;}
 .cart-panel.open{right:0;}
 .cart-header{padding:16px;font-size:20px;font-weight:700;border-bottom:1px solid #ccc;display:flex;justify-content:space-between;align-items:center;}
 .cart-items{flex:1;overflow-y:auto;padding:14px;}
 .cart-empty{text-align:center;color:var(--muted);font-size:15px;padding:50px 0;}
 .cart-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;}
+.cart-item img{width:50px;height:50px;object-fit:cover;border-radius:6px;margin-right:8px;}
 .cart-item button{background:none;border:none;color:var(--accent);cursor:pointer;font-weight:700;}
 .cart-footer{border-top:1px solid #ccc;padding:16px;transition:all .3s ease;}
 .cart-total{font-weight:800;margin-bottom:10px;text-align:right;}
@@ -53,13 +48,11 @@ main{max-width:1200px;margin:auto;padding:20px;}
 .toast.show{bottom:60px;opacity:1;transform:translateX(-50%) scale(1.05);}
 #menuBtn { cursor:pointer;font-size:26px;z-index:30;position:relative; }
 .menu-dropdown {position: fixed;top: 0; left: -270px;width: 250px; height: 100%;background: var(--card-bg);
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);transition: left 0.3s ease;z-index: 25;padding: 60px 20px 20px;
-  display: flex; flex-direction: column;}
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);transition: left 0.3s ease;z-index: 25;padding: 60px 20px 20px;display: flex; flex-direction: column;}
 .menu-dropdown.open { left: 0; }
 .menu-item {padding: 14px 0;border-bottom: 2px solid #e1e1e1;cursor: pointer;font-size: 16px;color: var(--text);font-weight: 600;text-align:center;}
 .menu-item:hover { color: var(--accent); }
-.menu-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.2);z-index: 24;
-  opacity: 0;visibility: hidden;transition: opacity 0.3s ease;}
+.menu-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.2);z-index: 24;opacity: 0;visibility: hidden;transition: opacity 0.3s ease;}
 .menu-overlay.show {opacity: 1;visibility: visible;}
 .menu-close{position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;color:var(--text);}
 </style>
@@ -71,6 +64,7 @@ main{max-width:1200px;margin:auto;padding:20px;}
     <div id="menuBtn" title="Menú">☰</div>
     <div class="logo">Boutique Buendía</div>
     <div class="header-actions">
+      <button id="loginBtn" class="login-btn">Iniciar Sesión</button>
       <div id="cartBtn" class="icon" title="Carrito">
         <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" width="22">
       </div>
@@ -89,9 +83,10 @@ main{max-width:1200px;margin:auto;padding:20px;}
   <div class="menu-item" data-section="pantalones">Pantalones</div>
   <div class="menu-item" data-section="tenis">Tenis</div>
   <div class="menu-item" data-section="sudaderas">Sudaderas</div>
+  <div class="menu-item" data-section="nosotros">Nosotros</div>
 </div>
 
-<main id="mainContent">
+<main>
   <h1 class="page-title" id="pageTitle">Productos disponibles</h1>
   <section class="grid" id="productsGrid"></section>
 </main>
@@ -108,7 +103,14 @@ main{max-width:1200px;margin:auto;padding:20px;}
   <div class="cart-footer" id="cartFooter">
     <div class="cart-total" id="cartTotal">Total: $0</div>
     <div class="payment-options">
-      <button class="pay-btn paypal" id="paypalBtn">Pagar con PayPal</button>
+      <button class="pay-btn paypal" id="paypalBtn">
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
+        Pagar con PayPal
+      </button>
+      <button class="pay-btn cardpay" id="cardBtn">
+        <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta">
+        Pagar con Tarjeta
+      </button>
     </div>
   </div>
 </div>
@@ -119,7 +121,6 @@ main{max-width:1200px;margin:auto;padding:20px;}
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -133,11 +134,13 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
-let cart = [];
-let productos = [];
-
-// UI Elements
+// Variables UI
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuClose = document.getElementById('menuClose');
 const productsGrid = document.getElementById('productsGrid');
 const cartBtn = document.getElementById('cartBtn');
 const cartPanel = document.getElementById('cartPanel');
@@ -145,87 +148,13 @@ const closeCart = document.getElementById('closeCart');
 const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const toast = document.getElementById('toast');
-const menuBtn = document.getElementById('menuBtn');
-const menuDropdown = document.getElementById('menuDropdown');
-const menuOverlay = document.getElementById('menuOverlay');
-const menuClose = document.getElementById('menuClose');
+const loginBtn = document.getElementById('loginBtn');
+
+let cart = [];
+let productos = [];
+let currentSection = 'todos';
 
 // Menú lateral
-menuBtn.onclick = ()=>{ menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
-menuClose.onclick = closeMenu;
-menuOverlay.onclick = closeMenu;
-function closeMenu(){ menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); }
-
-// Carrito
-cartBtn.onclick = ()=> cartPanel.classList.add('open');
-closeCart.onclick = ()=> cartPanel.classList.remove('open');
-
-// Toast
-function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2500); }
-
-// Cargar productos desde Firestore
-async function cargarProductos(){
-  const snapshot = await db.collection('productos').orderBy('createdAt','desc').get();
-  productos = snapshot.docs.map(doc=>({id:doc.id, ...doc.data()}));
-  renderProductos('todos');
-}
-
-// Render productos
-function renderProductos(section){
-  const grid = productsGrid;
-  grid.innerHTML = '';
-  let filtered = productos;
-  if(section!=='todos') filtered = productos.filter(p => p.categoria===section);
-  if(filtered.length===0){ grid.innerHTML='<div style="text-align:center;color:var(--muted);padding:50px;">No hay productos en esta sección.</div>'; return; }
-  filtered.forEach(p=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <img src="${p.imagen}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/240?text=Imagen+No+Disponible'">
-      <div class="meta">
-        <div class="title">${p.nombre}</div>
-        <div class="price">$${p.precio.toLocaleString('es-MX')}</div>
-        <div class="description">${p.descripcion || ''}</div>
-        <button onclick="agregarAlCarrito('${p.id}','${p.nombre}',${p.precio})">Agregar al carrito</button>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
-
-// Carrito
-function agregarAlCarrito(id,name,price){
-  cart.push({id,name,price});
-  renderCart();
-  animateCart();
-  showToast('Producto agregado al carrito 🛒');
-}
-function renderCart(){
-  cartItems.innerHTML='';
-  if(cart.length===0){ cartItems.innerHTML='<div class="cart-empty">Tu carrito está vacío 🛍️</div>'; cartTotal.textContent="Total: $0"; return; }
-  let total=0;
-  cart.forEach((p,i)=>{
-    const item=document.createElement('div');
-    item.className='cart-item';
-    item.innerHTML=`<span>${p.name}</span><span>$${p.price.toLocaleString('es-MX')}</span><button onclick="removeItem(${i})">✕</button>`;
-    cartItems.appendChild(item);
-    total+=p.price;
-  });
-  cartTotal.textContent="Total: $"+total.toLocaleString('es-MX');
-}
-function removeItem(i){ cart.splice(i,1); renderCart(); }
-function animateCart(){ const img=cartBtn.querySelector('img'); img.classList.add('shake'); setTimeout(()=>img.classList.remove('shake'),500); }
-
-// Filtrar productos por sección
-document.querySelectorAll('.menu-item').forEach(item=>{
-  item.onclick=()=>{
-    renderProductos(item.dataset.section);
-    closeMenu();
-  };
-});
-
-// Inicializar
-document.addEventListener('DOMContentLoaded',()=>{ cargarProductos(); });
-</script>
-
-</body>
-</html>
+menuBtn.onclick = () => { menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
+menuOverlay.onclick = () => { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
+menuClose.onclick = () => { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show
