@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Boutique Buendía</title>
 <style>
+/* --- Tus estilos existentes --- */
 :root {
   --bg: #ffffff;
   --text: #111;
@@ -18,8 +19,11 @@ body{background:var(--bg);color:var(--text);}
 header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
 .logo{font-size:24px;font-weight:900;letter-spacing:1px;}
-.header-actions{display:flex;align-items:center;gap:14px;cursor:pointer;}
-.icon img{width:22px;cursor:pointer;}
+.header-actions{display:flex;align-items:center;gap:14px;}
+.icon{cursor:pointer;font-size:20px;position:relative;}
+.login-btn {background:none;border:none;font-size:16px;font-weight:600;color:var(--accent);cursor:pointer;padding:8px 12px;border-radius:6px;transition:opacity 0.2s;}
+.login-btn:hover{opacity:0.8;}
+main{max-width:1200px;margin:auto;padding:20px;}
 .page-title{font-size:38px;margin:6px 0 14px;font-weight:800;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
 .card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s;cursor:pointer;}
@@ -30,8 +34,7 @@ header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;to
 .card .price{font-weight:800;font-size:16px;margin-bottom:12px;}
 .card button{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;}
 .card button:hover{opacity:0.9;}
-.cart-panel{position:fixed;top:0;right:-400px;width:340px;height:100%;background:var(--card-bg);
-  box-shadow:-4px 0 20px rgba(0,0,0,0.2);transition:right .3s ease;display:flex;flex-direction:column;z-index:100;}
+.cart-panel{position:fixed;top:0;right:-400px;width:340px;height:100%;background:var(--card-bg);box-shadow:-4px 0 20px rgba(0,0,0,0.2);transition:right .3s ease;display:flex;flex-direction:column;z-index:100;}
 .cart-panel.open{right:0;}
 .cart-header{padding:16px;font-size:20px;font-weight:700;border-bottom:1px solid #ccc;display:flex;justify-content:space-between;align-items:center;}
 .cart-items{flex:1;overflow-y:auto;padding:14px;}
@@ -48,15 +51,14 @@ header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;to
 .cardpay img{height:20px;filter:invert(1);}
 .toast{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:14px 22px;border-radius:10px;opacity:0;transition:all .4s ease;z-index:200;font-weight:600;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,0.2);}
 .toast.show{bottom:60px;opacity:1;transform:translateX(-50%) scale(1.05);}
-.shake { animation: shake 0.4s ease; }
 @keyframes shake {0%,100% { transform: rotate(0deg); } 20% { transform: rotate(-15deg); } 40% { transform: rotate(15deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); }}
-.menu-dropdown {position: fixed;top: 0; left: -270px;width: 250px; height: 100%;background: var(--card-bg);
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);transition: left 0.3s ease;z-index: 25;padding: 60px 20px 20px;
-  display: flex; flex-direction: column;}
+.shake { animation: shake 0.4s ease; }
+#menuBtn { cursor:pointer;font-size:26px;z-index:30;position:relative; }
+.menu-dropdown {position: fixed;top: 0; left: -270px;width: 250px; height: 100%;background: var(--card-bg);box-shadow: 2px 0 10px rgba(0,0,0,0.1);transition: left 0.3s ease;z-index: 25;padding: 60px 20px 20px;display: flex; flex-direction: column;}
 .menu-dropdown.open { left: 0; }
 .menu-item {padding: 14px 0;border-bottom: 2px solid #e1e1e1;cursor: pointer;font-size: 16px;color: var(--text);font-weight: 600;text-align:center;}
-.menu-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.2);z-index: 24;
-  opacity: 0;visibility: hidden;transition: opacity 0.3s ease;}
+.menu-item:hover { color: var(--accent); }
+.menu-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.2);z-index: 24;opacity: 0;visibility: hidden;transition: opacity 0.3s ease;}
 .menu-overlay.show {opacity: 1;visibility: visible;}
 .menu-close{position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;color:var(--text);}
 </style>
@@ -68,10 +70,10 @@ header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;to
     <div id="menuBtn" title="Menú">☰</div>
     <div class="logo">Boutique Buendía</div>
     <div class="header-actions">
-      <div id="cartBtn" class="icon" title="Carrito">
-        <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
-      </div>
       <button id="loginBtn" class="login-btn" title="Iniciar Sesión">Iniciar Sesión</button>
+      <div id="cartBtn" class="icon" title="Carrito">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" width="22">
+      </div>
     </div>
   </div>
 </header>
@@ -83,21 +85,35 @@ header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;to
   <div class="menu-item" data-section="todos">Todos</div>
   <div class="menu-item" data-section="gorras">Gorras</div>
   <div class="menu-item" data-section="camisetas">Camisetas</div>
-  <div class="menu-item" data-section="pantalones">Pantalones</div>
-  <div class="menu-item" data-section="tenis">Tenis</div>
   <div class="menu-item" data-section="sudaderas">Sudaderas</div>
+  <div class="menu-item" data-section="tenis">Tenis</div>
+</div>
+
+<!-- Panel Login -->
+<div class="login-panel" id="loginPanel">
+  <div class="login-header">
+    <span>Iniciar Sesión</span>
+    <span id="closeLogin" style="cursor:pointer;">✕</span>
+  </div>
+  <form class="login-form" id="loginForm">
+    <input type="text" id="username" class="login-input" placeholder="Usuario" required>
+    <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
+    <button type="submit" class="login-btn-submit">Iniciar Sesión</button>
+  </form>
 </div>
 
 <main id="mainContent">
   <h1 class="page-title" id="pageTitle">Productos disponibles</h1>
-  <section class="grid" id="productsGrid"></section>
+  <section class="grid" id="productsGrid">
+    <!-- Productos cargados desde Firebase -->
+  </section>
 </main>
 
 <!-- Carrito -->
 <div class="cart-panel" id="cartPanel">
   <div class="cart-header">
     <span>Carrito</span>
-    <span id="closeCart">✕</span>
+    <span id="closeCart" style="cursor:pointer;">✕</span>
   </div>
   <div class="cart-items" id="cartItems">
     <div class="cart-empty">Tu carrito está vacío 🛍️</div>
@@ -105,21 +121,18 @@ header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;to
   <div class="cart-footer" id="cartFooter">
     <div class="cart-total" id="cartTotal">Total: $0</div>
     <div class="payment-options">
-      <button class="pay-btn paypal" id="paypalBtn">
-        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
-        Pagar con PayPal
-      </button>
+      <button class="pay-btn paypal" id="paypalBtn">Pagar con PayPal</button>
+      <button class="pay-btn cardpay" id="cardBtn">Pagar con Tarjeta</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast">Producto agregado al carrito</div>
 
+<!-- Firebase -->
 <script type="module">
-// Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-import { getStorage, ref, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
@@ -128,12 +141,15 @@ const firebaseConfig = {
   storageBucket: "buendiashop-f3dcc.appspot.com",
   messagingSenderId: "181970112547",
   appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
+  measurementId: "G-MKP6G4V2KW"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
+let cart = [];
+
+// --- Elementos ---
 const cartBtn = document.getElementById('cartBtn');
 const cartPanel = document.getElementById('cartPanel');
 const closeCart = document.getElementById('closeCart');
@@ -146,108 +162,88 @@ const menuDropdown = document.getElementById('menuDropdown');
 const menuOverlay = document.getElementById('menuOverlay');
 const menuClose = document.getElementById('menuClose');
 const loginBtn = document.getElementById('loginBtn');
+const loginPanel = document.getElementById('loginPanel');
+const closeLogin = document.getElementById('closeLogin');
+const loginForm = document.getElementById('loginForm');
 
-let cart = [];
-let productos = [];
-let currentSection = 'todos';
-
-// Menú
+// --- Menú ---
 menuBtn.onclick = () => { menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
-menuOverlay.onclick = () => { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
-menuClose.onclick = () => { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
+menuOverlay.onclick = closeMenu;
+menuClose.onclick = closeMenu;
+function closeMenu(){ menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); }
 
-// Carrito
-cartBtn.onclick = () => cartPanel.classList.add('open');
-closeCart.onclick = () => cartPanel.classList.remove('open');
-
-// Login
-loginBtn.onclick = () => { window.location.href='login.html'; };
-
-// Cargar productos desde Firestore
-async function cargarProductos() {
-  const productosCol = collection(db, 'productos');
-  const snapshot = await getDocs(productosCol);
-  productos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  renderProductos('todos');
-}
-
-// Render productos
-function renderProductos(section){
-  currentSection = section;
-  productsGrid.innerHTML = '';
-  let filtered = productos;
-  if(section !== 'todos') filtered = productos.filter(p => p.categoria.toLowerCase() === section.toLowerCase());
-  if(filtered.length === 0){
-    productsGrid.innerHTML = '<div style="text-align:center;padding:50px;">No hay productos disponibles</div>';
-    return;
-  }
-  filtered.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <div class="meta">
-        <div class="title">${p.nombre}</div>
-        <div class="price">$${p.precio.toLocaleString('es-MX')}</div>
-        <button onclick="agregarAlCarrito('${p.nombre}',${p.precio})">Agregar al carrito</button>
-      </div>
-    `;
-    productsGrid.appendChild(card);
-  });
-  pageTitle.textContent = section.charAt(0).toUpperCase() + section.slice(1) + ' disponibles';
-}
-
-// Carrito
-window.agregarAlCarrito = function(name, price){
-  cart.push({name, price});
-  renderCart();
-  showToast('Producto agregado al carrito');
-  animateCart();
-};
-
-function renderCart(){
-  cartItems.innerHTML = '';
-  if(cart.length === 0){
-    cartItems.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
-    document.getElementById('cartTotal').textContent = 'Total: $0';
-    return;
-  }
-  let total = 0;
-  cart.forEach((item,i)=>{
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `<span>${item.name}</span><span>$${item.price.toLocaleString('es-MX')}</span><button onclick="removeItem(${i})">✕</button>`;
-    cartItems.appendChild(div);
-    total += item.price;
-  });
-  document.getElementById('cartTotal').textContent = 'Total: $'+total.toLocaleString('es-MX');
-}
-
-window.removeItem = function(i){
-  cart.splice(i,1);
-  renderCart();
-}
-
-function animateCart(){
-  const img = cartBtn.querySelector('img');
-  img.classList.add('shake');
-  setTimeout(()=> img.classList.remove('shake'),500);
-}
+// --- Carrito ---
+cartBtn.onclick = ()=> cartPanel.classList.add('open');
+closeCart.onclick = ()=> cartPanel.classList.remove('open');
 
 function showToast(msg){
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(()=> toast.classList.remove('show'),2500);
+  setTimeout(()=> toast.classList.remove('show'), 2500);
 }
 
-// Filtrar productos desde menú
-document.querySelectorAll('.menu-item').forEach(item=>{
-  item.onclick = () => {
-    renderProductos(item.dataset.section);
-    menuDropdown.classList.remove('open');
-    menuOverlay.classList.remove('show');
+function agregarAlCarrito(product){
+  cart.push(product);
+  renderCart();
+  showToast("Producto agregado 🛒");
+}
+
+function renderCart(){
+  cartItems.innerHTML = "";
+  if(cart.length===0){
+    cartItems.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
+    document.getElementById('cartTotal').textContent = "Total: $0";
+    return;
+  }
+  let total = 0;
+  cart.forEach((p,i)=>{
+    const item = document.createElement('div');
+    item.className = 'cart-item';
+    item.innerHTML = `<span>${p.nombre}</span>
+                      <span>$${p.precio.toLocaleString('es-MX')}</span>
+                      <button onclick="removeItem(${i})">✕</button>`;
+    cartItems.appendChild(item);
+    total += p.precio;
+  });
+  document.getElementById('cartTotal').textContent = "Total: $" + total.toLocaleString('es-MX');
+}
+window.removeItem = function(i){ cart.splice(i,1); renderCart(); }
+
+// --- Login ---
+loginBtn.onclick = () => loginPanel.classList.add('open');
+closeLogin.onclick = () => loginPanel.classList.remove('open');
+
+loginForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  if(username === "Buendia*]?~?£u837jwhwi" && password === "&2)3)8:&?3828&/82$:!"){
+    window.location.href = 'admin.html';
+  } else {
+    showToast('Usuario o contraseña incorrectos');
   }
 });
+
+// --- Cargar productos desde Firebase ---
+async function cargarProductos(){
+  const querySnapshot = await getDocs(collection(db, "productos"));
+  productsGrid.innerHTML = '';
+  querySnapshot.forEach((doc)=>{
+    const p = doc.data();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/240?text=No+Disponible'">
+      <div class="meta">
+        <div class="title">${p.nombre}</div>
+        <div class="price">$${p.precio.toLocaleString('es-MX')}</div>
+        <div class="description">${p.descripcion}</div>
+        <button onclick='agregarAlCarrito(${JSON.stringify(p)})'>Agregar al carrito</button>
+      </div>
+    `;
+    productsGrid.appendChild(card);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', cargarProductos);
 </script>
