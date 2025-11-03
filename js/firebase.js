@@ -1,25 +1,29 @@
+// Importar las funciones necesarias del SDK de Firebase
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 
-// Importaciones de Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-
-// Configuración
+// Configuración de tu proyecto Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
   authDomain: "buendiashop-f3dcc.firebaseapp.com",
   projectId: "buendiashop-f3dcc",
-  storageBucket: "buendiashop-f3dcc.firebasestorage.app",
+  storageBucket: "buendiashop-f3dcc.appspot.com", // ✅ Corrección importante
   messagingSenderId: "181970112547",
   appId: "1:181970112547:web:99072e1c4692bb195e6196",
   measurementId: "G-1Z5CKSCJDZ"
 };
 
-// Inicialización
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
+const analytics = getAnalytics(app);
 
-export { db, auth, storage, collection, getDocs, query, where, onAuthStateChanged };
+// Inicializar servicios
+const db = getFirestore(app);      // Base de datos Firestore
+const storage = getStorage(app);   // Almacenamiento de imágenes
+const auth = getAuth(app);         // Autenticación de usuarios
+
+// Exportar para usar en otros archivos
+export { db, storage, auth };
