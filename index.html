@@ -1,83 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Página web Efraín</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efraín | Tienda</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <button id="open-menu" class="menu-btn" aria-label="abrir menu">☰</button>
-    <h1 id="site-title" class="site-title">Página web Efraín</h1>
-    <div class="header-right">
-      <div id="user-area" class="user-area"></div>
-      <button id="open-cart" class="cart-btn" aria-label="abrir carrito">🛒 <span id="cart-count">0</span></button>
-    </div>
+  <!-- === Encabezado === -->
+  <header>
+    <div class="menu-btn" id="menu-btn">&#9776;</div>
+    <div class="logo">Efraín Shop</div>
+
+    <nav>
+      <ul>
+        <li id="btn-inicio">Inicio</li>
+        <li id="btn-nosotros">Nosotros</li>
+        <li id="btn-cuenta">Cuenta</li>
+        <li id="btn-carrito">🛒</li>
+      </ul>
+    </nav>
   </header>
 
-  <!-- SIDE MENU -->
-  <aside id="side-menu" class="side-menu hidden">
-    <button id="close-menu" class="close-menu">✕</button>
-    <nav>
-      <div id="menu-user" class="menu-user"></div>
-      <button class="menu-item" data-action="mis-compras">Mis compras</button>
-
-      <div class="menu-item has-sub">
-        <button class="sub-toggle">Productos ▾</button>
-        <div class="sub-list">
-          <button class="menu-item product-filter" data-cat="Gorras">Gorras</button>
-          <button class="menu-item product-filter" data-cat="Camisetas">Camisetas</button>
-          <button class="menu-item product-filter" data-cat="Cintos">Cintos</button>
-          <button class="menu-item product-filter" data-cat="Pantalones">Pantalones</button>
-          <button class="menu-item product-filter" data-cat="Tenis">Tenis</button>
-          <button class="menu-item product-filter" data-cat="Sudaderas">Sudaderas</button>
-        </div>
-      </div>
-
-      <button class="menu-item" data-action="nosotros">Nosotros</button>
-      <div id="social-links" class="menu-social"></div>
-      <div id="auth-actions" class="menu-auth"></div>
-    </nav>
-  </aside>
-  <div id="menu-backdrop" class="backdrop hidden"></div>
-
-  <!-- CONTROLS -->
-  <section class="controls">
-    <input id="search-input" placeholder="Buscar productos (nombre, descripción, talla...)" />
-    <select id="view-animation" title="Animaciones (solo visual)">
-      <option value="none">Sin animación</option>
-      <option value="carousel">Carrusel (nuevos)</option>
-      <option value="featured">Anuncios estrella</option>
-    </select>
-  </section>
-
-  <!-- ANIMATIONS AREA -->
-  <section id="animation-area" class="animation-area"></section>
-
-  <!-- PRODUCTS GRID -->
-  <main id="product-list" class="product-list" aria-live="polite"></main>
-
-  <!-- CART MODAL -->
-  <div id="cart-modal" class="cart-modal hidden" role="dialog" aria-modal="true">
-    <div class="cart-content">
-      <button id="close-cart" class="close-cart">✕</button>
-      <h2>Carrito de compras</h2>
-      <div id="cart-items" class="cart-items"></div>
-      <div id="cart-empty" class="cart-empty">Tu carrito está vacío</div>
-      <div id="cart-total" class="cart-total"></div>
-      <div id="payment-options" class="payment-options hidden">
-        <button class="pay-btn" data-pay="PayPal">PayPal</button>
-        <button class="pay-btn" data-pay="Tarjeta">Tarjeta</button>
-        <button class="pay-btn" data-pay="Oxxo">Oxxo</button>
-        <button class="pay-btn" data-pay="CLABE">CLABE</button>
-      </div>
-    </div>
+  <!-- === Menú lateral === -->
+  <div class="sidebar" id="sidebar">
+    <h2>Menú</h2>
+    <ul>
+      <li>Cuenta</li>
+      <li>Mis compras</li>
+      <li>Productos</li>
+      <ul>
+        <li>Gorras</li>
+        <li>Camisetas</li>
+        <li>Cintos</li>
+        <li>Pantalones</li>
+        <li>Tenis</li>
+        <li>Sudaderas</li>
+      </ul>
+      <li>Nosotros</li>
+      <li id="sesion">Iniciar sesión / Registrarse</li>
+    </ul>
   </div>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast hidden">Agregado</div>
+  <!-- === Carrusel de nuevos productos === -->
+  <section class="carrusel" id="carrusel">
+    <img src="https://via.placeholder.com/200x160?text=Nuevo+1" alt="Producto nuevo">
+    <img src="https://via.placeholder.com/200x160?text=Nuevo+2" alt="Producto nuevo">
+    <img src="https://via.placeholder.com/200x160?text=Nuevo+3" alt="Producto nuevo">
+    <img src="https://via.placeholder.com/200x160?text=Nuevo+4" alt="Producto nuevo">
+  </section>
 
-  <script type="module" src="js/main.js"></script>
+  <!-- === Sección de productos === -->
+  <main>
+    <h2 style="text-align:center;">Productos en stock</h2>
+    <div class="productos" id="productos-container">
+      <!-- Los productos se cargan desde Firebase -->
+    </div>
+  </main>
+
+  <!-- === Carrito === -->
+  <div id="carrito" title="Ver carrito">🛒</div>
+
+  <!-- === Scripts === -->
+  <script type="module" src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    // === Menú lateral ===
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    menuBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+
+    // === Carrito animación ===
+    const carrito = document.getElementById('carrito');
+    function animarCarrito() {
+      carrito.classList.add('shake');
+      setTimeout(() => carrito.classList.remove('shake'), 1000);
+    }
+  </script>
 </body>
 </html>
