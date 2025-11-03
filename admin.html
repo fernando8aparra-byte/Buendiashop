@@ -2,131 +2,164 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Administrador - Boutique Buendía</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrador - Buendía Shop</title>
 <style>
 :root {
-  --bg: #f5f5f5;
+  --bg: #fff;
   --text: #111;
-  --card-bg: #fff;
   --accent: #7c4dff;
+  --card-bg: #f9f9f9;
   --shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
-body{background:var(--bg);font-family:Inter,system-ui,sans-serif;margin:0;padding:0;color:var(--text);}
-header{background:var(--card-bg);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-weight:700;font-size:20px;}
+body{font-family:Inter, sans-serif; margin:0; padding:0; background:var(--bg); color:var(--text);}
+header{padding:16px; background:var(--card-bg); border-bottom:1px solid #ddd;}
+header h1{margin:0; font-size:24px;}
 main{max-width:1200px;margin:auto;padding:20px;}
-form{background:#fff;padding:20px;border-radius:10px;box-shadow:var(--shadow);margin-bottom:20px;display:flex;flex-direction:column;gap:12px;}
-input, select, textarea{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;width:100%;}
-button{background:var(--accent);color:#fff;padding:12px;border:none;border-radius:8px;font-weight:600;cursor:pointer;}
+form{display:flex; flex-direction:column; gap:10px; margin-bottom:30px;}
+input, select, textarea{padding:10px; border-radius:6px; border:1px solid #ccc;}
+button{background:var(--accent); color:#fff; border:none; padding:10px 16px; border-radius:6px; cursor:pointer;}
 button:hover{opacity:0.9;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
-.card{background:#fff;padding:12px;border-radius:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;}
-.card img{width:100%;height:150px;object-fit:contain;background:#f9f9f9;}
-.card button{background:#ff5252;}
+.card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
+.card img{width:100%;height:auto;object-fit:contain;}
+.card .meta{padding:10px; display:flex; flex-direction:column;}
+.card .meta div{margin-bottom:6px;}
+.card button{margin-top:auto;}
 </style>
 </head>
 <body>
 
-<header>Panel de Administración - Boutique Buendía</header>
+<header>
+  <h1>Administrador - Buendía Shop</h1>
+</header>
 
 <main>
-<h2>Agregar Producto</h2>
-<form id="productForm">
-  <select id="categoria" required>
-    <option value="">Selecciona categoría</option>
-    <option value="gorras">Gorras</option>
-    <option value="camisetas">Camisetas</option>
-    <option value="pantalones">Pantalones</option>
-    <option value="tenis">Tenis</option>
-    <option value="sudaderas">Sudaderas</option>
-  </select>
-  <input type="text" id="nombre" placeholder="Nombre del producto" required>
-  <textarea id="descripcion" placeholder="Descripción"></textarea>
-  <input type="number" id="precio" placeholder="Precio" required>
-  <input type="file" id="imagen" accept="image/*" required>
-  <button type="submit">Agregar Producto</button>
-</form>
+  <h2>Agregar Producto</h2>
+  <form id="productForm">
+    <input type="text" id="productName" placeholder="Nombre del producto" required>
+    <textarea id="productDesc" placeholder="Descripción del producto" required></textarea>
+    <input type="number" id="productPrice" placeholder="Precio" required>
+    <select id="productCategory" required>
+      <option value="">Selecciona categoría</option>
+      <option value="gorras">Gorras</option>
+      <option value="camisetas">Camisetas</option>
+      <option value="cintos">Cintos</option>
+      <option value="pantalones">Pantalones</option>
+      <option value="tenis">Tenis</option>
+      <option value="sudaderas">Sudaderas</option>
+    </select>
+    <label for="productImage">Seleccionar imagen</label>
+    <input type="file" id="productImage" accept="image/*" required>
+    <img id="previewImage" src="" alt="Vista previa" style="max-width:150px;">
+    <button type="submit">Agregar Producto</button>
+  </form>
 
-<h2>Productos Subidos</h2>
-<section class="grid" id="productosGrid"></section>
+  <h2>Productos Existentes</h2>
+  <div class="grid" id="productsGrid"></div>
+</main>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
+  // Firebase Config
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-storage.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
-  authDomain: "buendiashop-f3dcc.firebaseapp.com",
-  projectId: "buendiashop-f3dcc",
-  storageBucket: "buendiashop-f3dcc.appspot.com",
-  messagingSenderId: "181970112547",
-  appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
+    authDomain: "buendiashop-f3dcc.firebaseapp.com",
+    projectId: "buendiashop-f3dcc",
+    storageBucket: "buendiashop-f3dcc.appspot.com",
+    messagingSenderId: "181970112547",
+    appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
+    measurementId: "G-MKP6G4V2KW"
+  };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
 
-const productForm = document.getElementById('productForm');
-const productosGrid = document.getElementById('productosGrid');
+  // Elementos
+  const productForm = document.getElementById('productForm');
+  const productImage = document.getElementById('productImage');
+  const previewImage = document.getElementById('previewImage');
+  const productsGrid = document.getElementById('productsGrid');
 
-productForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const nombre = document.getElementById('nombre').value.trim();
-  const descripcion = document.getElementById('descripcion').value.trim();
-  const precio = parseFloat(document.getElementById('precio').value);
-  const categoria = document.getElementById('categoria').value;
-  const imagenFile = document.getElementById('imagen').files[0];
+  let uploadedImageUrl = "";
 
-  if(!nombre || !precio || !categoria || !imagenFile) return alert('Completa todos los campos');
-
-  // Subir imagen
-  const storageRef = ref(storage, 'productos/' + imagenFile.name);
-  await uploadBytes(storageRef, imagenFile);
-  const imagenURL = await getDownloadURL(storageRef);
-
-  // Guardar en Firestore
-  await addDoc(collection(db, 'productos'), {
-    nombre,
-    descripcion,
-    precio,
-    categoria,
-    imagen: imagenURL
+  // Vista previa
+  productImage.addEventListener('change', () => {
+    const file = productImage.files[0];
+    if(file){
+      previewImage.src = URL.createObjectURL(file);
+    }
   });
 
-  alert('Producto agregado correctamente');
-  productForm.reset();
-  cargarProductos();
-});
+  // Subir producto
+  productForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('productName').value.trim();
+    const desc = document.getElementById('productDesc').value.trim();
+    const price = parseFloat(document.getElementById('productPrice').value);
+    const category = document.getElementById('productCategory').value;
 
-// Cargar productos
-async function cargarProductos(){
-  productosGrid.innerHTML = '';
-  const snapshot = await getDocs(collection(db,'productos'));
-  snapshot.docs.forEach(docu=>{
-    const p = docu.data();
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <div><strong>${p.nombre}</strong></div>
-      <div>$${p.precio.toLocaleString('es-MX')}</div>
-      <button onclick="eliminarProducto('${docu.id}')">Eliminar</button>
-    `;
-    productosGrid.appendChild(card);
-  });
-}
+    if(!productImage.files[0]){
+      alert('Selecciona una imagen primero.');
+      return;
+    }
 
-window.eliminarProducto = async function(id){
-  if(confirm('¿Eliminar este producto?')){
-    await deleteDoc(doc(db,'productos',id));
+    // Subir imagen
+    const file = productImage.files[0];
+    const imageRef = ref(storage, 'productos/' + Date.now() + "_" + file.name);
+    await uploadBytes(imageRef, file);
+    const imageUrl = await getDownloadURL(imageRef);
+
+    // Guardar en Firestore
+    await addDoc(collection(db, 'productos'), {
+      nombre: name,
+      descripcion: desc,
+      precio: price,
+      categoria: category,
+      imagen: imageUrl
+    });
+
+    alert('Producto agregado con éxito!');
+    productForm.reset();
+    previewImage.src = '';
     cargarProductos();
-  }
-}
+  });
 
-// Inicializar
-cargarProductos();
+  // Cargar productos
+  async function cargarProductos(){
+    productsGrid.innerHTML = '';
+    const querySnapshot = await getDocs(collection(db, 'productos'));
+    querySnapshot.forEach((docSnap) => {
+      const p = docSnap.data();
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}">
+        <div class="meta">
+          <div><strong>${p.nombre}</strong></div>
+          <div>$${p.precio.toLocaleString('es-MX')}</div>
+          <div>${p.descripcion}</div>
+          <button onclick="eliminarProducto('${docSnap.id}')">Eliminar</button>
+        </div>
+      `;
+      productsGrid.appendChild(card);
+    });
+  }
+
+  // Eliminar producto
+  window.eliminarProducto = async (id) => {
+    if(confirm('¿Eliminar este producto?')){
+      await deleteDoc(doc(db, 'productos', id));
+      cargarProductos();
+    }
+  }
+
+  cargarProductos();
 </script>
 
 </body>
