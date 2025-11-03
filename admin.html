@@ -2,123 +2,120 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boutique Buendía</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Boutique Buendía</title>
 <style>
-:root {
-  --bg: #ffffff;
-  --text: #111;
-  --muted: #777;
-  --card-bg: #fff;
-  --accent: #7c4dff;
-  --shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,sans-serif;}
-body{background:var(--bg);color:var(--text);}
-header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20;}
-.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
-.logo{font-size:24px;font-weight:900;letter-spacing:1px;}
-.header-actions{display:flex;align-items:center;gap:14px;}
-.icon{cursor:pointer;font-size:20px;position:relative;}
-.login-btn {background:none;border:none;font-size:16px;font-weight:600;color:var(--accent);cursor:pointer;padding:8px 12px;border-radius:6px;transition:opacity 0.2s;}
-.login-btn:hover{opacity:0.8;}
-main{max-width:1200px;margin:auto;padding:20px;}
-.page-title{font-size:38px;margin:6px 0 14px;font-weight:800;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
-.card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s;cursor:pointer;}
-.card:hover{transform:translateY(-4px);}
-.card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#f9f9f9;}
-.card .meta{padding:14px;flex:1;display:flex;flex-direction:column;}
-.card .title{font-size:14px;font-weight:600;margin-bottom:8px;}
-.card .price{font-weight:800;font-size:16px;margin-bottom:12px;}
-.card button{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;}
-.card button:hover{opacity:0.9;}
-.cart-panel{position:fixed;top:0;right:-400px;width:340px;height:100%;background:var(--card-bg);
-  box-shadow:-4px 0 20px rgba(0,0,0,0.2);transition:right .3s ease;display:flex;flex-direction:column;z-index:100;}
-.cart-panel.open{right:0;}
-.cart-header{padding:16px;font-size:20px;font-weight:700;border-bottom:1px solid #ccc;display:flex;justify-content:space-between;align-items:center;}
-.cart-items{flex:1;overflow-y:auto;padding:14px;}
-.cart-empty{text-align:center;color:var(--muted);font-size:15px;padding:50px 0;}
-.cart-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;}
-.cart-item button{background:none;border:none;color:var(--accent);cursor:pointer;font-weight:700;}
-.cart-footer{border-top:1px solid #ccc;padding:16px;transition:all .3s ease;}
-.cart-total{font-weight:800;margin-bottom:10px;text-align:right;}
-.payment-options{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
-.pay-btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;padding:10px 14px;font-weight:700;font-size:15px;cursor:pointer;}
-.paypal{background:#ffc439;color:#111;}
-.paypal img{height:18px;}
-.cardpay{background:#0070ba;color:#fff;}
-.cardpay img{height:20px;filter:invert(1);}
-.toast{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:14px 22px;border-radius:10px;opacity:0;transition:all .4s ease;z-index:200;font-weight:600;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,0.2);}
-.toast.show{bottom:60px;opacity:1;transform:translateX(-50%) scale(1.05);}
-#menuBtn { cursor:pointer;font-size:26px;z-index:30;position:relative; }
-.menu-dropdown {position: fixed;top: 0; left: -270px;width: 250px; height: 100%;background: var(--card-bg);
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);transition: left 0.3s ease;z-index: 25;padding: 60px 20px 20px;
-  display: flex; flex-direction: column;}
-.menu-dropdown.open { left: 0; }
-.menu-item {padding: 14px 0;border-bottom: 2px solid #e1e1e1;cursor: pointer;font-size: 16px;color: var(--text);font-weight: 600;text-align:center;}
-.menu-item:hover { color: var(--accent); }
-.menu-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.2);z-index: 24;
-  opacity: 0;visibility: hidden;transition: opacity 0.3s ease;}
-.menu-overlay.show {opacity: 1;visibility: visible;}
-.menu-close{position:absolute;top:12px;right:16px;font-size:22px;cursor:pointer;color:var(--text);}
+  :root {
+    --accent: #7c4dff;
+    --bg: #fafafa;
+    --card-bg: #fff;
+    --text: #111;
+    --muted: #666;
+    --shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+  body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text);}
+  .sidebar { width:220px; position:fixed; top:0; left:0; height:100%; background:var(--card-bg); box-shadow:2px 0 10px rgba(0,0,0,0.1); padding-top:60px; display:flex; flex-direction:column; gap:12px;}
+  .sidebar button { padding:12px; border:none; background:none; text-align:left; font-weight:600; cursor:pointer; transition:0.2s; }
+  .sidebar button:hover { background:var(--accent); color:#fff; }
+  .main { margin-left:220px; padding:20px;}
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .card { background:var(--card-bg); padding:16px; border-radius:10px; box-shadow:var(--shadow); margin-bottom:16px;}
+  input, textarea, select, button { width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid #ddd; font-size:14px; }
+  button.btn { background:var(--accent); color:#fff; border:none; cursor:pointer; }
+  button.btn.red { background:#ff6b6b; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; }
+  th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; }
+  img.thumb { width:80px; height:80px; object-fit:cover; border-radius:8px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div id="menuBtn" title="Menú">☰</div>
-    <div class="logo">Boutique Buendía</div>
-    <div class="header-actions">
-      <div id="cartBtn" class="icon" title="Carrito">
-        <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" width="22">
+<div class="sidebar">
+  <button data-section="products">Productos</button>
+  <button data-section="stats">Estadísticas</button>
+  <button data-section="users">Usuarios</button>
+  <button data-section="settings">Configuración</button>
+  <button id="logoutBtn" class="red">Cerrar sesión</button>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <h2 id="sectionTitle">Productos</h2>
+    <div id="adminWelcome"></div>
+  </div>
+
+  <!-- Panel Productos -->
+  <div id="panelProducts" class="panel">
+    <div class="card">
+      <h3 id="formTitle">Agregar producto</h3>
+      <input id="pNombre" placeholder="Nombre del producto">
+      <textarea id="pDescripcion" rows="2" placeholder="Descripción breve"></textarea>
+      <input id="pPrecio" type="number" placeholder="Precio">
+      <input id="pFile" type="file" accept="image/*">
+      <input id="pURL" placeholder="URL de imagen">
+      <select id="pCategoria">
+        <option value="">Selecciona categoría</option>
+        <option value="gorras">Gorras</option>
+        <option value="camisetas">Camisetas</option>
+        <option value="cintos">Cintos</option>
+        <option value="pantalones">Pantalones</option>
+        <option value="tenis">Tenis</option>
+        <option value="sudaderas">Sudaderas</option>
+      </select>
+      <div style="display:flex; gap:12px;">
+        <button id="btnSave" class="btn">Guardar</button>
+        <button id="btnClear" class="btn" style="background:#999">Limpiar</button>
       </div>
     </div>
-  </div>
-</header>
-
-<!-- Menú -->
-<div class="menu-overlay" id="menuOverlay"></div>
-<div class="menu-dropdown" id="menuDropdown">
-  <span class="menu-close" id="menuClose">✕</span>
-  <div class="menu-item" data-section="todos">Todos</div>
-  <div class="menu-item" data-section="gorras">Gorras</div>
-  <div class="menu-item" data-section="camisetas">Camisetas</div>
-  <div class="menu-item" data-section="cintos">Cintos</div>
-  <div class="menu-item" data-section="pantalones">Pantalones</div>
-  <div class="menu-item" data-section="tenis">Tenis</div>
-  <div class="menu-item" data-section="sudaderas">Sudaderas</div>
-</div>
-
-<main id="mainContent">
-  <h1 class="page-title" id="pageTitle">Productos disponibles</h1>
-  <section class="grid" id="productsGrid"></section>
-</main>
-
-<!-- Carrito -->
-<div class="cart-panel" id="cartPanel">
-  <div class="cart-header">
-    <span>Carrito</span>
-    <span id="closeCart" style="cursor:pointer;">✕</span>
-  </div>
-  <div class="cart-items" id="cartItems">
-    <div class="cart-empty">Tu carrito está vacío 🛍️</div>
-  </div>
-  <div class="cart-footer" id="cartFooter">
-    <div class="cart-total" id="cartTotal">Total: $0</div>
-    <div class="payment-options">
-      <button class="pay-btn paypal" id="paypalBtn">Pagar con PayPal</button>
+    <div class="card">
+      <h3>Productos existentes</h3>
+      <table id="productsTable">
+        <thead><tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
-</div>
 
-<div class="toast" id="toast">Producto agregado al carrito</div>
+  <!-- Panel Estadísticas -->
+  <div id="panelStats" class="panel" style="display:none;">
+    <div class="card">
+      <h3>Estadísticas generales</h3>
+      <p>Total de productos: <span id="statProducts">0</span></p>
+      <p>Total de usuarios: <span id="statUsers">0</span></p>
+      <p>Total de compras: <span id="statSales">0</span></p>
+    </div>
+  </div>
+
+  <!-- Panel Usuarios -->
+  <div id="panelUsers" class="panel" style="display:none;">
+    <div class="card">
+      <h3>Usuarios registrados</h3>
+      <table id="usersTable">
+        <thead><tr><th>Email</th><th>UID</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Panel Configuración -->
+  <div id="panelSettings" class="panel" style="display:none;">
+    <div class="card">
+      <h3>Configuración de la tienda</h3>
+      <input id="shopName" placeholder="Nombre de la tienda">
+      <label><input type="checkbox" id="enablePage" checked> Habilitar página</label>
+      <label><input type="checkbox" id="enablePaypal" checked> Habilitar PayPal</label>
+      <label><input type="checkbox" id="enableCard" checked> Habilitar tarjeta</label>
+      <label><input type="checkbox" id="enableOxxo" checked> Habilitar OXXO</label>
+      <button id="saveSettings" class="btn">Guardar configuración</button>
+    </div>
+  </div>
+
+</div>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
 <script>
@@ -132,100 +129,125 @@ const firebaseConfig = {
   measurementId: "G-MKP6G4V2KW"
 };
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
 
-let cart = [];
-let productos = [];
+// Refs
+const panels = {
+  products: document.getElementById('panelProducts'),
+  stats: document.getElementById('panelStats'),
+  users: document.getElementById('panelUsers'),
+  settings: document.getElementById('panelSettings')
+};
+const sectionTitle = document.getElementById('sectionTitle');
+const adminWelcome = document.getElementById('adminWelcome');
+const logoutBtn = document.getElementById('logoutBtn');
 
-// UI Elements
-const productsGrid = document.getElementById('productsGrid');
-const cartBtn = document.getElementById('cartBtn');
-const cartPanel = document.getElementById('cartPanel');
-const closeCart = document.getElementById('closeCart');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
-const toast = document.getElementById('toast');
-const menuBtn = document.getElementById('menuBtn');
-const menuDropdown = document.getElementById('menuDropdown');
-const menuOverlay = document.getElementById('menuOverlay');
-const menuClose = document.getElementById('menuClose');
+// Product refs
+const pNombre = document.getElementById('pNombre');
+const pDescripcion = document.getElementById('pDescripcion');
+const pPrecio = document.getElementById('pPrecio');
+const pFile = document.getElementById('pFile');
+const pURL = document.getElementById('pURL');
+const pCategoria = document.getElementById('pCategoria');
+const btnSave = document.getElementById('btnSave');
+const btnClear = document.getElementById('btnClear');
+const productsTableBody = document.querySelector('#productsTable tbody');
 
-// Menú lateral
-menuBtn.onclick = ()=>{ menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
-menuClose.onclick = closeMenu;
-menuOverlay.onclick = closeMenu;
-function closeMenu(){ menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); }
+let editingId = null;
 
-// Carrito
-cartBtn.onclick = ()=> cartPanel.classList.add('open');
-closeCart.onclick = ()=> cartPanel.classList.remove('open');
-
-// Toast
-function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2500); }
-
-// Cargar productos desde Firestore
-async function cargarProductos(){
-  const snapshot = await db.collection('productos').orderBy('createdAt','desc').get();
-  productos = snapshot.docs.map(doc=>({id:doc.id, ...doc.data()}));
-  renderProductos('todos');
-}
-
-// Render productos
-function renderProductos(section){
-  const grid = productsGrid;
-  grid.innerHTML = '';
-  let filtered = productos;
-  if(section!=='todos') filtered = productos.filter(p => p.categoria===section);
-  if(filtered.length===0){ grid.innerHTML='<div style="text-align:center;color:var(--muted);padding:50px;">No hay productos en esta sección.</div>'; return; }
-  filtered.forEach(p=>{
-    const card = document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <img src="${p.imagen}" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/240?text=Imagen+No+Disponible'">
-      <div class="meta">
-        <div class="title">${p.nombre}</div>
-        <div class="price">$${p.precio.toLocaleString('es-MX')}</div>
-        <div class="description">${p.descripcion || ''}</div>
-        <button onclick="agregarAlCarrito('${p.id}','${p.nombre}',${p.precio})">Agregar al carrito</button>
-      </div>`;
-    grid.appendChild(card);
+// Sidebar navigation
+document.querySelectorAll('.sidebar button[data-section]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const section = btn.dataset.section;
+    for(const key in panels) panels[key].style.display = 'none';
+    panels[section].style.display = 'block';
+    sectionTitle.textContent = section.charAt(0).toUpperCase()+section.slice(1);
   });
-}
-
-// Carrito
-function agregarAlCarrito(id,name,price){
-  cart.push({id,name,price});
-  renderCart();
-  animateCart();
-  showToast('Producto agregado al carrito 🛒');
-}
-function renderCart(){
-  cartItems.innerHTML='';
-  if(cart.length===0){ cartItems.innerHTML='<div class="cart-empty">Tu carrito está vacío 🛍️</div>'; cartTotal.textContent="Total: $0"; return; }
-  let total=0;
-  cart.forEach((p,i)=>{
-    const item=document.createElement('div');
-    item.className='cart-item';
-    item.innerHTML=`<span>${p.name}</span><span>$${p.price.toLocaleString('es-MX')}</span><button onclick="removeItem(${i})">✕</button>`;
-    cartItems.appendChild(item);
-    total+=p.price;
-  });
-  cartTotal.textContent="Total: $"+total.toLocaleString('es-MX');
-}
-function removeItem(i){ cart.splice(i,1); renderCart(); }
-function animateCart(){ const img=cartBtn.querySelector('img'); img.classList.add('shake'); setTimeout(()=>img.classList.remove('shake'),500); }
-
-// Filtrar productos por sección
-document.querySelectorAll('.menu-item').forEach(item=>{
-  item.onclick=()=>{
-    renderProductos(item.dataset.section);
-    closeMenu();
-  };
 });
 
-// Inicializar
-document.addEventListener('DOMContentLoaded',()=>{ cargarProductos(); });
-</script>
+// Logout
+logoutBtn.addEventListener('click', async ()=>{
+  await auth.signOut();
+  location.href = 'login.html';
+});
 
-</body>
-</html>
+// Auth state
+auth.onAuthStateChanged(user=>{
+  if(!user) {
+    location.href = 'login.html';
+    return;
+  }
+  adminWelcome.textContent = 'Admin: ' + user.email;
+  loadProducts();
+  updateStats();
+});
+
+// Upload image
+async function uploadImage(file){
+  const name = Date.now()+'_'+file.name;
+  const ref = storage.ref('productos/'+name);
+  await ref.put(file);
+  return await ref.getDownloadURL();
+}
+
+// Save product
+btnSave.addEventListener('click', async ()=>{
+  const nombre = pNombre.value.trim();
+  const descripcion = pDescripcion.value.trim();
+  const precio = Number(pPrecio.value);
+  const categoria = pCategoria.value;
+  const file = pFile.files[0];
+  const urlManual = pURL.value.trim();
+
+  if(!nombre || !precio || !categoria || (!file && !urlManual)){
+    alert('Completa todos los campos e imagen.');
+    return;
+  }
+
+  let finalUrl = urlManual || '';
+  if(file) finalUrl = await uploadImage(file);
+
+  const payload = { nombre, descripcion, precio, categoria, imagen: finalUrl, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+  if(editingId){
+    await db.collection('productos').doc(editingId).update(payload);
+    editingId=null;
+  } else {
+    await db.collection('productos').add(payload);
+  }
+
+  clearForm();
+  loadProducts();
+});
+
+// Clear form
+btnClear.addEventListener('click', clearForm);
+function clearForm(){
+  pNombre.value = '';
+  pDescripcion.value = '';
+  pPrecio.value = '';
+  pFile.value = '';
+  pURL.value = '';
+  pCategoria.value = '';
+  editingId = null;
+  document.getElementById('formTitle').textContent = 'Agregar producto';
+}
+
+// Load products
+async function loadProducts(){
+  productsTableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+  const snap = await db.collection('productos').orderBy('createdAt','desc').get();
+  productsTableBody.innerHTML = '';
+  snap.forEach(doc=>{
+    const p = doc.data();
+    const id = doc.id;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img src="${p.imagen||''}" class="thumb"></td>
+      <td>${p.nombre}</td>
+      <td>$${p.precio}</td>
+      <td>${p.categoria}</td>
+      <td>
+        <button onclick="editProduct('${id}')">Editar
