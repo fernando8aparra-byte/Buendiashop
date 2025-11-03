@@ -3,54 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin - Buendía Shop</title>
+<title>Admin - Boutique Buendía</title>
 <style>
-body {font-family: Inter, sans-serif; background:#f9f9f9; margin:0; padding:0;}
-header{background:#7c4dff;color:#fff;padding:16px;text-align:center;font-size:20px;font-weight:700;}
-main{max-width:900px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
-input, select, textarea, button {width:100%;padding:12px;margin:6px 0;border-radius:6px;border:1px solid #ddd;}
-button {background:#7c4dff;color:#fff;border:none;cursor:pointer;font-weight:700;}
-button:hover {opacity:0.9;}
-.product-list {margin-top:30px;}
-.product-item {display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #ddd;}
-.product-item img {width:60px;height:60px;object-fit:cover;border-radius:6px;}
+:root {
+  --bg: #ffffff;
+  --text: #111;
+  --muted: #777;
+  --card-bg: #fff;
+  --accent: #7c4dff;
+  --shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);}
+header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-size:24px;font-weight:900;letter-spacing:1px;}
+.admin-menu{display:flex;gap:12px;}
+button{cursor:pointer;padding:10px 14px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-weight:600;}
+main{max-width:1200px;margin:auto;padding:20px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;margin-top:20px;}
+.card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
+.card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#f9f9f9;}
+.card .meta{padding:14px;display:flex;flex-direction:column;gap:8px;}
+.card button{background:var(--accent);color:#fff;border:none;padding:8px;border-radius:8px;cursor:pointer;font-weight:600;}
+form{display:flex;flex-direction:column;gap:10px;margin-top:20px;border:1px solid #ddd;padding:20px;border-radius:10px;}
+label{font-weight:600;}
+input, textarea, select{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;}
+.stats{margin-top:30px;}
+.map-container{margin-top:20px;height:400px;width:100%;}
+.switch {position: relative;display: inline-block;width: 50px;height: 24px;}
+.switch input {opacity:0;width:0;height:0;}
+.slider {position: absolute;cursor: pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;transition:.4s;border-radius:24px;}
+.slider:before {position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
+input:checked + .slider {background-color: var(--accent);}
+input:checked + .slider:before {transform: translateX(26px);}
 </style>
 </head>
 <body>
 
-<header>Panel de Administrador - Buendía Shop</header>
+<header>
+  <div class="logo" id="pageName">Admin - Boutique Buendía</div>
+  <div class="admin-menu">
+    <button id="toggleMaintenance">Página en mantenimiento</button>
+    <button id="addProductBtn">Agregar producto</button>
+    <button id="viewStatsBtn">Estadísticas</button>
+    <button id="configPageBtn">Configuración página</button>
+  </div>
+</header>
 
 <main>
-<h2>Agregar Producto</h2>
-<form id="productForm">
-    <input type="text" id="name" placeholder="Nombre del producto" required>
-    <textarea id="description" placeholder="Descripción" required></textarea>
-    <input type="number" id="price" placeholder="Precio (solo números)" required>
-    <select id="category" required>
-        <option value="">Selecciona categoría</option>
+  <!-- Formulario productos -->
+  <div id="productFormContainer">
+    <form id="productForm">
+      <label>Nombre del producto:</label>
+      <input type="text" id="productName" required>
+
+      <label>Descripción:</label>
+      <textarea id="productDesc"></textarea>
+
+      <label>Precio:</label>
+      <input type="text" id="productPrice" required placeholder="3000">
+
+      <label>Categoría:</label>
+      <select id="productCategory">
         <option value="gorras">Gorras</option>
         <option value="camisetas">Camisetas</option>
-        <option value="sudaderas">Sudaderas</option>
-        <option value="tenis">Tenis</option>
-        <option value="cintos">Cintos</option>
-        <option value="fragancias">Fragancias</option>
-        <option value="relojes">Relojes</option>
         <option value="pantalones">Pantalones</option>
-    </select>
-    <input type="file" id="image" accept="image/*" required>
-    <button type="submit">Subir Producto</button>
-</form>
+        <option value="tenis">Tenis</option>
+        <option value="sudaderas">Sudaderas</option>
+        <option value="cintos">Cintos</option>
+      </select>
 
-<h2>Productos Subidos</h2>
-<div class="product-list" id="productList">
-    <!-- Productos existentes se mostrarán aquí -->
-</div>
+      <label>Tipo de producto:</label>
+      <select id="productType">
+        <option value="normal">Normal</option>
+        <option value="carrusel">Carrusel</option>
+        <option value="principal">Producto principal</option>
+      </select>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-storage.js";
+      <label>Imagen del producto:</label>
+      <input type="file" id="productImage">
 
+      <label>Habilitado:</label>
+      <label class="switch">
+        <input type="checkbox" id="productEnabled" checked>
+        <span class="slider"></span>
+      </label>
+
+      <button type="submit">Subir / Actualizar producto</button>
+    </form>
+  </div>
+
+  <!-- Productos -->
+  <div class="grid" id="productsGrid"></div>
+
+  <!-- Estadísticas -->
+  <div class="stats" id="statsContainer">
+    <h2>Estadísticas</h2>
+    <div id="totalPurchases">Total compras: 0</div>
+    <div id="totalUsers">Usuarios registrados: 0</div>
+    <div class="map-container" id="mapContainer"></div>
+  </div>
+
+  <!-- Configuración página -->
+  <div id="configPageContainer" style="display:none;margin-top:20px;">
+    <form id="configForm">
+      <label>Nombre de la página:</label>
+      <input type="text" id="configPageName">
+
+      <label>WhatsApp:</label>
+      <input type="text" id="configWhatsApp">
+
+      <label>Instagram:</label>
+      <input type="text" id="configInstagram">
+
+      <label>Facebook:</label>
+      <input type="text" id="configFacebook">
+
+      <label>Twitter/X:</label>
+      <input type="text" id="configX">
+
+      <label>Youtube:</label>
+      <input type="text" id="configYoutube">
+
+      <button type="submit">Guardar configuración</button>
+    </form>
+  </div>
+
+</main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<!-- Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&libraries=visualization"></script>
+
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
   authDomain: "buendiashop-f3dcc.firebaseapp.com",
@@ -60,68 +150,94 @@ const firebaseConfig = {
   appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
   measurementId: "G-MKP6G4V2KW"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+// Elementos
+const productForm = document.getElementById('productForm');
+const productImage = document.getElementById('productImage');
+const productsGrid = document.getElementById('productsGrid');
+const pageNameEl = document.getElementById('pageName');
 
-const form = document.getElementById('productForm');
-const productList = document.getElementById('productList');
+// Variables
+let editingId = null;
 
-async function cargarProductos() {
-    productList.innerHTML = '';
-    const querySnapshot = await getDocs(collection(db, "productos"));
-    querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const div = document.createElement('div');
-        div.className = 'product-item';
-        div.innerHTML = `
-            <span>${data.nombre} - $${data.precio.toLocaleString()}</span>
-            <img src="${data.imagen}" alt="${data.nombre}">
-            <button onclick="eliminarProducto('${docSnap.id}')">Eliminar</button>
-        `;
-        productList.appendChild(div);
-    });
-}
+// Función subir/actualizar producto
+productForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('productName').value;
+  const desc = document.getElementById('productDesc').value;
+  const priceRaw = document.getElementById('productPrice').value.replace(/,/g,'');
+  const price = parseFloat(priceRaw);
+  const category = document.getElementById('productCategory').value;
+  const type = document.getElementById('productType').value;
+  const enabled = document.getElementById('productEnabled').checked;
 
-async function eliminarProducto(id) {
-    await deleteDoc(doc(db, "productos", id));
+  let imageUrl = '';
+  if(productImage.files.length>0){
+    const file = productImage.files[0];
+    const storageRef = storage.ref(`productos/${file.name}`);
+    await storageRef.put(file);
+    imageUrl = await storageRef.getDownloadURL();
+  }
+
+  const docRef = editingId || name;
+  db.collection('productos').doc(docRef).set({
+    nombre: name,
+    descripcion: desc,
+    precio: price,
+    categoria: category,
+    tipo: type,
+    imagen: imageUrl,
+    habilitado: enabled
+  }).then(()=>{
+    alert('Producto subido/actualizado');
+    productForm.reset();
+    editingId = null;
     cargarProductos();
-}
-
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    const description = document.getElementById('description').value;
-    const price = parseFloat(document.getElementById('price').value);
-    const category = document.getElementById('category').value;
-    const imageFile = document.getElementById('image').files[0];
-
-    // Subir imagen a Storage
-    const storageRef = ref(storage, `productos/${imageFile.name}_${Date.now()}`);
-    await uploadBytes(storageRef, imageFile);
-    const imageURL = await getDownloadURL(storageRef);
-
-    // Guardar producto en Firestore
-    await addDoc(collection(db, "productos"), {
-        nombre: name,
-        descripcion: description,
-        precio: price,
-        categoria: category,
-        imagen: imageURL,
-        fecha: new Date()
-    });
-
-    form.reset();
-    cargarProductos();
-    alert('Producto subido correctamente.');
+  }).catch(err=>alert('Error: '+err));
 });
 
-window.eliminarProducto = eliminarProducto;
+// Cargar productos
+async function cargarProductos(){
+  productsGrid.innerHTML='';
+  const snapshot = await db.collection('productos').get();
+  snapshot.forEach(doc=>{
+    const p = doc.data();
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <img src="${p.imagen||'https://via.placeholder.com/240?text=No+Imagen'}" alt="${p.nombre}">
+      <div class="meta">
+        <div><strong>${p.nombre}</strong></div>
+        <div>${p.descripcion}</div>
+        <div>$${p.precio.toLocaleString('es-MX')}</div>
+        <div>Tipo: ${p.tipo}</div>
+        <div>Categoria: ${p.categoria}</div>
+        <label>Habilitado:</label>
+        <input type="checkbox" ${p.habilitado?'checked':''} onchange="toggleEnable('${doc.id}',this.checked)">
+        <button onclick="editarProducto('${doc.id}')">Editar</button>
+        <button onclick="eliminarProducto('${doc.id}')">Eliminar</button>
+      </div>
+    `;
+    productsGrid.appendChild(card);
+  });
+}
 
-// Cargar productos al iniciar
-cargarProductos();
-</script>
+// Editar producto
+window.editarProducto = async (id)=>{
+  editingId = id;
+  const doc = await db.collection('productos').doc(id).get();
+  const p = doc.data();
+  document.getElementById('productName').value = p.nombre;
+  document.getElementById('productDesc').value = p.descripcion;
+  document.getElementById('productPrice').value = p.precio;
+  document.getElementById('productCategory').value = p.categoria;
+  document.getElementById('productType').value = p.tipo;
+  document.getElementById('productEnabled').checked = p.habilitado;
+}
 
-</body>
-</html>
+// Eliminar producto
+window.eliminarProducto = (id)=>{
+  if(confirm('Eliminar producto
