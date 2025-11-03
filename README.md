@@ -1,2 +1,0 @@
-# Buendiashop
-Tienda online 
