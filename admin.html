@@ -2,336 +2,132 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin - Boutique Buendía</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrador - Boutique Buendía</title>
 <style>
 :root {
-  --bg: #ffffff;
+  --bg: #f5f5f5;
   --text: #111;
-  --muted: #777;
   --card-bg: #fff;
   --accent: #7c4dff;
   --shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,sans-serif;}
-body{background:var(--bg);color:var(--text);}
-header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20;}
-.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
-.logo{font-size:24px;font-weight:900;letter-spacing:1px;}
-.header-actions{display:flex;align-items:center;gap:14px;}
-button{cursor:pointer;}
-.main-content{max-width:1200px;margin:auto;padding:20px;}
-.page-title{font-size:32px;margin-bottom:20px;font-weight:800;}
+body{background:var(--bg);font-family:Inter,system-ui,sans-serif;margin:0;padding:0;color:var(--text);}
+header{background:var(--card-bg);padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-weight:700;font-size:20px;}
+main{max-width:1200px;margin:auto;padding:20px;}
+form{background:#fff;padding:20px;border-radius:10px;box-shadow:var(--shadow);margin-bottom:20px;display:flex;flex-direction:column;gap:12px;}
+input, select, textarea{padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;width:100%;}
+button{background:var(--accent);color:#fff;padding:12px;border:none;border-radius:8px;font-weight:600;cursor:pointer;}
+button:hover{opacity:0.9;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
-.card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s;cursor:pointer;}
-.card:hover{transform:translateY(-4px);}
-.card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#f9f9f9;}
-.card .meta{padding:14px;flex:1;display:flex;flex-direction:column;}
-.card .title{font-size:14px;font-weight:600;margin-bottom:6px;}
-.card .price{font-weight:800;font-size:16px;margin-bottom:8px;}
-.card .description{font-size:12px;color:var(--muted);margin-bottom:12px;}
-.card .actions{display:flex;justify-content:space-between;gap:6px;}
-.card .actions button{padding:6px 10px;border-radius:6px;font-weight:600;border:none;color:#fff;}
-.edit-btn{background:#ffc107;}
-.delete-btn{background:#dc3545;}
-.toggle-btn{background:#28a745;}
-.form-panel{background:var(--card-bg);padding:20px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px;}
-.form-panel input, .form-panel select{width:100%;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:6px;}
-.form-panel label{font-weight:600;margin-bottom:6px;display:block;}
-.form-panel button{background:var(--accent);color:#fff;padding:12px;border:none;border-radius:8px;font-weight:600;}
-.stats-panel{margin-bottom:20px;}
-.stats-panel h2{font-size:20px;margin-bottom:12px;}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.stats-card{background:var(--card-bg);padding:16px;border-radius:10px;box-shadow:var(--shadow);}
-.switch-label{display:flex;align-items:center;justify-content:space-between;font-weight:600;}
-.switch-label input{transform:scale(1.2);}
-.map-container{width:100%;height:400px;margin-bottom:20px;}
-.social-links{margin-bottom:20px;}
-.social-links label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.social-links input{width:70%;padding:6px;}
-.config-panel{margin-bottom:20px;}
+.card{background:#fff;padding:12px;border-radius:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;}
+.card img{width:100%;height:150px;object-fit:contain;background:#f9f9f9;}
+.card button{background:#ff5252;}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">Admin - Boutique Buendía</div>
-    <div class="header-actions">
-      <button id="logoutBtn">Cerrar sesión</button>
-    </div>
-  </div>
-</header>
+<header>Panel de Administración - Boutique Buendía</header>
 
-<main class="main-content">
-  <h1 class="page-title">Panel de administración</h1>
+<main>
+<h2>Agregar Producto</h2>
+<form id="productForm">
+  <select id="categoria" required>
+    <option value="">Selecciona categoría</option>
+    <option value="gorras">Gorras</option>
+    <option value="camisetas">Camisetas</option>
+    <option value="pantalones">Pantalones</option>
+    <option value="tenis">Tenis</option>
+    <option value="sudaderas">Sudaderas</option>
+  </select>
+  <input type="text" id="nombre" placeholder="Nombre del producto" required>
+  <textarea id="descripcion" placeholder="Descripción"></textarea>
+  <input type="number" id="precio" placeholder="Precio" required>
+  <input type="file" id="imagen" accept="image/*" required>
+  <button type="submit">Agregar Producto</button>
+</form>
 
-  <!-- Configuración de la página -->
-  <div class="form-panel config-panel">
-    <h2>Configuración de la página</h2>
-    <label>Nombre de la página</label>
-    <input type="text" id="pageName">
-    <label class="switch-label">Página en mantenimiento
-      <input type="checkbox" id="pageMaintenance">
-    </label>
-    <h3>Redes sociales</h3>
-    <div class="social-links">
-      <label>Instagram <input type="text" id="linkInstagram"></label>
-      <label>Facebook <input type="text" id="linkFacebook"></label>
-      <label>X (Twitter) <input type="text" id="linkX"></label>
-      <label>Youtube <input type="text" id="linkYoutube"></label>
-      <button id="saveSocialBtn">Guardar redes</button>
-    </div>
-    <h3>Métodos de pago</h3>
-    <label class="switch-label">PayPal <input type="checkbox" id="payPaypal"></label>
-    <label class="switch-label">Tarjeta de crédito/débito <input type="checkbox" id="payCard"></label>
-    <label class="switch-label">Oxxo <input type="checkbox" id="payOxxo"></label>
-    <label class="switch-label">CLABE interbancaria <input type="checkbox" id="payClabe"></label>
-  </div>
+<h2>Productos Subidos</h2>
+<section class="grid" id="productosGrid"></section>
 
-  <!-- Formulario para agregar producto -->
-  <div class="form-panel">
-    <h2>Agregar / Editar Producto</h2>
-    <label>Nombre del producto</label>
-    <input type="text" id="productName">
-    <label>Descripción</label>
-    <input type="text" id="productDesc">
-    <label>Precio</label>
-    <input type="number" id="productPrice">
-    <label>Categoría</label>
-    <select id="productCategory">
-      <option value="gorras">Gorras</option>
-      <option value="camisetas">Camisetas</option>
-      <option value="cintos">Cintos</option>
-      <option value="pantalones">Pantalones</option>
-      <option value="tenis">Tenis</option>
-      <option value="sudaderas">Sudaderas</option>
-    </select>
-    <label>Tipo de producto</label>
-    <select id="productType">
-      <option value="normal">Normal</option>
-      <option value="principal">Producto principal</option>
-      <option value="publicidad">Publicidad</option>
-      <option value="carrusel">Carrusel</option>
-    </select>
-    <label>Imagen (subir desde dispositivo)</label>
-    <input type="file" id="productImageFile">
-    <label>Imagen (URL)</label>
-    <input type="text" id="productImageURL">
-    <button id="saveProductBtn">Guardar producto</button>
-  </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
 
-  <!-- Productos existentes -->
-  <div>
-    <h2>Productos agregados</h2>
-    <div class="grid" id="productsGridAdmin">
-      <!-- Productos se cargan aquí -->
-    </div>
-  </div>
-
-  <!-- Estadísticas -->
-  <div class="stats-panel">
-    <h2>Estadísticas</h2>
-    <div class="stats-grid">
-      <div class="stats-card" id="totalUsers">Usuarios registrados: 0</div>
-      <div class="stats-card" id="totalCompras">Compras totales: 0</div>
-      <div class="stats-card" id="totalVentas">Ventas totales: $0.00</div>
-    </div>
-  </div>
-
-  <!-- Mapa de México -->
-  <div>
-    <h2>Mapa de compras</h2>
-    <div id="map" class="map-container"></div>
-  </div>
-
-</main>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<script>
-// Configura Firebase
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MSG_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
+  authDomain: "buendiashop-f3dcc.firebaseapp.com",
+  projectId: "buendiashop-f3dcc",
+  storageBucket: "buendiashop-f3dcc.appspot.com",
+  messagingSenderId: "181970112547",
+  appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
 };
-firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
-const storage = firebase.storage();
-const auth = firebase.auth();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Variables
-const productName = document.getElementById('productName');
-const productDesc = document.getElementById('productDesc');
-const productPrice = document.getElementById('productPrice');
-const productCategory = document.getElementById('productCategory');
-const productType = document.getElementById('productType');
-const productImageFile = document.getElementById('productImageFile');
-const productImageURL = document.getElementById('productImageURL');
-const saveProductBtn = document.getElementById('saveProductBtn');
-const productsGridAdmin = document.getElementById('productsGridAdmin');
-const totalUsers = document.getElementById('totalUsers');
-const totalCompras = document.getElementById('totalCompras');
-const totalVentas = document.getElementById('totalVentas');
-const logoutBtn = document.getElementById('logoutBtn');
-const pageName = document.getElementById('pageName');
-const pageMaintenance = document.getElementById('pageMaintenance');
-const linkInstagram = document.getElementById('linkInstagram');
-const linkFacebook = document.getElementById('linkFacebook');
-const linkX = document.getElementById('linkX');
-const linkYoutube = document.getElementById('linkYoutube');
-const saveSocialBtn = document.getElementById('saveSocialBtn');
-const payPaypal = document.getElementById('payPaypal');
-const payCard = document.getElementById('payCard');
-const payOxxo = document.getElementById('payOxxo');
-const payClabe = document.getElementById('payClabe');
+const productForm = document.getElementById('productForm');
+const productosGrid = document.getElementById('productosGrid');
 
-// -------------------------
-// Funciones productos
-// -------------------------
-function renderProductsAdmin(products){
-  productsGridAdmin.innerHTML = '';
-  products.forEach(doc=>{
-    const data = doc.data();
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <img src="${data.imagen}" alt="${data.nombre}">
-      <div class="meta">
-        <div class="title">${data.nombre}</div>
-        <div class="price">$${parseFloat(data.precio).toLocaleString('es-MX', {minimumFractionDigits:2})}</div>
-        <div class="description">${data.descripcion}</div>
-        <div class="actions">
-          <button class="edit-btn" onclick="editProduct('${doc.id}')">Editar</button>
-          <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Eliminar</button>
-          <label class="switch-label">Habilitar <input type="checkbox" ${data.habilitado ? 'checked' : ''} onchange="toggleProduct('${doc.id}', this.checked)"></label>
-        </div>
-      </div>
-    `;
-    productsGridAdmin.appendChild(card);
-  });
-}
+productForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById('nombre').value.trim();
+  const descripcion = document.getElementById('descripcion').value.trim();
+  const precio = parseFloat(document.getElementById('precio').value);
+  const categoria = document.getElementById('categoria').value;
+  const imagenFile = document.getElementById('imagen').files[0];
 
-function loadProducts(){
-  db.collection('productos').get().then(snapshot=>{
-    renderProductsAdmin(snapshot.docs);
-  });
-}
+  if(!nombre || !precio || !categoria || !imagenFile) return alert('Completa todos los campos');
 
-saveProductBtn.onclick = async ()=>{
-  const nombre = productName.value.trim();
-  const descripcion = productDesc.value.trim();
-  const precio = parseFloat(productPrice.value);
-  const categoria = productCategory.value;
-  const tipo = productType.value;
+  // Subir imagen
+  const storageRef = ref(storage, 'productos/' + imagenFile.name);
+  await uploadBytes(storageRef, imagenFile);
+  const imagenURL = await getDownloadURL(storageRef);
 
-  if(!nombre || !descripcion || !precio) return alert('Completa todos los campos');
-
-  let imagen = '';
-  if(productImageFile.files[0]){
-    const file = productImageFile.files[0];
-    const ref = storage.ref().child('productos/'+file.name);
-    await ref.put(file);
-    imagen = await ref.getDownloadURL();
-  } else if(productImageURL.value){
-    imagen = productImageURL.value;
-  } else {
-    imagen = 'https://via.placeholder.com/240?text=No+Image';
-  }
-
-  db.collection('productos').add({
+  // Guardar en Firestore
+  await addDoc(collection(db, 'productos'), {
     nombre,
     descripcion,
     precio,
     categoria,
-    tipo,
-    imagen,
-    habilitado: true,
-    creado: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(()=>{
-    alert('Producto agregado');
-    productName.value=''; productDesc.value=''; productPrice.value=''; productImageFile.value=''; productImageURL.value='';
-    loadProducts();
+    imagen: imagenURL
   });
-}
 
-function editProduct(id){ /* Igual que antes, se puede usar código previo */ }
-function deleteProduct(id){ if(confirm('¿Eliminar producto?')) db.collection('productos').doc(id).delete().then(loadProducts); }
-function toggleProduct(id, estado){ db.collection('productos').doc(id).update({habilitado: estado}); }
-
-// -------------------------
-// Estadísticas
-// -------------------------
-function loadStats(){
-  db.collection('usuarios').get().then(snapshot=>{
-    totalUsers.textContent = `Usuarios registrados: ${snapshot.size}`;
-  });
-  db.collection('compras').get().then(snapshot=>{
-    let total = 0;
-    snapshot.forEach(doc=>{ total += doc.data().total; });
-    totalCompras.textContent = `Compras totales: ${snapshot.size}`;
-    totalVentas.textContent = `Ventas totales: $${total.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
-    renderMap(snapshot.docs);
-  });
-}
-
-// -------------------------
-// Mapa de México
-// -------------------------
-const map = L.map('map').setView([23.6345, -102.5528], 5);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-function renderMap(compras){
-  compras.forEach(doc=>{
-    const data = doc.data();
-    if(data.ubicacion){ // {lat, lng}
-      L.marker([data.ubicacion.lat, data.ubicacion.lng]).addTo(map);
-    }
-  });
-}
-
-// -------------------------
-// Configuración y redes
-// -------------------------
-saveSocialBtn.onclick = ()=>{
-  db.collection('config').doc('social').set({
-    instagram: linkInstagram.value,
-    facebook: linkFacebook.value,
-    x: linkX.value,
-    youtube: linkYoutube.value,
-    payPal: payPaypal.checked,
-    card: payCard.checked,
-    oxxo: payOxxo.checked,
-    clabe: payClabe.checked,
-    pageName: pageName.value,
-    pageMaintenance: pageMaintenance.checked
-  }).then(()=> alert('Configuración guardada'));
-}
-
-// -------------------------
-// Logout
-// -------------------------
-logoutBtn.onclick = ()=> auth.signOut().then(()=>window.location.href='login.html');
-
-// -------------------------
-// Inicializar
-// -------------------------
-document.addEventListener('DOMContentLoaded', ()=>{
-  loadProducts();
-  loadStats();
+  alert('Producto agregado correctamente');
+  productForm.reset();
+  cargarProductos();
 });
+
+// Cargar productos
+async function cargarProductos(){
+  productosGrid.innerHTML = '';
+  const snapshot = await getDocs(collection(db,'productos'));
+  snapshot.docs.forEach(docu=>{
+    const p = docu.data();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <div><strong>${p.nombre}</strong></div>
+      <div>$${p.precio.toLocaleString('es-MX')}</div>
+      <button onclick="eliminarProducto('${docu.id}')">Eliminar</button>
+    `;
+    productosGrid.appendChild(card);
+  });
+}
+
+window.eliminarProducto = async function(id){
+  if(confirm('¿Eliminar este producto?')){
+    await deleteDoc(doc(db,'productos',id));
+    cargarProductos();
+  }
+}
+
+// Inicializar
+cargarProductos();
 </script>
+
 </body>
 </html>
