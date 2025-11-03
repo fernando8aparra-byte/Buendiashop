@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Boutique Buendía</title>
 <style>
 :root {
@@ -18,10 +18,8 @@ body{background:var(--bg);color:var(--text);}
 header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
 .logo{font-size:24px;font-weight:900;letter-spacing:1px;}
-.header-actions{display:flex;align-items:center;gap:14px;}
-.icon{cursor:pointer;font-size:20px;position:relative;}
-button{cursor:pointer;}
-main{max-width:1200px;margin:auto;padding:20px;}
+.header-actions{display:flex;align-items:center;gap:14px;cursor:pointer;}
+.icon img{width:22px;cursor:pointer;}
 .page-title{font-size:38px;margin:6px 0 14px;font-weight:800;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
 .card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s;cursor:pointer;}
@@ -30,7 +28,6 @@ main{max-width:1200px;margin:auto;padding:20px;}
 .card .meta{padding:14px;flex:1;display:flex;flex-direction:column;}
 .card .title{font-size:14px;font-weight:600;margin-bottom:8px;}
 .card .price{font-weight:800;font-size:16px;margin-bottom:12px;}
-.card .description{font-size:12px;color:var(--muted);margin-bottom:12px;}
 .card button{background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;}
 .card button:hover{opacity:0.9;}
 .cart-panel{position:fixed;top:0;right:-400px;width:340px;height:100%;background:var(--card-bg);
@@ -51,13 +48,13 @@ main{max-width:1200px;margin:auto;padding:20px;}
 .cardpay img{height:20px;filter:invert(1);}
 .toast{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:14px 22px;border-radius:10px;opacity:0;transition:all .4s ease;z-index:200;font-weight:600;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,0.2);}
 .toast.show{bottom:60px;opacity:1;transform:translateX(-50%) scale(1.05);}
-#menuBtn { cursor:pointer;font-size:26px;z-index:30;position:relative; }
+.shake { animation: shake 0.4s ease; }
+@keyframes shake {0%,100% { transform: rotate(0deg); } 20% { transform: rotate(-15deg); } 40% { transform: rotate(15deg); } 60% { transform: rotate(-10deg); } 80% { transform: rotate(10deg); }}
 .menu-dropdown {position: fixed;top: 0; left: -270px;width: 250px; height: 100%;background: var(--card-bg);
   box-shadow: 2px 0 10px rgba(0,0,0,0.1);transition: left 0.3s ease;z-index: 25;padding: 60px 20px 20px;
   display: flex; flex-direction: column;}
 .menu-dropdown.open { left: 0; }
 .menu-item {padding: 14px 0;border-bottom: 2px solid #e1e1e1;cursor: pointer;font-size: 16px;color: var(--text);font-weight: 600;text-align:center;}
-.menu-item:hover { color: var(--accent); }
 .menu-overlay {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: rgba(0,0,0,0.2);z-index: 24;
   opacity: 0;visibility: hidden;transition: opacity 0.3s ease;}
 .menu-overlay.show {opacity: 1;visibility: visible;}
@@ -68,186 +65,192 @@ main{max-width:1200px;margin:auto;padding:20px;}
 
 <header>
   <div class="header-inner">
-    <div id="menuBtn">☰</div>
-    <div class="logo" id="pageLogo">Boutique Buendía</div>
+    <div id="menuBtn" title="Menú">☰</div>
+    <div class="logo">Boutique Buendía</div>
     <div class="header-actions">
-      <input type="text" id="searchInput" placeholder="Buscar..." style="padding:6px 10px;border-radius:6px;border:1px solid #ccc;">
-      <div id="cartBtn" class="icon">
-        <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" width="22" alt="Carrito">
+      <div id="cartBtn" class="icon" title="Carrito">
+        <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
       </div>
-      <button id="loginBtn">Iniciar sesión</button>
+      <button id="loginBtn" class="login-btn" title="Iniciar Sesión">Iniciar Sesión</button>
     </div>
   </div>
 </header>
 
+<!-- Menú -->
 <div class="menu-overlay" id="menuOverlay"></div>
 <div class="menu-dropdown" id="menuDropdown">
   <span class="menu-close" id="menuClose">✕</span>
   <div class="menu-item" data-section="todos">Todos</div>
   <div class="menu-item" data-section="gorras">Gorras</div>
   <div class="menu-item" data-section="camisetas">Camisetas</div>
-  <div class="menu-item" data-section="cintos">Cintos</div>
   <div class="menu-item" data-section="pantalones">Pantalones</div>
   <div class="menu-item" data-section="tenis">Tenis</div>
   <div class="menu-item" data-section="sudaderas">Sudaderas</div>
-  <div class="menu-item" id="accountMenu">Cuenta</div>
-  <div class="menu-item" id="aboutMenu">Nosotros</div>
 </div>
 
-<main>
+<main id="mainContent">
   <h1 class="page-title" id="pageTitle">Productos disponibles</h1>
   <section class="grid" id="productsGrid"></section>
 </main>
 
+<!-- Carrito -->
 <div class="cart-panel" id="cartPanel">
   <div class="cart-header">
     <span>Carrito</span>
-    <span id="closeCart" style="cursor:pointer;">✕</span>
+    <span id="closeCart">✕</span>
   </div>
   <div class="cart-items" id="cartItems">
     <div class="cart-empty">Tu carrito está vacío 🛍️</div>
   </div>
-  <div class="cart-footer">
+  <div class="cart-footer" id="cartFooter">
     <div class="cart-total" id="cartTotal">Total: $0</div>
-    <div class="payment-options" id="paymentOptions">
+    <div class="payment-options">
       <button class="pay-btn paypal" id="paypalBtn">
-        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
-      </button>
-      <button class="pay-btn cardpay" id="cardBtn">
-        <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
+        Pagar con PayPal
       </button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">Producto agregado al carrito</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script type="module">
+// Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore.js";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-storage.js";
 
-<script>
-// -------------------------
-// Firebase config
-// -------------------------
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MSG_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
+  authDomain: "buendiashop-f3dcc.firebaseapp.com",
+  projectId: "buendiashop-f3dcc",
+  storageBucket: "buendiashop-f3dcc.appspot.com",
+  messagingSenderId: "181970112547",
+  appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-const storage = firebase.storage();
 
-// Variables
-const productsGrid = document.getElementById('productsGrid');
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
 const cartBtn = document.getElementById('cartBtn');
 const cartPanel = document.getElementById('cartPanel');
 const closeCart = document.getElementById('closeCart');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
 const toast = document.getElementById('toast');
-const searchInput = document.getElementById('searchInput');
-const loginBtn = document.getElementById('loginBtn');
+const cartItems = document.getElementById('cartItems');
+const productsGrid = document.getElementById('productsGrid');
+const pageTitle = document.getElementById('pageTitle');
 const menuBtn = document.getElementById('menuBtn');
 const menuDropdown = document.getElementById('menuDropdown');
 const menuOverlay = document.getElementById('menuOverlay');
 const menuClose = document.getElementById('menuClose');
+const loginBtn = document.getElementById('loginBtn');
 
 let cart = [];
 let productos = [];
-let pageConfig = {};
+let currentSection = 'todos';
 
-// -------------------------
-// Cargar configuración y productos
-// -------------------------
-db.collection('config').doc('social').onSnapshot(doc=>{
-  pageConfig = doc.data();
-  if(pageConfig.pageName) document.getElementById('pageLogo').textContent = pageConfig.pageName;
-  if(pageConfig.pageMaintenance) productsGrid.innerHTML = '<div style="text-align:center;font-size:24px;margin-top:50px;">Página en mantenimiento</div>';
-});
+// Menú
+menuBtn.onclick = () => { menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
+menuOverlay.onclick = () => { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
+menuClose.onclick = () => { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
 
-db.collection('productos').where('habilitado','==',true).onSnapshot(snapshot=>{
-  productos = snapshot.docs.map(doc=>({id: doc.id, ...doc.data()}));
-  renderProductos(productos);
-});
+// Carrito
+cartBtn.onclick = () => cartPanel.classList.add('open');
+closeCart.onclick = () => cartPanel.classList.remove('open');
 
-// -------------------------
+// Login
+loginBtn.onclick = () => { window.location.href='login.html'; };
+
+// Cargar productos desde Firestore
+async function cargarProductos() {
+  const productosCol = collection(db, 'productos');
+  const snapshot = await getDocs(productosCol);
+  productos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  renderProductos('todos');
+}
+
 // Render productos
-// -------------------------
-function renderProductos(list){
+function renderProductos(section){
+  currentSection = section;
   productsGrid.innerHTML = '';
-  if(!list.length){ productsGrid.innerHTML = '<p>No hay productos disponibles</p>'; return; }
-  list.forEach(p=>{
+  let filtered = productos;
+  if(section !== 'todos') filtered = productos.filter(p => p.categoria.toLowerCase() === section.toLowerCase());
+  if(filtered.length === 0){
+    productsGrid.innerHTML = '<div style="text-align:center;padding:50px;">No hay productos disponibles</div>';
+    return;
+  }
+  filtered.forEach(p => {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
       <img src="${p.imagen}" alt="${p.nombre}">
       <div class="meta">
         <div class="title">${p.nombre}</div>
-        <div class="price">$${parseFloat(p.precio).toLocaleString('es-MX',{minimumFractionDigits:2})}</div>
-        <div class="description">${p.descripcion}</div>
-        <button onclick="agregarAlCarrito('${p.id}')">Agregar al carrito</button>
+        <div class="price">$${p.precio.toLocaleString('es-MX')}</div>
+        <button onclick="agregarAlCarrito('${p.nombre}',${p.precio})">Agregar al carrito</button>
       </div>
     `;
     productsGrid.appendChild(card);
   });
+  pageTitle.textContent = section.charAt(0).toUpperCase() + section.slice(1) + ' disponibles';
 }
 
-// -------------------------
 // Carrito
-// -------------------------
-function agregarAlCarrito(id){
-  const p = productos.find(x=>x.id===id);
-  cart.push({...p, cantidad:1});
+window.agregarAlCarrito = function(name, price){
+  cart.push({name, price});
   renderCart();
   showToast('Producto agregado al carrito');
-}
-function renderCart(){
-  cartItems.innerHTML = '';
-  if(!cart.length){ cartItems.innerHTML='<div class="cart-empty">Tu carrito está vacío 🛍️</div>'; cartTotal.textContent='Total: $0'; return; }
-  let total=0;
-  cart.forEach((item,i)=>{
-    const div=document.createElement('div');
-    div.className='cart-item';
-    div.innerHTML=`<span>${item.nombre} x${item.cantidad}</span><span>$${(item.precio*item.cantidad).toLocaleString('es-MX',{minimumFractionDigits:2})}</span><button onclick="removeItem(${i})">✕</button>`;
-    cartItems.appendChild(div);
-    total+=item.precio*item.cantidad;
-  });
-  cartTotal.textContent='Total: $'+total.toLocaleString('es-MX',{minimumFractionDigits:2});
-}
-function removeItem(i){ cart.splice(i,1); renderCart(); }
-function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2500); }
-
-// -------------------------
-// Eventos
-// -------------------------
-cartBtn.onclick = ()=>cartPanel.classList.add('open');
-closeCart.onclick = ()=>cartPanel.classList.remove('open');
-
-menuBtn.onclick = ()=>{menuDropdown.classList.add('open'); menuOverlay.classList.add('show');};
-menuClose.onclick = ()=>{menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show');};
-menuOverlay.onclick = menuClose.onclick;
-
-// -------------------------
-// Buscador
-// -------------------------
-searchInput.oninput = ()=> {
-  const term = searchInput.value.toLowerCase();
-  const filtered = productos.filter(p=>p.nombre.toLowerCase().includes(term) || p.descripcion.toLowerCase().includes(term));
-  renderProductos(filtered);
+  animateCart();
 };
 
-// -------------------------
-// Login placeholder
-// -------------------------
-loginBtn.onclick = ()=>window.location.href='login.html';
+function renderCart(){
+  cartItems.innerHTML = '';
+  if(cart.length === 0){
+    cartItems.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
+    document.getElementById('cartTotal').textContent = 'Total: $0';
+    return;
+  }
+  let total = 0;
+  cart.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `<span>${item.name}</span><span>$${item.price.toLocaleString('es-MX')}</span><button onclick="removeItem(${i})">✕</button>`;
+    cartItems.appendChild(div);
+    total += item.price;
+  });
+  document.getElementById('cartTotal').textContent = 'Total: $'+total.toLocaleString('es-MX');
+}
 
+window.removeItem = function(i){
+  cart.splice(i,1);
+  renderCart();
+}
+
+function animateCart(){
+  const img = cartBtn.querySelector('img');
+  img.classList.add('shake');
+  setTimeout(()=> img.classList.remove('shake'),500);
+}
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=> toast.classList.remove('show'),2500);
+}
+
+// Filtrar productos desde menú
+document.querySelectorAll('.menu-item').forEach(item=>{
+  item.onclick = () => {
+    renderProductos(item.dataset.section);
+    menuDropdown.classList.remove('open');
+    menuOverlay.classList.remove('show');
+  }
+});
+
+document.addEventListener('DOMContentLoaded', cargarProductos);
 </script>
+
 </body>
 </html>
