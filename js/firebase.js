@@ -1,8 +1,7 @@
-// Importar Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+// Importar SDKs necesarios desde Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
 
 // Configuración de tu proyecto Firebase
 const firebaseConfig = {
@@ -17,9 +16,7 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
 
-// Exportar para usar en otros archivos
-export { db, auth, storage };
+// Exportar servicios para usarlos en otros archivos
+export const db = getFirestore(app);
+export const storage = getStorage(app);
