@@ -2,252 +2,308 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Admin - Boutique Buendía</title>
 <style>
-  :root {
-    --accent: #7c4dff;
-    --bg: #fafafa;
-    --card-bg: #fff;
-    --text: #111;
-    --muted: #666;
-    --shadow: 0 6px 18px rgba(0,0,0,0.08);
-  }
-  body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text);}
-  .sidebar { width:220px; position:fixed; top:0; left:0; height:100%; background:var(--card-bg); box-shadow:2px 0 10px rgba(0,0,0,0.1); padding-top:60px; display:flex; flex-direction:column; gap:12px;}
-  .sidebar button { padding:12px; border:none; background:none; text-align:left; font-weight:600; cursor:pointer; transition:0.2s; }
-  .sidebar button:hover { background:var(--accent); color:#fff; }
-  .main { margin-left:220px; padding:20px;}
-  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-  .card { background:var(--card-bg); padding:16px; border-radius:10px; box-shadow:var(--shadow); margin-bottom:16px;}
-  input, textarea, select, button { width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid #ddd; font-size:14px; }
-  button.btn { background:var(--accent); color:#fff; border:none; cursor:pointer; }
-  button.btn.red { background:#ff6b6b; }
-  table { width:100%; border-collapse:collapse; margin-top:10px; }
-  th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; }
-  img.thumb { width:80px; height:80px; object-fit:cover; border-radius:8px; }
+:root {
+  --bg: #ffffff;
+  --text: #111;
+  --muted: #777;
+  --card-bg: #fff;
+  --accent: #7c4dff;
+  --shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);}
+header{background:var(--card-bg);border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20;}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
+.logo{font-size:24px;font-weight:900;letter-spacing:1px;}
+.header-actions{display:flex;align-items:center;gap:14px;}
+.icon{cursor:pointer;font-size:20px;position:relative;}
+button{cursor:pointer;}
+.main-content{max-width:1200px;margin:auto;padding:20px;}
+.page-title{font-size:32px;margin-bottom:20px;font-weight:800;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
+.card{background:var(--card-bg);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s;cursor:pointer;}
+.card:hover{transform:translateY(-4px);}
+.card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#f9f9f9;}
+.card .meta{padding:14px;flex:1;display:flex;flex-direction:column;}
+.card .title{font-size:14px;font-weight:600;margin-bottom:6px;}
+.card .price{font-weight:800;font-size:16px;margin-bottom:8px;}
+.card .description{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.card .actions{display:flex;justify-content:space-between;gap:6px;}
+.card .actions button{padding:6px 10px;border-radius:6px;font-weight:600;border:none;color:#fff;}
+.edit-btn{background:#ffc107;}
+.delete-btn{background:#dc3545;}
+.toggle-btn{background:#28a745;}
+.form-panel{background:var(--card-bg);padding:20px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px;}
+.form-panel input, .form-panel select{width:100%;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:6px;}
+.form-panel label{font-weight:600;margin-bottom:6px;display:block;}
+.form-panel button{background:var(--accent);color:#fff;padding:12px;border:none;border-radius:8px;font-weight:600;}
+.stats-panel{margin-bottom:20px;}
+.stats-panel h2{font-size:20px;margin-bottom:12px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.stats-card{background:var(--card-bg);padding:16px;border-radius:10px;box-shadow:var(--shadow);}
+.switch-label{display:flex;align-items:center;justify-content:space-between;font-weight:600;}
+.switch-label input{transform:scale(1.2);}
 </style>
 </head>
 <body>
 
-<div class="sidebar">
-  <button data-section="products">Productos</button>
-  <button data-section="stats">Estadísticas</button>
-  <button data-section="users">Usuarios</button>
-  <button data-section="settings">Configuración</button>
-  <button id="logoutBtn" class="red">Cerrar sesión</button>
-</div>
-
-<div class="main">
-  <div class="topbar">
-    <h2 id="sectionTitle">Productos</h2>
-    <div id="adminWelcome"></div>
-  </div>
-
-  <!-- Panel Productos -->
-  <div id="panelProducts" class="panel">
-    <div class="card">
-      <h3 id="formTitle">Agregar producto</h3>
-      <input id="pNombre" placeholder="Nombre del producto">
-      <textarea id="pDescripcion" rows="2" placeholder="Descripción breve"></textarea>
-      <input id="pPrecio" type="number" placeholder="Precio">
-      <input id="pFile" type="file" accept="image/*">
-      <input id="pURL" placeholder="URL de imagen">
-      <select id="pCategoria">
-        <option value="">Selecciona categoría</option>
-        <option value="gorras">Gorras</option>
-        <option value="camisetas">Camisetas</option>
-        <option value="cintos">Cintos</option>
-        <option value="pantalones">Pantalones</option>
-        <option value="tenis">Tenis</option>
-        <option value="sudaderas">Sudaderas</option>
-      </select>
-      <div style="display:flex; gap:12px;">
-        <button id="btnSave" class="btn">Guardar</button>
-        <button id="btnClear" class="btn" style="background:#999">Limpiar</button>
-      </div>
-    </div>
-    <div class="card">
-      <h3>Productos existentes</h3>
-      <table id="productsTable">
-        <thead><tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>Acciones</th></tr></thead>
-        <tbody></tbody>
-      </table>
+<header>
+  <div class="header-inner">
+    <div class="logo">Admin - Boutique Buendía</div>
+    <div class="header-actions">
+      <button id="logoutBtn">Cerrar sesión</button>
     </div>
   </div>
+</header>
 
-  <!-- Panel Estadísticas -->
-  <div id="panelStats" class="panel" style="display:none;">
-    <div class="card">
-      <h3>Estadísticas generales</h3>
-      <p>Total de productos: <span id="statProducts">0</span></p>
-      <p>Total de usuarios: <span id="statUsers">0</span></p>
-      <p>Total de compras: <span id="statSales">0</span></p>
+<main class="main-content">
+  <h1 class="page-title">Panel de administración</h1>
+
+  <!-- Formulario para agregar producto -->
+  <div class="form-panel">
+    <h2>Agregar / Editar Producto</h2>
+    <label>Nombre del producto</label>
+    <input type="text" id="productName">
+    <label>Descripción</label>
+    <input type="text" id="productDesc">
+    <label>Precio</label>
+    <input type="number" id="productPrice">
+    <label>Categoría</label>
+    <select id="productCategory">
+      <option value="gorras">Gorras</option>
+      <option value="camisetas">Camisetas</option>
+      <option value="cintos">Cintos</option>
+      <option value="pantalones">Pantalones</option>
+      <option value="tenis">Tenis</option>
+      <option value="sudaderas">Sudaderas</option>
+    </select>
+    <label>Tipo de producto</label>
+    <select id="productType">
+      <option value="normal">Normal</option>
+      <option value="principal">Producto principal</option>
+      <option value="publicidad">Publicidad</option>
+      <option value="carrusel">Carrusel</option>
+    </select>
+    <label>Imagen (subir desde dispositivo)</label>
+    <input type="file" id="productImageFile">
+    <label>Imagen (URL)</label>
+    <input type="text" id="productImageURL">
+    <button id="saveProductBtn">Guardar producto</button>
+  </div>
+
+  <!-- Productos existentes -->
+  <div>
+    <h2>Productos agregados</h2>
+    <div class="grid" id="productsGridAdmin">
+      <!-- Productos se cargan aquí -->
     </div>
   </div>
 
-  <!-- Panel Usuarios -->
-  <div id="panelUsers" class="panel" style="display:none;">
-    <div class="card">
-      <h3>Usuarios registrados</h3>
-      <table id="usersTable">
-        <thead><tr><th>Email</th><th>UID</th></tr></thead>
-        <tbody></tbody>
-      </table>
+  <!-- Estadísticas -->
+  <div class="stats-panel">
+    <h2>Estadísticas</h2>
+    <div class="stats-grid">
+      <div class="stats-card" id="totalUsers">Usuarios registrados: 0</div>
+      <div class="stats-card" id="totalCompras">Compras totales: 0</div>
+      <div class="stats-card" id="totalVentas">Ventas totales: $0.00</div>
     </div>
   </div>
 
-  <!-- Panel Configuración -->
-  <div id="panelSettings" class="panel" style="display:none;">
-    <div class="card">
-      <h3>Configuración de la tienda</h3>
-      <input id="shopName" placeholder="Nombre de la tienda">
-      <label><input type="checkbox" id="enablePage" checked> Habilitar página</label>
-      <label><input type="checkbox" id="enablePaypal" checked> Habilitar PayPal</label>
-      <label><input type="checkbox" id="enableCard" checked> Habilitar tarjeta</label>
-      <label><input type="checkbox" id="enableOxxo" checked> Habilitar OXXO</label>
-      <button id="saveSettings" class="btn">Guardar configuración</button>
-    </div>
-  </div>
+</main>
 
-</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
+// Configura Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
-  authDomain: "buendiashop-f3dcc.firebaseapp.com",
-  projectId: "buendiashop-f3dcc",
-  storageBucket: "buendiashop-f3dcc.appspot.com",
-  messagingSenderId: "181970112547",
-  appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
-  measurementId: "G-MKP6G4V2KW"
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_STORAGE_BUCKET",
+  messagingSenderId: "TU_MSG_ID",
+  appId: "TU_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+
 const db = firebase.firestore();
 const storage = firebase.storage();
+const auth = firebase.auth();
 
-// Refs
-const panels = {
-  products: document.getElementById('panelProducts'),
-  stats: document.getElementById('panelStats'),
-  users: document.getElementById('panelUsers'),
-  settings: document.getElementById('panelSettings')
-};
-const sectionTitle = document.getElementById('sectionTitle');
-const adminWelcome = document.getElementById('adminWelcome');
+// Variables
+const productName = document.getElementById('productName');
+const productDesc = document.getElementById('productDesc');
+const productPrice = document.getElementById('productPrice');
+const productCategory = document.getElementById('productCategory');
+const productType = document.getElementById('productType');
+const productImageFile = document.getElementById('productImageFile');
+const productImageURL = document.getElementById('productImageURL');
+const saveProductBtn = document.getElementById('saveProductBtn');
+const productsGridAdmin = document.getElementById('productsGridAdmin');
+const totalUsers = document.getElementById('totalUsers');
+const totalCompras = document.getElementById('totalCompras');
+const totalVentas = document.getElementById('totalVentas');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// Product refs
-const pNombre = document.getElementById('pNombre');
-const pDescripcion = document.getElementById('pDescripcion');
-const pPrecio = document.getElementById('pPrecio');
-const pFile = document.getElementById('pFile');
-const pURL = document.getElementById('pURL');
-const pCategoria = document.getElementById('pCategoria');
-const btnSave = document.getElementById('btnSave');
-const btnClear = document.getElementById('btnClear');
-const productsTableBody = document.querySelector('#productsTable tbody');
-
-let editingId = null;
-
-// Sidebar navigation
-document.querySelectorAll('.sidebar button[data-section]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const section = btn.dataset.section;
-    for(const key in panels) panels[key].style.display = 'none';
-    panels[section].style.display = 'block';
-    sectionTitle.textContent = section.charAt(0).toUpperCase()+section.slice(1);
+// -------------------------
+// Funciones de productos
+// -------------------------
+function renderProductsAdmin(products){
+  productsGridAdmin.innerHTML = '';
+  products.forEach(doc=>{
+    const data = doc.data();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${data.imagen}" alt="${data.nombre}">
+      <div class="meta">
+        <div class="title">${data.nombre}</div>
+        <div class="price">$${parseFloat(data.precio).toLocaleString('es-MX', {minimumFractionDigits:2})}</div>
+        <div class="description">${data.descripcion}</div>
+        <div class="actions">
+          <button class="edit-btn" onclick="editProduct('${doc.id}')">Editar</button>
+          <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Eliminar</button>
+          <label class="switch-label">Habilitar <input type="checkbox" ${data.habilitado ? 'checked' : ''} onchange="toggleProduct('${doc.id}', this.checked)"></label>
+        </div>
+      </div>
+    `;
+    productsGridAdmin.appendChild(card);
   });
-});
-
-// Logout
-logoutBtn.addEventListener('click', async ()=>{
-  await auth.signOut();
-  location.href = 'login.html';
-});
-
-// Auth state
-auth.onAuthStateChanged(user=>{
-  if(!user) {
-    location.href = 'login.html';
-    return;
-  }
-  adminWelcome.textContent = 'Admin: ' + user.email;
-  loadProducts();
-  updateStats();
-});
-
-// Upload image
-async function uploadImage(file){
-  const name = Date.now()+'_'+file.name;
-  const ref = storage.ref('productos/'+name);
-  await ref.put(file);
-  return await ref.getDownloadURL();
 }
 
-// Save product
-btnSave.addEventListener('click', async ()=>{
-  const nombre = pNombre.value.trim();
-  const descripcion = pDescripcion.value.trim();
-  const precio = Number(pPrecio.value);
-  const categoria = pCategoria.value;
-  const file = pFile.files[0];
-  const urlManual = pURL.value.trim();
+// Cargar productos desde Firestore
+function loadProducts(){
+  db.collection('productos').get().then(snapshot=>{
+    renderProductsAdmin(snapshot.docs);
+  });
+}
 
-  if(!nombre || !precio || !categoria || (!file && !urlManual)){
-    alert('Completa todos los campos e imagen.');
-    return;
-  }
+// Guardar producto
+saveProductBtn.onclick = async ()=>{
+  const nombre = productName.value.trim();
+  const descripcion = productDesc.value.trim();
+  const precio = parseFloat(productPrice.value);
+  const categoria = productCategory.value;
+  const tipo = productType.value;
 
-  let finalUrl = urlManual || '';
-  if(file) finalUrl = await uploadImage(file);
+  if(!nombre || !descripcion || !precio) return alert('Completa todos los campos');
 
-  const payload = { nombre, descripcion, precio, categoria, imagen: finalUrl, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-
-  if(editingId){
-    await db.collection('productos').doc(editingId).update(payload);
-    editingId=null;
+  let imagen = '';
+  if(productImageFile.files[0]){
+    const file = productImageFile.files[0];
+    const ref = storage.ref().child('productos/'+file.name);
+    await ref.put(file);
+    imagen = await ref.getDownloadURL();
+  } else if(productImageURL.value){
+    imagen = productImageURL.value;
   } else {
-    await db.collection('productos').add(payload);
+    imagen = 'https://via.placeholder.com/240?text=No+Image';
   }
 
-  clearForm();
-  loadProducts();
-});
-
-// Clear form
-btnClear.addEventListener('click', clearForm);
-function clearForm(){
-  pNombre.value = '';
-  pDescripcion.value = '';
-  pPrecio.value = '';
-  pFile.value = '';
-  pURL.value = '';
-  pCategoria.value = '';
-  editingId = null;
-  document.getElementById('formTitle').textContent = 'Agregar producto';
+  db.collection('productos').add({
+    nombre,
+    descripcion,
+    precio,
+    categoria,
+    tipo,
+    imagen,
+    habilitado: true,
+    creado: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    alert('Producto agregado');
+    productName.value=''; productDesc.value=''; productPrice.value=''; productImageFile.value=''; productImageURL.value='';
+    loadProducts();
+  });
 }
 
-// Load products
-async function loadProducts(){
-  productsTableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
-  const snap = await db.collection('productos').orderBy('createdAt','desc').get();
-  productsTableBody.innerHTML = '';
-  snap.forEach(doc=>{
-    const p = doc.data();
-    const id = doc.id;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><img src="${p.imagen||''}" class="thumb"></td>
-      <td>${p.nombre}</td>
-      <td>$${p.precio}</td>
-      <td>${p.categoria}</td>
-      <td>
-        <button onclick="editProduct('${id}')">Editar
+// Editar producto
+function editProduct(id){
+  const docRef = db.collection('productos').doc(id);
+  docRef.get().then(doc=>{
+    const data = doc.data();
+    productName.value = data.nombre;
+    productDesc.value = data.descripcion;
+    productPrice.value = data.precio;
+    productCategory.value = data.categoria;
+    productType.value = data.tipo;
+    // Guardar como actualización
+    saveProductBtn.onclick = async ()=>{
+      let imagen = data.imagen;
+      if(productImageFile.files[0]){
+        const file = productImageFile.files[0];
+        const ref = storage.ref().child('productos/'+file.name);
+        await ref.put(file);
+        imagen = await ref.getDownloadURL();
+      } else if(productImageURL.value){
+        imagen = productImageURL.value;
+      }
+      docRef.update({
+        nombre: productName.value,
+        descripcion: productDesc.value,
+        precio: parseFloat(productPrice.value),
+        categoria: productCategory.value,
+        tipo: productType.value,
+        imagen
+      }).then(()=>{
+        alert('Producto actualizado');
+        productName.value=''; productDesc.value=''; productPrice.value=''; productImageFile.value=''; productImageURL.value='';
+        saveProductBtn.onclick = saveOriginalProduct;
+        loadProducts();
+      });
+    };
+  });
+}
+
+// Guardar original
+const saveOriginalProduct = saveProductBtn.onclick;
+
+// Eliminar producto
+function deleteProduct(id){
+  if(confirm('¿Deseas eliminar este producto?')){
+    db.collection('productos').doc(id).delete().then(()=> loadProducts());
+  }
+}
+
+// Habilitar/deshabilitar
+function toggleProduct(id, estado){
+  db.collection('productos').doc(id).update({habilitado: estado});
+}
+
+// -------------------------
+// Estadísticas
+// -------------------------
+function loadStats(){
+  db.collection('usuarios').get().then(snapshot=>{
+    totalUsers.textContent = `Usuarios registrados: ${snapshot.size}`;
+  });
+  db.collection('compras').get().then(snapshot=>{
+    let total = 0;
+    snapshot.forEach(doc=>{
+      total += doc.data().total;
+    });
+    totalCompras.textContent = `Compras totales: ${snapshot.size}`;
+    totalVentas.textContent = `Ventas totales: $${total.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+  });
+}
+
+// -------------------------
+// Logout
+// -------------------------
+logoutBtn.onclick = ()=>{
+  auth.signOut().then(()=>window.location.href='login.html');
+}
+
+// Cargar productos y estadísticas al iniciar
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadProducts();
+  loadStats();
+});
+
+</script>
+</body>
+</html>
