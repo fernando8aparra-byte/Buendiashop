@@ -1,82 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Efraín | Tienda</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+
   <!-- === Encabezado === -->
   <header>
-    <div class="menu-btn" id="menu-btn">&#9776;</div>
-    <div class="logo">Efraín Shop</div>
-
-    <nav>
-      <ul>
-        <li id="btn-inicio">Inicio</li>
-        <li id="btn-nosotros">Nosotros</li>
-        <li id="btn-cuenta">Cuenta</li>
-        <li id="btn-carrito">🛒</li>
-      </ul>
-    </nav>
+    <div class="header-inner">
+      <div id="menuBtn" title="Menú">☰</div>
+      <div class="logo">Efraín Shop</div>
+      <div class="header-actions">
+        <div id="searchBtn" class="icon" title="Buscar">
+          <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Buscar" width="22">
+        </div>
+        <div id="cartBtn" class="icon" title="Carrito">
+          <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" width="22">
+        </div>
+      </div>
+    </div>
   </header>
 
   <!-- === Menú lateral === -->
-  <div class="sidebar" id="sidebar">
-    <h2>Menú</h2>
-    <ul>
-      <li>Cuenta</li>
-      <li>Mis compras</li>
-      <li>Productos</li>
-      <ul>
-        <li>Gorras</li>
-        <li>Camisetas</li>
-        <li>Cintos</li>
-        <li>Pantalones</li>
-        <li>Tenis</li>
-        <li>Sudaderas</li>
-      </ul>
-      <li>Nosotros</li>
-      <li id="sesion">Iniciar sesión / Registrarse</li>
-    </ul>
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="menu-dropdown" id="menuDropdown">
+    <span class="menu-close" id="menuClose">✕</span>
+    <div class="menu-item" data-section="cuenta">Cuenta</div>
+    <div class="menu-item" data-section="compras">Mis compras</div>
+    <div class="menu-item" data-section="productos">Productos</div>
+    <div class="submenu">
+      <div class="menu-item" data-section="gorras">Gorras</div>
+      <div class="menu-item" data-section="camisetas">Camisetas</div>
+      <div class="menu-item" data-section="cintos">Cintos</div>
+      <div class="menu-item" data-section="pantalones">Pantalones</div>
+      <div class="menu-item" data-section="tenis">Tenis</div>
+      <div class="menu-item" data-section="sudaderas">Sudaderas</div>
+    </div>
+    <div class="menu-item" data-section="nosotros">Nosotros</div>
   </div>
 
-  <!-- === Carrusel de nuevos productos === -->
-  <section class="carrusel" id="carrusel">
-    <img src="https://via.placeholder.com/200x160?text=Nuevo+1" alt="Producto nuevo">
-    <img src="https://via.placeholder.com/200x160?text=Nuevo+2" alt="Producto nuevo">
-    <img src="https://via.placeholder.com/200x160?text=Nuevo+3" alt="Producto nuevo">
-    <img src="https://via.placeholder.com/200x160?text=Nuevo+4" alt="Producto nuevo">
-  </section>
-
-  <!-- === Sección de productos === -->
-  <main>
-    <h2 style="text-align:center;">Productos en stock</h2>
-    <div class="productos" id="productos-container">
-      <!-- Los productos se cargan desde Firebase -->
-    </div>
+  <!-- === Principal === -->
+  <main id="mainContent">
+    <h1 class="page-title">Productos en stock</h1>
+    <section class="grid" id="productsGrid">
+      <!-- Los productos se cargarán desde Firebase -->
+    </section>
   </main>
 
   <!-- === Carrito === -->
-  <div id="carrito" title="Ver carrito">🛒</div>
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-header">
+      <span>Carrito</span>
+      <span id="closeCart" style="cursor:pointer;">✕</span>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">Tu carrito está vacío 🛍️</div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total" id="cartTotal">Total: $0</div>
+      <div class="payment-options">
+        <button class="pay-btn paypal">
+          <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
+        </button>
+        <button class="pay-btn cardpay">
+          <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <!-- === Scripts === -->
+  <div class="toast" id="toast">Producto agregado al carrito</div>
+
   <script type="module" src="js/firebase.js"></script>
   <script src="js/main.js"></script>
 
-  <script>
-    // === Menú lateral ===
-    const menuBtn = document.getElementById('menu-btn');
-    const sidebar = document.getElementById('sidebar');
-    menuBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
-
-    // === Carrito animación ===
-    const carrito = document.getElementById('carrito');
-    function animarCarrito() {
-      carrito.classList.add('shake');
-      setTimeout(() => carrito.classList.remove('shake'), 1000);
-    }
-  </script>
 </body>
 </html>
