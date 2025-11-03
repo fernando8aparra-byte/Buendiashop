@@ -1,42 +1,166 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administrador</title>
-  <style>
-    body { font-family: Arial; margin: 30px; }
-    input, textarea { width: 100%; margin: 6px 0; padding: 8px; }
-    button { margin-top: 10px; padding: 10px; cursor: pointer; }
-    img { max-width: 100px; margin-top: 10px; }
-    .producto { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin - Boutique Buendía</title>
+<style>
+  :root{
+    --accent:#7c4dff;
+    --muted:#666;
+    --bg:#fafafa;
+  }
+  body{font-family:Inter,system-ui,Arial;margin:0;background:var(--bg);color:#111}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#fff;border-bottom:1px solid #e6e6e6}
+  .logo{font-weight:900}
+  .container{max-width:1100px;margin:22px auto;padding:18px}
+  .card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,0.04);margin-bottom:16px}
+  input, textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;margin-top:8px;font-size:14px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .col{flex:1;min-width:180px}
+  .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;margin-top:8px}
+  .btn.red{background:#ff6b6b}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
+  img.thumb{width:80px;height:80px;object-fit:cover;border-radius:8px}
+  .small{font-size:13px;color:var(--muted)}
+  .flex{display:flex;gap:12px;align-items:center}
+  .actions button{margin-right:6px}
+  .hidden{display:none}
+  .login-wrap{max-width:420px;margin:40px auto}
+  .center{display:flex;justify-content:center;align-items:center}
+  .stat-grid{display:flex;gap:12px}
+  .stat{padding:12px;border-radius:8px;background:#fff;flex:1;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+  .hint{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
 </head>
 <body>
 
-<h2>Panel de Administrador</h2>
+<div class="top">
+  <div class="logo">Panel Admin — Boutique Buendía</div>
+  <div class="flex">
+    <div id="adminWelcome" class="small"></div>
+    <button id="logoutBtn" class="btn red hidden">Cerrar sesión</button>
+  </div>
+</div>
 
-<h3>Agregar nuevo producto</h3>
+<div class="container">
 
-<input id="nombre" placeholder="Nombre del producto">
-<textarea id="descripcion" placeholder="Descripción"></textarea>
-<input id="precio" type="number" placeholder="Precio">
-<input id="imagenArchivo" type="file">
-<input id="imagenURL" placeholder="O pega una URL de imagen">
+  <!-- LOGIN -->
+  <div id="loginBox" class="card login-wrap">
+    <h3>Iniciar sesión (Admin)</h3>
+    <p class="small">Solo un usuario admin autorizado.</p>
+    <input id="loginEmail" placeholder="Correo (ej: admin@ejemplo.com)" />
+    <input id="loginPass" type="password" placeholder="Contraseña" />
+    <div class="row">
+      <div class="col"><button id="btnLogin" class="btn">Entrar</button></div>
+    </div>
+  </div>
 
-<button onclick="subirProducto()">Subir Producto</button>
+  <!-- PANEL PRINCIPAL (oculto hasta login) -->
+  <div id="panel" class="hidden">
 
-<hr>
+    <!-- Estadísticas -->
+    <div class="card">
+      <h3>Estadísticas</h3>
+      <div class="stat-grid" style="margin-top:12px">
+        <div class="stat">
+          <div class="small">Ventas totales</div>
+          <div id="statSales" style="font-weight:800;font-size:18px">0</div>
+        </div>
+        <div class="stat">
+          <div class="small">Ingresos</div>
+          <div id="statIncome" style="font-weight:800;font-size:18px">$0</div>
+        </div>
+        <div class="stat">
+          <div class="small">Productos</div>
+          <div id="statProducts" style="font-weight:800;font-size:18px">0</div>
+        </div>
+      </div>
+    </div>
 
-<h3>Productos existentes</h3>
-<div id="listaProductos"></div>
+    <!-- Form agregar/editar producto -->
+    <div class="card">
+      <h3 id="formTitle">Agregar producto</h3>
+      <div style="margin-top:8px" class="row">
+        <div class="col">
+          <label>Nombre</label>
+          <input id="pNombre" placeholder="Nombre del producto">
+        </div>
+        <div class="col">
+          <label>Precio (ej. 18000)</label>
+          <input id="pPrecio" type="number" placeholder="Precio">
+        </div>
+      </div>
 
+      <label>Descripción</label>
+      <textarea id="pDescripcion" rows="3" placeholder="Descripción breve"></textarea>
+
+      <div style="margin-top:8px" class="row">
+        <div class="col">
+          <label>Imagen (archivo)</label>
+          <input id="pFile" type="file" accept="image/*">
+        </div>
+        <div class="col">
+          <label>O usar URL de imagen</label>
+          <input id="pURL" placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col"><button id="btnSave" class="btn">Guardar producto</button></div>
+        <div class="col"><button id="btnClear" class="btn" style="background:#999">Limpiar</button></div>
+      </div>
+
+      <div id="previewWrap" style="margin-top:12px" class="hidden">
+        <div class="small">Vista previa:</div>
+        <img id="previewImg" class="thumb" src="" alt="preview">
+      </div>
+    </div>
+
+    <!-- Lista de productos -->
+    <div class="card">
+      <h3>Productos existentes</h3>
+      <table id="productsTable">
+        <thead><tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Acciones</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Compras / historial -->
+    <div class="card">
+      <h3>Compras recientes</h3>
+      <table id="ordersTable">
+        <thead><tr><th>Fecha</th><th>Usuario</th><th>Total</th><th>Método</th><th>Estado</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Pruebas PayPal</h3>
+      <p class="small">Simula un pago con el total ingresado.</p>
+      <div class="row">
+        <div class="col"><input id="testAmount" placeholder="Total a pagar (ej. 1500)" type="number"></div>
+        <div class="col"><button id="btnPaypalTest" class="btn">Generar botón de pago</button></div>
+      </div>
+      <div id="paypalContainer" style="margin-top:10px"></div>
+      <p class="hint">Reemplaza el Client ID por tu sandbox o live de PayPal.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=EBKUb21NAL-nGerWODSldwIfO2ySPoPY-C8HH37NfC1vuBckv7urg2HonxxRwekYYm&currency=MXN"></script>
+
 <script>
-// Tu configuración corregida
+/* CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
   authDomain: "buendiashop-f3dcc.firebaseapp.com",
@@ -46,56 +170,266 @@ const firebaseConfig = {
   appId: "1:181970112547:web:5b5372bdb58033ba5e6196",
   measurementId: "G-MKP6G4V2KW"
 };
-
 firebase.initializeApp(firebaseConfig);
-
+const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-async function subirProducto(){
-  const nombre = document.getElementById("nombre").value;
-  const descripcion = document.getElementById("descripcion").value;
-  const precio = Number(document.getElementById("precio").value);
-  const archivo = document.getElementById("imagenArchivo").files[0];
-  const imagenURLManual = document.getElementById("imagenURL").value;
+/* ---------- UI refs ---------- */
+const loginBox = document.getElementById('loginBox');
+const panel = document.getElementById('panel');
+const adminWelcome = document.getElementById('adminWelcome');
+const logoutBtn = document.getElementById('logoutBtn');
 
-  let imagenFinal = imagenURLManual;
+const pNombre = document.getElementById('pNombre');
+const pPrecio = document.getElementById('pPrecio');
+const pDescripcion = document.getElementById('pDescripcion');
+const pFile = document.getElementById('pFile');
+const pURL = document.getElementById('pURL');
+const btnSave = document.getElementById('btnSave');
+const btnClear = document.getElementById('btnClear');
+const previewWrap = document.getElementById('previewWrap');
+const previewImg = document.getElementById('previewImg');
 
-  if(archivo){
-    const ref = storage.ref("productos/" + archivo.name);
-    await ref.put(archivo);
-    imagenFinal = await ref.getDownloadURL();
+const productsTableBody = document.querySelector('#productsTable tbody');
+const ordersTableBody = document.querySelector('#ordersTable tbody');
+const statSales = document.getElementById('statSales');
+const statIncome = document.getElementById('statIncome');
+const statProducts = document.getElementById('statProducts');
+
+const btnLogin = document.getElementById('btnLogin');
+const loginEmail = document.getElementById('loginEmail');
+const loginPass = document.getElementById('loginPass');
+
+const btnPaypalTest = document.getElementById('btnPaypalTest');
+const paypalContainer = document.getElementById('paypalContainer');
+const testAmount = document.getElementById('testAmount');
+
+/* ---------- Estado ---------- */
+let editingId = null;
+
+/* ---------- Login admin ---------- */
+// Solo un usuario autorizado (ejemplo)
+const ADMIN_EMAIL = "admin@buendia.com";
+
+btnLogin.addEventListener('click', async () => {
+  try {
+    if(loginEmail.value.trim() !== ADMIN_EMAIL){
+      return alert("Correo no autorizado");
+    }
+    const userCred = await auth.signInWithEmailAndPassword(loginEmail.value.trim(), loginPass.value.trim());
+    afterLogin(userCred.user);
+  } catch (err) {
+    alert("Error al iniciar sesión: " + err.message);
   }
+});
 
-  await db.collection("productos").add({ nombre, descripcion, precio, imagen: imagenFinal });
-
-  alert("Producto subido ✅");
+logoutBtn.addEventListener('click', async () => {
+  await auth.signOut();
   location.reload();
+});
+
+auth.onAuthStateChanged(user => {
+  if(user && user.email === ADMIN_EMAIL){
+    afterLogin(user);
+  } else {
+    loginBox.classList.remove('hidden');
+    panel.classList.add('hidden');
+    logoutBtn.classList.add('hidden');
+    adminWelcome.textContent = '';
+  }
+});
+
+function afterLogin(user){
+  loginBox.classList.add('hidden');
+  panel.classList.remove('hidden');
+  logoutBtn.classList.remove('hidden');
+  adminWelcome.textContent = 'Admin: ' + (user.email || user.uid);
+  loadProducts();
+  loadOrders();
+  updateStats();
 }
 
-function cargarProductos(){
-  db.collection("productos").onSnapshot(snapshot => {
-    document.getElementById("listaProductos").innerHTML = "";
-    snapshot.forEach(doc => {
+/* ---------- Subir imagen ---------- */
+async function uploadImageFile(file){
+  const name = Date.now() + '_' + file.name;
+  const ref = storage.ref().child('productos/' + name);
+  const snap = await ref.put(file);
+  return await snap.ref.getDownloadURL();
+}
+
+/* ---------- Guardar producto ---------- */
+btnSave.addEventListener('click', async () => {
+  const nombre = pNombre.value.trim();
+  const descripcion = pDescripcion.value.trim();
+  const precio = Number(pPrecio.value);
+  const urlManual = pURL.value.trim();
+  const file = pFile.files[0];
+
+  if(!nombre || !precio || (!urlManual && !file)){
+    return alert('Completa nombre, precio y agrega imagen (archivo o URL).');
+  }
+
+  try{
+    btnSave.disabled = true;
+    btnSave.textContent = 'Subiendo...';
+    let finalUrl = urlManual || '';
+
+    if(file){
+      finalUrl = await uploadImageFile(file);
+    }
+
+    const payload = {
+      nombre, descripcion, precio, imagen: finalUrl, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if(editingId){
+      await db.collection('productos').doc(editingId).update(payload);
+      editingId = null;
+      document.getElementById('formTitle').textContent = 'Agregar producto';
+    } else {
+      await db.collection('productos').add(payload);
+    }
+
+    btnSave.disabled = false;
+    btnSave.textContent = 'Guardar producto';
+    clearForm();
+    loadProducts();
+    updateStats();
+    alert('Producto guardado ✅');
+  }catch(err){
+    console.error(err);
+    alert('Error: ' + err.message);
+    btnSave.disabled = false;
+    btnSave.textContent = 'Guardar producto';
+  }
+});
+
+btnClear.addEventListener('click', clearForm);
+
+function clearForm(){
+  pNombre.value = '';
+  pPrecio.value = '';
+  pDescripcion.value = '';
+  pFile.value = '';
+  pURL.value = '';
+  previewWrap.classList.add('hidden');
+  previewImg.src = '';
+  editingId = null;
+  document.getElementById('formTitle').textContent = 'Agregar producto';
+}
+
+/* ---------- Cargar productos ---------- */
+function loadProducts(){
+  productsTableBody.innerHTML = '<tr><td colspan="4">Cargando...</td></tr>';
+  db.collection('productos').orderBy('createdAt','desc').get().then(snap=>{
+    productsTableBody.innerHTML = '';
+    let count = 0;
+    snap.forEach(doc=>{
       const p = doc.data();
-      document.getElementById("listaProductos").innerHTML += `
-        <div class="producto">
-          <img src="${p.imagen}">
-          <h4>${p.nombre}</h4>
-          <p>${p.descripcion}</p>
-          <strong>$${p.precio}</strong><br>
-          <button onclick="eliminar('${doc.id}')">Eliminar</button>
-        </div>`;
+      const id = doc.id;
+      count++;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><img src="${p.imagen||''}" class="thumb" /></td>
+        <td>${p.nombre}</td>
+        <td>$${p.precio}</td>
+        <td class="actions">
+          <button onclick="editProduct('${id}')">Editar</button>
+          <button onclick="deleteProduct('${id}')" style="background:#ff6b6b;color:#fff">Eliminar</button>
+        </td>
+      `;
+      productsTableBody.appendChild(tr);
     });
+    statProducts.textContent = count;
   });
 }
 
-function eliminar(id){
-  db.collection("productos").doc(id).delete();
+window.editProduct = async function(id){
+  const doc = await db.collection('productos').doc(id).get();
+  const p = doc.data();
+  editingId = id;
+  pNombre.value = p.nombre || '';
+  pPrecio.value = p.precio || '';
+  pDescripcion.value = p.descripcion || '';
+  pURL.value = p.imagen || '';
+  previewImg.src = p.imagen || '';
+  previewWrap.classList.remove('hidden');
+  document.getElementById('formTitle').textContent = 'Editar producto';
+};
+
+window.deleteProduct = async function(id){
+  if(!confirm('Eliminar producto?')) return;
+  await db.collection('productos').doc(id).delete();
+  loadProducts();
+  updateStats();
+};
+
+/* ---------- Cargar órdenes ---------- */
+async function loadOrders(){
+  ordersTableBody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+  const snap = await db.collection('compras').orderBy('createdAt','desc').limit(100).get();
+  ordersTableBody.innerHTML = '';
+  let ventas = 0;
+  let ingresos = 0;
+  snap.forEach(doc=>{
+    const c = doc.data();
+    ventas++;
+    ingresos += Number(c.total || 0);
+    const tr = document.createElement('tr');
+    const fecha = c.createdAt ? new Date(c.createdAt.seconds*1000).toLocaleString() : '-';
+    tr.innerHTML = `<td>${fecha}</td>
+                    <td>${(c.usuario && c.usuario.nombre) || (c.usuario && c.usuario.email) || 'Anon'}</td>
+                    <td>$${c.total}</td>
+                    <td>${c.metodoPago || '-'}</td>
+                    <td>${c.status || '-'}</td>`;
+    ordersTableBody.appendChild(tr);
+  });
+  statSales.textContent = ventas;
+  statIncome.textContent = '$' + ingresos;
 }
 
-cargarProductos();
-</script>
+/* ---------- Estadísticas ---------- */
+async function updateStats(){
+  const pSnap = await db.collection('productos').get();
+  statProducts.textContent = pSnap.size;
 
-</body>
-</html>
+  const cSnap = await db.collection('compras').get();
+  let ventas = 0;
+  let ingresos = 0;
+  cSnap.forEach(d=>{
+    ventas++;
+    ingresos += Number(d.data().total || 0);
+  });
+  statSales.textContent = ventas;
+  statIncome.textContent = '$' + ingresos;
+}
+
+/* ---------- PayPal Sandbox / Live ---------- */
+btnPaypalTest.addEventListener('click', () => {
+  paypalContainer.innerHTML = ''; 
+  const amount = Number(testAmount.value) || 1;
+
+  paypal.Buttons({
+    createOrder: function(data, actions){
+      return actions.order.create({
+        purchase_units: [{ amount: { value: amount.toString(), currency_code: 'MXN' } }]
+      });
+    },
+    onApprove: function(data, actions){
+      return actions.order.capture().then(async function(details){
+        const compra = {
+          items: [{ nombre: 'Pago de prueba', precio: amount, cantidad: 1 }],
+          total: amount,
+          metodoPago: 'paypal_live',
+          status: 'completed',
+          usuario: { email: (auth.currentUser && auth.currentUser.email) || 'admin' },
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await db.collection('compras').add(compra);
+        alert('Pago recibido y registrado ✅');
+        loadOrders();
+        updateStats();
+      });
+    },
+    onError: function(err){
