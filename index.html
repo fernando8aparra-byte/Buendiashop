@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Página web Efraín</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="header">
+    <button id="menu-btn" class="menu-btn">☰</button>
+    <h1 id="page-title">Página web Efraín</h1>
+    <div class="header-right">
+      <div id="user-info"></div>
+      <button id="cart-btn" class="cart-btn">🛒 <span id="cart-count">0</span></button>
+    </div>
+  </header>
 
+  <!-- Menú lateral -->
+  <aside id="side-menu" class="side-menu hidden">
+    <button id="close-menu" class="close-menu">✕</button>
+    <nav>
+      <ul>
+        <li><button class="menu-item" data-action="cuenta">Cuenta</button></li>
+        <li><button class="menu-item" data-action="mis-compras">Mis compras</button></li>
+        <li class="submenu">
+          <button class="menu-item">Productos ▾</button>
+          <ul>
+            <li><button class="filter-btn" data-cat="Gorras">Gorras</button></li>
+            <li><button class="filter-btn" data-cat="Camisetas">Camisetas</button></li>
+            <li><button class="filter-btn" data-cat="Cintos">Cintos</button></li>
+            <li><button class="filter-btn" data-cat="Pantalones">Pantalones</button></li>
+            <li><button class="filter-btn" data-cat="Tenis">Tenis</button></li>
+            <li><button class="filter-btn" data-cat="Sudaderas">Sudaderas</button></li>
+          </ul>
+        </li>
+        <li><button class="menu-item" data-action="nosotros">Nosotros</button></li>
+        <li id="auth-option"></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Buscador -->
+  <section class="search-section">
+    <input id="search" type="text" placeholder="Buscar productos..." />
+  </section>
+
+  <!-- Productos -->
+  <main id="product-list" class="product-list"></main>
+
+  <!-- Carrito -->
+  <div id="cart-modal" class="cart-modal hidden">
+    <div class="cart-content">
+      <button id="close-cart">✕</button>
+      <h2>Carrito de compras</h2>
+      <div id="cart-items"></div>
+      <div id="cart-empty" class="empty">Tu carrito está vacío</div>
+      <div id="cart-total"></div>
+      <div id="payment-options" class="hidden">
+        <button class="pay-btn">PayPal</button>
+        <button class="pay-btn">Tarjeta</button>
+        <button class="pay-btn">Oxxo</button>
+        <button class="pay-btn">CLABE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
