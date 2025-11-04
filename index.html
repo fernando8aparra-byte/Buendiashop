@@ -142,6 +142,7 @@
       padding: 60px 20px 20px;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
     }
     .menu-dropdown.open { left: 0; }
     .menu-item {
@@ -153,6 +154,21 @@
       font-weight: 600;
     }
     .menu-item:hover { color: var(--accent); }
+    .submenu {
+      display: none;
+      flex-direction: column;
+      padding-left: 10px;
+      animation: fadeIn 0.3s;
+    }
+    .submenu.show { display: flex; }
+    .submenu-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .submenu-item:hover { color: var(--accent); }
+
     .menu-overlay {
       position: fixed;
       top: 0;
@@ -232,6 +248,23 @@
       margin-bottom: 10px;
       text-align: right;
     }
+    .payment-options {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .pay-btn {
+      flex: 1;
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .paypal { background: #0070ba; }
+    .cardpay { background: #4caf50; }
+
     .toast {
       position: fixed;
       bottom: 30px;
@@ -254,6 +287,11 @@
       .page-title { font-size: 24px; }
       .grid { grid-template-columns: repeat(2, 1fr); }
       .card img { height: 120px; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -281,13 +319,24 @@
     <span class="menu-close" id="menuClose">✕</span>
     <div class="menu-item">Cuenta</div>
     <div class="menu-item">Mis compras</div>
-    <div class="menu-item">Gorras</div>
-    <div class="menu-item">Camisetas</div>
-    <div class="menu-item">Cintos</div>
-    <div class="menu-item">Pantalones</div>
-    <div class="menu-item">Tenis</div>
-    <div class="menu-item">Sudaderas</div>
-    <div class="menu-item">Nosotros</div>
+
+    <div class="menu-item toggle" id="productosToggle">Productos ▾</div>
+    <div class="submenu" id="productosSubmenu">
+      <div class="submenu-item">Gorras</div>
+      <div class="submenu-item">Camisetas</div>
+      <div class="submenu-item">Cintos</div>
+      <div class="submenu-item">Pantalones</div>
+      <div class="submenu-item">Tenis</div>
+      <div class="submenu-item">Sudaderas</div>
+    </div>
+
+    <div class="menu-item toggle" id="nosotrosToggle">Nosotros ▾</div>
+    <div class="submenu" id="nosotrosSubmenu">
+      <div class="submenu-item">Instagram</div>
+      <div class="submenu-item">Facebook</div>
+      <div class="submenu-item">X (Twitter)</div>
+      <div class="submenu-item">YouTube</div>
+    </div>
   </div>
 
   <main>
@@ -304,7 +353,7 @@
     <div class="cart-items" id="cartItems">
       <div class="cart-empty">Tu carrito está vacío 🛍️</div>
     </div>
-    <div class="cart-footer" id="cartFooter">
+    <div class="cart-footer" id="cartFooter" style="display:none;">
       <div class="cart-total" id="cartTotal">Total: $0</div>
       <div class="payment-options">
         <button class="pay-btn paypal" id="paypalBtn">PayPal</button>
@@ -316,10 +365,60 @@
   <div class="toast" id="toast">Producto agregado al carrito</div>
 
   <script>
-    // Redirige a login.html cuando presionas el botón
+    // Inicio de sesión
     document.getElementById("loginBtn").addEventListener("click", () => {
       window.location.href = "login.html";
     });
+
+    // Menú lateral
+    const menuBtn = document.getElementById("menuBtn");
+    const menuDropdown = document.getElementById("menuDropdown");
+    const menuOverlay = document.getElementById("menuOverlay");
+    const menuClose = document.getElementById("menuClose");
+    const productosToggle = document.getElementById("productosToggle");
+    const productosSubmenu = document.getElementById("productosSubmenu");
+    const nosotrosToggle = document.getElementById("nosotrosToggle");
+    const nosotrosSubmenu = document.getElementById("nosotrosSubmenu");
+
+    menuBtn.onclick = () => {
+      menuDropdown.classList.add("open");
+      menuOverlay.classList.add("show");
+    };
+    menuClose.onclick = () => {
+      menuDropdown.classList.remove("open");
+      menuOverlay.classList.remove("show");
+    };
+    menuOverlay.onclick = () => {
+      menuDropdown.classList.remove("open");
+      menuOverlay.classList.remove("show");
+    };
+    productosToggle.onclick = () => {
+      productosSubmenu.classList.toggle("show");
+    };
+    nosotrosToggle.onclick = () => {
+      nosotrosSubmenu.classList.toggle("show");
+    };
+
+    // Carrito
+    const cartBtn = document.getElementById("cartBtn");
+    const cartPanel = document.getElementById("cartPanel");
+    const closeCart = document.getElementById("closeCart");
+    const cartItems = document.getElementById("cartItems");
+    const cartFooter = document.getElementById("cartFooter");
+
+    cartBtn.onclick = () => {
+      cartPanel.classList.add("open");
+    };
+    closeCart.onclick = () => {
+      cartPanel.classList.remove("open");
+    };
+
+    // Ocultar opciones si el carrito está vacío
+    function checkCart() {
+      const hasItems = cartItems.querySelectorAll(".cart-item").length > 0;
+      cartFooter.style.display = hasItems ? "block" : "none";
+    }
+    checkCart();
   </script>
 
   <script type="module" src="js/firebase.js"></script>
