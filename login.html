@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel</title>
+<title>Login Firebase Compat</title>
 <style>
 :root {
   --bg: #ffffff;
@@ -15,57 +15,53 @@
 body {
   background: var(--bg);
   font-family: "Inter", sans-serif;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-h1 { text-align:center; margin-bottom:20px; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: var(--shadow);
+.login-container {
   background: var(--card-bg);
-  border-radius: 8px;
-  overflow: hidden;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  width: 320px;
 }
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
-th {
-  background: var(--accent);
-  color: #fff;
-}
-tr:hover { background:#f2f2f2; }
-.total-users { margin: 20px 0; font-weight: 700; font-size: 16px; }
-button.logout {
-  padding: 8px 12px;
-  background: red;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  float: right;
-}
+.login-container h2 { text-align: center; margin-bottom: 20px; }
+input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border:1px solid #ccc; }
+button { width: 100%; padding: 10px; background: var(--accent); color: #fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
+button:hover { opacity:0.9; transform: scale(1.03); }
+.shake { animation: shake 0.3s; border:1px solid red; }
+@keyframes shake { 0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-5px);}100%{transform:translateX(0);} }
+.toggle-form { text-align:center; margin-top:12px; cursor:pointer; color:var(--accent); }
+.forgot-password { text-align:center; margin-top:8px; color:var(--accent); cursor:pointer; display:none; }
+label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom:10px; }
 </style>
 </head>
 <body>
 
-<h1>Panel de Administrador</h1>
-<button class="logout" onclick="logout()">Cerrar Sesión</button>
-<div class="total-users" id="total-users"></div>
-<table>
-  <thead>
-    <tr>
-      <th>Nombre</th>
-      <th>Email</th>
-      <th>Rol</th>
-      <th>Activo</th>
-      <th>Fecha Registro</th>
-    </tr>
-  </thead>
-  <tbody id="users-table"></tbody>
-</table>
+<div class="login-container">
+<h2 id="form-title">Iniciar Sesión</h2>
+
+<!-- Login -->
+<div id="login-form">
+<input type="text" id="login-username" placeholder="Usuario o correo">
+<input type="password" id="login-password" placeholder="Contraseña">
+<button type="button" id="btn-login">Iniciar Sesión</button>
+<div class="forgot-password" id="forgot-password" onclick="resetPassword()">¿Olvidaste tu contraseña?</div>
+<div class="toggle-form" onclick="toggleForm()">Registrarse</div>
+</div>
+
+<!-- Registro -->
+<div id="register-form" style="display:none;">
+<input type="text" id="reg-username" placeholder="Nombre de usuario">
+<input type="email" id="reg-email" placeholder="Correo electrónico">
+<input type="password" id="reg-password" placeholder="Contraseña">
+<input type="password" id="reg-password2" placeholder="Repetir contraseña">
+<label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
+<button type="button" id="btn-register">Registrarse</button>
+<div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
+</div>
 
 <!-- Firebase Compat -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -90,47 +86,108 @@ button.logout {
   const adminUser = "Buendia*]?~?£u837jwhwi";
   const adminPass = "&2)3)8:&?3828&/82$:!";
 
-  const usersTable = document.getElementById("users-table");
-  const totalUsersEl = document.getElementById("total-users");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const formTitle = document.getElementById("form-title");
+  const forgot = document.getElementById("forgot-password");
 
-  // 🔹 Verificar que el admin esté logueado
-  auth.onAuthStateChanged(async user => {
-    if(!user){
-      // No hay usuario logueado, redirigir
-      window.location.href = "login.html";
+  window.toggleForm = () => {
+    if(loginForm.style.display === "none") {
+      loginForm.style.display = "block";
+      registerForm.style.display = "none";
+      formTitle.textContent = "Iniciar Sesión";
+    } else {
+      loginForm.style.display = "none";
+      registerForm.style.display = "block";
+      formTitle.textContent = "Registrarse";
+    }
+  }
+
+  const shake = el => {
+    el.classList.add("shake");
+    setTimeout(()=> el.classList.remove("shake"), 300);
+  }
+
+  // Registro
+  document.getElementById("btn-register").addEventListener("click", async ()=>{
+    const username = document.getElementById("reg-username").value.trim();
+    const email = document.getElementById("reg-email").value.trim();
+    const pass1 = document.getElementById("reg-password").value;
+    const pass2 = document.getElementById("reg-password2").value;
+    const terms = document.getElementById("terms").checked;
+
+    if(!username || !email || !pass1){ alert("Completa todos los campos"); return; }
+    if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
+    if(!terms){ alert("Acepta los términos y condiciones"); return; }
+
+    try {
+      // Verificar usuario único
+      const snapshot = await db.collection("usuarios").where("nombre","==",username).get();
+      if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
+
+      // Crear cuenta Auth
+      const cred = await auth.createUserWithEmailAndPassword(email, pass1);
+      // Guardar en Firestore
+      await db.collection("usuarios").doc(cred.user.uid).set({
+        uid: cred.user.uid,
+        nombre: username,
+        email: email,
+        contraseña: pass1,
+        activo: true,
+        rol: "usuario",
+        fechaRegistro: new Date()
+      });
+      alert("Se registró correctamente");
+      window.location.href = "index.html";
+    } catch(e){
+      alert("Error: " + e.message);
+    }
+  });
+
+  // Login
+  document.getElementById("btn-login").addEventListener("click", async ()=>{
+    const usernameOrEmail = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    if(usernameOrEmail === adminUser && password === adminPass){
+      window.location.href = "admin.html";
       return;
     }
 
-    // Opcional: puedes validar email específico del admin
-    // Solo mostrar admin.html si coincide con nuestro admin
-    // En este ejemplo usamos login manual de login.html
-    // Si quieres, se puede mejorar para autenticar admin real
+    try {
+      let userData = null;
+      const snapshot = await db.collection("usuarios").where("nombre","==",usernameOrEmail).get();
+      if(!snapshot.empty) userData = snapshot.docs[0].data();
+      else {
+        const snapshot2 = await db.collection("usuarios").where("email","==",usernameOrEmail).get();
+        if(!snapshot2.empty) userData = snapshot2.docs[0].data();
+      }
 
-    // 🔹 Cargar usuarios
-    const snapshot = await db.collection("usuarios").get();
-    usersTable.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const fecha = data.fechaRegistro ? data.fechaRegistro.toDate().toLocaleString() : "";
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${data.nombre}</td>
-        <td>${data.email}</td>
-        <td>${data.rol}</td>
-        <td>${data.activo}</td>
-        <td>${fecha}</td>
-      `;
-      usersTable.appendChild(tr);
-    });
-    totalUsersEl.textContent = `Total de usuarios: ${snapshot.size}`;
+      if(!userData){ shake(document.getElementById("login-username")); forgot.style.display="block"; return; }
+
+      await auth.signInWithEmailAndPassword(userData.email,password);
+      if(userData.rol === "admin") window.location.href="admin.html";
+      else window.location.href="index.html";
+
+    } catch(e){
+      shake(document.getElementById("login-password"));
+      forgot.style.display="block";
+    }
   });
 
-  // 🔹 Logout
-  function logout(){
-    auth.signOut().then(()=> window.location.href="login.html");
+  // Reset contraseña
+  window.resetPassword = async ()=>{
+    const email = document.getElementById("login-username").value.trim();
+    if(!email){ alert("Ingresa tu correo para recuperar"); return; }
+    try{
+      await auth.sendPasswordResetEmail(email);
+      alert("Correo de recuperación enviado");
+    }catch(e){ alert(e.message); }
   }
 
-  console.log("Firebase Admin inicializado:", firebase.app().name);
+  console.log("Firebase inicializado:", firebase.app().name);
+  console.log("Auth:", auth);
+  console.log("Firestore:", db);
 </script>
 
 </body>
