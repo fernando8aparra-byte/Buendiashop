@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro - Boutique Buendía</title>
+<title>Iniciar sesión - Boutique Buendía</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -41,13 +41,6 @@
     transition: 0.2s;
   }
   input:focus { border-color: #7c4dff; outline: none; box-shadow: 0 0 4px #b39ddb; }
-  label {
-    display: block;
-    text-align: left;
-    margin: 10px 0;
-    font-size: 14px;
-    color: #555;
-  }
   button {
     width: 100%;
     padding: 12px;
@@ -66,30 +59,35 @@
     font-size: 15px;
     font-weight: 500;
   }
-  a {
-    color: #7c4dff;
-    text-decoration: none;
-  }
+  a { color: #7c4dff; text-decoration: none; }
   a:hover { text-decoration: underline; }
+  .shake { animation: shake 0.3s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Crear cuenta</h1>
-  <input type="text" id="nombre" placeholder="Nombre de usuario">
-  <input type="email" id="email" placeholder="Correo electrónico">
-  <input type="password" id="pass" placeholder="Contraseña">
-  <input type="password" id="pass2" placeholder="Repetir contraseña">
-  <label><input type="checkbox" id="terminos"> Acepto términos y condiciones</label>
-  <button id="btnRegister">Registrarme</button>
+  <h1>Iniciar sesión</h1>
+  <input type="text" id="usuario" placeholder="Nombre de usuario">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button id="btnLogin">Iniciar sesión</button>
   <div id="info"></div>
-  <p style="margin-top:15px;">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+  <p style="margin-top:15px;">
+    ¿No tienes cuenta? <a href="register.html">Regístrate</a>
+  </p>
+  <p id="olvide" style="display:none; color:#e53935; margin-top:10px;">
+    ¿Olvidaste tu contraseña?
+  </p>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -104,49 +102,62 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const btn = document.getElementById("btnRegister");
+  const btn = document.getElementById("btnLogin");
   const info = document.getElementById("info");
+  const olvide = document.getElementById("olvide");
+
+  const ADMIN_USER = "Buendia*]?~?£u837jwhwi";
+  const ADMIN_PASS = "&2)3)8:&?3828&/82$:!";
 
   btn.addEventListener("click", async () => {
-    const nombre = document.getElementById("nombre").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const pass = document.getElementById("pass").value;
-    const pass2 = document.getElementById("pass2").value;
-    const terminos = document.getElementById("terminos").checked;
-
+    const usuario = document.getElementById("usuario");
+    const password = document.getElementById("password");
+    const user = usuario.value.trim();
+    const pass = password.value.trim();
     info.style.color = "#e53935";
+    olvide.style.display = "none";
 
-    if (!nombre || !email || !pass || !pass2) { info.textContent = "Completa todos los campos."; return; }
-    if (pass !== pass2) { info.textContent = "Las contraseñas no coinciden."; return; }
-    if (!terminos) { info.textContent = "Debes aceptar los términos."; return; }
+    if (!user || !pass) {
+      info.textContent = "Completa todos los campos.";
+      return;
+    }
+
+    // ADMIN LOGIN
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      info.style.color = "green";
+      info.textContent = "Bienvenido, administrador...";
+      setTimeout(() => window.location.href = "admin.html", 2000);
+      return;
+    }
 
     try {
       const usuariosRef = collection(db, "usuarios");
-      const qNombre = query(usuariosRef, where("nombre", "==", nombre));
-      const qEmail = query(usuariosRef, where("email", "==", email));
-      const snapNombre = await getDocs(qNombre);
-      const snapEmail = await getDocs(qEmail);
+      const q = query(usuariosRef, where("nombre", "==", user));
+      const snap = await getDocs(q);
 
-      if (!snapNombre.empty) { info.textContent = "Usuario en uso. Inicia sesión."; return; }
-      if (!snapEmail.empty) { info.textContent = "Correo ya registrado. Inicia sesión."; return; }
+      if (snap.empty) {
+        info.textContent = "Usuario no encontrado. Regístrate.";
+        usuario.classList.add("shake");
+        setTimeout(() => usuario.classList.remove("shake"), 300);
+        return;
+      }
 
-      const userDoc = doc(usuariosRef);
-      await setDoc(userDoc, {
-        uid: userDoc.id,
-        nombre,
-        email,
-        contraseña: pass,
-        activo: true,
-        rol: "usuario",
-        fechaRegistro: new Date()
-      });
+      const userData = snap.docs[0].data();
+
+      if (userData.contraseña !== pass) {
+        info.textContent = "Contraseña incorrecta.";
+        password.classList.add("shake");
+        setTimeout(() => password.classList.remove("shake"), 300);
+        olvide.style.display = "block";
+        return;
+      }
 
       info.style.color = "green";
-      info.textContent = "¡Registro exitoso! Redirigiendo...";
+      info.textContent = "Inicio de sesión exitoso. Redirigiendo...";
       setTimeout(() => window.location.href = "index.html", 2000);
 
     } catch (err) {
-      info.textContent = "Error al registrar: " + err.message;
+      info.textContent = "Error: " + err.message;
     }
   });
 </script>
