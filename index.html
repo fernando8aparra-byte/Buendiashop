@@ -15,7 +15,9 @@
       <div class="logo">Efraín Shop</div>
       <div class="header-actions">
         <input type="text" id="search" placeholder="Buscar..." />
-        <button class="login-btn">Iniciar sesión</button>
+        <button class="login-btn" id="loginBtn">Iniciar sesión</button>
+        <span id="welcomeUser" style="display:none; font-weight:bold; color:white;"></span>
+        <button class="login-btn" id="logoutBtn" style="display:none; background:#ff5252;">Cerrar sesión</button>
         <div id="cartBtn" class="icon" title="Carrito">
           <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" />
         </div>
@@ -81,6 +83,54 @@
 
   <!-- ====== SCRIPTS ====== -->
   <script type="module" src="js/script.js"></script>
+
+  <!-- ====== SESIÓN FIREBASE ====== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    getFirestore(app);
+
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const welcomeUser = document.getElementById("welcomeUser");
+
+    // Detectar sesión guardada
+    const usuarioActivo = localStorage.getItem("usuarioActivo");
+
+    if (usuarioActivo) {
+      welcomeUser.style.display = "inline-block";
+      welcomeUser.textContent = `Bienvenido, ${usuarioActivo}`;
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "inline-block";
+    } else {
+      loginBtn.style.display = "inline-block";
+      logoutBtn.style.display = "none";
+      welcomeUser.style.display = "none";
+    }
+
+    // Redirigir a login
+    loginBtn.addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+
+    // Cerrar sesión
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("usuarioActivo");
+      location.reload();
+    });
+  </script>
 
 </body>
 </html>
