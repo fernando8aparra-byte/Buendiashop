@@ -1,1 +1,219 @@
-login.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body, html {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg);
+    }
+    .login-container {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      width: 320px;
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="password"], input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+    .shake {
+      animation: shake 0.3s;
+      border: 1px solid red;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    .toggle-form {
+      text-align: center;
+      margin-top: 12px;
+      cursor: pointer;
+      color: var(--accent);
+    }
+    .forgot-password {
+      text-align: center;
+      margin-top: 8px;
+      color: var(--accent);
+      cursor: pointer;
+      display: none;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2 id="form-title">Iniciar Sesión</h2>
+    <div id="login-form">
+      <input type="text" id="login-username" placeholder="Usuario o correo">
+      <input type="password" id="login-password" placeholder="Contraseña">
+      <button onclick="login()">Iniciar Sesión</button>
+      <div class="forgot-password" id="forgot-password" onclick="resetPassword()">¿Olvidaste tu contraseña?</div>
+      <div class="toggle-form" onclick="toggleForm()">Registrarse</div>
+    </div>
+
+    <div id="register-form" style="display:none;">
+      <input type="text" id="reg-username" placeholder="Nombre de usuario">
+      <input type="email" id="reg-email" placeholder="Correo electrónico">
+      <input type="password" id="reg-password" placeholder="Contraseña">
+      <input type="password" id="reg-password2" placeholder="Repetir contraseña">
+      <label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
+      <button onclick="register()">Registrarse</button>
+      <div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
+      authDomain: "buendiashop-f3dcc.firebaseapp.com",
+      projectId: "buendiashop-f3dcc",
+      storageBucket: "buendiashop-f3dcc.firebasestorage.app",
+      messagingSenderId: "181970112547",
+      appId: "1:181970112547:web:99072e1c4692bb195e6196",
+      measurementId: "G-1Z5CKSCJDZ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    const adminUser = "Buendia*]?~?£u837jwhwi";
+    const adminPass = "&2)3)8:&?3828&/82$:!";
+
+    function toggleForm() {
+      const loginForm = document.getElementById("login-form");
+      const regForm = document.getElementById("register-form");
+      const title = document.getElementById("form-title");
+      if (loginForm.style.display === "none") {
+        loginForm.style.display = "block";
+        regForm.style.display = "none";
+        title.textContent = "Iniciar Sesión";
+      } else {
+        loginForm.style.display = "none";
+        regForm.style.display = "block";
+        title.textContent = "Registrarse";
+      }
+    }
+
+    function shake(el) {
+      el.classList.add("shake");
+      setTimeout(() => el.classList.remove("shake"), 300);
+    }
+
+    function login() {
+      const username = document.getElementById("login-username");
+      const password = document.getElementById("login-password");
+      const forgot = document.getElementById("forgot-password");
+
+      if(username.value === adminUser && password.value === adminPass){
+        window.location.href = "admin.html";
+        return;
+      }
+
+      auth.signInWithEmailAndPassword(username.value, password.value)
+      .then(() => {
+        window.location.href = "index.html";
+      })
+      .catch((error) => {
+        if(error.code === "auth/user-not-found"){
+          shake(username);
+        } else {
+          shake(password);
+        }
+        forgot.style.display = "block";
+      });
+    }
+
+    function register() {
+      const username = document.getElementById("reg-username").value;
+      const email = document.getElementById("reg-email").value;
+      const pass1 = document.getElementById("reg-password").value;
+      const pass2 = document.getElementById("reg-password2").value;
+      const terms = document.getElementById("terms").checked;
+
+      if(!terms){ alert("Acepta los términos y condiciones"); return; }
+      if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
+
+      // Verificar usuario único
+      db.ref("users").orderByChild("username").equalTo(username).once("value")
+      .then(snapshot => {
+        if(snapshot.exists()){
+          alert("Usuario ya registrado");
+          return;
+        }
+        // Verificar correo único
+        db.ref("users").orderByChild("email").equalTo(email).once("value")
+        .then(snap => {
+          if(snap.exists()){
+            alert("Correo ya registrado");
+            return;
+          }
+          // Crear cuenta
+          auth.createUserWithEmailAndPassword(email, pass1)
+          .then((cred) => {
+            db.ref("users/" + cred.user.uid).set({
+              username: username,
+              email: email,
+              password: pass1
+            });
+            window.location.href = "index.html";
+          })
+          .catch(err => alert(err.message));
+        });
+      });
+    }
+
+    function resetPassword(){
+      const email = document.getElementById("login-username").value;
+      if(!email){ alert("Ingresa tu correo para recuperar"); return; }
+      auth.sendPasswordResetEmail(email)
+      .then(()=> alert("Correo de recuperación enviado"))
+      .catch(err => alert(err.message));
+    }
+  </script>
+</body>
+</html>
