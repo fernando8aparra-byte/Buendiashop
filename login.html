@@ -93,7 +93,7 @@
   <div id="login-form">
     <input type="text" id="login-username" placeholder="Usuario o correo">
     <input type="password" id="login-password" placeholder="Contraseña">
-    <button onclick="login()">Iniciar Sesión</button>
+    <button type="button" onclick="login()">Iniciar Sesión</button>
     <div class="forgot-password" id="forgot-password" onclick="resetPassword()">¿Olvidaste tu contraseña?</div>
     <div class="toggle-form" onclick="toggleForm()">Registrarse</div>
   </div>
@@ -105,7 +105,7 @@
     <input type="password" id="reg-password" placeholder="Contraseña">
     <input type="password" id="reg-password2" placeholder="Repetir contraseña">
     <label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
-    <button onclick="register()">Registrarse</button>
+    <button type="button" onclick="register()">Registrarse</button>
     <div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
   </div>
 </div>
@@ -160,8 +160,8 @@
     if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
     if(!username || !email || !pass1){ alert("Completa todos los campos"); return; }
 
-    // Validar usuario único
-    db.collection("users").where("nombre","==",username).get()
+    // Validar usuario único en la colección usuarios
+    db.collection("usuarios").where("nombre","==",username).get()
       .then(snapshot=>{
         if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
 
@@ -174,7 +174,7 @@
             auth.createUserWithEmailAndPassword(email, pass1)
               .then(cred=>{
                 // Guardar datos en Firestore
-                db.collection("users").doc(cred.user.uid).set({
+                db.collection("usuarios").doc(cred.user.uid).set({
                   uid: cred.user.uid,
                   nombre: username,
                   email: email,
@@ -208,11 +208,10 @@
     }
 
     // Buscar en Firestore por nombre o email
-    db.collection("users").where("nombre","==",usernameOrEmail).get()
+    db.collection("usuarios").where("nombre","==",usernameOrEmail).get()
       .then(snapshot=>{
         if(snapshot.empty){
-          // intentar por email
-          db.collection("users").where("email","==",usernameOrEmail).get()
+          db.collection("usuarios").where("email","==",usernameOrEmail).get()
             .then(snapEmail=>{
               if(snapEmail.empty){ shake(document.getElementById("login-username")); forgot.style.display="block"; return; }
               const user = snapEmail.docs[0].data();
