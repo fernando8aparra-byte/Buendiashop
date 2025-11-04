@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Modular Firebase</title>
+<title>Login Firebase Compat</title>
 <style>
 :root {
   --bg: #ffffff;
@@ -63,12 +63,13 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
 <div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
 </div>
 
-<script type="module">
-  // 🔹 Firebase Modular
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-  import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+<!-- Firebase Compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+<script>
+  // 🔹 Configuración Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
     authDomain: "buendiashop-f3dcc.firebaseapp.com",
@@ -79,9 +80,9 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
     measurementId: "G-1Z5CKSCJDZ"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);       // 🔹 Auth inicializado correctamente
-  const db = getFirestore(app);
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
   const adminUser = "Buendia*]?~?£u837jwhwi";
   const adminPass = "&2)3)8:&?3828&/82$:!";
@@ -122,79 +123,7 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
     if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
     if(!terms){ alert("Acepta los términos y condiciones"); return; }
 
-    // Validar usuario único
-    const q = query(collection(db,"usuarios"), where("nombre","==",username));
-    const snapshot = await getDocs(q);
-    if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
-
     try {
-      // Crear cuenta Auth
-      const cred = await createUserWithEmailAndPassword(auth,email,pass1);
-      // Guardar en Firestore
-      await setDoc(doc(db,"usuarios",cred.user.uid), {
-        uid: cred.user.uid,
-        nombre: username,
-        email: email,
-        contraseña: pass1,
-        activo: true,
-        rol: "usuario",
-        fechaRegistro: new Date()
-      });
-      alert("Se registró correctamente");
-      window.location.href = "index.html";
-    } catch(e){
-      alert("Error: "+e.message);
-    }
-  });
-
-  // 🔹 Login
-  document.getElementById("btn-login").addEventListener("click", async ()=>{
-    const usernameOrEmail = document.getElementById("login-username").value.trim();
-    const password = document.getElementById("login-password").value;
-
-    if(usernameOrEmail === adminUser && password === adminPass){
-      window.location.href = "admin.html";
-      return;
-    }
-
-    // Buscar en Firestore
-    let userData = null;
-    const q1 = query(collection(db,"usuarios"), where("nombre","==",usernameOrEmail));
-    let snapshot = await getDocs(q1);
-    if(snapshot.empty){
-      const q2 = query(collection(db,"usuarios"), where("email","==",usernameOrEmail));
-      snapshot = await getDocs(q2);
-      if(snapshot.empty){ shake(document.getElementById("login-username")); forgot.style.display="block"; return; }
-      userData = snapshot.docs[0].data();
-    } else {
-      userData = snapshot.docs[0].data();
-    }
-
-    try {
-      await signInWithEmailAndPassword(auth,userData.email,password);
-      if(userData.rol === "admin") window.location.href="admin.html";
-      else window.location.href="index.html";
-    } catch(e){
-      shake(document.getElementById("login-password"));
-      forgot.style.display="block";
-    }
-  });
-
-  // 🔹 Reset contraseña
-  window.resetPassword = async ()=>{
-    const email = document.getElementById("login-username").value.trim();
-    if(!email){ alert("Ingresa tu correo para recuperar"); return; }
-    try{
-      await sendPasswordResetEmail(auth,email);
-      alert("Correo de recuperación enviado");
-    }catch(e){ alert(e.message); }
-  }
-
-  // 🔹 Comprobar inicialización
-  console.log("Firebase inicializado:", app.name);
-  console.log("Auth:", auth);
-  console.log("Firestore:", db);
-</script>
-
-</body>
-</html>
+      // Crear usuario Auth
+      const cred = await auth.createUserWithEmailAndPassword(email, pass1);
+      //
