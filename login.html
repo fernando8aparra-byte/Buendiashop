@@ -5,35 +5,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro - Boutique Buendía</title>
 <style>
+  * { box-sizing: border-box; }
   body {
-    font-family: "Inter", sans-serif;
-    background: #f5f5f5;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    height:100vh;
-    margin:0;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #7c4dff, #b39ddb);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
   }
-  h1 { margin-bottom: 20px; color:#333; }
-  input, button { padding: 10px; margin:5px 0; width:250px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
-  button { background:#7c4dff; color:#fff; border:none; cursor:pointer; transition:0.2s; }
-  button:hover { opacity:0.9; transform:scale(1.03); }
-  #info { margin-top:15px; font-size:16px; }
+  .container {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+  }
+  @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+  h1 {
+    margin-bottom: 15px;
+    color: #4a148c;
+    font-weight: 700;
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: 0.2s;
+  }
+  input:focus { border-color: #7c4dff; outline: none; box-shadow: 0 0 4px #b39ddb; }
+  label {
+    display: block;
+    text-align: left;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #555;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #7c4dff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.25s;
+    margin-top: 10px;
+  }
+  button:hover { transform: scale(1.03); background: #6a1b9a; }
+  #info {
+    margin-top: 15px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  a {
+    color: #7c4dff;
+    text-decoration: none;
+  }
+  a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<h1>Registro</h1>
-
-<input type="text" id="nombre" placeholder="Nombre o usuario" required>
-<input type="email" id="email" placeholder="Correo electrónico" required>
-<input type="password" id="pass" placeholder="Contraseña" required>
-<input type="password" id="pass2" placeholder="Repetir contraseña" required>
-<label><input type="checkbox" id="terminos"> Acepto términos y condiciones</label>
-<button id="btnRegister">Registrarse</button>
-
-<div id="info"></div>
+<div class="container">
+  <h1>Crear cuenta</h1>
+  <input type="text" id="nombre" placeholder="Nombre de usuario">
+  <input type="email" id="email" placeholder="Correo electrónico">
+  <input type="password" id="pass" placeholder="Contraseña">
+  <input type="password" id="pass2" placeholder="Repetir contraseña">
+  <label><input type="checkbox" id="terminos"> Acepto términos y condiciones</label>
+  <button id="btnRegister">Registrarme</button>
+  <div id="info"></div>
+  <p style="margin-top:15px;">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
@@ -62,38 +114,40 @@
     const pass2 = document.getElementById("pass2").value;
     const terminos = document.getElementById("terminos").checked;
 
-    if (!nombre || !email || !pass || !pass2) { info.textContent = "Todos los campos son obligatorios"; return; }
-    if (pass !== pass2) { info.textContent = "Las contraseñas no coinciden"; return; }
-    if (!terminos) { info.textContent = "Debes aceptar los términos y condiciones"; return; }
+    info.style.color = "#e53935";
 
-    // Verificar que el usuario o email no exista
-    const usuariosRef = collection(db, "usuarios");
+    if (!nombre || !email || !pass || !pass2) { info.textContent = "Completa todos los campos."; return; }
+    if (pass !== pass2) { info.textContent = "Las contraseñas no coinciden."; return; }
+    if (!terminos) { info.textContent = "Debes aceptar los términos."; return; }
 
-    const qNombre = query(usuariosRef, where("nombre", "==", nombre));
-    const qEmail = query(usuariosRef, where("email", "==", email));
+    try {
+      const usuariosRef = collection(db, "usuarios");
+      const qNombre = query(usuariosRef, where("nombre", "==", nombre));
+      const qEmail = query(usuariosRef, where("email", "==", email));
+      const snapNombre = await getDocs(qNombre);
+      const snapEmail = await getDocs(qEmail);
 
-    const snapNombre = await getDocs(qNombre);
-    const snapEmail = await getDocs(qEmail);
+      if (!snapNombre.empty) { info.textContent = "Usuario en uso. Inicia sesión."; return; }
+      if (!snapEmail.empty) { info.textContent = "Correo ya registrado. Inicia sesión."; return; }
 
-    if (!snapNombre.empty) { info.textContent = "El nombre de usuario ya está registrado"; return; }
-    if (!snapEmail.empty) { info.textContent = "El correo ya está registrado"; return; }
+      const userDoc = doc(usuariosRef);
+      await setDoc(userDoc, {
+        uid: userDoc.id,
+        nombre,
+        email,
+        contraseña: pass,
+        activo: true,
+        rol: "usuario",
+        fechaRegistro: new Date()
+      });
 
-    // Crear documento
-    const userDoc = doc(usuariosRef);
-    await setDoc(userDoc, {
-      uid: userDoc.id,
-      nombre: nombre,
-      email: email,
-      contraseña: pass,
-      activo: true,
-      rol: "usuario",
-      fechaRegistro: new Date()
-    });
+      info.style.color = "green";
+      info.textContent = "¡Registro exitoso! Redirigiendo...";
+      setTimeout(() => window.location.href = "index.html", 2000);
 
-    info.style.color = "green";
-    info.textContent = "¡Registro exitoso!";
-    // Opcional: redirigir a login
-    // window.location.href = "login.html";
+    } catch (err) {
+      info.textContent = "Error al registrar: " + err.message;
+    }
   });
 </script>
 
