@@ -1,22 +1,16 @@
-// Importar SDKs necesarios desde Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
+// js/firebase.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-// Configuración de tu proyecto Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
-  authDomain: "buendiashop-f3dcc.firebaseapp.com",
-  projectId: "buendiashop-f3dcc",
-  storageBucket: "buendiashop-f3dcc.appspot.com",
-  messagingSenderId: "181970112547",
-  appId: "1:181970112547:web:99072e1c4692bb195e6196",
-  measurementId: "G-1Z5CKSCJDZ"
+  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+  authDomain: "boutique-buendia.firebaseapp.com",
+  projectId: "boutique-buendia",
+  storageBucket: "boutique-buendia.firebasestorage.app",
+  messagingSenderId: "430651152709",
+  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+  measurementId: "G-9KJ2330RN7"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-
-// Exportar servicios para usarlos en otros archivos
 export const db = getFirestore(app);
-export const storage = getStorage(app);
