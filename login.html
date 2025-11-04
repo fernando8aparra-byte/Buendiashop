@@ -3,246 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Firestore</title>
-<link rel="stylesheet" href="css/styles.css">
+<title>Login Modular Firebase</title>
 <style>
-  body, html {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: var(--bg);
-  }
-  .login-container {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    width: 320px;
-  }
-  .login-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  input[type="text"], input[type="password"], input[type="email"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  button {
-    width: 100%;
-    padding: 10px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  button:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
-  }
-  .shake {
-    animation: shake 0.3s;
-    border: 1px solid red;
-  }
-  @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
-  }
-  .toggle-form {
-    text-align: center;
-    margin-top: 12px;
-    cursor: pointer;
-    color: var(--accent);
-  }
-  .forgot-password {
-    text-align: center;
-    margin-top: 8px;
-    color: var(--accent);
-    cursor: pointer;
-    display: none;
-  }
-  label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
+:root {
+  --bg: #ffffff;
+  --text: #111;
+  --card-bg: #fff;
+  --accent: #7c4dff;
+  --shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+body {
+  background: var(--bg);
+  font-family: "Inter", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.login-container {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  width: 320px;
+}
+.login-container h2 { text-align: center; margin-bottom: 20px; }
+input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border:1px solid #ccc; }
+button { width: 100%; padding: 10px; background: var(--accent); color: #fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
+button:hover { opacity:0.9; transform: scale(1.03); }
+.shake { animation: shake 0.3s; border:1px solid red; }
+@keyframes shake { 0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-5px);}100%{transform:translateX(0);} }
+.toggle-form { text-align:center; margin-top:12px; cursor:pointer; color:var(--accent); }
+.forgot-password { text-align:center; margin-top:8px; color:var(--accent); cursor:pointer; display:none; }
+label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom:10px; }
 </style>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
 <div class="login-container">
-  <h2 id="form-title">Iniciar Sesión</h2>
+<h2 id="form-title">Iniciar Sesión</h2>
 
-  <!-- Login -->
-  <div id="login-form">
-    <input type="text" id="login-username" placeholder="Usuario o correo">
-    <input type="password" id="login-password" placeholder="Contraseña">
-    <button type="button" onclick="login()">Iniciar Sesión</button>
-    <div class="forgot-password" id="forgot-password" onclick="resetPassword()">¿Olvidaste tu contraseña?</div>
-    <div class="toggle-form" onclick="toggleForm()">Registrarse</div>
-  </div>
-
-  <!-- Registro -->
-  <div id="register-form" style="display:none;">
-    <input type="text" id="reg-username" placeholder="Nombre de usuario">
-    <input type="email" id="reg-email" placeholder="Correo electrónico">
-    <input type="password" id="reg-password" placeholder="Contraseña">
-    <input type="password" id="reg-password2" placeholder="Repetir contraseña">
-    <label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
-    <button type="button" onclick="register()">Registrarse</button>
-    <div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
-  </div>
+<!-- Login -->
+<div id="login-form">
+<input type="text" id="login-username" placeholder="Usuario o correo">
+<input type="password" id="login-password" placeholder="Contraseña">
+<button type="button" id="btn-login">Iniciar Sesión</button>
+<div class="forgot-password" id="forgot-password" onclick="resetPassword()">¿Olvidaste tu contraseña?</div>
+<div class="toggle-form" onclick="toggleForm()">Registrarse</div>
 </div>
 
-<script>
-  // 🔹 Firebase Config
+<!-- Registro -->
+<div id="register-form" style="display:none;">
+<input type="text" id="reg-username" placeholder="Nombre de usuario">
+<input type="email" id="reg-email" placeholder="Correo electrónico">
+<input type="password" id="reg-password" placeholder="Contraseña">
+<input type="password" id="reg-password2" placeholder="Repetir contraseña">
+<label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
+<button type="button" id="btn-register">Registrarse</button>
+<div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
+</div>
+
+<script type="module">
+  // 🔹 Firebase Modular
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
   const firebaseConfig = {
     apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
     authDomain: "buendiashop-f3dcc.firebaseapp.com",
     projectId: "buendiashop-f3dcc",
-    storageBucket: "buendiashop-f3dcc.firebasestorage.app",
+    storageBucket: "buendiashop-f3dcc.appspot.com",
     messagingSenderId: "181970112547",
     appId: "1:181970112547:web:99072e1c4692bb195e6196",
     measurementId: "G-1Z5CKSCJDZ"
   };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
   const adminUser = "Buendia*]?~?£u837jwhwi";
   const adminPass = "&2)3)8:&?3828&/82$:!";
 
-  function toggleForm() {
-    const loginForm = document.getElementById("login-form");
-    const regForm = document.getElementById("register-form");
-    const title = document.getElementById("form-title");
-    if(loginForm.style.display === "none"){
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const formTitle = document.getElementById("form-title");
+  const forgot = document.getElementById("forgot-password");
+
+  // Toggle forms
+  window.toggleForm = () => {
+    if(loginForm.style.display === "none") {
       loginForm.style.display = "block";
-      regForm.style.display = "none";
-      title.textContent = "Iniciar Sesión";
+      registerForm.style.display = "none";
+      formTitle.textContent = "Iniciar Sesión";
     } else {
       loginForm.style.display = "none";
-      regForm.style.display = "block";
-      title.textContent = "Registrarse";
+      registerForm.style.display = "block";
+      formTitle.textContent = "Registrarse";
     }
   }
 
-  function shake(el) {
+  // Shake animation
+  const shake = el => {
     el.classList.add("shake");
-    setTimeout(() => el.classList.remove("shake"), 300);
+    setTimeout(()=> el.classList.remove("shake"), 300);
   }
 
   // 🔹 Registro
-  function register(){
+  document.getElementById("btn-register").addEventListener("click", async ()=>{
     const username = document.getElementById("reg-username").value.trim();
     const email = document.getElementById("reg-email").value.trim();
     const pass1 = document.getElementById("reg-password").value;
     const pass2 = document.getElementById("reg-password2").value;
     const terms = document.getElementById("terms").checked;
 
-    if(!terms){ alert("Acepta los términos y condiciones"); return; }
-    if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
     if(!username || !email || !pass1){ alert("Completa todos los campos"); return; }
+    if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
+    if(!terms){ alert("Acepta los términos y condiciones"); return; }
 
-    // Validar usuario único en la colección usuarios
-    db.collection("usuarios").where("nombre","==",username).get()
-      .then(snapshot=>{
-        if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
+    // Validar usuario único
+    const q = query(collection(db,"usuarios"), where("nombre","==",username));
+    const snapshot = await getDocs(q);
+    if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
 
-        // Validar correo único en Auth
-        auth.fetchSignInMethodsForEmail(email)
-          .then(methods=>{
-            if(methods.length > 0){ alert("Correo ya registrado"); return; }
-
-            // Crear cuenta Auth
-            auth.createUserWithEmailAndPassword(email, pass1)
-              .then(cred=>{
-                // Guardar datos en Firestore
-                db.collection("usuarios").doc(cred.user.uid).set({
-                  uid: cred.user.uid,
-                  nombre: username,
-                  email: email,
-                  contraseña: pass1,
-                  activo: true,
-                  rol: "usuario",
-                  fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then(()=>{
-                  alert("Se registró correctamente");
-                  window.location.href = "index.html";
-                })
-                .catch(err=>alert("Error al guardar en Firestore: "+err.message));
-              })
-              .catch(err=>alert("Error al crear cuenta: "+err.message));
-          });
-      })
-      .catch(err=>alert("Error al verificar usuario: "+err.message));
-  }
+    try {
+      // Crear cuenta Auth
+      const cred = await createUserWithEmailAndPassword(auth,email,pass1);
+      // Guardar en Firestore
+      await setDoc(doc(db,"usuarios",cred.user.uid), {
+        uid: cred.user.uid,
+        nombre: username,
+        email: email,
+        contraseña: pass1,
+        activo: true,
+        rol: "usuario",
+        fechaRegistro: new Date()
+      });
+      alert("Se registró correctamente");
+      window.location.href = "index.html";
+    } catch(e){
+      alert("Error: "+e.message);
+    }
+  });
 
   // 🔹 Login
-  function login(){
+  document.getElementById("btn-login").addEventListener("click", async ()=>{
     const usernameOrEmail = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
-    const forgot = document.getElementById("forgot-password");
 
-    // Comprobar si es admin local
     if(usernameOrEmail === adminUser && password === adminPass){
       window.location.href = "admin.html";
       return;
     }
 
-    // Buscar en Firestore por nombre o email
-    db.collection("usuarios").where("nombre","==",usernameOrEmail).get()
-      .then(snapshot=>{
-        if(snapshot.empty){
-          db.collection("usuarios").where("email","==",usernameOrEmail).get()
-            .then(snapEmail=>{
-              if(snapEmail.empty){ shake(document.getElementById("login-username")); forgot.style.display="block"; return; }
-              const user = snapEmail.docs[0].data();
-              signInFirebase(user.email,password,user.rol);
-            });
-        } else {
-          const user = snapshot.docs[0].data();
-          signInFirebase(user.email,password,user.rol);
-        }
-      });
-  }
+    // Buscar en Firestore
+    let userData = null;
+    const q1 = query(collection(db,"usuarios"), where("nombre","==",usernameOrEmail));
+    let snapshot = await getDocs(q1);
+    if(snapshot.empty){
+      const q2 = query(collection(db,"usuarios"), where("email","==",usernameOrEmail));
+      snapshot = await getDocs(q2);
+      if(snapshot.empty){ shake(document.getElementById("login-username")); forgot.style.display="block"; return; }
+      userData = snapshot.docs[0].data();
+    } else {
+      userData = snapshot.docs[0].data();
+    }
 
-  function signInFirebase(email,password,rol){
-    auth.signInWithEmailAndPassword(email,password)
-      .then(()=>{
-        if(rol === "admin") window.location.href="admin.html";
-        else window.location.href="index.html";
-      })
-      .catch(err=>{
-        shake(document.getElementById("login-password"));
-        document.getElementById("forgot-password").style.display="block";
-      });
-  }
+    try {
+      await signInWithEmailAndPassword(auth,userData.email,password);
+      if(userData.rol === "admin") window.location.href="admin.html";
+      else window.location.href="index.html";
+    } catch(e){
+      shake(document.getElementById("login-password"));
+      forgot.style.display="block";
+    }
+  });
 
-  // 🔹 Reset de contraseña
-  function resetPassword(){
+  // 🔹 Reset contraseña
+  window.resetPassword = async ()=>{
     const email = document.getElementById("login-username").value.trim();
     if(!email){ alert("Ingresa tu correo para recuperar"); return; }
-    auth.sendPasswordResetEmail(email)
-      .then(()=> alert("Correo de recuperación enviado"))
-      .catch(err=>alert(err.message));
+    try{
+      await sendPasswordResetEmail(auth,email);
+      alert("Correo de recuperación enviado");
+    }catch(e){ alert(e.message); }
   }
 </script>
 
