@@ -1,225 +1,192 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Boutique Buendía | Iniciar sesión</title>
-<style>
-  *{box-sizing:border-box;font-family:'Poppins',sans-serif;}
-  body{
-    margin:0;
-    background:linear-gradient(135deg,#7c4dff,#b39ddb);
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-  }
-  .container{
-    background:#fff;
-    border-radius:12px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.25);
-    width:360px;
-    padding:40px 30px;
-    text-align:center;
-    transition:0.5s;
-    position:relative;
-    overflow:hidden;
-  }
-  h1{color:#4a148c;margin-bottom:20px;}
-  input{
-    width:100%;
-    padding:12px;
-    margin:8px 0;
-    border:1px solid #ccc;
-    border-radius:6px;
-    transition:0.2s;
-    font-size:15px;
-  }
-  input:focus{border-color:#7c4dff;outline:none;box-shadow:0 0 5px #b39ddb;}
-  button{
-    width:100%;
-    padding:12px;
-    background:#7c4dff;
-    color:white;
-    border:none;
-    border-radius:6px;
-    font-size:16px;
-    cursor:pointer;
-    margin-top:10px;
-    transition:0.3s;
-  }
-  button:hover{background:#6a1b9a;transform:scale(1.03);}
-  #toggle{
-    margin-top:15px;
-    color:#4a148c;
-    cursor:pointer;
-    font-weight:500;
-  }
-  #toggle:hover{text-decoration:underline;}
-  .shake{animation:shake 0.3s ease;}
-  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
-  #info{margin-top:10px;font-weight:500;}
-  #terms{margin-top:10px;font-size:13px;text-align:left;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iniciar sesión | Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(120deg, #1a1a1a, #333);
+      color: white;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #00b894;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #019870;
+    }
+
+    .toggle-link {
+      margin-top: 15px;
+      display: inline-block;
+      color: #00cec9;
+      cursor: pointer;
+    }
+
+    .msg {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #ffd700;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container" id="box">
-  <h1 id="title">Iniciar sesión</h1>
-  <div id="form-login">
-    <input type="text" id="usuario" placeholder="Nombre de usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button id="btnLogin">Iniciar sesión</button>
+  <div class="login-container">
+    <h2 id="formTitle">Iniciar sesión</h2>
+
+    <input type="text" id="nombre" placeholder="Nombre de usuario" style="display:none;" />
+    <input type="email" id="correo" placeholder="Correo electrónico" />
+    <input type="password" id="contrasena" placeholder="Contraseña" />
+
+    <button id="actionBtn">Iniciar sesión</button>
+    <div class="toggle-link" id="toggleForm">¿No tienes cuenta? Regístrate</div>
+    <div class="msg" id="msg"></div>
   </div>
 
-  <div id="form-register" style="display:none;">
-    <input type="text" id="newUser" placeholder="Nombre de usuario o correo">
-    <input type="password" id="newPass" placeholder="Contraseña">
-    <input type="password" id="confirmPass" placeholder="Repetir contraseña">
-    <label id="terms">
-      <input type="checkbox" id="accept"> Acepto términos y condiciones
-    </label>
-    <button id="btnRegister">Registrarse</button>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-  <div id="info"></div>
-  <div id="toggle">¿Eres nuevo? Regístrate aquí</div>
-</div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
+    };
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-    authDomain: "boutique-buendia.firebaseapp.com",
-    projectId: "boutique-buendia",
-    storageBucket: "boutique-buendia.firebasestorage.app",
-    messagingSenderId: "430651152709",
-    appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-    measurementId: "G-9KJ2330RN7"
-  };
+    const nombre = document.getElementById("nombre");
+    const correo = document.getElementById("correo");
+    const contrasena = document.getElementById("contrasena");
+    const actionBtn = document.getElementById("actionBtn");
+    const toggleForm = document.getElementById("toggleForm");
+    const msg = document.getElementById("msg");
+    const formTitle = document.getElementById("formTitle");
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    let modoRegistro = false;
 
-  const ADMIN_USER = "Buendia*]?~?£u837jwhwi";
-  const ADMIN_PASS = "&2)3)8:&?3828&/82$:!";
-
-  const info = document.getElementById("info");
-  const toggle = document.getElementById("toggle");
-  const formLogin = document.getElementById("form-login");
-  const formRegister = document.getElementById("form-register");
-  const title = document.getElementById("title");
-
-  // 🔄 Cambiar entre login y registro
-  let mode = "login";
-  toggle.onclick = () => {
-    if (mode === "login") {
-      formLogin.style.display = "none";
-      formRegister.style.display = "block";
-      title.textContent = "Crear cuenta";
-      toggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
-      info.textContent = "";
-      mode = "register";
-    } else {
-      formLogin.style.display = "block";
-      formRegister.style.display = "none";
-      title.textContent = "Iniciar sesión";
-      toggle.textContent = "¿Eres nuevo? Regístrate aquí";
-      info.textContent = "";
-      mode = "login";
-    }
-  };
-
-  // 🔐 Inicio de sesión
-  document.getElementById("btnLogin").addEventListener("click", async () => {
-    const user = document.getElementById("usuario");
-    const pass = document.getElementById("password");
-    const u = user.value.trim();
-    const p = pass.value.trim();
-
-    if (!u || !p) {
-      info.textContent = "Completa todos los campos.";
-      info.style.color = "#e53935";
-      return;
+    // Si ya hay sesión activa, redirigir
+    const usuarioActivo = localStorage.getItem("usuarioActivo");
+    if (usuarioActivo) {
+      window.location.href = "index.html";
     }
 
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-      info.style.color = "green";
-      info.textContent = "Bienvenido, administrador...";
-      setTimeout(() => window.location.href = "admin.html", 2000);
-      return;
-    }
+    toggleForm.addEventListener("click", () => {
+      modoRegistro = !modoRegistro;
+      if (modoRegistro) {
+        nombre.style.display = "block";
+        formTitle.textContent = "Crear cuenta";
+        actionBtn.textContent = "Registrarme";
+        toggleForm.textContent = "¿Ya tienes cuenta? Inicia sesión";
+      } else {
+        nombre.style.display = "none";
+        formTitle.textContent = "Iniciar sesión";
+        actionBtn.textContent = "Iniciar sesión";
+        toggleForm.textContent = "¿No tienes cuenta? Regístrate";
+      }
+      msg.textContent = "";
+    });
 
-    const q = query(collection(db, "usuarios"), where("nombre", "==", u));
-    const snap = await getDocs(q);
+    actionBtn.addEventListener("click", async () => {
+      const correoVal = correo.value.trim();
+      const passVal = contrasena.value.trim();
+      const nombreVal = nombre.value.trim();
 
-    if (snap.empty) {
-      info.textContent = "Usuario no encontrado.";
-      info.style.color = "#e53935";
-      user.classList.add("shake");
-      setTimeout(() => user.classList.remove("shake"), 300);
-      return;
-    }
+      if (!correoVal || !passVal || (modoRegistro && !nombreVal)) {
+        msg.textContent = "Por favor, completa todos los campos.";
+        return;
+      }
 
-    const data = snap.docs[0].data();
-    if (data.contraseña !== p) {
-      info.textContent = "Contraseña incorrecta.";
-      info.style.color = "#e53935";
-      pass.classList.add("shake");
-      setTimeout(() => pass.classList.remove("shake"), 300);
-      return;
-    }
+      try {
+        const usuariosRef = collection(db, "usuarios");
+        const q = query(usuariosRef, where("correo", "==", correoVal));
+        const querySnapshot = await getDocs(q);
 
-    info.style.color = "green";
-    info.textContent = "Inicio exitoso, redirigiendo...";
-    setTimeout(() => window.location.href = "index.html", 2000);
-  });
-
-  // 📝 Registro de nuevo usuario
-  document.getElementById("btnRegister").addEventListener("click", async () => {
-    const newUser = document.getElementById("newUser").value.trim();
-    const newPass = document.getElementById("newPass").value.trim();
-    const confirmPass = document.getElementById("confirmPass").value.trim();
-    const accept = document.getElementById("accept").checked;
-
-    info.style.color = "#e53935";
-
-    if (!newUser || !newPass || !confirmPass) {
-      info.textContent = "Completa todos los campos.";
-      return;
-    }
-    if (newPass !== confirmPass) {
-      info.textContent = "Las contraseñas no coinciden.";
-      return;
-    }
-    if (!accept) {
-      info.textContent = "Debes aceptar los términos.";
-      return;
-    }
-
-    const q = query(collection(db, "usuarios"), where("nombre", "==", newUser));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      info.textContent = "Usuario ya registrado. Inicia sesión.";
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "usuarios"), {
-        nombre: newUser,
-        contraseña: newPass,
-        fechaRegistro: new Date().toISOString()
-      });
-      info.style.color = "green";
-      info.textContent = "Registro exitoso. Redirigiendo...";
-      setTimeout(() => window.location.href = "index.html", 2000);
-    } catch (err) {
-      info.textContent = "Error: " + err.message;
-    }
-  });
-</script>
-
+        if (modoRegistro) {
+          if (!querySnapshot.empty) {
+            msg.textContent = "Correo ya registrado. Inicia sesión.";
+            return;
+          }
+          await addDoc(usuariosRef, {
+            nombre: nombreVal,
+            correo: correoVal,
+            contrasena: passVal
+          });
+          localStorage.setItem("usuarioActivo", nombreVal);
+          msg.textContent = "Registro exitoso. Redirigiendo...";
+          setTimeout(() => window.location.href = "index.html", 1000);
+        } else {
+          if (querySnapshot.empty) {
+            msg.textContent = "Usuario no encontrado.";
+            return;
+          }
+          let valido = false;
+          let nombreUsuario = "";
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.contrasena === passVal) {
+              valido = true;
+              nombreUsuario = data.nombre;
+            }
+          });
+          if (valido) {
+            localStorage.setItem("usuarioActivo", nombreUsuario);
+            msg.textContent = "Inicio de sesión exitoso. Redirigiendo...";
+            setTimeout(() => window.location.href = "index.html", 1000);
+          } else {
+            msg.textContent = "Contraseña incorrecta.";
+          }
+        }
+      } catch (error) {
+        msg.textContent = "Error: " + error.message;
+      }
+    });
+  </script>
 </body>
 </html>
