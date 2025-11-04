@@ -3,163 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login / Registro</title>
+<title>Login - Boutique Buendía</title>
 <link rel="stylesheet" href="css/styles.css">
 <style>
-/* Shake y estilo básico para inputs incorrectos */
-.shake { animation: shake 0.3s; border:1px solid red; }
-@keyframes shake { 0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-5px);}100%{transform:translateX(0);} }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  h1 {
+    color: #333;
+  }
+  button {
+    background: white;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: #4285F4;
+    color: white;
+    border-color: #4285F4;
+  }
+  img {
+    width: 20px;
+    height: 20px;
+  }
 </style>
 </head>
 <body>
 
-<div class="login-container">
-<h2 id="form-title">Iniciar Sesión</h2>
+<h1>Iniciar sesión</h1>
+<button id="btnGoogle">
+  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+  Continuar con Google
+</button>
 
-<div id="login-form">
-<input type="text" id="login-username" placeholder="Usuario o correo">
-<input type="password" id="login-password" placeholder="Contraseña">
-<button id="btn-login">Iniciar Sesión</button>
-<div id="forgot-password" class="forgot-password" onclick="resetPassword()" style="display:none;">¿Olvidaste tu contraseña?</div>
-<div class="toggle-form" onclick="toggleForm()">Registrarse</div>
-</div>
+<script type="module">
+  // Importar Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-<div id="register-form" style="display:none;">
-<input type="text" id="reg-username" placeholder="Nombre de usuario">
-<input type="email" id="reg-email" placeholder="Correo electrónico">
-<input type="password" id="reg-password" placeholder="Contraseña">
-<input type="password" id="reg-password2" placeholder="Repetir contraseña">
-<label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
-<button id="btn-register">Registrarse</button>
-<div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-  // 🔹 Configuración Firebase
+  // Configuración Firebase
   const firebaseConfig = {
-    apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
-    authDomain: "buendiashop-f3dcc.firebaseapp.com",
-    projectId: "buendiashop-f3dcc",
-    storageBucket: "buendiashop-f3dcc.appspot.com",
-    messagingSenderId: "181970112547",
-    appId: "1:181970112547:web:99072e1c4692bb195e6196",
-    measurementId: "G-1Z5CKSCJDZ"
+    apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+    authDomain: "boutique-buendia.firebaseapp.com",
+    projectId: "boutique-buendia",
+    storageBucket: "boutique-buendia.firebasestorage.app",
+    messagingSenderId: "430651152709",
+    appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+    measurementId: "G-9KJ2330RN7"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  const adminUser = "Buendia*]?~?£u837jwhwi";
-  const adminPass = "&2)3)8:&?3828&/82$:!";
+  const provider = new GoogleAuthProvider();
 
-  const loginForm = document.getElementById("login-form");
-  const registerForm = document.getElementById("register-form");
-  const formTitle = document.getElementById("form-title");
-  const forgot = document.getElementById("forgot-password");
-
-  window.toggleForm = () => {
-    if(loginForm.style.display === "none") {
-      loginForm.style.display = "block";
-      registerForm.style.display = "none";
-      formTitle.textContent = "Iniciar Sesión";
-    } else {
-      loginForm.style.display = "none";
-      registerForm.style.display = "block";
-      formTitle.textContent = "Registrarse";
-    }
-  }
-
-  const shake = el => {
-    el.classList.add("shake");
-    setTimeout(()=> el.classList.remove("shake"), 300);
-  }
-
-  // 🔹 Registro funcional
-  document.getElementById("btn-register").addEventListener("click", async ()=>{
-    const username = document.getElementById("reg-username").value.trim();
-    const email = document.getElementById("reg-email").value.trim();
-    const pass1 = document.getElementById("reg-password").value;
-    const pass2 = document.getElementById("reg-password2").value;
-    const terms = document.getElementById("terms").checked;
-
-    if(!username || !email || !pass1){ alert("Completa todos los campos"); return; }
-    if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
-    if(!terms){ alert("Acepta los términos y condiciones"); return; }
-
+  document.getElementById("btnGoogle").addEventListener("click", async () => {
     try {
-      // Verificar que no exista usuario
-      const snapshot = await db.collection("usuarios").where("nombre","==",username).get();
-      if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-      // Crear usuario en Auth
-      const cred = await auth.createUserWithEmailAndPassword(email, pass1);
+      // Documento del usuario en Firestore
+      const userRef = doc(db, "usuarios", user.uid);
+      const userSnap = await getDoc(userRef);
 
-      // Guardar en Firestore
-      await db.collection("usuarios").doc(cred.user.uid).set({
-        uid: cred.user.uid,
-        nombre: username,
-        email: email,
-        contraseña: pass1,
-        activo: true,
-        rol: "usuario",
-        fechaRegistro: new Date()
-      });
-
-      alert("Se registró correctamente");
-      window.location.href = "index.html";
-
-    } catch(e){
-      alert("Error: "+ e.message);
-    }
-  });
-
-  // 🔹 Login funcional
-  document.getElementById("btn-login").addEventListener("click", async ()=>{
-    const usernameOrEmail = document.getElementById("login-username").value.trim();
-    const password = document.getElementById("login-password").value;
-
-    if(usernameOrEmail === adminUser && password === adminPass){
-      window.location.href = "admin.html";
-      return;
-    }
-
-    try {
-      let userData = null;
-      const snapshot = await db.collection("usuarios").where("nombre","==",usernameOrEmail).get();
-      if(!snapshot.empty) userData = snapshot.docs[0].data();
-      else {
-        const snapshot2 = await db.collection("usuarios").where("email","==",usernameOrEmail).get();
-        if(!snapshot2.empty) userData = snapshot2.docs[0].data();
+      if (!userSnap.exists()) {
+        // Crear documento si no existe
+        await setDoc(userRef, {
+          uid: user.uid,
+          nombre: user.displayName,
+          email: user.email,
+          activo: true,
+          rol: "usuario", // Por defecto
+          fechaRegistro: new Date()
+        });
       }
 
-      if(!userData){ shake(document.getElementById("login-username")); forgot.style.display="block"; return; }
+      // Obtener datos actualizados
+      const userData = (await getDoc(userRef)).data();
 
-      await auth.signInWithEmailAndPassword(userData.email,password);
-      if(userData.rol === "admin") window.location.href="admin.html";
-      else window.location.href="index.html";
+      // Redirigir según rol
+      if (userData.rol === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "index.html";
+      }
 
-    } catch(e){
-      shake(document.getElementById("login-password"));
-      forgot.style.display="block";
+    } catch (error) {
+      console.error("Error al iniciar sesión con Google:", error);
+      alert("Error: " + error.message);
     }
   });
-
-  // 🔹 Reset de contraseña
-  window.resetPassword = async ()=>{
-    const email = document.getElementById("login-username").value.trim();
-    if(!email){ alert("Ingresa tu correo para recuperar"); return; }
-    try{
-      await auth.sendPasswordResetEmail(email);
-      alert("Correo de recuperación enviado");
-    }catch(e){ alert(e.message); }
-  }
-
-  console.log("Firebase inicializado:", firebase.app().name);
 </script>
 
 </body>
