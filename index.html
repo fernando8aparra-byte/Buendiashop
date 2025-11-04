@@ -5,9 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ==== MEJORAS MÓVILES Y DETALLES ==== */
+    header {
+      background: #111;
+      color: #fff;
+      padding: 12px 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .logo {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #00cec9;
+    }
+
+    #menuBtn {
+      cursor: pointer;
+      font-size: 1.6em;
+      padding-right: 10px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-actions input {
+      border-radius: 5px;
+      border: none;
+      padding: 6px 10px;
+      outline: none;
+    }
+
+    .login-btn {
+      background: #00b894;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: 0.3s;
+    }
+
+    .login-btn:hover {
+      background: #019870;
+    }
+
+    .icon img {
+      width: 25px;
+      cursor: pointer;
+    }
+
+    .menu-dropdown {
+      background: #1f1f1f;
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 240px;
+      height: 100%;
+      overflow-y: auto;
+      color: #fff;
+      padding: 20px;
+      transition: 0.3s ease;
+    }
+
+    .menu-dropdown.open {
+      left: 0;
+    }
+
+    .menu-item {
+      margin: 15px 0;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .menu-item:hover {
+      color: #00cec9;
+    }
+
+    .submenu {
+      margin-left: 10px;
+      display: none;
+    }
+
+    .submenu.open {
+      display: block;
+    }
+
+    .cart-panel {
+      right: -100%;
+      transition: right 0.3s ease;
+    }
+
+    .cart-panel.open {
+      right: 0;
+    }
+
+    main {
+      margin-top: 80px;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .header-actions input {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-
   <!-- ====== HEADER ====== -->
   <header>
     <div class="header-inner">
@@ -16,8 +139,6 @@
       <div class="header-actions">
         <input type="text" id="search" placeholder="Buscar..." />
         <button class="login-btn" id="loginBtn">Iniciar sesión</button>
-        <span id="welcomeUser" style="display:none; font-weight:bold; color:white;"></span>
-        <button class="login-btn" id="logoutBtn" style="display:none; background:#ff5252;">Cerrar sesión</button>
         <div id="cartBtn" class="icon" title="Carrito">
           <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" />
         </div>
@@ -27,14 +148,18 @@
 
   <!-- ====== MENÚ LATERAL ====== -->
   <div class="menu-overlay"></div>
-  <nav class="menu-dropdown">
+  <nav class="menu-dropdown" id="menu">
     <span class="menu-close" id="menuClose">✕</span>
 
-    <div class="menu-item">Cuenta</div>
+    <div class="menu-item cuenta" id="cuentaBtn">Cuenta ▼</div>
+    <div class="submenu" id="submenuCuenta">
+      <div class="menu-item" id="estadoSesion">Iniciar sesión</div>
+    </div>
+
     <div class="menu-item">Mis compras</div>
 
-    <div class="menu-item">Productos ▼</div>
-    <div class="submenu">
+    <div class="menu-item productos">Productos ▼</div>
+    <div class="submenu" id="submenuProductos">
       <div class="menu-item">Gorras</div>
       <div class="menu-item">Camisetas</div>
       <div class="menu-item">Cintos</div>
@@ -43,8 +168,8 @@
       <div class="menu-item">Sudaderas</div>
     </div>
 
-    <div class="menu-item">Nosotros ▼</div>
-    <div class="submenu redes">
+    <div class="menu-item nosotros">Nosotros ▼</div>
+    <div class="submenu" id="submenuNosotros">
       <div class="menu-item">Facebook</div>
       <div class="menu-item">Instagram</div>
       <div class="menu-item">TikTok</div>
@@ -55,82 +180,73 @@
   <!-- ====== CONTENIDO ====== -->
   <main>
     <h1 class="page-title">Productos disponibles</h1>
-    <section class="grid" id="productsGrid"></section>
+    <section class="grid" id="productsGrid">
+      <!-- Aquí puedes cargar tus productos dinámicamente -->
+    </section>
   </main>
 
   <!-- ====== CARRITO ====== -->
-  <div class="cart-panel">
+  <div class="cart-panel" id="cartPanel">
     <div class="cart-header">
       <span>Carrito</span>
       <span id="closeCart" style="cursor:pointer;">✕</span>
     </div>
-
     <div class="cart-items">
       <div class="cart-empty">Tu carrito está vacío 🛍️</div>
     </div>
-
-    <div class="cart-footer">
-      <div class="cart-total"></div>
-      <div class="payment-options">
-        <button class="pay-btn paypal" id="paypalBtn">PayPal</button>
-        <button class="pay-btn cardpay" id="cardBtn">Tarjeta</button>
-      </div>
-    </div>
   </div>
 
-  <!-- ====== TOAST ====== -->
   <div class="toast">Producto agregado al carrito</div>
 
   <!-- ====== SCRIPTS ====== -->
-  <script type="module" src="js/script.js"></script>
-
-  <!-- ====== SESIÓN FIREBASE ====== -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-      measurementId: "G-9KJ2330RN7"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    getFirestore(app);
-
+    // Detectar sesión
     const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const welcomeUser = document.getElementById("welcomeUser");
-
-    // Detectar sesión guardada
+    const estadoSesion = document.getElementById("estadoSesion");
     const usuarioActivo = localStorage.getItem("usuarioActivo");
 
     if (usuarioActivo) {
-      welcomeUser.style.display = "inline-block";
-      welcomeUser.textContent = `Bienvenido, ${usuarioActivo}`;
-      loginBtn.style.display = "none";
-      logoutBtn.style.display = "inline-block";
+      loginBtn.textContent = "Bienvenido, " + usuarioActivo;
+      estadoSesion.textContent = "Cerrar sesión";
     } else {
-      loginBtn.style.display = "inline-block";
-      logoutBtn.style.display = "none";
-      welcomeUser.style.display = "none";
+      estadoSesion.textContent = "Iniciar sesión";
     }
 
-    // Redirigir a login
+    estadoSesion.addEventListener("click", () => {
+      if (usuarioActivo) {
+        localStorage.removeItem("usuarioActivo");
+        alert("Sesión cerrada correctamente");
+        location.reload();
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
     loginBtn.addEventListener("click", () => {
-      window.location.href = "login.html";
+      if (usuarioActivo) {
+        alert("Ya tienes una sesión iniciada.");
+      } else {
+        window.location.href = "login.html";
+      }
     });
 
-    // Cerrar sesión
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("usuarioActivo");
-      location.reload();
-    });
+    // ====== MENÚ LATERAL ======
+    const menuBtn = document.getElementById("menuBtn");
+    const menuClose = document.getElementById("menuClose");
+    const menu = document.getElementById("menu");
+    const submenuCuenta = document.getElementById("submenuCuenta");
+    const cuentaBtn = document.getElementById("cuentaBtn");
+    const productosBtn = document.querySelector(".productos");
+    const submenuProductos = document.getElementById("submenuProductos");
+    const nosotrosBtn = document.querySelector(".nosotros");
+    const submenuNosotros = document.getElementById("submenuNosotros");
+
+    menuBtn.onclick = () => menu.classList.add("open");
+    menuClose.onclick = () => menu.classList.remove("open");
+
+    cuentaBtn.onclick = () => submenuCuenta.classList.toggle("open");
+    productosBtn.onclick = () => submenuProductos.classList.toggle("open");
+    nosotrosBtn.onclick = () => submenuNosotros.classList.toggle("open");
   </script>
-
 </body>
 </html>
