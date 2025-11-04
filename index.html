@@ -1,52 +1,52 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
-  <!-- ====== HEADER ====== -->
-  <header>
+  <!-- FRANJA DE BIENVENIDA (aparece arriba, dura 5s) -->
+  <div id="welcomeBar" class="welcome-bar hidden" role="status" aria-live="polite"></div>
+
+  <!-- HEADER -->
+  <header class="header">
     <div class="header-inner">
-      <div id="menuBtn">☰</div>
-      <div class="logo">Efraín Shop</div>
+      <div id="menuBtn" class="menu-btn" aria-label="Abrir menú">☰</div>
+
+      <div class="logo-wrap">
+        <div class="logo">
+          <img src="https://cdn-icons-png.flaticon.com/512/892/892458.png" alt="logo" />
+          <span class="logo-text">Efraín Shop</span>
+        </div>
+      </div>
 
       <div class="header-actions">
-        <!-- Bienvenido sutil a la izquierda (oculto por defecto) -->
-        <div id="welcomeBadge" class="welcome-badge" aria-hidden="true" style="display:none;">
-          <span id="welcomeText">Bienvenido, Usuario</span>
-        </div>
-
-        <!-- Search oculto inicialmente si hay sesión activa hasta que el welcome desaparezca -->
-        <input type="text" id="search" placeholder="Buscar..." />
-
-        <button class="login-btn" id="loginBtn">Iniciar sesión</button>
-
-        <div id="cartBtn" class="icon" title="Carrito">
-          <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" />
+        <input id="searchInput" class="search-input" type="text" placeholder="Buscar..." aria-label="Buscar productos">
+        <button id="loginBtn" class="login-btn">Iniciar sesión</button>
+        <div id="cartBtn" class="icon cart-icon" title="Carrito">
+          <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="carrito" />
         </div>
       </div>
     </div>
   </header>
 
-  <!-- ====== MENÚ LATERAL ====== -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <nav class="menu-dropdown" id="menu">
-    <span class="menu-close" id="menuClose">✕</span>
+  <!-- MENU LATERAL -->
+  <div id="menuOverlay" class="menu-overlay"></div>
+  <nav id="menuDropdown" class="menu-dropdown" aria-hidden="true">
+    <button id="menuClose" class="menu-close" aria-label="Cerrar menú">✕</button>
 
-    <div class="menu-item cuenta" id="cuentaBtn">Cuenta ▼</div>
+    <div class="menu-item menu-section" id="menuCuentaBtn">Cuenta ▼</div>
     <div class="submenu" id="submenuCuenta">
-      <!-- Rellenado dinámicamente: "Cerrar sesión" o "Iniciar sesión / Registrarse" -->
-      <div class="menu-item" id="estadoSesion">Iniciar sesión</div>
+      <div class="menu-item" id="menuEstadoSesion">Iniciar sesión / Registrarse</div>
     </div>
 
     <div class="menu-item">Mis compras</div>
 
-    <div class="menu-item">Productos ▼</div>
-    <div class="submenu">
+    <div class="menu-item" id="menuProductosBtn">Productos ▼</div>
+    <div class="submenu" id="submenuProductos">
       <div class="menu-item">Gorras</div>
       <div class="menu-item">Camisetas</div>
       <div class="menu-item">Cintos</div>
@@ -55,56 +55,66 @@
       <div class="menu-item">Sudaderas</div>
     </div>
 
-    <div class="menu-item">Nosotros ▼</div>
-    <div class="submenu redes">
-      <div class="menu-item">Facebook</div>
-      <div class="menu-item">Instagram</div>
-      <div class="menu-item">TikTok</div>
-      <div class="menu-item">WhatsApp</div>
+    <div class="menu-item" id="menuNosotrosBtn">Nosotros ▼</div>
+    <div class="submenu redes" id="submenuNosotros">
+      <div class="menu-item social" data-url="https://facebook.com">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" /> Facebook
+      </div>
+      <div class="menu-item social" data-url="https://instagram.com">
+        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" alt="Instagram" /> Instagram
+      </div>
+      <div class="menu-item social" data-url="https://twitter.com">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X" /> X
+      </div>
+      <div class="menu-item social" data-url="https://youtube.com">
+        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" /> YouTube
+      </div>
+      <div class="menu-item social" data-url="https://wa.me/">
+        <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp" /> WhatsApp
+      </div>
     </div>
+
   </nav>
 
-  <!-- ====== CONTENIDO ====== -->
-  <main>
+  <!-- CARRUSEL HORIZONTAL INFINITO -->
+  <section class="carousel-wrap" id="carouselWrap" aria-hidden="false">
+    <div class="carousel-track" id="carouselTrack" aria-hidden="false"></div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main">
     <h1 class="page-title">Productos disponibles</h1>
 
-    <!-- Carrusel de nuevos productos (horizontal infinito) -->
-    <div class="carousel-wrap" id="carouselWrap" aria-hidden="true">
-      <div class="carousel" id="carouselInner"></div>
-    </div>
+    <!-- ANUNCIOS DE PRODUCTOS ESTRELLA -->
+    <div class="star-ads" id="starAds"></div>
 
-    <!-- Anuncios de productos estrella -->
-    <div class="star-ads" id="starAds" aria-hidden="true"></div>
-
-    <!-- Grid -->
+    <!-- GRID DE PRODUCTOS -->
     <section class="grid" id="productsGrid"></section>
   </main>
 
-  <!-- ====== CARRITO ====== -->
-  <div class="cart-panel" id="cartPanel">
+  <!-- CARRITO -->
+  <aside class="cart-panel" id="cartPanel" aria-hidden="true">
     <div class="cart-header">
-      <span>Carrito</span>
-      <span id="closeCart" style="cursor:pointer;">✕</span>
+      <div>Carrito</div>
+      <div id="closeCart" class="cart-close">✕</div>
     </div>
-
     <div class="cart-items" id="cartItems">
       <div class="cart-empty">Tu carrito está vacío 🛍️</div>
     </div>
-
     <div class="cart-footer" id="cartFooter" style="display:none;">
       <div class="cart-total" id="cartTotal">Total: $0</div>
       <div class="payment-options" id="paymentOptions">
-        <button class="pay-btn" id="paypalBtn">PayPal</button>
-        <button class="pay-btn" id="cardBtn">Tarjeta</button>
-        <button class="pay-btn" id="oxxoBtn">Pago en Oxxo</button>
+        <button id="paypalBtn" class="pay-btn">PayPal</button>
+        <button id="cardBtn" class="pay-btn">Tarjeta</button>
+        <button id="oxxoBtn" class="pay-btn">Pago en Oxxo</button>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <!-- Toast -->
-  <div class="toast" id="toast">Producto agregado al carrito</div>
+  <!-- TOAST -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- Scripts -->
+  <!-- SCRIPTS -->
   <script type="module" src="js/firebase.js"></script>
   <script type="module" src="js/script.js"></script>
 </body>
