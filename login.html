@@ -111,7 +111,7 @@
 </div>
 
 <script>
-  // Firebase Config
+  // 🔹 Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
     authDomain: "buendiashop-f3dcc.firebaseapp.com",
@@ -124,6 +124,9 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+
+  const adminUser = "Buendia*]?~?£u837jwhwi";
+  const adminPass = "&2)3)8:&?3828&/82$:!";
 
   function toggleForm() {
     const loginForm = document.getElementById("login-form");
@@ -145,7 +148,7 @@
     setTimeout(() => el.classList.remove("shake"), 300);
   }
 
-  // Registro
+  // 🔹 Registro
   function register(){
     const username = document.getElementById("reg-username").value.trim();
     const email = document.getElementById("reg-email").value.trim();
@@ -155,13 +158,14 @@
 
     if(!terms){ alert("Acepta los términos y condiciones"); return; }
     if(pass1 !== pass2){ alert("Las contraseñas no coinciden"); return; }
+    if(!username || !email || !pass1){ alert("Completa todos los campos"); return; }
 
     // Validar usuario único
     db.collection("users").where("nombre","==",username).get()
       .then(snapshot=>{
         if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
 
-        // Validar correo único
+        // Validar correo único en Auth
         auth.fetchSignInMethodsForEmail(email)
           .then(methods=>{
             if(methods.length > 0){ alert("Correo ya registrado"); return; }
@@ -178,20 +182,30 @@
                   activo: true,
                   rol: "usuario",
                   fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert("Registro exitoso");
-                window.location.href = "index.html";
+                })
+                .then(()=>{
+                  alert("Se registró correctamente");
+                  window.location.href = "index.html";
+                })
+                .catch(err=>alert("Error al guardar en Firestore: "+err.message));
               })
-              .catch(err=>alert(err.message));
+              .catch(err=>alert("Error al crear cuenta: "+err.message));
           });
-      });
+      })
+      .catch(err=>alert("Error al verificar usuario: "+err.message));
   }
 
-  // Login
+  // 🔹 Login
   function login(){
     const usernameOrEmail = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
     const forgot = document.getElementById("forgot-password");
+
+    // Comprobar si es admin local
+    if(usernameOrEmail === adminUser && password === adminPass){
+      window.location.href = "admin.html";
+      return;
+    }
 
     // Buscar en Firestore por nombre o email
     db.collection("users").where("nombre","==",usernameOrEmail).get()
@@ -223,6 +237,7 @@
       });
   }
 
+  // 🔹 Reset de contraseña
   function resetPassword(){
     const email = document.getElementById("login-username").value.trim();
     if(!email){ alert("Ingresa tu correo para recuperar"); return; }
