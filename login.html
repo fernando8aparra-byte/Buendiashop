@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Boutique Buendía</title>
+<title>Registro - Boutique Buendía</title>
 <style>
   body {
     font-family: "Inter", sans-serif;
@@ -16,34 +16,29 @@
     margin:0;
   }
   h1 { margin-bottom: 20px; color:#333; }
-  button {
-    padding: 10px 20px;
-    font-size:16px;
-    cursor:pointer;
-    background:#7c4dff;
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    transition:0.2s;
-  }
+  input, button { padding: 10px; margin:5px 0; width:250px; border-radius:6px; border:1px solid #ccc; font-size:16px; }
+  button { background:#7c4dff; color:#fff; border:none; cursor:pointer; transition:0.2s; }
   button:hover { opacity:0.9; transform:scale(1.03); }
-  #info { margin-top:20px; font-size:16px; }
+  #info { margin-top:15px; font-size:16px; }
 </style>
 </head>
 <body>
 
-<h1>Iniciar sesión con Google</h1>
-<button id="btnGoogle">Iniciar sesión</button>
+<h1>Registro</h1>
+
+<input type="text" id="nombre" placeholder="Nombre o usuario" required>
+<input type="email" id="email" placeholder="Correo electrónico" required>
+<input type="password" id="pass" placeholder="Contraseña" required>
+<input type="password" id="pass2" placeholder="Repetir contraseña" required>
+<label><input type="checkbox" id="terminos"> Acepto términos y condiciones</label>
+<button id="btnRegister">Registrarse</button>
 
 <div id="info"></div>
 
 <script type="module">
-  // Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-  // Configuración de Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
     authDomain: "boutique-buendia.firebaseapp.com",
@@ -55,41 +50,50 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
   const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
 
-  const btn = document.getElementById("btnGoogle");
+  const btn = document.getElementById("btnRegister");
   const info = document.getElementById("info");
 
   btn.addEventListener("click", async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+    const nombre = document.getElementById("nombre").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("pass").value;
+    const pass2 = document.getElementById("pass2").value;
+    const terminos = document.getElementById("terminos").checked;
 
-      // Revisar si el usuario ya existe en Firestore
-      const userRef = doc(db, "usuarios", user.uid);
-      const userSnap = await getDoc(userRef);
+    if (!nombre || !email || !pass || !pass2) { info.textContent = "Todos los campos son obligatorios"; return; }
+    if (pass !== pass2) { info.textContent = "Las contraseñas no coinciden"; return; }
+    if (!terminos) { info.textContent = "Debes aceptar los términos y condiciones"; return; }
 
-      if (!userSnap.exists()) {
-        // Crear usuario si no existe
-        await setDoc(userRef, {
-          uid: user.uid,
-          nombre: user.displayName,
-          email: user.email,
-          activo: true,
-          rol: "usuario",
-          fechaRegistro: new Date()
-        });
-        info.innerHTML = `<p>Usuario registrado: <strong>${user.displayName}</strong> (${user.email})</p>`;
-      } else {
-        info.innerHTML = `<p>Usuario ya existe: <strong>${userSnap.data().nombre}</strong> (${userSnap.data().email})</p>`;
-      }
+    // Verificar que el usuario o email no exista
+    const usuariosRef = collection(db, "usuarios");
 
-    } catch (e) {
-      console.error("Error:", e);
-      info.innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
-    }
+    const qNombre = query(usuariosRef, where("nombre", "==", nombre));
+    const qEmail = query(usuariosRef, where("email", "==", email));
+
+    const snapNombre = await getDocs(qNombre);
+    const snapEmail = await getDocs(qEmail);
+
+    if (!snapNombre.empty) { info.textContent = "El nombre de usuario ya está registrado"; return; }
+    if (!snapEmail.empty) { info.textContent = "El correo ya está registrado"; return; }
+
+    // Crear documento
+    const userDoc = doc(usuariosRef);
+    await setDoc(userDoc, {
+      uid: userDoc.id,
+      nombre: nombre,
+      email: email,
+      contraseña: pass,
+      activo: true,
+      rol: "usuario",
+      fechaRegistro: new Date()
+    });
+
+    info.style.color = "green";
+    info.textContent = "¡Registro exitoso!";
+    // Opcional: redirigir a login
+    // window.location.href = "login.html";
   });
 </script>
 
