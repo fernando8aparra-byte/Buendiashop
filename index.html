@@ -5,307 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <style>
-    :root {
-      --bg: #ffffff;
-      --text: #111;
-      --muted: #777;
-      --card-bg: #fff;
-      --accent: #7c4dff;
-      --shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Inter, system-ui, sans-serif;
-    }
-    body { background: var(--bg); color: var(--text); }
-
-    header {
-      background: var(--card-bg);
-      border-bottom: 1px solid #ddd;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-align: center;
-      flex: 1;
-    }
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .icon {
-      cursor: pointer;
-      width: 22px;
-      height: 22px;
-    }
-    .icon img { width: 100%; height: 100%; }
-
-    #menuBtn {
-      cursor: pointer;
-      font-size: 26px;
-      z-index: 30;
-    }
-
-    .login-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-    .login-btn:hover {
-      opacity: 0.9;
-      transform: scale(1.03);
-    }
-
-    main {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-    }
-    .page-title {
-      font-size: 28px;
-      margin: 10px 0 20px;
-      font-weight: 800;
-      text-align: center;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 18px;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s;
-      cursor: pointer;
-    }
-    .card:hover { transform: translateY(-4px); }
-    .card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      background: #f2f2f2;
-    }
-    .card .meta {
-      padding: 10px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .card .title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-    .card .price { font-weight: 800; font-size: 16px; margin-bottom: 10px; }
-    .card button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .card button:hover { opacity: 0.9; }
-
-    /* Menú lateral */
-    .menu-dropdown {
-      position: fixed;
-      top: 0;
-      left: -270px;
-      width: 250px;
-      height: 100%;
-      background: var(--card-bg);
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      transition: left 0.3s ease;
-      z-index: 25;
-      padding: 60px 20px 20px;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-    .menu-dropdown.open { left: 0; }
-    .menu-item {
-      padding: 14px 0;
-      border-bottom: 2px solid #e1e1e1;
-      cursor: pointer;
-      font-size: 16px;
-      color: var(--text);
-      font-weight: 600;
-    }
-    .menu-item:hover { color: var(--accent); }
-    .submenu {
-      display: none;
-      flex-direction: column;
-      padding-left: 10px;
-      animation: fadeIn 0.3s;
-    }
-    .submenu.show { display: flex; }
-    .submenu-item {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .submenu-item:hover { color: var(--accent); }
-
-    .menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.2);
-      z-index: 24;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-    }
-    .menu-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .menu-close {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 22px;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    /* Carrito */
-    .cart-panel {
-      position: fixed;
-      top: 0;
-      right: -400px;
-      width: 340px;
-      height: 100%;
-      background: var(--card-bg);
-      box-shadow: -4px 0 20px rgba(0,0,0,0.2);
-      transition: right 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      z-index: 100;
-    }
-    .cart-panel.open { right: 0; }
-    .cart-header {
-      padding: 16px;
-      font-size: 20px;
-      font-weight: 700;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .cart-items { flex: 1; overflow-y: auto; padding: 14px; }
-    .cart-empty {
-      text-align: center;
-      color: var(--muted);
-      font-size: 15px;
-      padding: 50px 0;
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-    .cart-item button {
-      background: none;
-      border: none;
-      color: var(--accent);
-      cursor: pointer;
-      font-weight: 700;
-    }
-    .cart-footer {
-      border-top: 1px solid #ccc;
-      padding: 16px;
-    }
-    .cart-total {
-      font-weight: 800;
-      margin-bottom: 10px;
-      text-align: right;
-    }
-    .payment-options {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .pay-btn {
-      flex: 1;
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .paypal { background: #0070ba; }
-    .cardpay { background: #4caf50; }
-
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent);
-      color: #fff;
-      padding: 12px 18px;
-      border-radius: 8px;
-      opacity: 0;
-      transition: 0.4s;
-      z-index: 200;
-      font-weight: 600;
-    }
-    .toast.show { opacity: 1; bottom: 60px; }
-
-    @media (max-width: 600px) {
-      .logo { font-size: 18px; }
-      .header-inner { padding: 10px; }
-      .page-title { font-size: 24px; }
-      .grid { grid-template-columns: repeat(2, 1fr); }
-      .card img { height: 120px; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
 </head>
 <body>
 
+  <!-- ====== HEADER ====== -->
   <header>
     <div class="header-inner">
       <div id="menuBtn">☰</div>
       <div class="logo">Efraín Shop</div>
       <div class="header-actions">
-        <button class="login-btn" id="loginBtn">Iniciar sesión</button>
-        <div id="searchBtn" class="icon" title="Buscar">
-          <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Buscar" />
-        </div>
+        <input type="text" id="search" placeholder="Buscar..." />
+        <button class="login-btn">Iniciar sesión</button>
         <div id="cartBtn" class="icon" title="Carrito">
           <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" />
         </div>
@@ -313,48 +23,52 @@
     </div>
   </header>
 
-  <!-- Menú lateral -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <div class="menu-dropdown" id="menuDropdown">
+  <!-- ====== MENÚ LATERAL ====== -->
+  <div class="menu-overlay"></div>
+  <nav class="menu-dropdown">
     <span class="menu-close" id="menuClose">✕</span>
+
     <div class="menu-item">Cuenta</div>
     <div class="menu-item">Mis compras</div>
 
-    <div class="menu-item toggle" id="productosToggle">Productos ▾</div>
-    <div class="submenu" id="productosSubmenu">
-      <div class="submenu-item">Gorras</div>
-      <div class="submenu-item">Camisetas</div>
-      <div class="submenu-item">Cintos</div>
-      <div class="submenu-item">Pantalones</div>
-      <div class="submenu-item">Tenis</div>
-      <div class="submenu-item">Sudaderas</div>
+    <div class="menu-item">Productos ▼</div>
+    <div class="submenu">
+      <div class="menu-item">Gorras</div>
+      <div class="menu-item">Camisetas</div>
+      <div class="menu-item">Cintos</div>
+      <div class="menu-item">Pantalones</div>
+      <div class="menu-item">Tenis</div>
+      <div class="menu-item">Sudaderas</div>
     </div>
 
-    <div class="menu-item toggle" id="nosotrosToggle">Nosotros ▾</div>
-    <div class="submenu" id="nosotrosSubmenu">
-      <div class="submenu-item">Instagram</div>
-      <div class="submenu-item">Facebook</div>
-      <div class="submenu-item">X (Twitter)</div>
-      <div class="submenu-item">YouTube</div>
+    <div class="menu-item">Nosotros ▼</div>
+    <div class="submenu redes">
+      <div class="menu-item">Facebook</div>
+      <div class="menu-item">Instagram</div>
+      <div class="menu-item">TikTok</div>
+      <div class="menu-item">WhatsApp</div>
     </div>
-  </div>
+  </nav>
 
+  <!-- ====== CONTENIDO ====== -->
   <main>
     <h1 class="page-title">Productos disponibles</h1>
     <section class="grid" id="productsGrid"></section>
   </main>
 
-  <!-- Carrito -->
-  <div class="cart-panel" id="cartPanel">
+  <!-- ====== CARRITO ====== -->
+  <div class="cart-panel">
     <div class="cart-header">
       <span>Carrito</span>
       <span id="closeCart" style="cursor:pointer;">✕</span>
     </div>
-    <div class="cart-items" id="cartItems">
+
+    <div class="cart-items">
       <div class="cart-empty">Tu carrito está vacío 🛍️</div>
     </div>
-    <div class="cart-footer" id="cartFooter" style="display:none;">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
+
+    <div class="cart-footer">
+      <div class="cart-total"></div>
       <div class="payment-options">
         <button class="pay-btn paypal" id="paypalBtn">PayPal</button>
         <button class="pay-btn cardpay" id="cardBtn">Tarjeta</button>
@@ -362,66 +76,11 @@
     </div>
   </div>
 
-  <div class="toast" id="toast">Producto agregado al carrito</div>
+  <!-- ====== TOAST ====== -->
+  <div class="toast">Producto agregado al carrito</div>
 
-  <script>
-    // Inicio de sesión
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      window.location.href = "login.html";
-    });
+  <!-- ====== SCRIPTS ====== -->
+  <script type="module" src="js/script.js"></script>
 
-    // Menú lateral
-    const menuBtn = document.getElementById("menuBtn");
-    const menuDropdown = document.getElementById("menuDropdown");
-    const menuOverlay = document.getElementById("menuOverlay");
-    const menuClose = document.getElementById("menuClose");
-    const productosToggle = document.getElementById("productosToggle");
-    const productosSubmenu = document.getElementById("productosSubmenu");
-    const nosotrosToggle = document.getElementById("nosotrosToggle");
-    const nosotrosSubmenu = document.getElementById("nosotrosSubmenu");
-
-    menuBtn.onclick = () => {
-      menuDropdown.classList.add("open");
-      menuOverlay.classList.add("show");
-    };
-    menuClose.onclick = () => {
-      menuDropdown.classList.remove("open");
-      menuOverlay.classList.remove("show");
-    };
-    menuOverlay.onclick = () => {
-      menuDropdown.classList.remove("open");
-      menuOverlay.classList.remove("show");
-    };
-    productosToggle.onclick = () => {
-      productosSubmenu.classList.toggle("show");
-    };
-    nosotrosToggle.onclick = () => {
-      nosotrosSubmenu.classList.toggle("show");
-    };
-
-    // Carrito
-    const cartBtn = document.getElementById("cartBtn");
-    const cartPanel = document.getElementById("cartPanel");
-    const closeCart = document.getElementById("closeCart");
-    const cartItems = document.getElementById("cartItems");
-    const cartFooter = document.getElementById("cartFooter");
-
-    cartBtn.onclick = () => {
-      cartPanel.classList.add("open");
-    };
-    closeCart.onclick = () => {
-      cartPanel.classList.remove("open");
-    };
-
-    // Ocultar opciones si el carrito está vacío
-    function checkCart() {
-      const hasItems = cartItems.querySelectorAll(".cart-item").length > 0;
-      cartFooter.style.display = hasItems ? "block" : "none";
-    }
-    checkCart();
-  </script>
-
-  <script type="module" src="js/firebase.js"></script>
-  <script src="js/script.js"></script>
 </body>
 </html>
