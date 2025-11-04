@@ -1,6 +1,8 @@
 // js/firebase.js
+// Inicializa Firestore por si quieres leer config/admin desde Firestore.
+// Si no lo usas ahora, lo dejamos listo para opciones admin.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -14,3 +16,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+
+// función opcional: leer config (si pones doc config/main en Firestore)
+export async function loadConfig() {
+  try {
+    const cfgRef = doc(db, "config", "main");
+    const snap = await getDoc(cfgRef);
+    if (!snap.exists()) return null;
+    return snap.data();
+  } catch (e) {
+    console.warn("No se pudo leer config:", e.message);
+    return null;
+  }
+}
