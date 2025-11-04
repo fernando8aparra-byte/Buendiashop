@@ -3,20 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Test - Boutique Buendía</title>
+<title>Login - Boutique Buendía</title>
+<style>
+  body { font-family: "Inter", sans-serif; background: #f5f5f5; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; margin:0; }
+  h1 { margin-bottom: 20px; color:#333; }
+  button { padding: 10px 20px; font-size:16px; cursor:pointer; background:#7c4dff; color:#fff; border:none; border-radius:6px; transition:0.2s; }
+  button:hover { opacity:0.9; transform:scale(1.03); }
+  #info { margin-top:20px; font-size:16px; }
+</style>
 </head>
 <body>
 
-<h1>Login con Google</h1>
-<button id="btnGoogle">Iniciar sesión con Google</button>
+<h1>Iniciar sesión con Google</h1>
+<button id="btnGoogle">Iniciar sesión</button>
 
 <div id="info"></div>
 
 <script type="module">
+  // Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
+  // Configuración de Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
     authDomain: "boutique-buendia.firebaseapp.com",
@@ -30,7 +39,6 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
-
   const provider = new GoogleAuthProvider();
 
   const btn = document.getElementById("btnGoogle");
@@ -41,11 +49,12 @@
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Guardar en Firestore
+      // Revisar si el usuario ya existe en Firestore
       const userRef = doc(db, "usuarios", user.uid);
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
+        // Si no existe, crear usuario
         await setDoc(userRef, {
           uid: user.uid,
           nombre: user.displayName,
@@ -54,9 +63,9 @@
           rol: "usuario",
           fechaRegistro: new Date()
         });
-        info.innerHTML = `<p>Usuario registrado: ${user.displayName} (${user.email})</p>`;
+        info.innerHTML = `<p>Usuario registrado: <strong>${user.displayName}</strong> (${user.email})</p>`;
       } else {
-        info.innerHTML = `<p>Usuario ya existe: ${userSnap.data().nombre} (${userSnap.data().email})</p>`;
+        info.innerHTML = `<p>Usuario ya existe: <strong>${userSnap.data().nombre}</strong> (${userSnap.data().email})</p>`;
       }
 
     } catch (e) {
