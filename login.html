@@ -80,7 +80,7 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  const auth = getAuth(app);       // 🔹 Auth inicializado correctamente
   const db = getFirestore(app);
 
   const adminUser = "Buendia*]?~?£u837jwhwi";
@@ -189,6 +189,11 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
       alert("Correo de recuperación enviado");
     }catch(e){ alert(e.message); }
   }
+
+  // 🔹 Comprobar inicialización
+  console.log("Firebase inicializado:", app.name);
+  console.log("Auth:", auth);
+  console.log("Firestore:", db);
 </script>
 
 </body>
