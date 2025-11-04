@@ -1,37 +1,39 @@
 // js/script.js
-import { db } from "./firebase.js"; // db is optional for admin/config
+import { db, loadConfig } from "./firebase.js"; // db optional
 
-// DOM
+/* ------------- DOM ------------- */
+const welcomeBar = document.getElementById("welcomeBar");
 const menuBtn = document.getElementById("menuBtn");
-const menu = document.getElementById("menu");
-const menuClose = document.getElementById("menuClose");
+const menuDropdown = document.getElementById("menuDropdown");
 const menuOverlay = document.getElementById("menuOverlay");
-const cuentaBtn = document.getElementById("cuentaBtn");
+const menuClose = document.getElementById("menuClose");
+const menuCuentaBtn = document.getElementById("menuCuentaBtn");
 const submenuCuenta = document.getElementById("submenuCuenta");
-const estadoSesion = document.getElementById("estadoSesion");
+const menuProductosBtn = document.getElementById("menuProductosBtn");
+const submenuProductos = document.getElementById("submenuProductos");
+const menuNosotrosBtn = document.getElementById("menuNosotrosBtn");
+const submenuNosotros = document.getElementById("submenuNosotros");
+const menuEstadoSesion = document.getElementById("menuEstadoSesion");
+const searchInput = document.getElementById("searchInput");
 const loginBtn = document.getElementById("loginBtn");
-
-const searchInput = document.getElementById("search");
-const productsGrid = document.getElementById("productsGrid");
 const cartBtn = document.getElementById("cartBtn");
 const cartPanel = document.getElementById("cartPanel");
+const closeCart = document.getElementById("closeCart");
 const cartItemsEl = document.getElementById("cartItems");
 const cartFooter = document.getElementById("cartFooter");
 const cartTotalEl = document.getElementById("cartTotal");
-const toast = document.getElementById("toast");
-const carouselInner = document.getElementById("carouselInner");
-const carouselWrap = document.getElementById("carouselWrap");
+const toastEl = document.getElementById("toast");
+const productsGrid = document.getElementById("productsGrid");
+const carouselTrack = document.getElementById("carouselTrack");
 const starAdsEl = document.getElementById("starAds");
-const welcomeBadge = document.getElementById("welcomeBadge");
-const welcomeText = document.getElementById("welcomeText");
 
-// sample products — stored in localStorage
+/* ------------- Data (localStorage) ------------- */
 const SAMPLE_PRODUCTS = [
-  { id: 'p1', nombre: 'Gorra Barbas Hats', descripcion:'Gorra con logo bordado', precio:120, stock:5, categoria:'Gorras', img:'https://images.unsplash.com/photo-1520975918143-3a0c87a1e0b7?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=75f8f0bdea6b0af2a2a7a0f8a8b5a8e3', talla:[], estrella:true },
-  { id: 'p2', nombre: 'Camiseta Oversize Negra', descripcion:'Camiseta oversize algodón 100%', precio:220, stock:12, categoria:'Camisetas', img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=4f0e1f6c7a0ecf3ee2b8b2f9f6f6e8b2', talla:['S','M','L','XL'], estrella:false },
-  { id: 'p3', nombre: 'Tenis Runner Pro', descripcion:'Tenis deportivos para correr', precio:1350, stock:4, categoria:'Tenis', img:'https://images.unsplash.com/photo-1528701800489-2c34b0a2f8e3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=7a3c2b1d3e5f6a7b8c9d0e1f2a3b4c5d', talla:['40','41','42','43'], estrella:true },
-  { id: 'p4', nombre: 'Pantalón Cargo Verde', descripcion:'Pantalón cargo resistente', precio:450, stock:8, categoria:'Pantalones', img:'https://images.unsplash.com/photo-1578894386599-1b073cbd3d14?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=abcd1234abcd1234abcd1234abcd1234', talla:['M','L','XL'], estrella:false },
-  { id: 'p5', nombre: 'Sudadera Logo', descripcion:'Sudadera con capucha y logo', precio:580, stock:7, categoria:'Sudaderas', img:'https://images.unsplash.com/photo-1520975918143-3a0c87a1e0b7?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=75f8f0bdea6b0af2a2a7a0f8a8b5a8e3', talla:['S','M','L'], estrella:false }
+  { id: 'p1', nombre: 'Gorra Barbas Hats', descripcion:'Gorra con logo bordado', precio:120, stock:5, categoria:'Gorras', img:'https://i.ibb.co/gJTvCjp/gorra1.jpg', talla:[], estrella:true },
+  { id: 'p2', nombre: 'Camiseta Oversize Negra', descripcion:'Camiseta oversize algodón 100%', precio:220, stock:12, categoria:'Camisetas', img:'https://i.ibb.co/DtkLMcy/playera1.jpg', talla:['S','M','L','XL'], estrella:false },
+  { id: 'p3', nombre: 'Tenis Runner Pro', descripcion:'Tenis deportivos', precio:1350, stock:4, categoria:'Tenis', img:'https://i.ibb.co/C0cMKC5/tenis1.jpg', talla:['40','41','42','43'], estrella:true },
+  { id: 'p4', nombre: 'Pantalón Cargo Verde', descripcion:'Pantalón cargo resistente', precio:450, stock:8, categoria:'Pantalones', img:'https://i.ibb.co/Lp0pKqR/sudadera1.jpg', talla:['M','L','XL'], estrella:false },
+  { id: 'p5', nombre: 'Sudadera Logo', descripcion:'Sudadera con capucha', precio:580, stock:7, categoria:'Sudaderas', img:'https://i.ibb.co/Lp0pKqR/sudadera1.jpg', talla:['S','M','L'], estrella:false }
 ];
 
 function getStoredProducts(){
@@ -42,7 +44,7 @@ function getStoredProducts(){
 function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
 function saveCart(c){ localStorage.setItem('cart', JSON.stringify(c)); }
 
-// RENDER PRODUCTS
+/* ------------- Render products ------------- */
 function renderProducts(list){
   productsGrid.innerHTML = '';
   if(!list.length){ productsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#777">No hay productos que coincidan</p>'; return; }
@@ -65,35 +67,34 @@ function renderProducts(list){
   });
 }
 
-// CAROUSEL & STAR-ADS
+/* ------------- Carousel & star-ads ------------- */
 function setupCarousel(products){
   const items = products.filter(p=>p.estrella);
-  if(!items.length){ carouselWrap.style.display='none'; return; }
-  // duplicate to give illusion
-  const itemsDup = items.concat(items);
-  carouselInner.innerHTML = '';
-  itemsDup.forEach(p=>{
+  if(!items.length){ document.getElementById('carouselWrap').style.display='none'; return; }
+  // duplicate for smooth infinite
+  const dup = items.concat(items);
+  carouselTrack.innerHTML = '';
+  dup.forEach(p=>{
     const it = document.createElement('div');
-    it.className = 'item';
-    it.innerHTML = `<img src="${p.img}" alt=""><div><strong>${p.nombre}</strong><div class="small-muted">$${p.precio}</div></div>`;
-    carouselInner.appendChild(it);
+    it.className = 'carousel-item';
+    it.innerHTML = `<img src="${p.img}" alt="${p.nombre}"><div style="margin-left:8px"><strong>${p.nombre}</strong><div style="color:#666">$${p.precio}</div></div>`;
+    carouselTrack.appendChild(it);
   });
 }
-
 function setupStarAds(products){
   const ads = products.filter(p=>p.estrella);
   if(!ads.length){ starAdsEl.style.display='none'; return; }
-  starAdsEl.innerHTML = '';
+  starAdsEl.innerHTML='';
   ads.forEach(p=>{
     const a = document.createElement('div');
     a.className='ad';
-    a.innerHTML = `<img src="${p.img}" alt=""><div><strong style="font-size:14px">${p.nombre}</strong><div class="small-muted">$${p.precio}</div></div>`;
+    a.innerHTML = `<img src="${p.img}" alt="${p.nombre}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;margin-right:8px;"><div><strong>${p.nombre}</strong><div style="color:#666">$${p.precio}</div></div>`;
     a.addEventListener('click', ()=> openProduct(p.id));
     starAdsEl.appendChild(a);
   });
 }
 
-// SEARCH (tokens must be all present)
+/* ------------- Search ------------- */
 function searchProducts(q){
   q = q.trim().toLowerCase();
   const products = getStoredProducts();
@@ -105,23 +106,23 @@ function searchProducts(q){
   });
 }
 
-// CART UI
+/* ------------- Cart functions ------------- */
 function renderCart(){
   const cart = getCart();
   cartItemsEl.innerHTML = '';
   if(!cart.length){ cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>'; cartFooter.style.display='none'; return; }
-  cartFooter.style.display='block';
+  cartFooter.style.display = 'block';
   cart.forEach(item=>{
     const p = getStoredProducts().find(x=>x.id===item.id);
+    if(!p) return;
     const div = document.createElement('div');
     div.style.display='flex'; div.style.gap='10px'; div.style.alignItems='center'; div.style.marginBottom='10px';
-    div.innerHTML = `<img src="${p.img}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;"><div style="flex:1"><div style="font-weight:700">${p.nombre}</div><div class="small-muted">x${item.qty}</div></div><div style="font-weight:800">$${p.precio*item.qty}</div>`;
+    div.innerHTML = `<img src="${p.img}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;"><div style="flex:1"><div style="font-weight:700">${p.nombre}</div><div style="color:#666">x${item.qty}</div></div><div style="font-weight:800">$${p.precio*item.qty}</div>`;
     cartItemsEl.appendChild(div);
   });
-  const total = cart.reduce((s,i)=>{ const p = getStoredProducts().find(x=>x.id===i.id); return s + (p ? p.precio * i.qty : 0); },0);
+  const total = cart.reduce((s,i)=> { const p = getStoredProducts().find(x=>x.id===i.id); return s + (p ? p.precio*i.qty : 0); },0);
   cartTotalEl.textContent = `Total: $${total}`;
 }
-
 function addToCart(id){
   const p = getStoredProducts().find(x=>x.id===id);
   if(!p) return;
@@ -132,100 +133,105 @@ function addToCart(id){
   // animate cart
   cartBtn.classList.add('cart-shake');
   setTimeout(()=>cartBtn.classList.remove('cart-shake'), 1000);
-  showToast('Agregado al carrito','green');
+  showToast('Agregado al carrito');
   renderCart();
 }
-
-function showToast(text, color='green'){
-  toast.textContent = text;
-  toast.style.background = color==='green' ? 'var(--accent,#7c4dff)' : '#e53935';
-  toast.classList.add('show');
-  setTimeout(()=> toast.classList.remove('show'), 1600);
+function showToast(text){
+  toastEl.textContent = text;
+  toastEl.classList.add('show');
+  setTimeout(()=> toastEl.classList.remove('show'), 1600);
 }
-
 function openProduct(id){ window.location.href = `product.html?id=${id}`; }
 
-// Modal placeholders (payment)
-document.getElementById('paypalBtn')?.addEventListener('click', ()=> alert('Abrir PayPal (placeholder)'));
-document.getElementById('cardBtn')?.addEventListener('click', ()=> alert('Abrir formulario tarjeta (placeholder)'));
-document.getElementById('oxxoBtn')?.addEventListener('click', ()=> alert('Abrir OXXO (placeholder)'));
+/* ------------- UI events ------------- */
+menuBtn.onclick = ()=> { menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
+menuClose.onclick = ()=> { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
+menuOverlay.onclick = ()=> { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
 
-// MENU interactions
-menuBtn.onclick = ()=> { menu.classList.add('open'); document.querySelector('.menu-overlay').classList.add('show'); };
-menuClose.onclick = ()=> { menu.classList.remove('open'); document.querySelector('.menu-overlay').classList.remove('show'); };
-document.querySelector('.menu-overlay').onclick = ()=> { menu.classList.remove('open'); document.querySelector('.menu-overlay').classList.remove('show'); };
+menuCuentaBtn.onclick = ()=> submenuCuenta.classList.toggle('open');
+menuProductosBtn.onclick = ()=> submenuProductos.classList.toggle('open');
+menuNosotrosBtn.onclick = ()=> submenuNosotros.classList.toggle('open');
 
-cuentaBtn.onclick = ()=> submenuCuenta.classList.toggle('active');
-
-// delegated product buttons
-productsGrid.addEventListener('click', (ev)=>{
-  const add = ev.target.closest('.addBtn');
-  const view = ev.target.closest('.viewBtn');
+/* product buttons (delegation) */
+productsGrid.addEventListener('click', (e)=>{
+  const add = e.target.closest('.addBtn');
+  const view = e.target.closest('.viewBtn');
   if(add){ addToCart(add.dataset.id); return; }
   if(view){ openProduct(view.dataset.id); return; }
 });
 
-// Search input
+/* search */
 searchInput.addEventListener('input', (e)=> renderProducts(searchProducts(e.target.value)));
 
-// Cart open/close
-cartBtn.onclick = ()=> cartPanel.classList.toggle('open');
-document.getElementById('closeCart').onclick = ()=> cartPanel.classList.remove('open');
+/* cart open/close */
+cartBtn.addEventListener('click', ()=> cartPanel.classList.toggle('open'));
+closeCart?.addEventListener('click', ()=> cartPanel.classList.remove('open'));
 
-// SESSION handling & welcome badge behavior
+/* menu social links */
+document.querySelectorAll('.menu-dropdown .social').forEach(el=>{
+  el.addEventListener('click', ()=> {
+    const url = el.dataset.url;
+    if(url) window.open(url, '_blank');
+  });
+});
+
+/* login / session handling (uses localStorage.usuarioActivo which debe guardar tu login) */
 function updateSessionUI(){
   const user = localStorage.getItem('usuarioActivo');
-  const estado = document.getElementById('estadoSesion');
   if(user){
-    // show welcome badge for 3s, hide search meanwhile
-    welcomeText.textContent = `Bienvenido, ${user}`;
-    welcomeBadge.style.display = 'flex';
-    welcomeBadge.classList.add('show');
-    searchInput.style.display = 'none';
+    // show welcome bar for 5s, hide search during that time and center header
+    welcomeBar.textContent = `Hola, ${user} 👋`;
+    welcomeBar.classList.remove('hidden'); welcomeBar.classList.add('visible');
+    // hide search temporarily
+    const searchEl = document.getElementById('searchInput');
+    if(searchEl) searchEl.style.display = 'none';
+    // change login button text subtle
     loginBtn.textContent = `Hola, ${user}`;
-    estado.textContent = 'Cerrar sesión';
+    // menu account shows "Cerrar sesión"
+    menuEstadoSesion.textContent = 'Cerrar sesión';
+    menuEstadoSesion.onclick = ()=> {
+      localStorage.removeItem('usuarioActivo');
+      location.reload();
+    };
+    // remove welcome after 5s
     setTimeout(()=> {
-      // hide welcome and show search
-      welcomeBadge.classList.remove('show');
-      setTimeout(()=> { welcomeBadge.style.display='none'; }, 300);
-      searchInput.style.display = ''; // restore
-    }, 3000);
+      welcomeBar.classList.remove('visible'); welcomeBar.classList.add('hide');
+      setTimeout(()=> { welcomeBar.classList.add('hidden'); welcomeBar.classList.remove('hide'); if(searchEl) searchEl.style.display = ''; }, 480);
+    }, 5000);
   } else {
-    estado.textContent = 'Iniciar sesión';
+    // no session
+    menuEstadoSesion.textContent = 'Iniciar sesión / Registrarse';
+    menuEstadoSesion.onclick = ()=> location.href = 'login.html';
     loginBtn.textContent = 'Iniciar sesión';
-    welcomeBadge.style.display = 'none';
-    searchInput.style.display = '';
+    // ensure welcome hidden
+    welcomeBar.classList.add('hidden');
+    const searchEl = document.getElementById('searchInput');
+    if(searchEl) searchEl.style.display = '';
   }
 }
-updateSessionUI();
-
-estadoSesion.addEventListener('click', ()=>{
+/* hook login button to go to login page if not session */
+loginBtn.addEventListener('click', ()=> {
   const user = localStorage.getItem('usuarioActivo');
-  if(user){
-    localStorage.removeItem('usuarioActivo');
-    alert('Sesión cerrada');
-    location.reload();
-  } else {
-    window.location.href = 'login.html';
-  }
-});
-loginBtn.addEventListener('click', ()=>{
-  const user = localStorage.getItem('usuarioActivo');
-  if(user) alert('Ya tienes sesión iniciada');
-  else window.location.href = 'login.html';
+  if(user) alert('Ya tienes sesión iniciada.');
+  else location.href = 'login.html';
 });
 
-// INIT: load data
-const products = getStoredProducts();
-renderProducts(products);
-setupCarousel(products);
-setupStarAds(products);
-renderCart();
-
-// optional: read config from Firestore to enable/disable features
-(async function loadConfig(){
+/* ---------- Init app ---------- */
+(async function init(){
+  // optional: read admin config from Firestore if you want (not required)
   try {
-    const cfgRef = db ? (await import('https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js')).doc(db, 'config', 'main') : null;
-    // For now we ignore config load failure; admin panel will write config if needed.
-  } catch(e){}
+    const cfg = await loadConfig();
+    if(cfg){
+      if(cfg.carouselEnabled === false) document.getElementById('carouselWrap').style.display='none';
+      if(cfg.starAdsEnabled === false) document.getElementById('starAds').style.display='none';
+      // payments config...
+    }
+  } catch(e){ /* ignore */ }
+
+  const products = getStoredProducts();
+  renderProducts(products);
+  setupCarousel(products);
+  setupStarAds(products);
+  renderCart();
+  updateSessionUI();
 })();
