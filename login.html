@@ -3,39 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Firebase Compat</title>
+<title>Login / Registro</title>
+<link rel="stylesheet" href="css/styles.css">
 <style>
-:root {
-  --bg: #ffffff;
-  --text: #111;
-  --card-bg: #fff;
-  --accent: #7c4dff;
-  --shadow: 0 8px 20px rgba(0,0,0,0.08);
-}
-body {
-  background: var(--bg);
-  font-family: "Inter", sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.login-container {
-  background: var(--card-bg);
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  width: 320px;
-}
-.login-container h2 { text-align: center; margin-bottom: 20px; }
-input { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; border:1px solid #ccc; }
-button { width: 100%; padding: 10px; background: var(--accent); color: #fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
-button:hover { opacity:0.9; transform: scale(1.03); }
+/* Shake y estilo básico para inputs incorrectos */
 .shake { animation: shake 0.3s; border:1px solid red; }
 @keyframes shake { 0%{transform:translateX(0);}25%{transform:translateX(-5px);}50%{transform:translateX(5px);}75%{transform:translateX(-5px);}100%{transform:translateX(0);} }
-.toggle-form { text-align:center; margin-top:12px; cursor:pointer; color:var(--accent); }
-.forgot-password { text-align:center; margin-top:8px; color:var(--accent); cursor:pointer; display:none; }
-label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom:10px; }
 </style>
 </head>
 <body>
@@ -43,32 +16,30 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
 <div class="login-container">
 <h2 id="form-title">Iniciar Sesión</h2>
 
-<!-- Login -->
 <div id="login-form">
 <input type="text" id="login-username" placeholder="Usuario o correo">
 <input type="password" id="login-password" placeholder="Contraseña">
-<button type="button" id="btn-login">Iniciar Sesión</button>
-<div class="forgot-password" id="forgot-password" onclick="resetPassword()">¿Olvidaste tu contraseña?</div>
+<button id="btn-login">Iniciar Sesión</button>
+<div id="forgot-password" class="forgot-password" onclick="resetPassword()" style="display:none;">¿Olvidaste tu contraseña?</div>
 <div class="toggle-form" onclick="toggleForm()">Registrarse</div>
 </div>
 
-<!-- Registro -->
 <div id="register-form" style="display:none;">
 <input type="text" id="reg-username" placeholder="Nombre de usuario">
 <input type="email" id="reg-email" placeholder="Correo electrónico">
 <input type="password" id="reg-password" placeholder="Contraseña">
 <input type="password" id="reg-password2" placeholder="Repetir contraseña">
 <label><input type="checkbox" id="terms"> Acepto términos y condiciones</label>
-<button type="button" id="btn-register">Registrarse</button>
+<button id="btn-register">Registrarse</button>
 <div class="toggle-form" onclick="toggleForm()">Volver a Iniciar Sesión</div>
 </div>
 
-<!-- Firebase Compat -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+  // 🔹 Configuración Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBi49isj_vzkCzIyJLxsAQ_4n3_zMu4txs",
     authDomain: "buendiashop-f3dcc.firebaseapp.com",
@@ -108,7 +79,7 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
     setTimeout(()=> el.classList.remove("shake"), 300);
   }
 
-  // Registro
+  // 🔹 Registro funcional
   document.getElementById("btn-register").addEventListener("click", async ()=>{
     const username = document.getElementById("reg-username").value.trim();
     const email = document.getElementById("reg-email").value.trim();
@@ -121,12 +92,13 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
     if(!terms){ alert("Acepta los términos y condiciones"); return; }
 
     try {
-      // Verificar usuario único
+      // Verificar que no exista usuario
       const snapshot = await db.collection("usuarios").where("nombre","==",username).get();
       if(!snapshot.empty){ alert("Usuario ya registrado"); return; }
 
-      // Crear cuenta Auth
+      // Crear usuario en Auth
       const cred = await auth.createUserWithEmailAndPassword(email, pass1);
+
       // Guardar en Firestore
       await db.collection("usuarios").doc(cred.user.uid).set({
         uid: cred.user.uid,
@@ -137,14 +109,16 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
         rol: "usuario",
         fechaRegistro: new Date()
       });
+
       alert("Se registró correctamente");
       window.location.href = "index.html";
+
     } catch(e){
-      alert("Error: " + e.message);
+      alert("Error: "+ e.message);
     }
   });
 
-  // Login
+  // 🔹 Login funcional
   document.getElementById("btn-login").addEventListener("click", async ()=>{
     const usernameOrEmail = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
@@ -175,7 +149,7 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
     }
   });
 
-  // Reset contraseña
+  // 🔹 Reset de contraseña
   window.resetPassword = async ()=>{
     const email = document.getElementById("login-username").value.trim();
     if(!email){ alert("Ingresa tu correo para recuperar"); return; }
@@ -186,8 +160,6 @@ label { display:flex; align-items:center; gap:6px; font-size:14px; margin-bottom
   }
 
   console.log("Firebase inicializado:", firebase.app().name);
-  console.log("Auth:", auth);
-  console.log("Firestore:", db);
 </script>
 
 </body>
