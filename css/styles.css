@@ -39,7 +39,6 @@ button, input {
   z-index: 1000;
   padding: 12px 18px;
 }
-
 .header-inner {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
