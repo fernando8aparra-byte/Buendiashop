@@ -189,27 +189,31 @@ productsGrid.addEventListener("click", (e) => {
   if (view) openProduct(view.dataset.id);
 });
 
-/* Buscar animado */
+/* Buscar animado centrado y fijo dentro del header */
 searchBtn.onclick = () => {
+  // Oculta la lupa y el logo
   searchBtn.style.display = "none";
-  logoCenter.classList.add("hide-logo");
+  logoCenter.style.opacity = "0";
+
+  // Muestra y centra el input dentro del header
   searchInput.style.display = "block";
-  searchInput.classList.add("visible", "centered");
+  searchInput.classList.add("centered");
   searchInput.focus();
 };
 
-searchInput.addEventListener("input", (e) => renderProducts(searchProducts(e.target.value)));
+searchInput.addEventListener("input", (e) => {
+  renderProducts(searchProducts(e.target.value));
+});
 
 searchInput.addEventListener("blur", () => {
   if (!searchInput.value) {
-    searchInput.classList.remove("visible", "centered");
-    logoCenter.classList.remove("hide-logo");
-    setTimeout(() => {
-      searchInput.style.display = "none";
-      searchBtn.style.display = "flex";
-    }, 300);
+    searchInput.classList.remove("centered");
+    searchInput.style.display = "none";
+    searchBtn.style.display = "flex";
+    logoCenter.style.opacity = "1";
   }
 });
+
 /* Carrito */
 cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
 closeCart?.addEventListener("click", () => cartPanel.classList.remove("open"));
