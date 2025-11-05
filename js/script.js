@@ -1,3 +1,4 @@
+// js/script.js
 import { db, loadConfig } from "./firebase.js"; // Firebase intacto
 
 /* ------------- DOM ------------- */
@@ -81,8 +82,9 @@ function renderProducts(list) {
 /* ------------- Carousel & star-ads ------------- */
 function setupCarousel(products) {
   const items = products.filter(p => p.estrella);
-  if (!items.length) { document.getElementById("carouselWrap").style.display = "none"; return; }
+  if (!items.length) { const cw = document.getElementById("carouselWrap"); if(cw) cw.style.display = "none"; return; }
   const dup = items.concat(items);
+  if(!carouselTrack) return;
   carouselTrack.innerHTML = "";
   dup.forEach(p => {
     const it = document.createElement("div");
@@ -93,7 +95,7 @@ function setupCarousel(products) {
 }
 function setupStarAds(products) {
   const ads = products.filter(p => p.estrella);
-  if (!ads.length) { starAdsEl.style.display = "none"; return; }
+  if (!ads.length) { if(starAdsEl) starAdsEl.style.display = "none"; return; }
   starAdsEl.innerHTML = "";
   ads.forEach(p => {
     const a = document.createElement("div");
@@ -106,7 +108,7 @@ function setupStarAds(products) {
 
 /* ------------- Search ------------- */
 function searchProducts(q) {
-  q = q.trim().toLowerCase();
+  q = (q||"").trim().toLowerCase();
   const products = getStoredProducts();
   if (!q) return products;
   const tokens = q.split(/\s+/).filter(Boolean);
@@ -116,17 +118,18 @@ function searchProducts(q) {
   });
 }
 
-/* ------------- Carrito ------------- */
+/* ------------- Cart functions ------------- */
 function renderCart() {
   const cart = getCart();
   cartItemsEl.innerHTML = "";
   if (!cart.length) {
     cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
-    cartFooter.style.display = "none";
-    document.getElementById("cartCount").textContent = "0";
+    if(cartFooter) cartFooter.style.display = "none";
+    const cntEl = document.getElementById("cartCount");
+    if(cntEl) cntEl.textContent = "0";
     return;
   }
-  cartFooter.style.display = "block";
+  if(cartFooter) cartFooter.style.display = "block";
   let totalItems = 0, total = 0;
   cart.forEach(item => {
     const p = getStoredProducts().find(x => x.id === item.id);
@@ -143,8 +146,9 @@ function renderCart() {
     totalItems += item.qty;
     total += p.precio * item.qty;
   });
-  document.getElementById("cartCount").textContent = totalItems;
-  cartTotalEl.textContent = `$${total}`;
+  const cntEl = document.getElementById("cartCount");
+  if(cntEl) cntEl.textContent = totalItems;
+  if(cartTotalEl) cartTotalEl.textContent = `$${total}`;
 }
 function addToCart(id) {
   const p = getStoredProducts().find(x => x.id === id);
@@ -153,8 +157,10 @@ function addToCart(id) {
   const idx = cart.findIndex(c => c.id === id);
   if (idx >= 0) cart[idx].qty += 1; else cart.push({ id, qty: 1 });
   saveCart(cart);
-  cartBtn.classList.add("cart-shake");
-  setTimeout(() => cartBtn.classList.remove("cart-shake"), 1000);
+  if(cartBtn) {
+    cartBtn.classList.add("cart-shake");
+    setTimeout(() => cartBtn.classList.remove("cart-shake"), 1000);
+  }
   showToast("Agregado al carrito");
   renderCart();
 }
@@ -165,6 +171,7 @@ function removeFromCart(id) {
   showToast("Producto eliminado");
 }
 function showToast(text) {
+  if(!toastEl) return;
   toastEl.textContent = text;
   toastEl.classList.add("show");
   setTimeout(() => toastEl.classList.remove("show"), 2000);
@@ -172,92 +179,141 @@ function showToast(text) {
 function openProduct(id) { window.location.href = `product.html?id=${id}`; }
 
 /* ------------- UI events ------------- */
-menuBtn.onclick = () => { menuDropdown.classList.add("open"); menuOverlay.classList.add("show"); };
-menuClose.onclick = () => { menuDropdown.classList.remove("open"); menuOverlay.classList.remove("show"); };
-menuOverlay.onclick = () => { menuDropdown.classList.remove("open"); menuOverlay.classList.remove("show"); };
+if(menuBtn) menuBtn.onclick = () => { menuDropdown.classList.add("open"); menuOverlay.classList.add("show"); };
+if(menuClose) menuClose.onclick = () => { menuDropdown.classList.remove("open"); menuOverlay.classList.remove("show"); };
+if(menuOverlay) menuOverlay.onclick = () => { menuDropdown.classList.remove("open"); menuOverlay.classList.remove("show"); };
 
-menuCuentaBtn.onclick = () => submenuCuenta.classList.toggle("open");
-menuProductosBtn.onclick = () => submenuProductos.classList.toggle("open");
-menuNosotrosBtn.onclick = () => submenuNosotros.classList.toggle("open");
+if(menuCuentaBtn) menuCuentaBtn.onclick = () => submenuCuenta.classList.toggle("open");
+if(menuProductosBtn) menuProductosBtn.onclick = () => submenuProductos.classList.toggle("open");
+if(menuNosotrosBtn) menuNosotrosBtn.onclick = () => submenuNosotros.classList.toggle("open");
 
-/* Delegación */
-productsGrid.addEventListener("click", (e) => {
+/* product buttons (delegation) */
+if(productsGrid) productsGrid.addEventListener("click", (e) => {
   const add = e.target.closest(".addBtn");
   const view = e.target.closest(".viewBtn");
-  if (add) addToCart(add.dataset.id);
-  if (view) openProduct(view.dataset.id);
+  if (add) { addToCart(add.dataset.id); return; }
+  if (view) { openProduct(view.dataset.id); return; }
 });
 
-/* ---------- BUSCADOR CENTRADO FIJO ---------- */
-searchBtn.onclick = () => {
-  searchBtn.style.display = "none";
-  logoCenter.style.opacity = "0";
-  searchInput.style.display = "block";
-  searchInput.classList.add("centered");
-  searchInput.focus();
-};
+/* ---------- BUSCADOR CENTRADO FIJO + comportamiento de cierre al tocar fuera ---------- */
+/* Comportamiento:
+   - Al presionar searchBtn se muestra el input centrado dentro del header.
+   - Logo se desvanece (opacity 0).
+   - Si haces clic fuera (document) y el input está abierto, se cierra.
+   - Al escribir filtra productos en tiempo real.
+*/
+if (searchBtn && searchInput) {
+  // Prevent accidental page clicks from closing immediately when clicking the button
+  searchBtn.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    // show centered input
+    searchBtn.style.display = "none";
+    logoCenter.style.opacity = "0";
+    searchInput.style.display = "block";
+    // small delay to allow CSS transition
+    setTimeout(()=> searchInput.classList.add("centered"), 10);
+    searchInput.focus();
+  });
 
-searchInput.addEventListener("input", (e) => {
-  renderProducts(searchProducts(e.target.value));
-});
+  // input filtering
+  searchInput.addEventListener("input", (e) => {
+    renderProducts(searchProducts(e.target.value));
+  });
 
-// Cierra el buscador al hacer clic fuera
+  // prevent clicks inside input from bubbling (so document click won't immediately close)
+  searchInput.addEventListener("click", (ev) => ev.stopPropagation());
+
+  // close on outside click (menu or cart clicks should not trigger closure if they contain the target)
+  document.addEventListener("click", (e) => {
+    const isOpen = searchInput.classList.contains("centered");
+    if (!isOpen) return;
+
+    const clickedInsideSearch = searchInput.contains(e.target) || searchBtn.contains(e.target);
+    // allow clicks on menuOverlay or cart to also close the search (that's intended)
+    if (!clickedInsideSearch) {
+      // hide centered input
+      searchInput.classList.remove("centered");
+      // small delay for transition then hide element and restore search button/logo
+      setTimeout(()=> {
+        searchInput.style.display = "none";
+        searchBtn.style.display = "flex";
+        logoCenter.style.opacity = "1";
+      }, 240); // match CSS transition ~0.3s
+    }
+  });
+}
+
+/* cart open/close */
+if (cartBtn) cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
+if (closeCart) closeCart.addEventListener("click", () => cartPanel.classList.remove("open"));
+
+/* close cart when clicking outside of it (but don't close if clicking the cart button itself) */
 document.addEventListener("click", (e) => {
-  const dentro = e.target === searchInput || e.target === searchBtn;
-  if (!dentro && searchInput.classList.contains("centered")) {
-    searchInput.classList.remove("centered");
-    searchInput.style.display = "none";
-    searchBtn.style.display = "flex";
-    logoCenter.style.opacity = "1";
+  if (!cartPanel) return;
+  if (cartPanel.classList.contains("open")) {
+    const clickedCart = cartPanel.contains(e.target) || cartBtn.contains(e.target);
+    if (!clickedCart) cartPanel.classList.remove("open");
   }
 });
 
-/* ---------- CARRITO ---------- */
-cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
-closeCart?.addEventListener("click", () => cartPanel.classList.remove("open"));
-cartItemsEl.addEventListener("click", (e) => {
+/* remove from cart */
+if (cartItemsEl) cartItemsEl.addEventListener("click", (e) => {
   const remove = e.target.closest(".remove-btn");
   if (remove) removeFromCart(remove.dataset.id);
 });
 
-/* Redes */
-document.querySelectorAll(".menu-dropdown .social").forEach(el => {
-  el.addEventListener("click", () => {
+/* menu social links */
+document.querySelectorAll(".menu-dropdown .social").forEach(el=>{
+  el.addEventListener("click", ()=> {
     const url = el.dataset.url;
-    if (url) window.open(url, "_blank");
+    if(url) window.open(url, '_blank');
   });
 });
 
-/* Sesión */
+/* login / session handling */
 function updateSessionUI() {
   const user = localStorage.getItem("usuarioActivo");
   if (user) {
     welcomeBar.textContent = `Hola, ${user} 👋`;
     welcomeBar.classList.remove("hidden");
     welcomeBar.classList.add("visible");
-    menuEstadoSesion.textContent = "Cerrar sesión";
-    menuEstadoSesion.onclick = () => { localStorage.removeItem("usuarioActivo"); location.reload(); };
-    setTimeout(() => {
+    if(menuEstadoSesion) {
+      menuEstadoSesion.textContent = "Cerrar sesión";
+      menuEstadoSesion.onclick = ()=> {
+        localStorage.removeItem('usuarioActivo');
+        location.reload();
+      };
+    }
+    // show only 3 seconds then hide smoothly
+    setTimeout(()=> {
       welcomeBar.classList.remove("visible");
       welcomeBar.classList.add("hide");
-      setTimeout(() => welcomeBar.classList.add("hidden"), 400);
+      setTimeout(()=> welcomeBar.classList.add("hidden"), 400);
     }, 3000);
   } else {
-    menuEstadoSesion.textContent = "Iniciar sesión / Registrarse";
-    menuEstadoSesion.onclick = () => (location.href = "login.html");
-    welcomeBar.classList.add("hidden");
+    if(menuEstadoSesion) {
+      menuEstadoSesion.textContent = "Iniciar sesión / Registrarse";
+      menuEstadoSesion.onclick = ()=> location.href = 'login.html';
+    }
+    if(welcomeBar) welcomeBar.classList.add('hidden');
   }
 }
 
-/* ---------- Init ---------- */
-(async function init() {
+/* ---------- Init app ---------- */
+(async function init(){
   try {
     const cfg = await loadConfig();
-    if (cfg) {
-      if (cfg.carouselEnabled === false) document.getElementById("carouselWrap").style.display = "none";
-      if (cfg.starAdsEnabled === false) document.getElementById("starAds").style.display = "none";
+    if(cfg){
+      if(cfg.carouselEnabled === false) {
+        const cw = document.getElementById("carouselWrap");
+        if(cw) cw.style.display = 'none';
+      }
+      if(cfg.starAdsEnabled === false) {
+        if(starAdsEl) starAdsEl.style.display = 'none';
+      }
     }
-  } catch (e) {}
+  } catch(e){ /* ignore config load errors */ }
+
   const products = getStoredProducts();
   renderProducts(products);
   setupCarousel(products);
