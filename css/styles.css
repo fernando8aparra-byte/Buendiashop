@@ -113,3 +113,42 @@ body { padding: 0; }
 .logo {
   transition: opacity 0.3s ease;
 }
+/* ANIMACIÓN del buscador centrado corregida */
+.header-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.search-input {
+  transition: all 0.3s ease;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+.search-input.centered {
+  width: 60%;
+  margin: 0 auto;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.search-input:focus {
+  border-color: #ff6600;
+  box-shadow: 0 0 4px #ff6600;
+}
+
+/* Logo animación */
+.logo.hide-logo {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.logo {
+  transition: opacity 0.3s ease;
+}
