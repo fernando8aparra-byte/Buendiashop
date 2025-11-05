@@ -16,7 +16,9 @@
       --muted: #777;
       --card-bg: #fff;
       --accent: #7c4dff;
+      --accent-gradient: linear-gradient(135deg, #7c4dff 0%, #5b21b6 100%);
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      --shadow-soft: 0 4px 12px rgba(124, 77, 255, 0.1);
     }
 
     * {
@@ -75,6 +77,24 @@
       display: flex;
       gap: 12px;
       align-items: center;
+      position: relative;
+    }
+
+    /* Badge en carrito */
+    #cartBadge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
     }
 
     /* Barra de búsqueda - Básica en blanco y negro */
@@ -117,11 +137,14 @@
       display: block;
     }
 
-    /* Main */
+    /* Main con patrón sutil */
     main {
       max-width: 1200px;
       margin: 24px auto;
       padding: 0 20px 80px;
+      background-image: 
+        radial-gradient(circle at 1px 1px, rgba(124,77,255,0.05) 1px, transparent 0);
+      background-size: 20px 20px;
     }
 
     .breadcrumbs {
@@ -156,7 +179,7 @@
       position: relative;
       overflow: hidden;
       border-radius: 12px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-soft);
       background: #fafafa;
     }
 
@@ -171,6 +194,11 @@
       object-fit: contain;
       flex-shrink: 0;
       display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .product-gallery:hover .gallery-img {
+      transform: scale(1.05);
     }
 
     .gallery-nav {
@@ -224,16 +252,44 @@
       transform: scale(1.1);
     }
 
+    /* Thumbnails */
+    .gallery-thumbs {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      justify-content: center;
+      background: rgba(255,255,255,0.8);
+    }
+
+    .thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+    }
+
+    .thumb.active { 
+      opacity: 1; 
+      border: 2px solid var(--accent); 
+    }
+
     .product-info {
       flex: 1 1 420px;
       min-width: 300px;
     }
 
     .page-title {
-      font-size: 26px;
+      font-size: clamp(24px, 5vw, 32px);
       margin-bottom: 8px;
-      font-weight: 800;
+      font-weight: 900;
       line-height: 1.2;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .price {
@@ -245,9 +301,10 @@
 
     .desc {
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.7;
       margin-bottom: 18px;
       font-size: 15px;
+      font-variation-settings: 'wght' 400;
     }
 
     .qty-row {
@@ -273,7 +330,7 @@
     }
 
     .add-btn {
-      background: var(--accent);
+      background: var(--accent-gradient);
       color: #fff;
       border: none;
       padding: 12px 16px;
@@ -281,6 +338,7 @@
       font-weight: 700;
       cursor: pointer;
       transition: opacity 0.2s;
+      box-shadow: var(--shadow-soft);
     }
 
     .add-btn:hover {
@@ -358,7 +416,7 @@
     .card {
       background: var(--card-bg);
       border-radius: 10px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-soft);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -368,6 +426,7 @@
 
     .card:hover {
       transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(124, 77, 255, 0.15);
     }
 
     .card img {
@@ -397,7 +456,7 @@
       color: var(--text);
     }
 
-    /* Menú tipo Apple - Limpio y profesional */
+    /* Menú tipo Apple - Con animaciones */
     .menu-overlay {
       position: fixed;
       inset: 0;
@@ -430,6 +489,24 @@
 
     .menu-dropdown.open {
       left: 0;
+    }
+
+    .menu-dropdown.open .menu-item {
+      animation: slideIn 0.4s ease forwards;
+    }
+
+    .menu-item:nth-child(1) { animation-delay: 0.1s; }
+    .menu-item:nth-child(2) { animation-delay: 0.15s; }
+    .menu-item:nth-child(3) { animation-delay: 0.2s; }
+    .menu-item:nth-child(4) { animation-delay: 0.25s; }
+    .menu-item:nth-child(5) { animation-delay: 0.3s; }
+    .menu-item:nth-child(6) { animation-delay: 0.35s; }
+    .menu-item:nth-child(7) { animation-delay: 0.4s; }
+    .menu-item:nth-child(8) { animation-delay: 0.45s; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     .menu-close {
@@ -591,4 +668,516 @@
 
     .toast.show {
       opacity: 1;
-      transform: translateX(-50%) translateY
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Animación shake */
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(-12deg); }
+      40% { transform: rotate(12deg); }
+      60% { transform: rotate(-8deg); }
+      80% { transform: rotate(8deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .shake {
+      animation: shake 0.45s ease;
+    }
+
+    /* Responsive - Optimizado para móvil */
+    @media (max-width: 900px) {
+      .product-wrap {
+        flex-direction: column;
+      }
+      .product-gallery,
+      .product-info {
+        max-width: 100%;
+      }
+      .search-bar input {
+        width: 140px;
+      }
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      .card img {
+        height: 150px;
+      }
+      .add-btn, .pay-btn {
+        padding: 16px 20px;
+        font-size: 16px;
+        min-height: 44px;
+      }
+      .gallery-nav {
+        width: 48px;
+        height: 48px;
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner {
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+      .logo {
+        font-size: 18px;
+        order: -1;
+      }
+      .search-bar input {
+        width: 120px;
+        font-size: 13px;
+        flex: 1;
+        max-width: 200px;
+      }
+      .header-actions {
+        order: 1;
+      }
+      .cart-panel {
+        width: 100%;
+        right: -100%;
+      }
+      .menu-dropdown {
+        width: 100%;
+        left: -100%;
+      }
+      .gallery-nav {
+        width: 48px;
+        height: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div id="menuBtn" aria-label="Abrir menú">☰</div>
+      <div class="logo">Boutique Buendía</div>
+      <div class="header-actions">
+        <div class="search-bar">
+          <input type="text" placeholder="Buscar..." aria-label="Buscar productos">
+        </div>
+        <div id="cartBtn" class="icon" title="Carrito" aria-label="Abrir carrito">
+          <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
+          <span id="cartBadge">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Menú lateral - Estilo Apple -->
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+  <div class="menu-dropdown" id="menuDropdown" aria-hidden="true">
+    <div class="menu-close" id="menuClose" aria-label="Cerrar menú">×</div>
+    <div class="menu-item" onclick="location.href='index.html'">
+      <span style="margin-right: 12px;">🧢</span>
+      Gorras
+    </div>
+    <div class="menu-item prox">
+      <span style="margin-right: 12px;">👕</span>
+      Camisetas <small>Próximamente</small>
+    </div>
+    <div class="menu-item prox">
+      <span style="margin-right: 12px;">🧥</span>
+      Sudaderas <small>Próximamente</small>
+    </div>
+    <div class="menu-item prox">
+      <span style="margin-right: 12px;">👟</span>
+      Tenis <small>Próximamente</small>
+    </div>
+    <div class="menu-item prox">
+      <span style="margin-right: 12px;">🕯</span>
+      Fragancias <small>Próximamente</small>
+    </div>
+    <div class="menu-item prox">
+      <span style="margin-right: 12px;">⌚</span>
+      Relojes <small>Próximamente</small>
+    </div>
+    <div class="menu-item prox">
+      <span style="margin-right: 12px;">🎒</span>
+      Cintos <small>Próximamente</small>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main>
+    <nav class="breadcrumbs">
+      <a href="index.html">INICIO</a> &gt; <a href="index.html">GORRAS</a> &gt; GALAXY CT
+    </nav>
+
+    <section class="product-wrap">
+      <!-- Galería deslizable con gotitas y thumbnails -->
+      <div class="product-gallery" id="gallery">
+        <button class="gallery-nav prev" id="prevBtn" aria-label="Imagen anterior">◀</button>
+        <button class="gallery-nav next" id="nextBtn" aria-label="Imagen siguiente">▶</button>
+        
+        <div class="gallery-track" id="galleryTrack">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra GALAXY CT - Frente' class="gallery-img" loading="lazy">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt='Gorra GALAXY CT - Lateral' class="gallery-img" loading="lazy">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt='Gorra GALAXY CT - Detalle' class="gallery-img" loading="lazy">
+        </div>
+
+        <div class="gallery-dots" id="dots"></div>
+
+        <div class="gallery-thumbs" id="thumbs">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="Thumb 1" class="thumb active" onclick="goToSlide(0)">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="Thumb 2" class="thumb" onclick="goToSlide(1)">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="Thumb 3" class="thumb" onclick="goToSlide(2)">
+        </div>
+      </div>
+
+      <div class="product-info">
+        <h1 class="page-title">Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED</h1>
+        <div class="price">$18,000.00</div>
+        <p class="desc">
+          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado y confección premium. Ajuste regulable y materiales de alta calidad.
+        </p>
+
+        <div class="qty-row">
+          <label for="qty">Cantidad</label>
+          <input id="qty" type="number" min="1" value="1" aria-label="Cantidad">
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <button class="add-btn" id="addToCartBtn" aria-label="Agregar al carrito">
+            Agregar al carrito
+          </button>
+
+          <!-- Botones de pago ocultos hasta agregar -->
+          <div class="payment-options" id="paymentOptions">
+            <button class="pay-btn paypal" onclick="paypalSimulate(event)">
+              <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
+            </button>
+            <button class="pay-btn cardpay" onclick="cardSimulate(event)">
+              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Productos relacionados: 2 filas, 4 productos -->
+    <section class="related">
+      <h2>También podría interesarte</h2>
+      <div class="grid">
+        <div class="card" onclick="location.href='producto2.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
+            <div class="price">$4,500.00</div>
+          </div>
+        </div>
+
+        <div class="card" onclick="location.href='producto3.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="ORIENTAL TUMBADO" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "ORIENTAL TUMBADO"</div>
+            <div class="price">$3,300.00</div>
+          </div>
+        </div>
+
+        <!-- Duplicados para 2 filas -->
+        <div class="card" onclick="location.href='producto4.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="GALAXY CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "GALAXY CT"</div>
+            <div class="price">$18,000.00</div>
+          </div>
+        </div>
+
+        <div class="card" onclick="location.href='producto5.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
+            <div class="price">$4,500.00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Carrito lateral -->
+  <aside class="cart-panel" id="cartPanel" aria-hidden="true" role="region" aria-label="Carrito de compras">
+    <div class="cart-header">
+      <span>Carrito</span>
+      <span id="closeCart" style="cursor:pointer;" aria-label="Cerrar carrito">×</span>
+    </div>
+
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">Tu carrito está vacío 🛍️</div>
+    </div>
+
+    <div class="cart-footer">
+      <div class="cart-total" id="cartTotal">Total: $0</div>
+      <div class="payment-area" id="paymentArea">
+        <button class="pay-btn paypal" id="paypalCheckout">
+          <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
+        </button>
+        <button class="pay-btn cardpay" id="cardCheckout">
+          <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive">¡Producto agregado con éxito! 🛒</div>
+
+  <script>
+    /* ------------------------------
+       Elementos DOM
+       ------------------------------ */
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+
+    const cartBtn = document.getElementById('cartBtn');
+    const cartPanel = document.getElementById('cartPanel');
+    const closeCart = document.getElementById('closeCart');
+    const cartBadge = document.getElementById('cartBadge');
+
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const qtyInput = document.getElementById('qty');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+    const paymentArea = document.getElementById('paymentArea');
+    const paymentOptions = document.getElementById('paymentOptions');
+    const toast = document.getElementById('toast');
+
+    // Galería
+    const galleryTrack = document.getElementById('galleryTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('dots');
+    const thumbsContainer = document.getElementById('thumbs');
+    const images = galleryTrack.querySelectorAll('.gallery-img');
+    let currentIndex = 0;
+    let autoSlideInterval;
+
+    /* Carrito */
+    let cart = [];
+
+    /* ------------------------------
+       Galería - Auto-slide cada 10s
+       ------------------------------ */
+    function updateGallery() {
+      const offset = -currentIndex * 100;
+      galleryTrack.style.transform = `translateX(${offset}%)`;
+
+      document.querySelectorAll('.dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+      });
+
+      document.querySelectorAll('.thumb').forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === currentIndex);
+      });
+    }
+
+    function createDots() {
+      images.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => {
+          currentIndex = i;
+          updateGallery();
+          resetAutoSlide();
+        });
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function goToSlide(index) {
+      currentIndex = index;
+      updateGallery();
+      resetAutoSlide();
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % images.length;
+      updateGallery();
+    }
+
+    function startAutoSlide() {
+      autoSlideInterval = setInterval(nextSlide, 10000);
+    }
+
+    function resetAutoSlide() {
+      clearInterval(autoSlideInterval);
+      startAutoSlide();
+    }
+
+    prevBtn.onclick = () => {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      updateGallery();
+      resetAutoSlide();
+    };
+
+    nextBtn.onclick = () => {
+      nextSlide();
+      resetAutoSlide();
+    };
+
+    // Inicializar galería y auto-slide
+    createDots();
+    updateGallery();
+    startAutoSlide();
+
+    /* ------------------------------
+       Menú lateral
+       ------------------------------ */
+    menuBtn.onclick = () => {
+      menuDropdown.classList.add('open');
+      menuOverlay.classList.add('show');
+      menuDropdown.setAttribute('aria-hidden', 'false');
+      menuOverlay.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeMenu = () => {
+      menuDropdown.classList.remove('open');
+      menuOverlay.classList.remove('show');
+      menuDropdown.setAttribute('aria-hidden', 'true');
+      menuOverlay.setAttribute('aria-hidden', 'true');
+    };
+
+    menuClose.onclick = closeMenu;
+    menuOverlay.onclick = closeMenu;
+
+    /* ------------------------------
+       Carrito panel
+       ------------------------------ */
+    cartBtn.onclick = () => {
+      cartPanel.classList.add('open');
+      cartPanel.setAttribute('aria-hidden', 'false');
+    };
+
+    closeCart.onclick = () => {
+      cartPanel.classList.remove('open');
+      cartPanel.setAttribute('aria-hidden', 'true');
+    };
+
+    /* ------------------------------
+       Agregar al carrito
+       ------------------------------ */
+    addToCartBtn.onclick = (e) => {
+      e.preventDefault();
+      const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+      const product = {
+        name: 'Gorra Barbas Hats x CT "GALAXY CT"',
+        price: 18000
+      };
+
+      for (let i = 0; i < qty; i++) {
+        cart.push(product);
+      }
+
+      renderCart();
+      animateCartIcon();
+      showToast('¡Producto agregado con éxito! 🛒');
+      qtyInput.value = 1;
+
+      // Mostrar botones de pago al agregar
+      paymentOptions.classList.add('show');
+    };
+
+    /* ------------------------------
+       Renderizar carrito
+       ------------------------------ */
+    function renderCart() {
+      cartItemsEl.innerHTML = '';
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
+        cartTotalEl.textContent = 'Total: $0';
+        paymentArea.classList.remove('show');
+        paymentOptions.classList.remove('show');
+        cartBadge.style.display = 'none';
+        return;
+      }
+
+      let total = 0;
+      cart.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div>${item.name}</div>
+          <div>$${item.price.toLocaleString('es-MX')}</div>
+          <button onclick="removeItem(${index})" aria-label="Eliminar item">×</button>
+        `;
+        cartItemsEl.appendChild(row);
+        total += item.price;
+      });
+
+      cartTotalEl.textContent = `Total: $${total.toLocaleString('es-MX')}`;
+      paymentArea.classList.add('show');
+
+      // Actualizar badge
+      cartBadge.textContent = cart.length;
+      cartBadge.style.display = 'flex';
+    }
+
+    /* ------------------------------
+       Eliminar item
+       ------------------------------ */
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+      showToast('Producto eliminado del carrito');
+      if (cart.length === 0) {
+        paymentOptions.classList.remove('show');
+      }
+    }
+
+    window.removeItem = removeItem;
+    window.goToSlide = goToSlide;
+
+    /* ------------------------------
+       Animación icono carrito
+       ------------------------------ */
+    function animateCartIcon() {
+      const img = cartBtn.querySelector('img');
+      if (!img) return;
+      img.classList.add('shake');
+      setTimeout(() => img.classList.remove('shake'), 480);
+    }
+
+    /* ------------------------------
+       Toast
+       ------------------------------ */
+    let toastTimeout = null;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    /* ------------------------------
+       Simulación de pagos
+       ------------------------------ */
+    function paypalSimulate(e) {
+      e?.stopPropagation();
+      alert('Redirigiendo a PayPal (simulación)...');
+    }
+
+    function cardSimulate(e) {
+      e?.stopPropagation();
+      alert('Procesando pago con tarjeta (simulación)...');
+    }
+
+    document.getElementById('paypalCheckout').onclick = paypalSimulate;
+    document.getElementById('cardCheckout').onclick = cardSimulate;
+
+    /* ------------------------------
+       Inicialización
+       ------------------------------ */
+    renderCart();
+  </script>
+</body>
+</html>
