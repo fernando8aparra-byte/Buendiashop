@@ -28,7 +28,7 @@
         <button id="searchBtn" class="icon search-btn" title="Buscar" aria-label="Buscar productos">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </button>
-        <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar" style="display:none;">
+        <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar">
       </div>
 
       <button id="cartBtn" class="icon cart-icon" title="Carrito" aria-label="Abrir carrito">
@@ -103,15 +103,11 @@
   <!-- MAIN CONTENT -->
   <main class="main">
     <h1 class="page-title">Productos Destacados</h1>
-
-    <!-- ANUNCIOS ESTRELLA -->
     <div class="star-ads" id="starAds"></div>
-
-    <!-- GRID DE PRODUCTOS -->
     <section class="grid" id="productsGrid"></section>
   </main>
 
-  <!-- CARRITO LATERAL -->
+  <!-- CARRITO -->
   <aside class="cart-panel" id="cartPanel" aria-hidden="true">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -121,14 +117,9 @@
       <div class="cart-empty">Tu carrito está vacío 🛍️</div>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
-      <div class="cart-total">
-        <span>Total:</span>
-        <strong id="cartTotal">$0</strong>
-      </div>
+      <div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div>
       <div class="payment-options">
-        <button id="paypalBtn" class="pay-btn paypal">
-          <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x74.jpg" alt="PayPal"> PayPal
-        </button>
+        <button id="paypalBtn" class="pay-btn paypal">PayPal</button>
         <button id="cardBtn" class="pay-btn card">Tarjeta</button>
         <button id="oxxoBtn" class="pay-btn oxxo">OXXO</button>
       </div>
@@ -136,10 +127,8 @@
   </aside>
 
   <!-- TOAST -->
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast"></div>
 
-  <!-- SCRIPTS -->
-  <script type="module" src="js/firebase.js"></script>
   <script type="module" src="js/script.js"></script>
 </body>
 </html>
