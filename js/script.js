@@ -20,6 +20,67 @@ const cartTotalEl = document.getElementById('cartTotal');
 const paymentArea = document.getElementById('paymentArea');
 const paymentOptions = document.getElementById('paymentOptions');
 const toast = document.getElementById('toast');
+// === Búsqueda con lupa ===
+const searchBtn = document.getElementById('searchBtn');
+const searchContainer = document.getElementById('searchContainer');
+const searchInput = document.getElementById('searchInput');
+const closeSearch = document.getElementById('closeSearch');
+const logo = document.getElementById('logo');
+
+function openSearch() {
+  searchContainer.classList.add('active');
+  logo.classList.add('hidden');
+  setTimeout(() => searchInput.focus(), 100);
+}
+
+function closeSearchFn() {
+  searchContainer.classList.remove('active');
+  logo.classList.remove('hidden');
+  searchInput.value = '';
+}
+
+searchBtn.onclick = openSearch;
+closeSearch.onclick = closeSearchFn;
+
+// Cerrar con ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && searchContainer.classList.contains('active')) {
+    closeSearchFn();
+  }
+});
+
+// Cerrar al hacer clic fuera (opcional)
+searchContainer.onclick = (e) => {
+  if (e.target === searchContainer) {
+    closeSearchFn();
+  }
+};
+
+// === Resto del script (sin cambios) ===
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuClose = document.getElementById('menuClose');
+
+const cartBtn = document.getElementById('cartBtn');
+const cartPanel = document.getElementById('cartPanel');
+const closeCart = document.getElementById('closeCart');
+const cartBadge = document.getElementById('cartBadge');
+
+const addToCartBtn = document.getElementById('addToCartBtn');
+const qtyInput = document.getElementById('qty');
+const cartItemsEl = document.getElementById('cartItems');
+const cartTotalEl = document.getElementById('cartTotal');
+const paymentArea = document.getElementById('paymentArea');
+const paymentOptions = document.getElementById('paymentOptions');
+const toast = document.getElementById('toast');
+
+let cart = [];
+let currentIndex = 0;
+let autoSlideInterval;
+
+// === Galería, menú, carrito, etc. (sin cambios) ===
+// ... (pega aquí todo el código anterior de galería, menú, carrito, etc.)
 
 // Galería
 const galleryTrack = document.getElementById('galleryTrack');
