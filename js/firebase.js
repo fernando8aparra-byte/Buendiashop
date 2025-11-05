@@ -1,9 +1,12 @@
-// js/firebase.js
-// Inicializa Firestore por si quieres leer config/admin desde Firestore.
-// Si no lo usas ahora, lo dejamos listo para opciones admin.
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+// firebase.js
+// Incluye este archivo con <script src="firebase.js"></script> en cada HTML
+// Asegúrate de añadir las libs firebase-app, auth y firestore en cada html.
 
+if (typeof firebase === 'undefined') {
+  console.error('Carga primero los scripts de Firebase en tu HTML (firebase-app.js, firebase-auth.js, firebase-firestore.js).');
+}
+
+// Config (la que nos diste)
 const firebaseConfig = {
   apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
   authDomain: "boutique-buendia.firebaseapp.com",
@@ -14,18 +17,10 @@ const firebaseConfig = {
   measurementId: "G-9KJ2330RN7"
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-
-// función opcional: leer config (si pones doc config/main en Firestore)
-export async function loadConfig() {
-  try {
-    const cfgRef = doc(db, "config", "main");
-    const snap = await getDoc(cfgRef);
-    if (!snap.exists()) return null;
-    return snap.data();
-  } catch (e) {
-    console.warn("No se pudo leer config:", e.message);
-    return null;
-  }
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+window.__FB = { auth, db }; // export simple reference para usar en los HTML
