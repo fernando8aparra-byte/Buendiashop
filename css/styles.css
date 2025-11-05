@@ -1,3 +1,20 @@
+/* css/styles.css */
+:root {
+  --bg: #fff;
+  --text: #111;
+  --muted: #777;
+  --card-bg: #fff;
+  --accent: #7c4dff;
+  --accent-gradient: linear-gradient(135deg, #7c4dff 0%, #5b21b6 100%);
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --shadow-soft: 0 4px 12px rgba(124, 77, 255, 0.1);
+  --border-radius: 12px;
+  --transition: all 0.25s ease;
+}
+
+/* ... TODO EL CSS QUE TE DI ANTERIORMENTE ... */
+
+/* (Pega aquí todo el CSS del mensaje anterior) */
 <style>
   :root {
     --bg: #fff;
