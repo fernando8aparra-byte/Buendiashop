@@ -51,105 +51,150 @@
     display: block;
   }
 
-  /* ===== HEADER ===== */
-  header {
-    background: var(--card-bg);
-    border-bottom: 1px solid #ddd;
-    position: sticky;
-    top: 0;
-    z-index: 40;
-  }
+  /* ===== HEADER NUEVO ===== */
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  height: 60px;
+}
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-btn {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.icon-btn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+#cartBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* Logo centrado */
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 900;
+  font-size: clamp(18px, 4vw, 22px);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+/* Contenedor de búsqueda (oculto por defecto) */
+.search-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 30;
+  padding: 0 16px;
+}
+
+.search-container.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px 40px 10px 12px;
+  border: 1.5px solid #000;
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fff;
+  color: #000;
+  min-height: 44px;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.2);
+}
+
+#closeSearch {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+/* Ocultar logo cuando búsqueda activa */
+.logo.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
   .header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    max-width: 1400px;
-    margin: 0 auto;
-    gap: 12px;
+    padding: 10px 12px;
   }
-
-  #menuBtn {
-    cursor: pointer;
-    font-size: 28px;
-    user-select: none;
-    color: var(--text);
-    padding: 8px;
-    border-radius: 8px;
-    transition: var(--transition);
-  }
-
-  #menuBtn:hover {
-    background: rgba(0,0,0,0.05);
-  }
-
+  
   .logo {
-    font-weight: 900;
-    font-size: clamp(18px, 4vw, 22px);
-    letter-spacing: 1px;
+    font-size: 17px;
   }
-
-  .header-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    position: relative;
-  }
-
-  #cartBadge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: var(--accent);
-    color: #fff;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 11px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-  }
-
-  .search-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
+  
   .search-bar input {
-    padding: 10px 12px 10px 36px;
-    border: 1.5px solid #000;
-    border-radius: 8px;
     font-size: 14px;
-    background: #fff;
-    color: #000;
-    transition: var(--transition);
-    min-height: 44px;
   }
-
-  .search-bar input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.2);
-  }
-
-  .search-bar::before {
-    content: "";
-    position: absolute;
-    left: 12px;
-    width: 18px;
-    height: 18px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23000" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat center;
-    background-size: contain;
-  }
-
-  .icon img {
-    width: 24px;
-    height: 24px;
-  }
+}
 
   /* ===== MAIN ===== */
   main {
