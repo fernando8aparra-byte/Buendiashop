@@ -1,96 +1,86 @@
-// js/script.js
-import { db } from "./firebase.js";
+// Productos demo
+const demoProducts = [
+  { id: 1, nombre: "Gorra Oversize", precio: 450, categoria: "Gorras", img: "https://i.ibb.co/4p4J0kJ/gorra.jpg", tipo: "carrusel" },
+  { id: 2, nombre: "Camiseta Premium", precio: 680, categoria: "Camisetas", img: "https://i.ibb.co/5x5Y5Y5/camiseta.jpg", tipo: "carrusel" },
+  { id: 3, nombre: "Cinto Cuero", precio: 320, categoria: "Cintos", img: "https://i.ibb.co/5x5Y5Y5/cinto.jpg", tipo: "normal" },
+  { id: 4, nombre: "Sudadera Negra", precio: 890, categoria: "Sudaderas", img: "https://i.ibb.co/5x5Y5Y5/sudadera.jpg", tipo: "principal" },
+  // + más...
+];
 
 const DOM = {
-  welcomeBar: document.getElementById("welcomeBar"),
-  maintenanceBar: document.getElementById("maintenanceBar"),
   menuBtn: document.getElementById("menuBtn"),
   menuDropdown: document.getElementById("menuDropdown"),
   menuOverlay: document.getElementById("menuOverlay"),
   menuClose: document.getElementById("menuClose"),
-  menuCuentaBtn: document.getElementById("menuCuentaBtn"),
-  submenuCuenta: document.getElementById("submenuCuenta"),
-  menuNosotrosBtn: document.getElementById("menuNosotrosBtn"),
-  submenuNosotros: document.getElementById("submenuNosotros"),
-  menuProductosBtn: document.getElementById("menuProductosBtn"),
-  submenuProductos: document.getElementById("submenuProductos"),
-  menuEstadoSesion: document.getElementById("menuEstadoSesion"),
   searchBtn: document.getElementById("searchBtn"),
   searchInput: document.getElementById("searchInput"),
   cartBtn: document.getElementById("cartBtn"),
   cartPanel: document.getElementById("cartPanel"),
   closeCart: document.getElementById("closeCart"),
-  cartItemsEl: document.getElementById("cartItems"),
-  cartFooter: document.getElementById("cartFooter"),
-  cartTotalEl: document.getElementById("cartTotal"),
-  toastEl: document.getElementById("toast"),
-  productsGrid: document.getElementById("productsGrid"),
+  cartCount: document.getElementById("cartCount"),
   carouselGrid: document.getElementById("carouselGrid"),
-  logoText: document.getElementById("logoText"),
-  siteTitle: document.getElementById("siteTitle"),
+  productsGrid: document.getElementById("productsGrid"),
   filters: document.getElementById("filters")
 };
 
-let products = [], config = {};
+let cart = [], currentFilter = 'all';
 
-// === CARGA CONFIG ===
-async function loadConfig() {
-  const snap = await db.ref('config').once('value');
-  config = snap.val() || {};
-  if (config.nombre) {
-    DOM.logoText.textContent = config.nombre;
-    DOM.siteTitle.textContent = `${config.nombre} | Moda Premium`;
-  }
-  if (config.mantenimiento) {
-    DOM.maintenanceBar.classList.add('visible');
-    DOM.productsGrid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-muted)">Página en mantenimiento</p>';
-    return false;
-  }
-  setupSocialLinks();
-  return true;
-}
+// === MENU ===
+DOM.menuBtn.onclick = () => {
+  DOM.menuDropdown.classList.add('open');
+  DOM.menuOverlay.classList.add('show');
+};
+DOM.menuClose.onclick = DOM.menuOverlay.onclick = () => {
+  DOM.menuDropdown.classList.remove('open');
+  DOM.menuOverlay.classList.remove('show');
+};
 
-function setupSocialLinks() {
-  const socials = config.socials || {};
-  Object.keys(socials).forEach(key => {
-    const el = DOM.submenuNosotros.querySelector(`[data-social="${key}"]`);
-    if (el && socials[key].enabled && socials[key].url) {
-      el.style.display = 'flex';
-      el.onclick = () => window.open(key === 'whatsapp' ? `https://wa.me/${config.whatsapp}` : socials[key].url, '_blank');
-    } else {
-      el.style.display = 'none';
-    }
-  });
-}
+// Submenús
+document.querySelectorAll('.menu-header').forEach(h => {
+  h.onclick = () => h.nextElementSibling.classList.toggle('open');
+});
 
-// === PRODUCTOS ===
-async function loadProducts() {
-  const snap = await db.ref('products').once('value');
-  products = Object.entries(snap.val() || {}).map(([id, p]) => ({ id, ...p })).filter(p => p.enabled !== false);
-  renderProducts(products);
-  renderDestacados(products.filter(p => p.tipo === 'carrusel' || p.tipo === 'principal'));
-}
-
-function renderDestacados(list) {
-  DOM.carouselGrid.innerHTML = list.map(p => `
+// === RENDER ===
+function render() {
+  // Carrusel
+  const destacados = demoProducts.filter(p => p.tipo === 'carrusel' || p.tipo === 'principal');
+  DOM.carouselGrid.innerHTML = destacados.map(p => `
     <div class="carousel-item">
       <img src="${p.img}" alt="${p.nombre}">
-      <div><strong>${p.nombre}</strong><div>$${formatPrice(p.precio)}</div></div>
+      <div><strong>${p.nombre}</strong><div>$${p.precio.toLocaleString()}</div></div>
+    </div>
+  `).join('');
+
+  // Productos
+  let list = demoProducts.filter(p => currentFilter === 'all' || p.categoria === currentFilter);
+  DOM.productsGrid.innerHTML = list.map(p => `
+    <div class="card">
+      <img src="${p.img}" alt="${p.nombre}">
+      <div class="meta">
+        <div class="title">${p.nombre}</div>
+        <div class="price">$${p.precio.toLocaleString()}</div>
+        <button class="addBtn" onclick="addToCart(${p.id})">Agregar</button>
+      </div>
     </div>
   `).join('');
 }
 
-function renderProducts(list) {
-  DOM.productsGrid.innerHTML = list.length ? list.map(p => /* ... igual que antes ... */).join('') : '<p>No hay productos</p>';
+function addToCart(id) {
+  const p = demoProducts.find(x => x.id === id);
+  cart.push(p);
+  DOM.cartCount.textContent = cart.length;
+  showToast("¡Agregado al carrito!");
 }
 
-function formatPrice(num) {
-  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(num).replace('MXN', '');
-}
+// === FILTROS ===
+DOM.filters.onclick = e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  DOM.filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter === 'all' ? 'all' : btn.dataset.filter === 'precio-asc' ? 'asc' : 'desc';
+  render();
+};
 
 // === INIT ===
-(async () => {
-  if (!await loadConfig()) return;
-  await loadProducts();
-  // ... resto de eventos: menú, carrito, modal, etc.
-})();
+render();
