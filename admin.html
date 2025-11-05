@@ -1,1 +1,96 @@
+// js/admin.js
+import { db, loadConfig } from "./firebase.js";
 
+const addProductBtn = document.getElementById("addProductBtn");
+const addProductModal = document.getElementById("addProductModal");
+const closeModal = document.getElementById("closeModal");
+const addProductForm = document.getElementById("addProductForm");
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsModal = document.getElementById("settingsModal");
+const closeSettings = document.getElementById("closeSettings");
+const siteNameInput = document.getElementById("siteName");
+const saveNameBtn = document.getElementById("saveName");
+const maintenanceToggle = document.getElementById("maintenanceToggle");
+const monthlyPurchases = document.getElementById("monthlyPurchases");
+const purchaseList = document.getElementById("purchaseList");
+const registrations = document.getElementById("registrations");
+const productsGrid = document.getElementById("productsGrid");
+
+// Sample data (expand to Firebase)
+const samplePurchases = [
+  { user: 'User1', date: new Date(), location: 'Michoacán' },
+  { user: 'User2', date: new Date(), location: 'Jalisco' }
+];
+const sampleRegistrations = 5;
+const stateCoords = {
+  'Michoacán': { lat: 19.5667, lng: -101.8333 },
+  'Jalisco': { lat: 20.6597, lng: -103.3496 }
+  // Add more states
+};
+
+// Render products with edit/delete
+function renderProducts(list){
+  productsGrid.innerHTML = '';
+  list.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${p.img}" alt="${p.nombre}" loading="lazy">
+      <div class="meta">
+        <div class="title">${p.nombre}</div>
+        <div class="price">$${p.precio.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div class="small-muted">${p.categoria} • Stock ${p.stock}</div>
+        <button class="editBtn" data-id="${p.id}">Editar</button>
+        <button class="deleteBtn" data-id="${p.id}">Eliminar</button>
+      </div>
+    `;
+    productsGrid.appendChild(card);
+  });
+}
+
+// Add product form
+addProductForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const newProduct = {
+    id: 'p' + (getStoredProducts().length + 1),
+    tipo: formData.get('tipo'),
+    nombre: formData.get('nombre'),
+    descripcion: formData.get('descripcion'),
+    precio: parseFloat(formData.get('precio')).toLocaleString('en-US', {minimumFractionDigits: 2, style: 'currency', currency: 'USD'}),
+    categoria: formData.get('categoria'),
+    stock: parseInt(formData.get('stock')),
+    talla: formData.get('talla').split(',').map(t => t.trim()),
+    img: formData.get('img'),
+    estrella: formData.get('tipo') === 'publicidad' || formData.get('tipo') === 'carrusel'
+  };
+  const products = getStoredProducts();
+  products.push(newProduct);
+  localStorage.setItem('productos', JSON.stringify(products));
+  renderProducts(products);
+  addProductModal.classList.add('hidden');
+  // Save to Firebase if needed
+});
+
+// Edit/Delete delegation
+productsGrid.addEventListener('click', (e) => {
+  const edit = e.target.closest('.editBtn');
+  const del = e.target.closest('.deleteBtn');
+  if(edit) {
+    alert('Editar producto ' + edit.dataset.id);
+    // Implement edit form
+  }
+  if(del) {
+    if(confirm('Eliminar?')) {
+      let products = getStoredProducts();
+      products = products.filter(p => p.id !== del.dataset.id);
+      localStorage.setItem('productos', JSON.stringify(products));
+      renderProducts(products);
+    }
+  }
+});
+
+// Modals
+addProductBtn.onclick = () => addProductModal.classList.remove('hidden');
+closeModal.onclick = () => addProductModal.classList.add('hidden');
+settingsBtn.onclick = ()
