@@ -55,6 +55,14 @@
       cursor: pointer;
       font-size: 26px;
       user-select: none;
+      color: var(--text);
+      padding: 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    #menuBtn:hover {
+      background: rgba(0,0,0,0.05);
     }
 
     .logo {
@@ -69,7 +77,7 @@
       align-items: center;
     }
 
-    /* Barra de búsqueda */
+    /* Barra de búsqueda - Básica en blanco y negro */
     .search-bar {
       position: relative;
       display: flex;
@@ -78,25 +86,29 @@
 
     .search-bar input {
       padding: 8px 12px 8px 34px;
-      border: 1px solid #ddd;
+      border: 1px solid #000;
       border-radius: 8px;
       font-size: 14px;
       width: 180px;
+      background: #fff;
+      color: #000;
       transition: all 0.2s;
     }
 
     .search-bar input:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+      border-color: #000;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     }
 
     .search-bar::before {
-      content: "🔍";
+      content: "";
       position: absolute;
-      left: 10px;
-      font-size: 16px;
-      color: var(--muted);
+      left: 12px;
+      width: 16px;
+      height: 16px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23000" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat center;
+      background-size: contain;
     }
 
     .icon img {
@@ -165,12 +177,12 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.8);
-      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ddd;
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -178,6 +190,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 10;
       transition: all 0.2s;
+      color: #000;
     }
 
     .gallery-nav:hover {
@@ -194,20 +207,21 @@
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
 
     .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+      width: 6px;
+      height: 12px;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
       background: rgba(0,0,0,0.3);
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
     }
 
     .dot.active {
       background: var(--accent);
+      transform: scale(1.1);
     }
 
     .product-info {
@@ -383,15 +397,16 @@
       color: var(--text);
     }
 
-    /* Menu */
+    /* Menú tipo Apple - Limpio y profesional */
     .menu-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.3);
       z-index: 30;
       opacity: 0;
       visibility: hidden;
       transition: 0.25s;
+      backdrop-filter: blur(4px);
     }
 
     .menu-overlay.show {
@@ -403,13 +418,14 @@
       position: fixed;
       top: 0;
       left: -300px;
-      width: 260px;
+      width: 280px;
       height: 100%;
-      background: var(--card-bg);
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
-      padding: 56px 18px 20px;
+      background: #fff;
+      box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+      padding: 80px 24px 24px;
       z-index: 35;
-      transition: left 0.28s;
+      transition: left 0.28s ease;
+      border-right: 1px solid #eee;
     }
 
     .menu-dropdown.open {
@@ -418,37 +434,59 @@
 
     .menu-close {
       position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 20px;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
       cursor: pointer;
-      color: var(--text);
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+
+    .menu-close:hover {
+      background: rgba(0,0,0,0.05);
     }
 
     .menu-item {
-      padding: 14px 0;
-      border-bottom: 2px solid #eee;
-      font-weight: 700;
+      padding: 16px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-weight: 600;
       cursor: pointer;
       text-align: left;
       color: var(--text);
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: color 0.2s;
+    }
+
+    .menu-item:hover {
+      color: var(--accent);
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
     }
 
     .menu-item.prox {
       color: var(--muted);
-      display: flex;
-      gap: 10px;
-      align-items: center;
+      opacity: 0.7;
+    }
+
+    .menu-item.prox:hover {
+      color: var(--muted);
+      opacity: 1;
     }
 
     .menu-item.prox small {
-      margin-left: auto;
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 11px;
+      font-size: 12px;
+      font-weight: 500;
     }
 
     /* Carrito lateral */
@@ -553,227 +591,4 @@
 
     .toast.show {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Animación shake */
-    @keyframes shake {
-      0% { transform: rotate(0deg); }
-      20% { transform: rotate(-12deg); }
-      40% { transform: rotate(12deg); }
-      60% { transform: rotate(-8deg); }
-      80% { transform: rotate(8deg); }
-      100% { transform: rotate(0deg); }
-    }
-
-    .shake {
-      animation: shake 0.45s ease;
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      .product-wrap {
-        flex-direction: column;
-      }
-      .product-gallery,
-      .product-info {
-        max-width: 100%;
-      }
-      .search-bar input {
-        width: 140px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .header-inner {
-        padding: 10px 16px;
-        flex-wrap: wrap;
-      }
-      .logo {
-        font-size: 18px;
-      }
-      .search-bar input {
-        width: 120px;
-        font-size: 13px;
-      }
-      .cart-panel {
-        width: 100%;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Header -->
-  <header>
-    <div class="header-inner">
-      <div id="menuBtn" aria-label="Abrir menú">Menu</div>
-      <div class="logo">Boutique Buendía</div>
-      <div class="header-actions">
-        <div class="search-bar">
-          <input type="text" placeholder="Buscar..." aria-label="Buscar productos">
-        </div>
-        <div id="cartBtn" class="icon" title="Carrito" aria-label="Abrir carrito">
-          <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Menú lateral -->
-  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
-  <div class="menu-dropdown" id="menuDropdown" aria-hidden="true">
-    <div class="menu-close" id="menuClose" aria-label="Cerrar menú">X</div>
-    <div class="menu-item" onclick="location.href='index.html'">Gorras</div>
-    <div class="menu-item prox"><span>Tag</span> Camisetas <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>Sweater</span> Sudaderas <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>Shoe</span> Tenis <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>Candle</span> Fragancias <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>Watch</span> Relojes <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>Bag</span> Cintos <small>Próximamente</small></div>
-  </div>
-
-  <!-- Main Content -->
-  <main>
-    <nav class="breadcrumbs">
-      <a href="index.html">INICIO</a> > <a href="index.html">GORRAS</a> > GALAXY CT
-    </nav>
-
-    <section class="product-wrap">
-      <!-- Galería deslizable -->
-      <div class="product-gallery" id="gallery">
-        <button class="gallery-nav prev" id="prevBtn" aria-label="Imagen anterior">Left Arrow</button>
-        <button class="gallery-nav next" id="nextBtn" aria-label="Imagen siguiente">Right Arrow</button>
-        
-        <div class="gallery-track" id="galleryTrack">
-          <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra GALAXY CT - Frente' class="gallery-img" loading="lazy">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt='Gorra GALAXY CT - Lateral' class="gallery-img" loading="lazy">
-          <img src="http://imgfz.com/i/P9gF7m8.webp" alt='Gorra GALAXY CT - Detalle' class="gallery-img" loading="lazy">
-        </div>
-
-        <div class="gallery-dots" id="dots"></div>
-      </div>
-
-      <div class="product-info">
-        <h1 class="page-title">Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED</h1>
-        <div class="price">$18,000.00</div>
-        <p class="desc">
-          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado y confección premium. Ajuste regulable y materiales de alta calidad.
-        </p>
-
-        <div class="qty-row">
-          <label for="qty">Cantidad</label>
-          <input id="qty" type="number" min="1" value="1" aria-label="Cantidad">
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-          <button class="add-btn" id="addToCartBtn" aria-label="Agregar al carrito">
-            Agregar al carrito
-          </button>
-
-          <!-- Botones de pago ocultos hasta agregar -->
-          <div class="payment-options" id="paymentOptions">
-            <button class="pay-btn paypal" onclick="paypalSimulate(event)">
-              <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
-            </button>
-            <button class="pay-btn cardpay" onclick="cardSimulate(event)">
-              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Productos relacionados: 2 filas, 4 productos -->
-    <section class="related">
-      <h2>También podría interesarte</h2>
-      <div class="grid">
-        <div class="card" onclick="location.href='producto2.html'" role="link" tabindex="0">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
-            <div class="price">$4,500.00</div>
-          </div>
-        </div>
-
-        <div class="card" onclick="location.href='producto3.html'" role="link" tabindex="0">
-          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="ORIENTAL TUMBADO" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "ORIENTAL TUMBADO"</div>
-            <div class="price">$3,300.00</div>
-          </div>
-        </div>
-
-        <!-- Duplicados para 2 filas -->
-        <div class="card" onclick="location.href='producto4.html'" role="link" tabindex="0">
-          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="GALAXY CT" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "GALAXY CT"</div>
-            <div class="price">$18,000.00</div>
-          </div>
-        </div>
-
-        <div class="card" onclick="location.href='producto5.html'" role="link" tabindex="0">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
-            <div class="price">$4,500.00</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Carrito lateral -->
-  <aside class="cart-panel" id="cartPanel" aria-hidden="true" role="region" aria-label="Carrito de compras">
-    <div class="cart-header">
-      <span>Carrito</span>
-      <span id="closeCart" style="cursor:pointer;" aria-label="Cerrar carrito">X</span>
-    </div>
-
-    <div class="cart-items" id="cartItems">
-      <div class="cart-empty">Tu carrito está vacío Shopping Bag</div>
-    </div>
-
-    <div class="cart-footer">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div class="payment-area" id="paymentArea">
-        <button class="pay-btn paypal" id="paypalCheckout">
-          <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
-        </button>
-        <button class="pay-btn cardpay" id="cardCheckout">
-          <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Toast -->
-  <div class="toast" id="toast" role="alert" aria-live="assertive">Producto agregado con éxito Shopping Bag</div>
-
-  <script>
-    /* ------------------------------
-       Elementos DOM
-       ------------------------------ */
-    const menuBtn = document.getElementById('menuBtn');
-    const menuDropdown = document.getElementById('menuDropdown');
-    const menuOverlay = document.getElementById('menuOverlay');
-    const menuClose = document.getElementById('menuClose');
-
-    const cartBtn = document.getElementById('cartBtn');
-    const cartPanel = document.getElementById('cartPanel');
-    const closeCart = document.getElementById('closeCart');
-
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    const qtyInput = document.getElementById('qty');
-    const cartItemsEl = document.getElementById('cartItems');
-    const cartTotalEl = document.getElementById('cartTotal');
-    const paymentArea = document.getElementById('paymentArea');
-    const paymentOptions = document.getElementById('paymentOptions');
-    const toast = document.getElementById('toast');
-
-    // Galería
-    const galleryTrack = document.getElementById('galleryTrack');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const dotsContainer =
+      transform: translateX(-50%) translateY
