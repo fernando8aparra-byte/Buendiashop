@@ -1,71 +1,787 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Boutique Buendía</title>
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gorra Barbas Hats x CT "GALAXY CT" - Boutique Buendía</title>
+  <meta name="description" content='Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado premium, ajuste regulable y materiales de alta calidad.'>
+
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #111;
+      --muted: #777;
+      --card-bg: #fff;
+      --accent: #7c4dff;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid #ddd;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    #menuBtn {
+      cursor: pointer;
+      font-size: 26px;
+      user-select: none;
+    }
+
+    .logo {
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .icon img {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+
+    /* Main */
+    main {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px 80px;
+    }
+
+    .breadcrumbs {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .breadcrumbs a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .breadcrumbs a:hover {
+      color: var(--accent);
+    }
+
+    .product-wrap {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .product-media {
+      flex: 1 1 420px;
+      min-width: 300px;
+      max-width: 520px;
+    }
+
+    .product-media img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      object-fit: contain;
+      background: #fafafa;
+      display: block;
+    }
+
+    .product-info {
+      flex: 1 1 420px;
+      min-width: 300px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      margin-bottom: 8px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .price {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .desc {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+      font-size: 15px;
+    }
+
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .qty-row label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .qty-row input {
+      width: 80px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .add-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .add-btn:hover {
+      opacity: 0.95;
+    }
+
+    /* Payment buttons */
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      max-width: 340px;
+    }
+
+    .pay-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 11px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .pay-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .paypal {
+      background: #ffc439;
+      color: #111;
+    }
+
+    .paypal img {
+      height: 20px;
+    }
+
+    .cardpay {
+      background: #0070ba;
+      color: #fff;
+    }
+
+    .cardpay img {
+      height: 20px;
+      filter: invert(1);
+    }
+
+    /* Related */
+    .related {
+      margin-top: 48px;
+    }
+
+    .related h2 {
+      font-size: 20px;
+      margin-bottom: 14px;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 220px;
+      object-fit: contain;
+      background: #fafafa;
+    }
+
+    .meta {
+      padding: 12px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .meta .title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .meta .price {
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* Menu */
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.2);
+      z-index: 30;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.25s;
+    }
+
+    .menu-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-dropdown {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 260px;
+      height: 100%;
+      background: var(--card-bg);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+      padding: 56px 18px 20px;
+      z-index: 35;
+      transition: left 0.28s;
+    }
+
+    .menu-dropdown.open {
+      left: 0;
+    }
+
+    .menu-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .menu-item {
+      padding: 14px 0;
+      border-bottom: 2px solid #eee;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .menu-item.prox {
+      color: var(--muted);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .menu-item.prox small {
+      margin-left: auto;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    /* Carrito lateral */
+    .cart-panel {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 360px;
+      height: 100%;
+      background: var(--card-bg);
+      box-shadow: -6px 0 30px rgba(0, 0, 0, 0.12);
+      transition: right 0.28s;
+      display: flex;
+      flex-direction: column;
+      z-index: 45;
+    }
+
+    .cart-panel.open {
+      right: 0;
+    }
+
+    .cart-header {
+      padding: 16px;
+      font-weight: 800;
+      border-bottom: 1px solid #e6e6e6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .cart-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 48px 8px;
+      font-weight: 600;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f2f2f2;
+      font-size: 14px;
+    }
+
+    .cart-item button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .cart-footer {
+      padding: 16px;
+      border-top: 1px solid #eee;
+    }
+
+    .cart-total {
+      font-weight: 900;
+      text-align: right;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .payment-area {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .payment-area.show {
+      display: flex;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      bottom: 18px;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-weight: 800;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s;
+      z-index: 60;
+      font-size: 15px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Animación shake */
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(-12deg); }
+      40% { transform: rotate(12deg); }
+      60% { transform: rotate(-8deg); }
+      80% { transform: rotate(8deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .shake {
+      animation: shake 0.45s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .product-wrap {
+        flex-direction: column;
+      }
+      .product-media,
+      .product-info {
+        max-width: 100%;
+      }
+      .payment-options {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-inner {
+        padding: 10px 16px;
+      }
+      .logo {
+        font-size: 18px;
+      }
+      .cart-panel {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<header class="site-header">
-  <button id="menuBtn" class="icon-btn" aria-label="menu">☰</button>
-  <div class="logo">Boutique Buendía</div>
-  <div class="header-right">
-    <button id="searchBtn" class="icon-btn" aria-label="buscar">🔍</button>
-    <button id="cartBtn" class="icon-btn" aria-label="carrito">🛒</button>
-  </div>
-</header>
-
-<!-- Search (animated first use) -->
-<div id="searchWrap" class="search-wrap">
-  <input id="searchInput" placeholder="Buscar producto, color o talla..." />
-</div>
-
-<main class="page-wrap">
-
-  <!-- PRINCIPAL (gran tarjeta estilo imagen) -->
-  <section id="principalSection" class="principal-wrap">
-    <!-- contenido inyectado por JS -->
-  </section>
-
-  <!-- Carrusel horizontal -->
-  <section class="section">
-    <h3 class="section-title">Nuevas llegadas</h3>
-    <div id="carousel" class="carousel"></div>
-  </section>
-
-  <!-- Grid productos (2 por fila en pantallas grandes) -->
-  <section class="section">
-    <h3 class="section-title">También podría interesarte</h3>
-    <div id="productsGrid" class="grid"></div>
-  </section>
-
-</main>
-
-<!-- Carrito panel -->
-<aside id="cartPanel" class="cart-panel" aria-hidden="true">
-  <div class="cart-header">
-    <strong>Carrito</strong>
-    <button id="closeCart" class="icon-btn">✕</button>
-  </div>
-  <div id="cartItems" class="cart-items">
-    <div class="cart-empty">Tu carrito está vacío 🛍️</div>
-  </div>
-  <div class="cart-footer">
-    <div id="cartTotal" class="cart-total">Total: $0</div>
-    <div class="payment-options">
-      <button id="payPayPal" class="pay-btn paypal"><img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt=""> Pagar con PayPal</button>
-      <button id="payCard" class="pay-btn cardpay"><img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt=""> Pagar con Tarjeta</button>
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div id="menuBtn" aria-label="Abrir menú">☰</div>
+      <div class="logo">Boutique Buendía</div>
+      <div class="header-actions">
+        <div id="cartBtn" class="icon" title="Carrito" aria-label="Abrir carrito">
+          <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
+        </div>
+      </div>
     </div>
+  </header>
+
+  <!-- Menú lateral -->
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
+  <div class="menu-dropdown" id="menuDropdown" aria-hidden="true">
+    <div class="menu-close" id="menuClose" aria-label="Cerrar menú">✕</div>
+    <div class="menu-item" onclick="location.href='index.html'">Gorras</div>
+    <div class="menu-item prox"><span>🏷</span> Camisetas <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>🧥</span> Sudaderas <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>👟</span> Tenis <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>🕯</span> Fragancias <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>⌚</span> Relojes <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>🎒</span> Cintos <small>Próximamente</small></div>
   </div>
-</aside>
 
-<div id="toast" class="toast">Producto agregado</div>
+  <!-- Main Content -->
+  <main>
+    <nav class="breadcrumbs">
+      <a href="index.html">INICIO</a> &gt; <a href="index.html">GORRAS</a> &gt; GALAXY CT
+    </nav>
 
-<!-- Firebase (usa tu firebase.js que te pasé) -->
-<script type="module" src="firebase.js"></script>
-<!-- App logic -->
-<script type="module" src="app.js"></script>
+    <section class="product-wrap">
+      <div class="product-media">
+        <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED' loading="lazy">
+      </div>
+
+      <div class="product-info">
+        <h1 class="page-title">Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED</h1>
+        <div class="price">$18,000.00</div>
+        <p class="desc">
+          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado y confección premium. Ajuste regulable y materiales de alta calidad.
+        </p>
+
+        <div class="qty-row">
+          <label for="qty">Cantidad</label>
+          <input id="qty" type="number" min="1" value="1" aria-label="Cantidad">
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <button class="add-btn" id="addToCartBtn" aria-label="Agregar al carrito">
+            Agregar al carrito
+          </button>
+
+          <div class="payment-options" style="pointer-events:none;opacity:0.95;">
+            <button class="pay-btn paypal" onclick="paypalSimulate(event)">
+              <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
+            </button>
+            <button class="pay-btn cardpay" onclick="cardSimulate(event)">
+              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Productos relacionados -->
+    <section class="related">
+      <h2>También podría interesarte</h2>
+      <div class="grid">
+        <div class="card" onclick="location.href='producto2.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="Gorra Barbas Hats x CT STAR CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
+            <div class="price">$4,500.00</div>
+          </div>
+        </div>
+
+        <div class="card" onclick="location.href='producto3.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="Gorra Barbas Hats x CT ORIENTAL TUMBADO" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "ORIENTAL TUMBADO"</div>
+            <div class="price">$3,300.00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Carrito lateral -->
+  <aside class="cart-panel" id="cartPanel" aria-hidden="true" role="region" aria-label="Carrito de compras">
+    <div class="cart-header">
+      <span>Carrito</span>
+      <span id="closeCart" style="cursor:pointer;" aria-label="Cerrar carrito">✕</span>
+    </div>
+
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">Tu carrito está vacío 🛍️</div>
+    </div>
+
+    <div class="cart-footer">
+      <div class="cart-total" id="cartTotal">Total: $0</div>
+      <div class="payment-area" id="paymentArea">
+        <button class="pay-btn paypal" id="paypalCheckout">
+          <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
+        </button>
+        <button class="pay-btn cardpay" id="cardCheckout">
+          <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive">Producto agregado con éxito 🛒</div>
+
+  <script>
+    /* ------------------------------
+       Elementos DOM
+       ------------------------------ */
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuClose = document.getElementById('menuClose');
+
+    const cartBtn = document.getElementById('cartBtn');
+    const cartPanel = document.getElementById('cartPanel');
+    const closeCart = document.getElementById('closeCart');
+
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const qtyInput = document.getElementById('qty');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+    const paymentArea = document.getElementById('paymentArea');
+    const toast = document.getElementById('toast');
+
+    /* Carrito en memoria (no persiste) */
+    let cart = [];
+
+    /* ------------------------------
+       Menú lateral
+       ------------------------------ */
+    menuBtn.onclick = () => {
+      menuDropdown.classList.add('open');
+      menuOverlay.classList.add('show');
+      menuDropdown.setAttribute('aria-hidden', 'false');
+      menuOverlay.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeMenu = () => {
+      menuDropdown.classList.remove('open');
+      menuOverlay.classList.remove('show');
+      menuDropdown.setAttribute('aria-hidden', 'true');
+      menuOverlay.setAttribute('aria-hidden', 'true');
+    };
+
+    menuClose.onclick = closeMenu;
+    menuOverlay.onclick = closeMenu;
+
+    /* ------------------------------
+       Carrito panel
+       ------------------------------ */
+    cartBtn.onclick = () => {
+      cartPanel.classList.add('open');
+      cartPanel.setAttribute('aria-hidden', 'false');
+    };
+
+    closeCart.onclick = () => {
+      cartPanel.classList.remove('open');
+      cartPanel.setAttribute('aria-hidden', 'true');
+    };
+
+    /* ------------------------------
+       Agregar al carrito
+       ------------------------------ */
+    addToCartBtn.onclick = (e) => {
+      e.preventDefault();
+      const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+      const product = {
+        name: 'Gorra Barbas Hats x CT "GALAXY CT"',
+        price: 18000
+      };
+
+      for (let i = 0; i < qty; i++) {
+        cart.push(product);
+      }
+
+      renderCart();
+      animateCartIcon();
+      showToast('¡Producto agregado con éxito! 🛒');
+      qtyInput.value = 1;
+    };
+
+    /* ------------------------------
+       Renderizar carrito
+       ------------------------------ */
+    function renderCart() {
+      cartItemsEl.innerHTML = '';
+      if (cart.length === 0) {
+        cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
+        cartTotalEl.textContent = 'Total: $0';
+        paymentArea.classList.remove('show');
+        return;
+      }
+
+      let total = 0;
+      cart.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div>${item.name}</div>
+          <div>$${item.price.toLocaleString('es-MX')}</div>
+          <button onclick="removeItem(${index})" aria-label="Eliminar item">✕</button>
+        `;
+        cartItemsEl.appendChild(row);
+        total += item.price;
+      });
+
+      cartTotalEl.textContent = `Total: $${total.toLocaleString('es-MX')}`;
+      paymentArea.classList.add('show');
+    }
+
+    /* ------------------------------
+       Eliminar item
+       ------------------------------ */
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+      showToast('Producto eliminado del carrito');
+    }
+
+    /* Exponer función global */
+    window.removeItem = removeItem;
+
+    /* ------------------------------
+       Animación icono carrito
+       ------------------------------ */
+    function animateCartIcon() {
+      const img = cartBtn.querySelector('img');
+      if (!img) return;
+      img.classList.add('shake');
+      setTimeout(() => img.classList.remove('shake'), 480);
+    }
+
+    /* ------------------------------
+       Toast
+       ------------------------------ */
+    let toastTimeout = null;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    /* ------------------------------
+       Simulación de pagos
+       ------------------------------ */
+    function paypalSimulate(e) {
+      e?.stopPropagation();
+      alert('Redirigiendo a PayPal (simulación)...');
+    }
+
+    function cardSimulate(e) {
+      e?.stopPropagation();
+      alert('Procesando pago con tarjeta (simulación)...');
+    }
+
+    document.getElementById('paypalCheckout').onclick = paypalSimulate;
+    document.getElementById('cardCheckout').onclick = cardSimulate;
+
+    /* ------------------------------
+       Inicialización
+       ------------------------------ */
+    renderCart();
+  </script>
 </body>
 </html>
