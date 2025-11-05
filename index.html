@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -26,16 +26,21 @@
           <span>Boutique Buendía</span>
         </div>
         <button id="searchBtn" class="icon search-btn" title="Buscar" aria-label="Buscar productos">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
         </button>
-        <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar">
       </div>
 
       <button id="cartBtn" class="icon cart-icon" title="Carrito" aria-label="Abrir carrito">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.5 12.5a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L23 6H6"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.5 12.5a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L23 6H6"/>
+        </svg>
         <span class="cart-count" id="cartCount">0</span>
       </button>
     </div>
+    <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar">
   </header>
 
   <!-- MENU LATERAL -->
@@ -46,7 +51,9 @@
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuCuentaBtn">
         <span>Mi Cuenta</span>
-        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
       </div>
       <div class="submenu" id="submenuCuenta">
         <div class="menu-item" id="menuEstadoSesion">Iniciar sesión / Registrarse</div>
@@ -58,42 +65,43 @@
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuProductosBtn">
         <span>Categorías</span>
-        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
       </div>
       <div class="submenu" id="submenuProductos">
-        <div class="menu-item">Gorras</div>
-        <div class="menu-item">Camisetas</div>
-        <div class="menu-item">Cintos</div>
-        <div class="menu-item">Pantalones</div>
-        <div class="menu-item">Tenis</div>
-        <div class="menu-item">Sudaderas</div>
+        <div class="menu-item filter-cat" data-cat="Gorras">Gorras</div>
+        <div class="menu-item filter-cat" data-cat="Camisetas">Camisetas</div>
+        <div class="menu-item filter-cat" data-cat="Cintos">Cintos</div>
+        <div class="menu-item filter-cat" data-cat="Pantalones">Pantalones</div>
+        <div class="menu-item filter-cat" data-cat="Tenis">Tenis</div>
+        <div class="menu-item filter-cat" data-cat="Sudaderas">Sudaderas</div>
       </div>
     </div>
 
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuNosotrosBtn">
         <span>Síguenos</span>
-        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
       </div>
       <div class="submenu" id="submenuNosotros">
-        <div class="menu-item social" data-url="https://facebook.com">
-          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" /> Facebook
-        </div>
-        <div class="menu-item social" data-url="https://instagram.com">
-          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" alt="Instagram" /> Instagram
-        </div>
-        <div class="menu-item social" data-url="https://twitter.com">
-          <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X" /> X
-        </div>
-        <div class="menu-item social" data-url="https://youtube.com">
-          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" /> YouTube
-        </div>
-        <div class="menu-item social" data-url="https://wa.me/">
-          <img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp" /> WhatsApp
-        </div>
+        <div class="menu-item social" data-url="https://facebook.com"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"> Facebook</div>
+        <div class="menu-item social" data-url="https://instagram.com"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" alt="Instagram"> Instagram</div>
+        <div class="menu-item social" data-url="https://twitter.com"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X"> X</div>
+        <div class="menu-item social" data-url="https://youtube.com"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube"> YouTube</div>
+        <div class="menu-item social" data-url="https://wa.me/"><img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp"> WhatsApp</div>
       </div>
     </div>
   </nav>
+
+  <!-- FILTROS -->
+  <section class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="precio-asc">Menor precio</button>
+    <button class="filter-btn" data-filter="precio-desc">Mayor precio</button>
+  </section>
 
   <!-- CARRUSEL DESTACADOS -->
   <section class="carousel-wrap" id="carouselWrap">
@@ -104,8 +112,18 @@
   <main class="main">
     <h1 class="page-title">Productos Destacados</h1>
     <div class="star-ads" id="starAds"></div>
-    <section class="grid" id="productsGrid"></section>
+    <section class="grid" id="productsGrid">
+      <div class="loading">Cargando productos...</div>
+    </section>
   </main>
+
+  <!-- MODAL PRODUCTO -->
+  <div class="modal" id="productModal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
 
   <!-- CARRITO -->
   <aside class="cart-panel" id="cartPanel" aria-hidden="true">
@@ -114,7 +132,7 @@
       <button id="closeCart" class="cart-close">✕</button>
     </div>
     <div class="cart-items" id="cartItems">
-      <div class="cart-empty">Tu carrito está vacío 🛍️</div>
+      <div class="cart-empty">Tu carrito está vacío</div>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
       <div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div>
