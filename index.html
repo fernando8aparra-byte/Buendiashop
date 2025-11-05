@@ -15,17 +15,20 @@
 <body>
 
   <!-- Header -->
-  <header>
+  <header class="header-animated">
     <div class="header-inner">
       <!-- Menú Hamburguesa -->
-      <div id="menuBtn" class="icon-btn" aria-label="Abrir menú">Menu</div>
+      <div id="menuBtn" class="icon-btn" aria-label="Abrir menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </div>
 
       <!-- Logo (centrado) -->
       <div class="logo" id="logo">Boutique Buendía</div>
 
-      <!-- Contenedor de búsqueda y carrito -->
+      <!-- Derecha: Lupa + Carrito -->
       <div class="header-right">
-        <!-- Lupa (abre búsqueda) -->
         <div id="searchBtn" class="icon-btn" aria-label="Buscar">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="11" cy="11" r="8"/>
@@ -33,18 +36,17 @@
           </svg>
         </div>
 
-        <!-- Carrito -->
         <div id="cartBtn" class="icon-btn" title="Carrito" aria-label="Abrir carrito">
           <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
           <span id="cartBadge">0</span>
         </div>
       </div>
 
-      <!-- Barra de búsqueda (oculta por defecto) -->
+      <!-- Barra de búsqueda (oculta) -->
       <div class="search-container" id="searchContainer">
         <div class="search-bar">
           <input type="text" id="searchInput" placeholder="Buscar productos..." aria-label="Buscar">
-          <button id="closeSearch" class="icon-btn" aria-label="Cerrar búsqueda">Close</button>
+          <button id="closeSearch" class="icon-btn" aria-label="Cerrar búsqueda">×</button>
         </div>
       </div>
     </div>
@@ -54,40 +56,26 @@
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
   <div class="menu-dropdown" id="menuDropdown" aria-hidden="true">
     <div class="menu-close" id="menuClose" aria-label="Cerrar menú">×</div>
-    <div class="menu-item" onclick="location.href='index.html'">
-      <span style="margin-right: 12px;">Cap</span> Gorras
-    </div>
-    <div class="menu-item prox">
-      <span style="margin-right: 12px;">T-shirt</span> Camisetas <small>Próximamente</small>
-    </div>
-    <div class="menu-item prox">
-      <span style="margin-right: 12px;">Hoodie</span> Sudaderas <small>Próximamente</small>
-    </div>
-    <div class="menu-item prox">
-      <span style="margin-right: 12px;">Sneaker</span> Tenis <small>Próximamente</small>
-    </div>
-    <div class="menu-item prox">
-      <span style="margin-right: 12px;">Perfume</span> Fragancias <small>Próximamente</small>
-    </div>
-    <div class="menu-item prox">
-      <span style="margin-right: 12px;">Watch</span> Relojes <small>Próximamente</small>
-    </div>
-    <div class="menu-item prox">
-      <span style="margin-right: 12px;">Belt</span> Cintos <small>Próximamente</small>
-    </div>
+    <div class="menu-item" onclick="location.href='index.html'">Gorras</div>
+    <div class="menu-item prox">Camisetas <small>Próximamente</small></div>
+    <div class="menu-item prox">Sudaderas <small>Próximamente</small></div>
+    <div class="menu-item prox">Tenis <small>Próximamente</small></div>
+    <div class="menu-item prox">Fragancias <small>Próximamente</small></div>
+    <div class="menu-item prox">Relojes <small>Próximamente</small></div>
+    <div class="menu-item prox">Cintos <small>Próximamente</small></div>
   </div>
 
-  <!-- Main Content (sin cambios) -->
+  <!-- Main -->
   <main>
-    <!-- ... todo el contenido anterior ... -->
     <nav class="breadcrumbs">
       <a href="index.html">INICIO</a> > <a href="index.html">GORRAS</a> > GALAXY CT
     </nav>
 
     <section class="product-wrap">
+      <!-- Galería -->
       <div class="product-gallery" id="gallery">
-        <button class="gallery-nav prev" id="prevBtn" aria-label="Imagen anterior">Previous</button>
-        <button class="gallery-nav next" id="nextBtn" aria-label="Imagen siguiente">Next</button>
+        <button class="gallery-nav prev" id="prevBtn">Previous</button>
+        <button class="gallery-nav next" id="nextBtn">Next</button>
         <div class="gallery-track" id="galleryTrack">
           <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra GALAXY CT - Frente' class="gallery-img" loading="lazy">
           <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt='Gorra GALAXY CT - Lateral' class="gallery-img" loading="lazy">
@@ -101,64 +89,81 @@
         </div>
       </div>
 
+      <!-- Info -->
       <div class="product-info">
         <h1 class="page-title">Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED</h1>
         <div class="price">$18,000.00</div>
         <p class="desc">
-          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado y confección premium.
+          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado premium.
         </p>
         <div class="qty-row">
           <label for="qty">Cantidad</label>
-          <input id="qty" type="number" min="1" value="1" aria-label="Cantidad">
+          <input id="qty" type="number" min="1" value="1">
         </div>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
           <button class="add-btn" id="addToCartBtn">Agregar al carrito</button>
           <div class="payment-options" id="paymentOptions">
             <button class="pay-btn paypal" onclick="paypalSimulate(event)">
-              <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
+              <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> PayPal
             </button>
             <button class="pay-btn cardpay" onclick="cardSimulate(event)">
-              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
+              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Tarjeta
             </button>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Productos relacionados (con data-search) -->
     <section class="related">
       <h2>También podría interesarte</h2>
       <div class="grid">
-        <!-- Productos relacionados (sin cambios) -->
-        <div class="card" onclick="location.href='producto2.html'">
+        <div class="card" data-search="star ct gorra" onclick="location.href='producto2.html'">
           <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
           <div class="meta">
             <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
             <div class="price">$4,500.00</div>
           </div>
         </div>
-        <!-- ... más productos ... -->
+        <div class="card" data-search="oriental tumbado gorra" onclick="location.href='producto3.html'">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="ORIENTAL TUMBADO" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "ORIENTAL TUMBADO"</div>
+            <div class="price">$3,300.00</div>
+          </div>
+        </div>
+        <div class="card" data-search="galaxy ct gorra oro" onclick="location.href='producto4.html'">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="GALAXY CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "GALAXY CT"</div>
+            <div class="price">$18,000.00</div>
+          </div>
+        </div>
+        <div class="card" data-search="star ct gorra" onclick="location.href='producto5.html'">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
+            <div class="price">$4,500.00</div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
 
-  <!-- Carrito lateral -->
+  <!-- Carrito -->
   <aside class="cart-panel" id="cartPanel" aria-hidden="true">
     <div class="cart-header">
       <span>Carrito</span>
       <span id="closeCart" style="cursor:pointer;">×</span>
     </div>
     <div class="cart-items" id="cartItems">
-      <div class="cart-empty">Tu carrito está vacío Shopping Bag</div>
+      <div class="cart-empty">Tu carrito está vacío</div>
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
       <div class="payment-area" id="paymentArea">
-        <button class="pay-btn paypal" id="paypalCheckout">
-          <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
-        </button>
-        <button class="pay-btn cardpay" id="cardCheckout">
-          <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Pagar con Tarjeta
-        </button>
+        <button class="pay-btn paypal" id="paypalCheckout">PayPal</button>
+        <button class="pay-btn cardpay" id="cardCheckout">Tarjeta</button>
       </div>
     </div>
   </aside>
@@ -166,7 +171,7 @@
   <!-- Toast -->
   <div class="toast" id="toast">¡Producto agregado!</div>
 
-  <!-- JavaScript -->
+  <!-- JS -->
   <script src="js/script.js"></script>
 </body>
 </html>
