@@ -1,5 +1,5 @@
 /* =============================================
-   FUENTE Y RESET BÁSICO
+   FUENTE Y RESET
    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
@@ -14,7 +14,7 @@ html, body {
   font-family: 'Inter', sans-serif;
   background: #fff;
   color: #000;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 a {
@@ -26,6 +26,9 @@ button, input {
   font-size: 16px;
   font-family: inherit;
   outline: none;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 /* =============================================
@@ -37,8 +40,9 @@ button, input {
   background: #fff;
   border-bottom: 1px solid #000;
   z-index: 1000;
-  padding: 18px 22px; /* Más espacio + sin recortes */
+  padding: 18px 22px; /* más espacio para evitar recortes */
 }
+
 .header-inner {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
@@ -48,43 +52,22 @@ button, input {
   margin: 0 auto;
 }
 
-#menuBtn {
-  margin-right: 10px;
-}
-
 .logo {
-  font-weight: 900;
+  font-weight: 800;
   font-size: 18px;
   text-align: center;
   white-space: nowrap;
-  letter-spacing: 0.5px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.icon-btn:hover {
-  background: #f0f0f0;
 }
 
 .icon-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   stroke: #000;
   stroke-width: 2.2;
   fill: none;
 }
 
-/* Badge del carrito */
+/* Carrito Badge */
 #cartBtn {
   position: relative;
 }
@@ -100,15 +83,13 @@ button, input {
   min-width: 16px;
   height: 16px;
   border-radius: 50%;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
-  display: none;
 }
 
 /* =============================================
-   BARRA DE BÚSQUEDA
+   BUSCADOR
    ============================================= */
 .search-container {
   position: absolute;
@@ -117,7 +98,7 @@ button, input {
   right: 0;
   background: #fff;
   border-top: 1px solid #000;
-  padding: 10px 18px;
+  padding: 12px 20px;
   display: none;
   z-index: 900;
 }
@@ -128,130 +109,37 @@ button, input {
 
 .search-bar {
   display: flex;
-  align-items: center;
-  border: 1.5px solid #000;
-  border-radius: 8px;
+  border: 1.6px solid #000;
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .search-bar input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: none;
   background: transparent;
-  font-size: 15px;
-}
-
-.search-bar input::placeholder {
-  color: #777;
-}
-
-#closeSearch {
-  padding: 8px 12px;
-  font-size: 20px;
-  color: #555;
 }
 
 /* =============================================
    MENÚ LATERAL
    ============================================= */
 .menu-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.3s;
-  z-index: 1090;
-}
-
-.menu-overlay.show {
-  opacity: 1;
-  visibility: visible;
+  display: none;
 }
 
 .menu-sidebar {
   position: fixed;
   top: 0;
-  left: -280px;
+  left: 0;
   width: 260px;
   height: 100%;
   background: #fff;
   border-right: 1px solid #000;
-  padding: 70px 20px 20px;
-  transition: left 0.3s ease;
-  z-index: 1100;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.menu-sidebar.open {
-  left: 0;
-}
-
-.menu-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 26px;
-  color: #555;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.menu-close:hover {
-  background: #f0f0f0;
-}
-
-.menu-item {
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  font-weight: 600;
-  font-size: 14px;
-  color: #000;
-}
-
-.menu-item:hover {
-  color: #7c4dff;
-}
-
-.menu-item.welcome {
-  font-weight: 700;
-  color: #7c4dff;
-  border-bottom: none;
-  padding-bottom: 8px;
-}
-
-.dropdown-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-}
-
-.submenu {
+  padding: 80px 20px;
   display: none;
-  padding-left: 16px;
-  margin-top: 4px;
-}
-
-.submenu.show {
-  display: block;
-}
-
-.submenu-item {
-  padding: 8px 0;
-  font-size: 13px;
-  color: #555;
-}
-
-.submenu-item:hover {
-  color: #000;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* =============================================
@@ -260,74 +148,54 @@ button, input {
 .main-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 15px;
+  padding: 26px 18px;
 }
 
 /* =============================================
-   CARRUSEL INFINITO
+   CARRUSELES TIPO APPLE
    ============================================= */
-.infinite-carousel-section {
-  margin-bottom: 40px;
-}
-
 .infinite-carousel-section h2 {
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 14px;
   text-align: center;
-  letter-spacing: 0.5px;
+  margin-bottom: 14px;
 }
 
 .infinite-carousel {
   overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 26px;
+  border: 1px solid #000;
+  padding: 18px;
+  margin-bottom: 40px;
+  background: #fff;
 }
 
 .carousel-track {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   width: max-content;
 }
 
 .carousel-item {
-  min-width: 160px;
+  min-width: 190px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  padding: 12px;
   background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: transform 0.2s;
-}
-
-.carousel-item:hover {
-  transform: translateY(-4px);
+  text-align: center;
 }
 
 .carousel-item img {
   width: 100%;
-  height: 120px;
+  height: 160px;
   object-fit: cover;
-}
-
-.item-info {
-  padding: 10px;
-  text-align: center;
+  border-radius: 14px;
 }
 
 .item-info h4 {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.item-info p {
-  font-size: 12px;
-  font-weight: 700;
-  color: #7c4dff;
+  margin-top: 8px;
 }
 
 /* =============================================
@@ -335,8 +203,7 @@ button, input {
    ============================================= */
 .products-grid {
   display: grid;
-  gap: 18px;
-  margin-top: 30px;
+  gap: 20px;
 }
 
 @media (max-width: 480px) {
@@ -358,108 +225,43 @@ button, input {
 }
 
 .product-card {
-  background: #fff;
   border: 1px solid #000;
-  border-radius: 10px;
-  overflow: hidden;
+  border-radius: 22px;
+  padding: 14px;
   text-align: center;
-  padding: 10px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .product-card img {
   width: 100%;
-  height: 140px;
-  object-fit: contain;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 14px;
   background: #fafafa;
 }
 
-.card-info {
-  padding: 8px 4px 4px;
-}
-
-.card-info h3 {
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-info .desc {
-  font-size: 11px;
-  color: #555;
-  margin-bottom: 6px;
-  height: 32px;
-  overflow: hidden;
-}
-
-.sizes {
-  font-size: 11px;
-  color: #7c4dff;
-  margin: 4px 0;
-  font-weight: 600;
-}
-
-.card-info .price {
+.product-card h3 {
   font-size: 14px;
-  font-weight: 800;
-  color: #7c4dff;
-  margin: 6px 0;
-}
-
-.out-stock {
-  background: #000;
-  color: #fff;
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 700;
-}
-
-.add-btn {
-  width: 100%;
-  background: #000;
-  color: #fff;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 12px;
   font-weight: 700;
   margin-top: 8px;
-  transition: background 0.2s;
 }
 
-.add-btn:hover {
-  background: #333;
-}
-
-.add-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+.product-card p {
+  font-size: 13px;
+  margin-top: 4px;
 }
 
 /* =============================================
-   CARRITO LATERAL
+   CARRITO LATERAL (MINIMAL)
    ============================================= */
 .cart-sidebar {
   position: fixed;
   top: 0;
   right: -320px;
   width: 300px;
-  max-width: 100vw;
   height: 100%;
   background: #fff;
   border-left: 1px solid #000;
   padding: 20px;
-  transition: right 0.3s ease;
-  z-index: 1200;
   display: flex;
   flex-direction: column;
 }
@@ -468,171 +270,4 @@ button, input {
   right: 0;
 }
 
-.cart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #000;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-}
-
-.cart-header h3 {
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.cart-items {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px 0;
-}
-
-.empty-cart {
-  text-align: center;
-  color: #777;
-  padding: 40px 20px;
-  font-size: 14px;
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-}
-
-.cart-item img.thumb {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.cart-item > div {
-  flex: 1;
-}
-
-.cart-item button {
-  font-size: 18px;
-  color: #7c4dff;
-  font-weight: 700;
-}
-
-.cart-footer {
-  border-top: 1px solid #000;
-  padding-top: 12px;
-}
-
-.cart-total {
-  text-align: right;
-  font-weight: 900;
-  font-size: 15px;
-  margin-bottom: 12px;
-}
-
-.payment-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.payment-options button {
-  width: 100%;
-  padding: 10px;
-  border: 1.5px solid #000;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 13px;
-  background: #fff;
-  transition: all 0.2s;
-}
-
-.payment-options button:hover {
-  background: #000;
-  color: #fff;
-}
-
-.payment-options button[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* =============================================
-   TOAST
-   ============================================= */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: #7c4dff;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 14px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.35s ease;
-  z-index: 1300;
-  white-space: nowrap;
-}
-
-.toast.success {
-  background: #22c55e;
-}
-
-.toast.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* =============================================
-   ANIMACIONES
-   ============================================= */
-@keyframes slideDown {
-  from { transform: translateY(-100%); }
-  to { transform: translateY(0); }
-}
-
-.header {
-  animation: slideDown 0.5s ease-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
-}
-
-.shake {
-  animation: shake 0.6s ease-in-out;
-}
-
-/* =============================================
-   RESPONSIVE FIXES
-   ============================================= */
-@media (max-width: 480px) {
-  .header-inner {
-    gap: 8px;
-    padding: 0 10px;
-  }
-  .logo {
-    font-size: 16px;
-  }
-  .icon-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-  .infinite-carousel-section h2 {
-    font-size: 16px;
-  }
-  .carousel-item {
-    min-width: 140px;
-  }
-}
+/* No animaciones extra */
