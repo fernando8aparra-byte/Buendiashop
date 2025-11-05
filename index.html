@@ -1,15 +1,20 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Boutique Buendía: Moda premium con tallas oversize, gorras, camisetas y más. Envíos a todo México." />
-  <title>Boutique Buendía | Moda Premium</title>
+  <title id="siteTitle">Boutique Buendía | Moda Premium</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="icon" href="https://i.ibb.co/9yY7Y7K/logo-buendia.png" type="image/png">
 </head>
 <body>
+
+  <!-- MANTENIMIENTO (solo usuarios) -->
+  <div id="maintenanceBar" class="maintenance-bar hidden">
+    Página en mantenimiento. ¡Vuelve pronto!
+  </div>
 
   <!-- BARRA DE BIENVENIDA -->
   <div id="welcomeBar" class="welcome-bar hidden" role="status" aria-live="polite"></div>
@@ -23,7 +28,7 @@
 
       <div class="logo-container">
         <div class="logo" id="logoCenter">
-          <span>Boutique Buendía</span>
+          <span id="logoText">Boutique Buendía</span>
         </div>
         <button id="searchBtn" class="icon search-btn" title="Buscar" aria-label="Buscar productos">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -46,7 +51,7 @@
   <!-- MENU LATERAL -->
   <div id="menuOverlay" class="menu-overlay"></div>
   <nav id="menuDropdown" class="menu-dropdown" aria-hidden="true">
-    <button id="menuClose" class="menu-close" aria-label="Cerrar menú">✕</button>
+    <button id="menuClose" class="menu-close" aria-label="Cerrar menú">X</button>
 
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuCuentaBtn">
@@ -62,6 +67,33 @@
 
     <div class="menu-item">Mis compras</div>
 
+    <!-- NOSOTROS -->
+    <div class="menu-section">
+      <div class="menu-item menu-header" id="menuNosotrosBtn">
+        <span>Nosotros</span>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </div>
+      <div class="submenu" id="submenuNosotros">
+        <div class="menu-item social" data-social="facebook">
+          <svg width="16" height="16" viewBox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg> Facebook
+        </div>
+        <div class="menu-item social" data-social="instagram">
+          <svg width="16" height="16" viewBox="0 0 448 512"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.6 102.7-9 132.1z"/></svg> Instagram
+        </div>
+        <div class="menu-item social" data-social="x">
+          <svg width="16" height="16" viewBox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg> X
+        </div>
+        <div class="menu-item social" data-social="youtube">
+          <svg width="16" height="16" viewBox="0 0 576 512"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.782 64 288 64 288 64S117.218 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.218 448 288 448 288 448s170.782 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.414-42.867 11.414-132.305 11.414-132.305s0-89.438-11.414-132.305zM224 352V160l160 96-160 96z"/></svg> YouTube
+        </div>
+        <div class="menu-item social" data-social="whatsapp">
+          <svg width="16" height="16" viewBox="0 0 448 512"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 346.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L87 352.7l-4.3-6.7c-16.8-28.3-25.7-63.8-25.7-100 0-101.3 82.4-184.6 184.6-184.6 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.1 81.2 56.1 130.5 0 101.3-82.4 184.6-184.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg> WhatsApp
+        </div>
+      </div>
+    </div>
+
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuProductosBtn">
         <span>Categorías</span>
@@ -70,28 +102,13 @@
         </svg>
       </div>
       <div class="submenu" id="submenuProductos">
+        <div class="menu-item filter-cat" data-cat="all">Todos</div>
         <div class="menu-item filter-cat" data-cat="Gorras">Gorras</div>
         <div class="menu-item filter-cat" data-cat="Camisetas">Camisetas</div>
         <div class="menu-item filter-cat" data-cat="Cintos">Cintos</div>
         <div class="menu-item filter-cat" data-cat="Pantalones">Pantalones</div>
         <div class="menu-item filter-cat" data-cat="Tenis">Tenis</div>
         <div class="menu-item filter-cat" data-cat="Sudaderas">Sudaderas</div>
-      </div>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-item menu-header" id="menuNosotrosBtn">
-        <span>Síguenos</span>
-        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="m6 9 6 6 6-6"/>
-        </svg>
-      </div>
-      <div class="submenu" id="submenuNosotros">
-        <div class="menu-item social" data-url="https://facebook.com"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"> Facebook</div>
-        <div class="menu-item social" data-url="https://instagram.com"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384063.png" alt="Instagram"> Instagram</div>
-        <div class="menu-item social" data-url="https://twitter.com"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X"> X</div>
-        <div class="menu-item social" data-url="https://youtube.com"><img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube"> YouTube</div>
-        <div class="menu-item social" data-url="https://wa.me/"><img src="https://cdn-icons-png.flaticon.com/512/3670/3670051.png" alt="WhatsApp"> WhatsApp</div>
       </div>
     </div>
   </nav>
@@ -103,24 +120,24 @@
     <button class="filter-btn" data-filter="precio-desc">Mayor precio</button>
   </section>
 
-  <!-- CARRUSEL DESTACADOS -->
+  <!-- CARRUSEL (2 filas en mobile) -->
   <section class="carousel-wrap" id="carouselWrap">
-    <div class="carousel-track" id="carouselTrack"></div>
+    <div class="carousel-grid" id="carouselGrid"></div>
   </section>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <main class="main">
     <h1 class="page-title">Productos Destacados</h1>
     <div class="star-ads" id="starAds"></div>
     <section class="grid" id="productsGrid">
-      <div class="loading">Cargando productos...</div>
+      <div class="loading">Cargando...</div>
     </section>
   </main>
 
-  <!-- MODAL PRODUCTO -->
+  <!-- MODAL -->
   <div class="modal" id="productModal" aria-hidden="true">
     <div class="modal-content">
-      <button class="modal-close" id="modalClose">✕</button>
+      <button class="modal-close" id="modalClose">X</button>
       <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
@@ -129,7 +146,7 @@
   <aside class="cart-panel" id="cartPanel" aria-hidden="true">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
-      <button id="closeCart" class="cart-close">✕</button>
+      <button id="closeCart" class="cart-close">X</button>
     </div>
     <div class="cart-items" id="cartItems">
       <div class="cart-empty">Tu carrito está vacío</div>
@@ -147,6 +164,7 @@
   <!-- TOAST -->
   <div id="toast" class="toast"></div>
 
+  <script type="module" src="js/firebase.js"></script>
   <script type="module" src="js/script.js"></script>
 </body>
 </html>
