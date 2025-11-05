@@ -192,14 +192,14 @@ productsGrid.addEventListener("click", (e) => {
 /* Buscar animado */
 searchBtn.onclick = () => {
   searchBtn.style.display = "none";
+  logoCenter.classList.add("hide-logo");
   searchInput.style.display = "block";
-  setTimeout(() => {
-    searchInput.classList.add("visible", "centered");
-    logoCenter.classList.add("hide-logo");
-  }, 10);
+  searchInput.classList.add("visible", "centered");
   searchInput.focus();
 };
+
 searchInput.addEventListener("input", (e) => renderProducts(searchProducts(e.target.value)));
+
 searchInput.addEventListener("blur", () => {
   if (!searchInput.value) {
     searchInput.classList.remove("visible", "centered");
@@ -210,7 +210,6 @@ searchInput.addEventListener("blur", () => {
     }, 300);
   }
 });
-
 /* Carrito */
 cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
 closeCart?.addEventListener("click", () => cartPanel.classList.remove("open"));
