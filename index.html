@@ -1,119 +1,1069 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ff6b00" />
-  <title>Boutique Buendía | Moda Premium</title>
-  <link rel="stylesheet" href="css/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="img/logo-buendia.png" type="image/png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efraín - Tienda Online</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Animate.css para animaciones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
+        .carousel-item img { height: 300px; object-fit: cover; }
+        .product-card { transition: transform 0.3s; cursor: pointer; }
+        .product-card:hover { transform: scale(1.05); }
+        .badge-star { background-color: gold; color: black; }
+        .cart-icon { position: relative; }
+        .cart-badge { position: absolute; top: -8px; right: -8px; font-size: 0.7rem; }
+        .added-animation { animation: shake 1s ease-in-out; }
+        .added-toast { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .offcanvas-header .btn-close { margin-left: auto; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        @media (min-width: 576px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .size-selector { display: flex; gap: 5px; flex-wrap: wrap; }
+        .size-btn { min-width: 40px; }
+        .admin-only { display: none; }
+        .maintenance-mode { display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 2rem; color: #6c757d; }
+        .infinite-carousel {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .infinite-carousel .carousel-inner {
+            display: flex;
+            animation: scroll 20s linear infinite;
+        }
+        .infinite-carousel:hover .carousel-inner { animation-play-state: paused; }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    </style>
 </head>
-<body class="light">
+<body>
 
-  <!-- HEADER -->
-  <header class="header animate-in">
-    <div class="header-inner">
-      <button id="menuBtn" class="menu-btn" aria-label="Menú">
-        <svg class="icon-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      </button>
-
-      <div class="logo">Boutique Buendía</div>
-
-      <div class="header-icons">
-        <button id="searchBtn" class="icon-btn">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        </button>
-        <button id="themeBtn" class="icon-btn">
-          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <button id="cartBtn" class="icon-btn cart-icon">
-          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.5 12.5a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L23 6H6"/></svg>
-          <span class="badge" id="cartCount">0</span>
-        </button>
-      </div>
+<!-- Modo Mantenimiento (solo visible si está deshabilitado por admin) -->
+<div id="maintenance-mode" class="maintenance-mode" style="display: none;">
+    <div class="text-center">
+        <h1>Página en Mantenimiento</h1>
+        <p>Estamos trabajando para mejorar tu experiencia. Vuelve pronto.</p>
+        <button class="btn btn-primary" onclick="showAdminLogin()">Entrar como Administrador</button>
     </div>
-    <input id="searchInput" class="search-bar" type="text" placeholder="Buscar productos..." />
-  </header>
+</div>
 
-  <!-- MENU LATERAL -->
-  <div id="menuOverlay" class="overlay"></div>
-  <nav id="menu" class="sidebar">
-    <button id="menuClose" class="close-btn">×</button>
-    <div class="menu-content">
-      <div class="menu-section">
-        <div class="menu-header" id="cuentaBtn">Mi Cuenta <span class="arrow">></span></div>
-        <div class="submenu" id="submenuCuenta">
-          <div class="menu-item">Iniciar sesión</div>
+<!-- Contenido Principal -->
+<div id="main-content">
+
+    <!-- Navbar Superior -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <!-- Menú Hamburguesa (Offcanvas) -->
+            <button class="navbar-toggler me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Nombre de la Tienda (Centro) -->
+            <a class="navbar-brand mx-auto" href="#" id="store-name">Efraín</a>
+
+            <!-- Búsqueda -->
+            <form class="d-flex me-auto d-none d-md-flex" role="search" onsubmit="return false;">
+                <input class="form-control me-2" type="search" id="search-input" placeholder="Buscar productos..." aria-label="Buscar">
+            </form>
+
+            <!-- Usuario / Login -->
+            <div class="d-flex align-items-center me-3" id="user-section">
+                <!-- Se llena dinámicamente -->
+            </div>
+
+            <!-- Carrito -->
+            <button class="btn btn-outline-light position-relative cart-icon" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge bg-danger rounded-pill cart-badge" id="cart-count">0</span>
+            </button>
         </div>
-      </div>
-      <div class="menu-item">Mis compras</div>
+    </nav>
 
-      <div class="menu-section">
-        <div class="menu-header" id="nosotrosBtn">Nosotros <span class="arrow">></span></div>
-        <div class="submenu" id="submenuNosotros">
-          <div class="menu-item social" data-link="https://facebook.com"><svg viewBox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg> Facebook</div>
-          <div class="menu-item social" data-link="https://instagram.com"><svg viewBox="0 0 448 512">...</svg> Instagram</div>
+    <!-- Offcanvas Menú Lateral Izquierdo -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menú</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
-      </div>
-
-      <div class="menu-section">
-        <div class="menu-header" id="categoriasBtn">Categorías <span class="arrow">></span></div>
-        <div class="submenu" id="submenuCategorias">
-          <div class="menu-item filter-cat" data-cat="all">Todos</div>
-          <div class="menu-item filter-cat" data-cat="Gorras">Gorras</div>
-          <div class="menu-item filter-cat" data-cat="Camisetas">Camisetas</div>
+        <div class="offcanvas-body">
+            <ul class="list-group list-group-flush" id="menu-items">
+                <!-- Items dinámicos -->
+            </ul>
+            <hr>
+            <div id="social-links">
+                <!-- Enlaces sociales dinámicos -->
+            </div>
         </div>
-      </div>
     </div>
-  </nav>
 
-  <!-- FILTROS -->
-  <section class="filters animate-in">
-    <button class="filter-btn active" data-filter="all">Todos</button>
-    <button class="filter-btn" data-filter="precio-asc">Menor precio</button>
-    <button class="filter-btn" data-filter="precio-desc">Mayor precio</button>
-  </section>
-
-  <!-- CARRUSEL -->
-  <section class="carousel-wrap">
-    <div class="carousel-grid" id="carouselGrid"></div>
-  </section>
-
-  <!-- PRODUCTOS -->
-  <main class="main">
-    <h1 class="title animate-in">Productos Destacados</h1>
-    <section class="grid" id="productsGrid">
-      <div class="skeleton"></div>
-    </section>
-  </main>
-
-  <!-- MODAL -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <button class="modal-close">×</button>
-      <div id="modalBody"></div>
+    <!-- Offcanvas Carrito -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCart">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Carrito de Compras</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="cart-empty" class="text-center text-muted">
+                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                <p>Tu carrito está vacío</p>
+            </div>
+            <div id="cart-items"></div>
+            <div id="checkout-options" class="mt-4" style="display: none;">
+                <h6>Métodos de Pago</h6>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary payment-btn" data-method="paypal">PayPal</button>
+                    <button class="btn btn-outline-primary payment-btn" data-method="card">Tarjeta de Crédito/Débito</button>
+                    <button class="btn btn-outline-primary payment-btn" data-method="oxxo">Pago en Oxxo</button>
+                    <button class="btn btn-outline-primary payment-btn" data-method="clave">CLABE Interbancaria</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- CARRITO -->
-  <aside class="cart" id="cart">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button id="closeCart">×</button>
+    <!-- Toast de "Agregado" -->
+    <div class="toast added-toast align-items-center text-white bg-success border-0" role="alert" id="added-toast">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check me-2"></i> ¡Agregado al carrito!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
     </div>
-    <div id="cartItems" class="cart-items"></div>
-    <div class="cart-footer" id="cartFooter">
-      <div class="total">Total: <strong id="cartTotal">$0</strong></div>
-      <button class="pay-btn whatsapp">WhatsApp</button>
+
+    <!-- Carrusel de Productos Nuevos (Infinito Horizontal) -->
+    <div class="container my-4" id="new-products-section">
+        <h4 class="mb-3">Novedades</h4>
+        <div class="infinite-carousel">
+            <div class="carousel-inner" id="new-products-carousel">
+                <!-- Duplicado para infinito -->
+            </div>
+        </div>
     </div>
-  </aside>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast"></div>
+    <!-- Anuncios de Productos Estrella -->
+    <div class="container my-5" id="featured-products-section">
+        <h4 class="mb-4 text-center">Productos Estrella</h4>
+        <div class="row row-cols-1 row-cols-md-3 g-4" id="featured-products"></div>
+    </div>
 
-  <script type="module" src="js/firebase.js"></script>
-  <script type="module" src="js/script.js"></script>
+    <!-- Grid de Productos (2 columnas en móvil, carrusel infinito por categoría) -->
+    <div class="container my-5">
+        <h4 class="mb-4">Todos los Productos</h4>
+        <div class="product-grid" id="products-grid"></div>
+    </div>
+
+</div>
+
+<!-- Modal de Detalle de Producto -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="product-modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img id="product-modal-image" class="img-fluid rounded" src="" alt="">
+                    </div>
+                    <div class="col-md-6">
+                        <p id="product-modal-description"></p>
+                        <h5 id="product-modal-price"></h5>
+                        <div id="size-selector" class="my-3"></div>
+                        <button class="btn btn-success w-100" id="add-to-cart-btn">Agregar al Carrito</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Login / Registro -->
+<div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="auth-modal-title">Iniciar Sesión</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="auth-form">
+                    <div class="mb-3">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="auth-email" required>
+                    </div>
+                    <div class="mb-3" id="password-field">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="auth-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" id="toggle-auth">¿No tienes cuenta? Regístrate</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Panel de Administrador (oculto por defecto) -->
+<div id="admin-panel" class="container mt-5 admin-only" style="display: none;">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5>Panel de Administrador</h5>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="adminTabs">
+                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-general">General</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-products">Productos</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-menu">Menú</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-payments">Pagos</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-social">Redes Sociales</a></li>
+            </ul>
+            <div class="tab-content mt-3">
+                <!-- General -->
+                <div class="tab-pane active" id="tab-general">
+                    <div class="mb-3">
+                        <label>Nombre de la Tienda</label>
+                        <input type="text" class="form-control" id="admin-store-name" value="Efraín">
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="admin-maintenance">
+                        <label class="form-check-label">Poner en Mantenimiento</label>
+                    </div>
+                </div>
+                <!-- Productos -->
+                <div class="tab-pane" id="tab-products">
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addProductModal">Agregar Producto</button>
+                    <div id="admin-products-list"></div>
+                </div>
+                <!-- Menú -->
+                <div class="tab-pane" id="tab-menu">
+                    <div id="admin-menu-items"></div>
+                </div>
+                <!-- Pagos -->
+                <div class="tab-pane" id="tab-payments">
+                    <div id="admin-payment-options"></div>
+                </div>
+                <!-- Redes Sociales -->
+                <div class="tab-pane" id="tab-social">
+                    <div id="admin-social-links"></div>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-3" onclick="saveAdminSettings()">Guardar Cambios</button>
+            <button class="btn btn-secondary mt-3 ms-2" onclick="logoutAdmin()">Cerrar Sesión Admin</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agregar/Editar Producto -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <input type="hidden" id="edit-product-id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" id="product-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Categoría</label>
+                                <select class="form-select" id="product-category" required>
+                                    <option value="gorras">Gorras</option>
+                                    <option value="camisetas">Camisetas</option>
+                                    <option value="cintos">Cintos</option>
+                                    <option value="pantalones">Pantalones</option>
+                                    <option value="tenis">Tenis</option>
+                                    <option value="sudaderas">Sudaderas</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Precio</label>
+                                <input type="number" step="0.01" class="form-control" id="product-price" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Stock</label>
+                                <input type="number" class="form-control" id="product-stock" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Descripción</label>
+                                <textarea class="form-control" id="product-description" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label>Imagen URL</label>
+                                <input type="url" class="form-control" id="product-image" placeholder="https://ejemplo.com/imagen.jpg">
+                            </div>
+                            <div class="mb-3">
+                                <label>Tallas (separadas por coma)</label>
+                                <input type="text" class="form-control" id="product-sizes" placeholder="S, M, L, XL">
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="product-featured">
+                                <label>Producto Estrella</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="product-enabled" checked>
+                                <label>Habilitado</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveProduct()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Toast -->
+<script>
+    const toastEl = document.getElementById('added-toast');
+    const toast = new bootstrap.Toast(toastEl, { delay: 2000 });
+</script>
+
+<script>
+/* ==================== ESTRUCTURA DE DATOS ==================== */
+let products = [];
+let cart = [];
+let currentUser = null;
+let isAdmin = false;
+let adminSettings = {
+    storeName: 'Efraín',
+    maintenance: false,
+    payments: {
+        paypal: true,
+        card: true,
+        oxxo: true,
+        clave: true
+    },
+    menu: {
+        cuenta: true,
+        compras: true,
+        productos: true,
+        nosotros: true
+    },
+    categories: {
+        gorras: true,
+        camisetas: true,
+        cintos: true,
+        pantalones: true,
+        tenis: true,
+        sudaderas: true
+    },
+    social: {
+        instagram: { enabled: true, url: '' },
+        facebook: { enabled: true, url: '' },
+        x: { enabled: true, url: '' },
+        youtube: { enabled: true, url: '' }
+    }
+};
+
+/* ==================== CARGA INICIAL ==================== */
+document.addEventListener('DOMContentLoaded', function() {
+    loadFromLocalStorage();
+    updateUI();
+    renderMenu();
+    renderProducts();
+    renderCart();
+    checkMaintenance();
+});
+
+/* ==================== LOCAL STORAGE ==================== */
+function loadFromLocalStorage() {
+    const savedProducts = localStorage.getItem('efrain_products');
+    const savedCart = localStorage.getItem('efrain_cart');
+    const savedUser = localStorage.getItem('efrain_user');
+    const savedAdmin = localStorage.getItem('efrain_admin');
+    const savedSettings = localStorage.getItem('efrain_settings');
+
+    if (savedProducts) products = JSON.parse(savedProducts);
+    if (savedCart) cart = JSON.parse(savedCart);
+    if (savedUser) currentUser = JSON.parse(savedUser);
+    if (savedAdmin) isAdmin = JSON.parse(savedAdmin);
+    if (savedSettings) adminSettings = JSON.parse(savedSettings);
+
+    // Datos de ejemplo si no hay productos
+    if (products.length === 0) {
+        products = [
+            {
+                id: 1,
+                name: "Gorra Barbas Hats",
+                category: "gorras",
+                price: 299.99,
+                description: "Gorra premium con bordado 3D. Ajustable.",
+                image: "https://via.placeholder.com/300x300/333/fff?text=Gorra+Barbas",
+                stock: 15,
+                featured: true,
+                enabled: true,
+                sizes: []
+            },
+            {
+                id: 2,
+                name: "Camiseta Oversize Negra",
+                category: "camisetas",
+                price: 449.99,
+                description: "100% algodón, corte oversize, perfecta para streetwear.",
+                image: "https://via.placeholder.com/300x300/000/fff?text=Camiseta+Oversize",
+                stock: 20,
+                featured: true,
+                enabled: true,
+                sizes: ["S", "M", "L", "XL"]
+            },
+            {
+                id: 3,
+                name: "Tenis Urban Blancos",
+                category: "tenis",
+                price: 1299.99,
+                description: "Diseño minimalista, suela antideslizante.",
+                image: "https://via.placeholder.com/300x300/fff/000?text=Tenis+Urban",
+                stock: 8,
+                featured: false,
+                enabled: true,
+                sizes: ["25", "26", "27", "28"]
+            }
+        ];
+        saveProducts();
+    }
+}
+
+function saveProducts() {
+    localStorage.setItem('efrain_products', JSON.stringify(products));
+}
+
+function saveCart() {
+    localStorage.setItem('efrain_cart', JSON.stringify(cart));
+}
+
+function saveUser() {
+    localStorage.setItem('efrain_user', JSON.stringify(currentUser));
+}
+
+function saveAdmin() {
+    localStorage.setItem('efrain_admin', JSON.stringify(isAdmin));
+}
+
+function saveSettings() {
+    localStorage.setItem('efrain_settings', JSON.stringify(adminSettings));
+}
+
+/* ==================== UI PRINCIPAL ==================== */
+function updateUI() {
+    // Nombre de tienda
+    document.getElementById('store-name').textContent = adminSettings.storeName;
+    document.getElementById('admin-store-name').value = adminSettings.storeName;
+
+    // Usuario
+    const userSection = document.getElementById('user-section');
+    if (currentUser) {
+        userSection.innerHTML = `<span class="text-white me-3">Bienvenido, ${currentUser.name}</span><button class="btn btn-outline-light btn-sm" onclick="logout()">Salir</button>`;
+    } else {
+        userSection.innerHTML = `<button class="btn btn-outline-light me-2" data-bs-toggle="modal" data-bs-target="#authModal">Iniciar Sesión</button>`;
+    }
+
+    // Panel admin
+    document.getElementById('admin-panel').style.display = isAdmin ? 'block' : 'none';
+    if (isAdmin) renderAdminPanel();
+}
+
+function checkMaintenance() {
+    if (adminSettings.maintenance && !isAdmin) {
+        document.getElementById('maintenance-mode').style.display = 'flex';
+        document.getElementById('main-content').style.display = 'none';
+    } else {
+        document.getElementById('maintenance-mode').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+    }
+}
+
+function showAdminLogin() {
+    const password = prompt("Contraseña de administrador:");
+    if (password === "admin123") { // Cambiar en producción
+        isAdmin = true;
+        saveAdmin();
+        checkMaintenance();
+        updateUI();
+        alert("Bienvenido, Administrador");
+    } else {
+        alert("Contraseña incorrecta");
+    }
+}
+
+function logoutAdmin() {
+    isAdmin = false;
+    saveAdmin();
+    document.getElementById('admin-panel').style.display = 'none';
+    checkMaintenance();
+}
+
+/* ==================== MENÚ DESPLEGABLE ==================== */
+function renderMenu() {
+    const menu = document.getElementById('menu-items');
+    menu.innerHTML = '';
+
+    const items = [
+        { label: 'Cuenta', id: 'cuenta', enabled: adminSettings.menu.cuenta },
+        { label: 'Mis Compras', id: 'compras', enabled: adminSettings.menu.compras },
+        { label: 'Productos', id: 'productos', enabled: adminSettings.menu.productos, submenu: true },
+        { label: 'Nosotros', id: 'nosotros', enabled: adminSettings.menu.nosotros }
+    ];
+
+    items.forEach(item => {
+        if (!item.enabled) return;
+
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+
+        if (item.submenu) {
+            li.innerHTML = `
+                <div class="dropdown">
+                    <a class="btn btn-light dropdown-toggle w-100 text-start" data-bs-toggle="dropdown">${item.label}</a>
+                    <ul class="dropdown-menu w-100" id="submenu-${item.id}"></ul>
+                </div>
+            `;
+            menu.appendChild(li);
+            renderSubmenu(item.id);
+        } else {
+            li.innerHTML = `<a href="#" class="text-decoration-none">${item.label}</a>`;
+            menu.appendChild(li);
+        }
+    });
+
+    // Opción de salir
+    if (currentUser) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = `<a href="#" onclick="logout()" class="text-danger">Cerrar Sesión</a>`;
+        menu.appendChild(li);
+    }
+
+    renderSocialLinks();
+}
+
+function renderSubmenu(parentId) {
+    const submenu = document.getElementById(`submenu-${parentId}`);
+    submenu.innerHTML = '';
+    const cats = ['gorras', 'camisetas', 'cintos', 'pantalones', 'tenis', 'sudaderas'];
+    cats.forEach(cat => {
+        if (adminSettings.categories[cat]) {
+            const li = document.createElement('li');
+            li.innerHTML = `<a class="dropdown-item" href="#" onclick="filterByCategory('${cat}')">${capitalize(cat)}</a>`;
+            submenu.appendChild(li);
+        }
+    });
+}
+
+function renderSocialLinks() {
+    const container = document.getElementById('social-links');
+    container.innerHTML = '<h6 class="mt-3">Síguenos</h6>';
+    const socials = ['instagram', 'facebook', 'x', 'youtube'];
+    const icons = { instagram: 'fab fa-instagram', facebook: 'fab fa-facebook', x: 'fab fa-x-twitter', youtube: 'fab fa-youtube' };
+
+    socials.forEach(s => {
+        if (adminSettings.social[s].enabled && adminSettings.social[s].url) {
+            const a = document.createElement('a');
+            a.href = adminSettings.social[s].url;
+            a.target = '_blank';
+            a.className = 'btn btn-outline-primary btn-sm me-2 mb-2';
+            a.innerHTML = `<i class="${icons[s]}"></i> ${capitalize(s)}`;
+            container.appendChild(a);
+        }
+    });
+}
+
+/* ==================== BÚSQUEDA ==================== */
+document.getElementById('search-input').addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase();
+    const filtered = products.filter(p => 
+        p.enabled && 
+        (p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query))
+    );
+    renderProducts(filtered);
+});
+
+/* ==================== PRODUCTOS ==================== */
+function renderProducts(productList = products) {
+    const grid = document.getElementById('products-grid');
+    const filtered = productList.filter(p => p.enabled && p.stock > 0);
+    
+    grid.innerHTML = '';
+    if (filtered.length === 0) {
+        grid.innerHTML = '<p class="text-center text-muted">No hay productos disponibles</p>';
+        return;
+    }
+
+    filtered.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'card product-card h-100';
+        div.onclick = () => openProductModal(product);
+        
+        const badge = product.featured ? '<span class="badge badge-star position-absolute top-0 end-0 m-2">★</span>' : '';
+        
+        div.innerHTML = `
+            ${badge}
+            <img src="${product.image}" class="card-img-top" alt="${product.name}" style="height: 150px; object-fit: cover;">
+            <div class="card-body d-flex flex-column">
+                <h6 class="card-title">${product.name}</h6>
+                <p class="card-text text-muted small">${product.category}</p>
+                <p class="card-text"><strong>$${product.price.toFixed(2)}</strong></p>
+                <button class="btn btn-primary mt-auto" onclick="event.stopPropagation(); addToCart(${product.id})">
+                    <i class="fas fa-cart-plus"></i> Agregar
+                </button>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+
+    renderFeatured();
+    renderNewProductsCarousel();
+}
+
+function renderFeatured() {
+    const container = document.getElementById('featured-products');
+    const featured = products.filter(p => p.enabled && p.featured && p.stock > 0);
+    container.innerHTML = '';
+
+    if (featured.length === 0) {
+        document.getElementById('featured-products-section').style.display = 'none';
+        return;
+    }
+    document.getElementById('featured-products-section').style.display = 'block';
+
+    featured.forEach(product => {
+        const col = document.createElement('div');
+        col.className = 'col';
+        col.innerHTML = `
+            <div class="card h-100 product-card" onclick="openProductModal(${product.id})">
+                <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                <div class="card-body text-center">
+                    <h5>${product.name}</h5>
+                    <p class="text-success fw-bold">$${product.price.toFixed(2)}</p>
+                    <span class="badge bg-warning text-dark">★ Producto Estrella</span>
+                </div>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function renderNewProductsCarousel() {
+    const container = document.getElementById('new-products-carousel');
+    const recent = products.filter(p => p.enabled && p.stock > 0).slice(-6);
+    
+    if (recent.length === 0) {
+        document.getElementById('new-products-section').style.display = 'none';
+        return;
+    }
+    document.getElementById('new-products-section').style.display = 'block';
+
+    let html = '';
+    [...recent, ...recent].forEach(product => { // Duplicar para efecto infinito
+        html += `
+            <div class="carousel-item" style="min-width: 200px; padding: 0 10px;">
+                <div class="card" onclick="openProductModal(${product.id})">
+                    <img src="${product.image}" class="card-img-top" alt="${product.name}" style="height: 150px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <p class="card-text small mb-1">${product.name}</p>
+                        <p class="card-text text-success fw-bold small">$${product.price.toFixed(2)}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function openProductModal(product) {
+    if (typeof product === 'number') {
+        product = products.find(p => p.id === product);
+    }
+    if (!product || !product.enabled) return;
+
+    document.getElementById('product-modal-title').textContent = product.name;
+    document.getElementById('product-modal-image').src = product.image;
+    document.getElementById('product-modal-description').textContent = product.description;
+    document.getElementById('product-modal-price').textContent = `$${product.price.toFixed(2)}`;
+
+    const sizeContainer = document.getElementById('size-selector');
+    sizeContainer.innerHTML = '';
+    if (product.sizes && product.sizes.length > 0) {
+        sizeContainer.innerHTML = '<label class="form-label">Talla:</label><div class="size-selector"></div>';
+        const selector = sizeContainer.querySelector('.size-selector');
+        product.sizes.forEach(size => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-outline-secondary size-btn';
+            btn.textContent = size;
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('btn-primary', 'text-white'));
+                btn.classList.add('btn-primary', 'text-white');
+            };
+            selector.appendChild(btn);
+        });
+    }
+
+    document.getElementById('add-to-cart-btn').onclick = () => {
+        const selectedSize = document.querySelector('.size-btn.btn-primary');
+        addToCart(product.id, selectedSize ? selectedSize.textContent : null);
+        bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+    };
+
+    new bootstrap.Modal(document.getElementById('productModal')).show();
+}
+
+/* ==================== CARRITO ==================== */
+function addToCart(productId, size = null) {
+    const product = products.find(p => p.id === productId);
+    if (!product || product.stock <= 0) return;
+
+    const existing = cart.find(item => item.id === productId && item.size === size);
+    if (existing) {
+        if (existing.quantity < product.stock) {
+            existing.quantity++;
+        } else {
+            alert("No hay suficiente stock");
+            return;
+        }
+    } else {
+        cart.push({ id: productId, size, quantity: 1 });
+    }
+
+    saveCart();
+    renderCart();
+    animateCart();
+    toast.show();
+}
+
+function animateCart() {
+    const cartIcon = document.querySelector('.cart-icon');
+    cartIcon.classList.add('added-animation');
+    setTimeout(() => cartIcon.classList.remove('added-animation'), 1000);
+}
+
+function renderCart() {
+    const itemsContainer = document.getElementById('cart-items');
+    const emptyMsg = document.getElementById('cart-empty');
+    const checkout = document.getElementById('checkout-options');
+    const badge = document.getElementById('cart-count');
+
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    badge.textContent = totalItems;
+
+    if (cart.length === 0) {
+        emptyMsg.style.display = 'block';
+        checkout.style.display = 'none';
+        itemsContainer.innerHTML = '';
+        return;
+    }
+
+    emptyMsg.style.display = 'none';
+    checkout.style.display = 'block';
+
+    itemsContainer.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        const product = products.find(p => p.id === item.id);
+        if (!product) return;
+
+        const subtotal = product.price * item.quantity;
+        total += subtotal;
+
+        const div = document.createElement('div');
+        div.className = 'd-flex align-items-center mb-3 border-bottom pb-3';
+        div.innerHTML = `
+            <img src="${product.image}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+            <div class="flex-grow-1">
+                <h6 class="mb-0">${product.name} x${item.quantity} ${item.size ? `(${item.size})` : ''}</h6>
+                <p class="mb-0 text-success">$${subtotal.toFixed(2)}</p>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+        `;
+        itemsContainer.appendChild(div);
+    });
+
+    const totalDiv = document.createElement('div');
+    totalDiv.className = 'text-end mt-3';
+    totalDiv.innerHTML = `<h5>Total: $${total.toFixed(2)}</h5>`;
+    itemsContainer.appendChild(totalDiv);
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    saveCart();
+    renderCart();
+}
+
+/* ==================== PAGO ==================== */
+document.querySelectorAll('.payment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const method = this.dataset.method;
+        alert(`Redirigiendo a pago con ${method.toUpperCase()}... (simulación)`);
+        // Aquí iría integración real
+        cart = [];
+        saveCart();
+        renderCart();
+        bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasCart')).hide();
+    });
+});
+
+/* ==================== AUTENTICACIÓN ==================== */
+document.getElementById('toggle-auth').addEventListener('click', function(e) {
+    e.preventDefault();
+    const isLogin = document.getElementById('auth-modal-title').textContent === 'Iniciar Sesión';
+    if (isLogin) {
+        document.getElementById('auth-modal-title').textContent = 'Registrarse';
+        document.getElementById('password-field').style.display = 'none';
+        this.textContent = '¿Ya tienes cuenta? Inicia sesión';
+    } else {
+        document.getElementById('auth-modal-title').textContent = 'Iniciar Sesión';
+        document.getElementById('password-field').style.display = 'block';
+        this.textContent = '¿No tienes cuenta? Regístrate';
+    }
+});
+
+document.getElementById('auth-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value;
+    const isLogin = document.getElementById('auth-modal-title').textContent === 'Iniciar Sesión';
+
+    if (isLogin) {
+        // Simulación de login
+        currentUser = { email, name: email.split('@')[0] };
+        saveUser();
+        updateUI();
+        renderMenu();
+        bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
+    } else {
+        alert('Registro exitoso (simulación). Ahora inicia sesión.');
+        document.getElementById('toggle-auth').click();
+    }
+});
+
+function logout() {
+    currentUser = null;
+    saveUser();
+    updateUI();
+    renderMenu();
+}
+
+/* ==================== ADMIN PANEL ==================== */
+function renderAdminPanel() {
+    renderAdminProducts();
+    renderAdminMenu();
+    renderAdminPayments();
+    renderAdminSocial();
+}
+
+function renderAdminProducts() {
+    const container = document.getElementById('admin-products-list');
+    container.innerHTML = '';
+    products.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'border p-3 mb-2 rounded';
+        div.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${product.name}</strong> - $${product.price} 
+                    ${product.featured ? '<span class="badge bg-warning">★</span>' : ''}
+                    ${!product.enabled ? '<span class="badge bg-secondary">Deshabilitado</span>' : ''}
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-warning" onclick="editProduct(${product.id})">Editar</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">Eliminar</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function renderAdminMenu() {
+    const container = document.getElementById('admin-menu-items');
+    container.innerHTML = '';
+    const menuItems = [
+        { key: 'cuenta', label: 'Cuenta' },
+        { key: 'compras', label: 'Mis Compras' },
+        { key: 'productos', label: 'Productos' },
+        { key: 'nosotros', label: 'Nosotros' }
+    ];
+    menuItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'form-check form-switch';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" id="menu-${item.key}" ${adminSettings.menu[item.key] ? 'checked' : ''}>
+            <label class="form-check-label" for="menu-${item.key}">${item.label}</label>
+        `;
+        div.querySelector('input').addEventListener('change', function() {
+            adminSettings.menu[item.key] = this.checked;
+        });
+        container.appendChild(div);
+    });
+}
+
+function renderAdminPayments() {
+    const container = document.getElementById('admin-payment-options');
+    container.innerHTML = '';
+    const payments = [
+        { key: 'paypal', label: 'PayPal' },
+        { key: 'card', label: 'Tarjeta de Crédito/Débito' },
+        { key: 'oxxo', label: 'Pago en Oxxo' },
+        { key: 'clave', label: 'CLABE Interbancaria' }
+    ];
+    payments.forEach(pay => {
+        const div = document.createElement('div');
+        div.className = 'form-check form-switch';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" id="pay-${pay.key}" ${adminSettings.payments[pay.key] ? 'checked' : ''}>
+            <label class="form-check-label" for="pay-${pay.key}">${pay.label}</label>
+        `;
+        div.querySelector('input').addEventListener('change', function() {
+            adminSettings.payments[pay.key] = this.checked;
+            updatePaymentButtons();
+        });
+        container.appendChild(div);
+    });
+    updatePaymentButtons();
+}
+
+function updatePaymentButtons() {
+    document.querySelectorAll('.payment-btn').forEach(btn => {
+        const method = btn.dataset.method;
+        btn.style.display = adminSettings.payments[method] ? 'block' : 'none';
+    });
+}
+
+function renderAdminSocial() {
+    const container = document.getElementById('admin-social-links');
+    container.innerHTML = '';
+    const socials = ['instagram', 'facebook', 'x', 'youtube'];
+    socials.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'mb-3';
+        div.innerHTML = `
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="social-${s}" ${adminSettings.social[s].enabled ? 'checked' : ''}>
+                <label class="form-check-label" for="social-${s}">${capitalize(s)}</label>
+            </div>
+            <input type="url" class="form-control form-control-sm" placeholder="URL" value="${adminSettings.social[s].url || ''}" id="url-${s}">
+        `;
+        div.querySelector(`#social-${s}`).addEventListener('change', function() {
+            adminSettings.social[s].enabled = this.checked;
+        });
+        div.querySelector(`#url-${s}`).addEventListener('input', function() {
+            adminSettings.social[s].url = this.value;
+        });
+        container.appendChild(div);
+    });
+}
+
+function saveAdminSettings() {
+    adminSettings.storeName = document.getElementById('admin-store-name').value;
+    adminSettings.maintenance = document.getElementById('admin-maintenance').checked;
+    saveSettings();
+    updateUI();
+    renderMenu();
+    renderSocialLinks();
+    checkMaintenance();
+    alert('Configuración guardada');
+}
+
+function editProduct(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    document.getElementById('edit-product-id').value = product.id;
+    document.getElementById('product-name').value = product.name;
+    document.getElementById('product-category').value = product.category;
+    document.getElementById('product-price').value = product.price;
+    document.getElementById('product-stock').value = product.stock;
+    document.getElementById('product-description').value = product.description;
+    document.getElementById('product-image').value = product.image;
+    document.getElementById('product-sizes').value = product.sizes ? product.sizes.join(', ') : '';
+    document.getElementById('product-featured').checked = product.featured;
+    document.getElementById('product-enabled').checked = product.enabled;
+
+    new bootstrap.Modal(document.getElementById('addProductModal')).show();
+}
+
+function saveProduct() {
+    const id = document.getElementById('edit-product-id').value;
+    const name = document.getElementById('product-name').value;
+    const category = document.getElementById('product-category').value;
+    const price = parseFloat(document.getElementById('product-price').value);
+    const stock = parseInt(document.getElementById('product-stock').value);
+    const description = document.getElementById('product-description').value;
+    const image = document.getElementById('product-image').value || 'https://via.placeholder.com/300';
+    const sizes = document.getElementById('product-sizes').value.split(',').map(s => s.trim()).filter(s => s);
+    const featured = document.getElementById('product-featured').checked;
+    const enabled = document.getElementById('product-enabled').checked;
+
+    if (id) {
+        const product = products.find(p => p.id == id);
+        Object.assign(product, { name, category, price, stock, description, image, sizes, featured, enabled });
+    } else {
+        const newId = Math.max(...products.map(p => p.id), 0) + 1;
+        products.push({ id: newId, name, category, price, stock, description, image, sizes, featured, enabled });
+    }
+
+    saveProducts();
+    renderProducts();
+    renderAdminProducts();
+    bootstrap.Modal.getInstance(document.getElementById('addProductModal')).hide();
+}
+
+function deleteProduct(id) {
+    if (confirm('¿Eliminar este producto?')) {
+        products = products.filter(p => p.id !== id);
+        saveProducts();
+        renderProducts();
+        renderAdminProducts();
+    }
+}
+
+/* ==================== UTILIDADES ==================== */
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function filterByCategory(cat) {
+    const filtered = products.filter(p => p.category === cat && p.enabled && p.stock > 0);
+    renderProducts(filtered);
+    bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu')).hide();
+}
+</script>
 </body>
 </html>
