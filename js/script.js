@@ -1,4 +1,3 @@
-// js/script.js
 import { db, loadConfig } from "./firebase.js"; // Firebase intacto
 
 /* ------------- DOM ------------- */
@@ -117,7 +116,7 @@ function searchProducts(q) {
   });
 }
 
-/* ------------- Cart ------------- */
+/* ------------- Carrito ------------- */
 function renderCart() {
   const cart = getCart();
   cartItemsEl.innerHTML = "";
@@ -189,13 +188,10 @@ productsGrid.addEventListener("click", (e) => {
   if (view) openProduct(view.dataset.id);
 });
 
-/* Buscar animado centrado y fijo dentro del header */
+/* ---------- BUSCADOR CENTRADO FIJO ---------- */
 searchBtn.onclick = () => {
-  // Oculta la lupa y el logo
   searchBtn.style.display = "none";
   logoCenter.style.opacity = "0";
-
-  // Muestra y centra el input dentro del header
   searchInput.style.display = "block";
   searchInput.classList.add("centered");
   searchInput.focus();
@@ -205,8 +201,10 @@ searchInput.addEventListener("input", (e) => {
   renderProducts(searchProducts(e.target.value));
 });
 
-searchInput.addEventListener("blur", () => {
-  if (!searchInput.value) {
+// Cierra el buscador al hacer clic fuera
+document.addEventListener("click", (e) => {
+  const dentro = e.target === searchInput || e.target === searchBtn;
+  if (!dentro && searchInput.classList.contains("centered")) {
     searchInput.classList.remove("centered");
     searchInput.style.display = "none";
     searchBtn.style.display = "flex";
@@ -214,7 +212,7 @@ searchInput.addEventListener("blur", () => {
   }
 });
 
-/* Carrito */
+/* ---------- CARRITO ---------- */
 cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
 closeCart?.addEventListener("click", () => cartPanel.classList.remove("open"));
 cartItemsEl.addEventListener("click", (e) => {
