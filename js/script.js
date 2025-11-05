@@ -26,33 +26,48 @@ const toastEl = document.getElementById("toast");
 const productsGrid = document.getElementById("productsGrid");
 const carouselTrack = document.getElementById("carouselTrack");
 const starAdsEl = document.getElementById("starAds");
-const headerInner = document.querySelector('.header-inner');
+const headerInner = document.querySelector(".header-inner");
 const logoCenter = document.getElementById("logoCenter");
 
 /* ------------- Data (localStorage) ------------- */
 const SAMPLE_PRODUCTS = [
-  { id: 'p1', nombre: 'Gorra Barbas Hats', descripcion:'Gorra con logo bordado', precio:120, stock:5, categoria:'Gorras', img:'https://i.ibb.co/gJTvCjp/gorra1.jpg', talla:[], estrella:true },
-  { id: 'p2', nombre: 'Camiseta Oversize Negra', descripcion:'Camiseta oversize algodón 100%', precio:220, stock:12, categoria:'Camisetas', img:'https://i.ibb.co/DtkLMcy/playera1.jpg', talla:['S','M','L','XL'], estrella:false },
-  { id: 'p3', nombre: 'Tenis Runner Pro', descripcion:'Tenis deportivos', precio:1350, stock:4, categoria:'Tenis', img:'https://i.ibb.co/C0cMKC5/tenis1.jpg', talla:['40','41','42','43'], estrella:true },
-  { id: 'p4', nombre: 'Pantalón Cargo Verde', descripcion:'Pantalón cargo resistente', precio:450, stock:8, categoria:'Pantalones', img:'https://i.ibb.co/Lp0pKqR/sudadera1.jpg', talla:['M','L','XL'], estrella:false },
-  { id: 'p5', nombre: 'Sudadera Logo', descripcion:'Sudadera con capucha', precio:580, stock:7, categoria:'Sudaderas', img:'https://i.ibb.co/Lp0pKqR/sudadera1.jpg', talla:['S','M','L'], estrella:false }
+  { id: "p1", nombre: "Gorra Barbas Hats", descripcion: "Gorra con logo bordado", precio: 120, stock: 5, categoria: "Gorras", img: "https://i.ibb.co/gJTvCjp/gorra1.jpg", talla: [], estrella: true },
+  { id: "p2", nombre: "Camiseta Oversize Negra", descripcion: "Camiseta oversize algodón 100%", precio: 220, stock: 12, categoria: "Camisetas", img: "https://i.ibb.co/DtkLMcy/playera1.jpg", talla: ["S","M","L","XL"], estrella: false },
+  { id: "p3", nombre: "Tenis Runner Pro", descripcion: "Tenis deportivos", precio: 1350, stock: 4, categoria: "Tenis", img: "https://i.ibb.co/C0cMKC5/tenis1.jpg", talla: ["40","41","42","43"], estrella: true },
+  { id: "p4", nombre: "Pantalón Cargo Verde", descripcion: "Pantalón cargo resistente", precio: 450, stock: 8, categoria: "Pantalones", img: "https://i.ibb.co/Lp0pKqR/sudadera1.jpg", talla: ["M","L","XL"], estrella: false },
+  { id: "p5", nombre: "Sudadera Logo", descripcion: "Sudadera con capucha", precio: 580, stock: 7, categoria: "Sudaderas", img: "https://i.ibb.co/Lp0pKqR/sudadera1.jpg", talla: ["S","M","L"], estrella: false }
 ];
 
-function getStoredProducts(){
-  const raw = localStorage.getItem('productos');
-  if(!raw){ localStorage.setItem('productos', JSON.stringify(SAMPLE_PRODUCTS)); return SAMPLE_PRODUCTS.slice(); }
-  try { return JSON.parse(raw); } catch(e){ localStorage.setItem('productos', JSON.stringify(SAMPLE_PRODUCTS)); return SAMPLE_PRODUCTS.slice(); }
+function getStoredProducts() {
+  const raw = localStorage.getItem("productos");
+  if (!raw) {
+    localStorage.setItem("productos", JSON.stringify(SAMPLE_PRODUCTS));
+    return SAMPLE_PRODUCTS.slice();
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    localStorage.setItem("productos", JSON.stringify(SAMPLE_PRODUCTS));
+    return SAMPLE_PRODUCTS.slice();
+  }
 }
-function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
-function saveCart(c){ localStorage.setItem('cart', JSON.stringify(c)); }
+function getCart() {
+  return JSON.parse(localStorage.getItem("cart") || "[]");
+}
+function saveCart(c) {
+  localStorage.setItem("cart", JSON.stringify(c));
+}
 
 /* ------------- Render products ------------- */
-function renderProducts(list){
-  productsGrid.innerHTML = '';
-  if(!list.length){ productsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No hay productos que coincidan</p>'; return; }
-  list.forEach(p=>{
-    const card = document.createElement('div');
-    card.className = 'card';
+function renderProducts(list) {
+  productsGrid.innerHTML = "";
+  if (!list.length) {
+    productsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No hay productos que coincidan</p>';
+    return;
+  }
+  list.forEach((p) => {
+    const card = document.createElement("div");
+    card.className = "card";
     card.innerHTML = `
       <img src="${p.img}" alt="${p.nombre}" loading="lazy">
       <div class="meta">
@@ -70,195 +85,218 @@ function renderProducts(list){
 }
 
 /* ------------- Carousel & star-ads ------------- */
-function setupCarousel(products){
-  const items = products.filter(p=>p.estrella);
-  if(!items.length){ document.getElementById('carouselWrap').style.display='none'; return; }
+function setupCarousel(products) {
+  const items = products.filter((p) => p.estrella);
+  if (!items.length) {
+    document.getElementById("carouselWrap").style.display = "none";
+    return;
+  }
   const dup = items.concat(items);
-  carouselTrack.innerHTML = '';
-  dup.forEach(p=>{
-    const it = document.createElement('div');
-    it.className = 'carousel-item';
+  carouselTrack.innerHTML = "";
+  dup.forEach((p) => {
+    const it = document.createElement("div");
+    it.className = "carousel-item";
     it.innerHTML = `<img src="${p.img}" alt="${p.nombre}"><div><strong>${p.nombre}</strong><div style="color:var(--text-muted)">$${p.precio}</div></div>`;
     carouselTrack.appendChild(it);
   });
 }
-function setupStarAds(products){
-  const ads = products.filter(p=>p.estrella);
-  if(!ads.length){ starAdsEl.style.display='none'; return; }
-  starAdsEl.innerHTML='';
-  ads.forEach(p=>{
-    const a = document.createElement('div');
-    a.className='ad';
+function setupStarAds(products) {
+  const ads = products.filter((p) => p.estrella);
+  if (!ads.length) {
+    starAdsEl.style.display = "none";
+    return;
+  }
+  starAdsEl.innerHTML = "";
+  ads.forEach((p) => {
+    const a = document.createElement("div");
+    a.className = "ad";
     a.innerHTML = `<img src="${p.img}" alt="${p.nombre}" style="width:60px;height:60px;object-fit:cover;margin-right:10px;"><div><strong>${p.nombre}</strong><div style="color:var(--text-muted)">$${p.precio} - ¡Oferta limitada!</div></div>`;
-    a.addEventListener('click', ()=> openProduct(p.id));
+    a.addEventListener("click", () => openProduct(p.id));
     starAdsEl.appendChild(a);
   });
 }
 
 /* ------------- Search ------------- */
-function searchProducts(q){
+function searchProducts(q) {
   q = q.trim().toLowerCase();
   const products = getStoredProducts();
-  if(!q) return products;
+  if (!q) return products;
   const tokens = q.split(/\s+/).filter(Boolean);
-  return products.filter(p=>{
-    const hay = (p.nombre + ' ' + (p.descripcion||'')).toLowerCase();
-    return tokens.every(tok => hay.includes(tok));
+  return products.filter((p) => {
+    const hay = (p.nombre + " " + (p.descripcion || "")).toLowerCase();
+    return tokens.every((tok) => hay.includes(tok));
   });
 }
 
 /* ------------- Cart functions ------------- */
-function renderCart(){
+function renderCart() {
   const cart = getCart();
-  cartItemsEl.innerHTML = '';
-  if(!cart.length){ cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>'; cartFooter.style.display='none'; document.getElementById('cartCount').textContent = '0'; return; }
-  cartFooter.style.display = 'block';
+  cartItemsEl.innerHTML = "";
+  if (!cart.length) {
+    cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
+    cartFooter.style.display = "none";
+    document.getElementById("cartCount").textContent = "0";
+    return;
+  }
+  cartFooter.style.display = "block";
   let totalItems = 0;
   let total = 0;
-  cart.forEach(item=>{
-    const p = getStoredProducts().find(x=>x.id===item.id);
-    if(!p) return;
-    const div = document.createElement('div');
-    div.className = 'cart-item';
+  cart.forEach((item) => {
+    const p = getStoredProducts().find((x) => x.id === item.id);
+    if (!p) return;
+    const div = document.createElement("div");
+    div.className = "cart-item";
     div.innerHTML = `
       <button class="remove-btn" data-id="${item.id}">✕</button>
       <img src="${p.img}" style="width:60px;height:60px;object-fit:cover;">
       <div style="flex:1"><div style="font-weight:700">${p.nombre}</div><div style="color:var(--text-muted)">x${item.qty}</div></div>
-      <div style="font-weight:800">$${p.precio*item.qty}</div>
+      <div style="font-weight:800">$${p.precio * item.qty}</div>
     `;
     cartItemsEl.appendChild(div);
     totalItems += item.qty;
     total += p.precio * item.qty;
   });
-  document.getElementById('cartCount').textContent = totalItems;
+  document.getElementById("cartCount").textContent = totalItems;
   cartTotalEl.textContent = `$${total}`;
 }
-function addToCart(id){
-  const p = getStoredProducts().find(x=>x.id===id);
-  if(!p) return;
+function addToCart(id) {
+  const p = getStoredProducts().find((x) => x.id === id);
+  if (!p) return;
   const cart = getCart();
-  const idx = cart.findIndex(c=>c.id===id);
-  if(idx>=0) cart[idx].qty += 1; else cart.push({id, qty:1});
+  const idx = cart.findIndex((c) => c.id === id);
+  if (idx >= 0) cart[idx].qty += 1;
+  else cart.push({ id, qty: 1 });
   saveCart(cart);
-  cartBtn.classList.add('cart-shake');
-  setTimeout(()=>cartBtn.classList.remove('cart-shake'), 1000);
-  showToast('Agregado al carrito');
+  cartBtn.classList.add("cart-shake");
+  setTimeout(() => cartBtn.classList.remove("cart-shake"), 1000);
+  showToast("Agregado al carrito");
   renderCart();
 }
-function removeFromCart(id){
+function removeFromCart(id) {
   let cart = getCart();
-  cart = cart.filter(c => c.id !== id);
+  cart = cart.filter((c) => c.id !== id);
   saveCart(cart);
   renderCart();
-  showToast('Producto eliminado');
+  showToast("Producto eliminado");
 }
-function showToast(text){
+function showToast(text) {
   toastEl.textContent = text;
-  toastEl.classList.add('show');
-  setTimeout(()=> toastEl.classList.remove('show'), 2000);
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), 2000);
 }
-function openProduct(id){ window.location.href = `product.html?id=${id}`; }
+function openProduct(id) {
+  window.location.href = `product.html?id=${id}`;
+}
 
 /* ------------- UI events ------------- */
-menuBtn.onclick = ()=> { menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
-menuClose.onclick = ()=> { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
-menuOverlay.onclick = ()=> { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); };
+menuBtn.onclick = () => {
+  menuDropdown.classList.add("open");
+  menuOverlay.classList.add("show");
+};
+menuClose.onclick = () => {
+  menuDropdown.classList.remove("open");
+  menuOverlay.classList.remove("show");
+};
+menuOverlay.onclick = () => {
+  menuDropdown.classList.remove("open");
+  menuOverlay.classList.remove("show");
+};
 
-menuCuentaBtn.onclick = ()=> submenuCuenta.classList.toggle('open');
-menuProductosBtn.onclick = ()=> submenuProductos.classList.toggle('open');
-menuNosotrosBtn.onclick = ()=> submenuNosotros.classList.toggle('open');
+menuCuentaBtn.onclick = () => submenuCuenta.classList.toggle("open");
+menuProductosBtn.onclick = () => submenuProductos.classList.toggle("open");
+menuNosotrosBtn.onclick = () => submenuNosotros.classList.toggle("open");
 
 /* product buttons (delegation) */
-productsGrid.addEventListener('click', (e)=>{
-  const add = e.target.closest('.addBtn');
-  const view = e.target.closest('.viewBtn');
-  if(add){ addToCart(add.dataset.id); return; }
-  if(view){ openProduct(view.dataset.id); return; }
+productsGrid.addEventListener("click", (e) => {
+  const add = e.target.closest(".addBtn");
+  const view = e.target.closest(".viewBtn");
+  if (add) {
+    addToCart(add.dataset.id);
+    return;
+  }
+  if (view) {
+    openProduct(view.dataset.id);
+    return;
+  }
 });
 
 /* search expansion smooth */
 searchBtn.onclick = () => {
-  if(searchInput.style.display === 'none' || searchInput.style.display === '') {
-    searchBtn.style.display = 'none';
-    searchInput.style.display = 'block';
+  if (searchInput.style.display === "none" || searchInput.style.display === "") {
+    searchBtn.style.display = "none";
+    searchInput.style.display = "block";
     setTimeout(() => {
-      searchInput.classList.add('visible');
-      headerInner.classList.add('search-active');
-    }, 10); // for smooth
+      searchInput.classList.add("visible");
+      headerInner.classList.add("search-active");
+    }, 10);
     searchInput.focus();
   }
 };
-searchInput.addEventListener('input', (e)=> {
-  if(e.target.value) {
-    // Lupa ya desaparecida
-  } else {
-    // Lupa reaparece si vacío, pero solo al blur
-  }
-  renderProducts(searchProducts(e.target.value));
-});
-searchInput.addEventListener('blur', () => {
-  if(!searchInput.value) {
-    searchInput.classList.remove('visible');
+searchInput.addEventListener("input", (e) => renderProducts(searchProducts(e.target.value)));
+searchInput.addEventListener("blur", () => {
+  if (!searchInput.value) {
+    searchInput.classList.remove("visible");
     setTimeout(() => {
-      searchInput.style.display = 'none';
-      headerInner.classList.remove('search-active');
-      searchBtn.style.display = 'flex';
+      searchInput.style.display = "none";
+      headerInner.classList.remove("search-active");
+      searchBtn.style.display = "flex";
     }, 300);
   }
 });
 
 /* cart open/close */
-cartBtn.addEventListener('click', ()=> cartPanel.classList.toggle('open'));
-closeCart?.addEventListener('click', ()=> cartPanel.classList.remove('open'));
+cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
+closeCart?.addEventListener("click", () => cartPanel.classList.remove("open"));
 
 /* remove from cart */
-cartItemsEl.addEventListener('click', (e) => {
-  const remove = e.target.closest('.remove-btn');
-  if(remove) removeFromCart(remove.dataset.id);
+cartItemsEl.addEventListener("click", (e) => {
+  const remove = e.target.closest(".remove-btn");
+  if (remove) removeFromCart(remove.dataset.id);
 });
 
 /* menu social links */
-document.querySelectorAll('.menu-dropdown .social').forEach(el=>{
-  el.addEventListener('click', ()=> {
+document.querySelectorAll(".menu-dropdown .social").forEach((el) => {
+  el.addEventListener("click", () => {
     const url = el.dataset.url;
-    if(url) window.open(url, '_blank');
+    if (url) window.open(url, "_blank");
   });
 });
 
 /* login / session handling */
-function updateSessionUI(){
-  const user = localStorage.getItem('usuarioActivo');
-  if(user){
+function updateSessionUI() {
+  const user = localStorage.getItem("usuarioActivo");
+  if (user) {
     welcomeBar.textContent = `Hola, ${user} 👋`;
-    welcomeBar.classList.remove('hidden');
-    welcomeBar.classList.add('visible');
-    menuEstadoSesion.textContent = 'Cerrar sesión';
-    menuEstadoSesion.onclick = ()=> {
-      localStorage.removeItem('usuarioActivo');
+    welcomeBar.classList.remove("hidden");
+    welcomeBar.classList.add("visible");
+    menuEstadoSesion.textContent = "Cerrar sesión";
+    menuEstadoSesion.onclick = () => {
+      localStorage.removeItem("usuarioActivo");
       location.reload();
     };
-    setTimeout(()=> {
-      welcomeBar.classList.remove('visible');
-      welcomeBar.classList.add('hide');
-      setTimeout(()=> welcomeBar.classList.add('hidden'), 500);
-    }, 5000);
+
+    // Mostrar solo 3 segundos sin mover elementos
+    setTimeout(() => {
+      welcomeBar.classList.remove("visible");
+      welcomeBar.classList.add("hide");
+      setTimeout(() => welcomeBar.classList.add("hidden"), 400);
+    }, 3000);
   } else {
-    menuEstadoSesion.textContent = 'Iniciar sesión / Registrarse';
-    menuEstadoSesion.onclick = ()=> location.href = 'login.html';
-    welcomeBar.classList.add('hidden');
+    menuEstadoSesion.textContent = "Iniciar sesión / Registrarse";
+    menuEstadoSesion.onclick = () => (location.href = "login.html");
+    welcomeBar.classList.add("hidden");
   }
 }
 
 /* ---------- Init app ---------- */
-(async function init(){
-  // Firebase config (intacto)
+(async function init() {
   try {
     const cfg = await loadConfig();
-    if(cfg){
-      if(cfg.carouselEnabled === false) document.getElementById('carouselWrap').style.display='none';
-      if(cfg.starAdsEnabled === false) document.getElementById('starAds').style.display='none';
+    if (cfg) {
+      if (cfg.carouselEnabled === false) document.getElementById("carouselWrap").style.display = "none";
+      if (cfg.starAdsEnabled === false) document.getElementById("starAds").style.display = "none";
     }
-  } catch(e){ /* ignore */ }
+  } catch (e) {}
 
   const products = getStoredProducts();
   renderProducts(products);
