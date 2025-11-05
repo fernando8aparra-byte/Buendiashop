@@ -1,337 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Boutique Buendía</title>
-
-<link rel="stylesheet" href="styles.css">
-
-<!-- Firebase v8 CDN (app, auth, firestore) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<!-- Tu config -->
-<script src="firebase.js"></script>
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div id="menuBtn" title="Menú">☰</div>
-    <div class="logo">Boutique Buendía</div>
-    <div class="header-actions">
-      <div id="searchBtn" class="icon" title="Buscar">
-        <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Buscar" width="22">
-      </div>
-      <div id="cartBtn" class="icon" title="Carrito">
-        <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito" width="22">
-      </div>
-      <a href="login.html" class="icon" title="Iniciar Sesión" style="text-decoration:none;color:var(--text);font-weight:700;margin-left:8px;">Iniciar</a>
-    </div>
+<header class="site-header">
+  <button id="menuBtn" class="icon-btn" aria-label="menu">☰</button>
+  <div class="logo">Boutique Buendía</div>
+  <div class="header-right">
+    <button id="searchBtn" class="icon-btn" aria-label="buscar">🔍</button>
+    <button id="cartBtn" class="icon-btn" aria-label="carrito">🛒</button>
   </div>
 </header>
 
-<!-- Menú -->
-<div class="menu-overlay" id="menuOverlay"></div>
-<div class="menu-dropdown" id="menuDropdown">
-  <span class="menu-close" id="menuClose">✕</span>
-  <div class="menu-item" data-section="gorras">Gorras</div>
-  <div class="menu-item" data-section="camisetas">Camisetas</div>
-  <div class="menu-item" data-section="sudaderas">Sudaderas</div>
-  <div class="menu-item" data-section="tenis">Tenis</div>
-  <div class="menu-item" data-section="fragancias">Fragancias</div>
-  <div class="menu-item" data-section="relojes">Relojes</div>
-  <div class="menu-item" data-section="cintos">Cintos</div>
-  <hr style="margin:12px 0;">
-  <div class="menu-item" id="menuNosotros">Nosotros</div>
+<!-- Search (animated first use) -->
+<div id="searchWrap" class="search-wrap">
+  <input id="searchInput" placeholder="Buscar producto, color o talla..." />
 </div>
 
-<main id="mainContent">
-  <h1 class="page-title">Productos disponibles</h1>
+<main class="page-wrap">
 
-  <div class="search-bar" id="searchBarWrap">
-    <input id="searchInput" placeholder="Buscar producto, color o talla...">
-  </div>
-
-  <!-- Carrusel simple -->
-  <div style="margin-bottom:18px;">
-    <img id="carouselImg" src="images/IMG_4852.jpeg" style="width:100%;height:360px;object-fit:cover;border-radius:10px;box-shadow:var(--shadow)">
-  </div>
-
-  <section class="grid" id="productsGrid">
-    <!-- productos se inyectan desde JS -->
+  <!-- PRINCIPAL (gran tarjeta estilo imagen) -->
+  <section id="principalSection" class="principal-wrap">
+    <!-- contenido inyectado por JS -->
   </section>
+
+  <!-- Carrusel horizontal -->
+  <section class="section">
+    <h3 class="section-title">Nuevas llegadas</h3>
+    <div id="carousel" class="carousel"></div>
+  </section>
+
+  <!-- Grid productos (2 por fila en pantallas grandes) -->
+  <section class="section">
+    <h3 class="section-title">También podría interesarte</h3>
+    <div id="productsGrid" class="grid"></div>
+  </section>
+
 </main>
 
-<!-- Carrito -->
-<div class="cart-panel" id="cartPanel" aria-hidden="true">
+<!-- Carrito panel -->
+<aside id="cartPanel" class="cart-panel" aria-hidden="true">
   <div class="cart-header">
-    <span>Carrito</span>
-    <span id="closeCart" style="cursor:pointer;">✕</span>
+    <strong>Carrito</strong>
+    <button id="closeCart" class="icon-btn">✕</button>
   </div>
-
-  <div class="cart-items" id="cartItems">
+  <div id="cartItems" class="cart-items">
     <div class="cart-empty">Tu carrito está vacío 🛍️</div>
   </div>
-
-  <div class="cart-footer" id="cartFooter">
-    <div class="cart-total" id="cartTotal">Total: $0</div>
+  <div class="cart-footer">
+    <div id="cartTotal" class="cart-total">Total: $0</div>
     <div class="payment-options">
-      <button class="pay-btn paypal" id="paypalBtn">
-        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
-        Pagar con PayPal
-      </button>
-      <button class="pay-btn cardpay" id="cardBtn">
-        <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta">
-        Pagar con Tarjeta
-      </button>
+      <button id="payPayPal" class="pay-btn paypal"><img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt=""> Pagar con PayPal</button>
+      <button id="payCard" class="pay-btn cardpay"><img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt=""> Pagar con Tarjeta</button>
     </div>
   </div>
-</div>
+</aside>
 
-<div class="toast" id="toast">Producto agregado al carrito</div>
+<div id="toast" class="toast">Producto agregado</div>
 
-<script>
-/* -------------------------
-  Variables & UI elements
--------------------------*/
-const menuBtn = document.getElementById('menuBtn');
-const menuDropdown = document.getElementById('menuDropdown');
-const menuOverlay = document.getElementById('menuOverlay');
-const menuClose = document.getElementById('menuClose');
-const menuItems = document.querySelectorAll('.menu-item');
-const menuNosotros = document.getElementById('menuNosotros');
-
-const cartBtn = document.getElementById('cartBtn');
-const cartPanel = document.getElementById('cartPanel');
-const closeCart = document.getElementById('closeCart');
-const cartItemsWrap = document.getElementById('cartItems');
-const cartTotalEl = document.getElementById('cartTotal');
-const productsGrid = document.getElementById('productsGrid');
-const toast = document.getElementById('toast');
-
-const searchBtn = document.getElementById('searchBtn');
-const searchBarWrap = document.getElementById('searchBarWrap');
-const searchInput = document.getElementById('searchInput');
-
-let cart = []; // NO persistente (B)
-let allProducts = []; // lista cache
-let carouselImages = []; // para carrusel
-let carouselIndex = 0;
-
-/* Firebase references */
-const auth = window.__FB.auth;
-const db = window.__FB.db;
-
-/* -------------------------
-  Menu behavior
--------------------------*/
-menuBtn.onclick = ()=>{ menuDropdown.classList.add('open'); menuOverlay.classList.add('show'); };
-menuClose.onclick = closeMenu;
-menuOverlay.onclick = closeMenu;
-function closeMenu(){ menuDropdown.classList.remove('open'); menuOverlay.classList.remove('show'); }
-
-/* Menu categories: filtrar */
-menuItems.forEach(mi=>{
-  mi.onclick = async () => {
-    const section = mi.dataset.section;
-    if(section === undefined) return;
-    await loadProducts(section);
-    closeMenu();
-  };
-});
-menuNosotros.onclick = ()=> location.href = 'about.html';
-
-/* Search bar toggle */
-searchBtn.onclick = ()=> {
-  searchBarWrap.style.display = searchBarWrap.style.display === 'block' ? 'none' : 'block';
-  if(searchBarWrap.style.display === 'block') searchInput.focus();
-};
-searchInput.addEventListener('input', ()=> renderProducts(filteredBySearch(searchInput.value)));
-
-/* Cart behavior */
-cartBtn.onclick = ()=> {
-  cartPanel.classList.add('open');
-  cartPanel.setAttribute('aria-hidden','false');
-};
-closeCart.onclick = ()=> {
-  cartPanel.classList.remove('open');
-  cartPanel.setAttribute('aria-hidden','true');
-};
-
-function showToast(msg){
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(()=> toast.classList.remove('show'), 2000);
-}
-
-/* -------------------------
-  Productos: carga desde Firestore
--------------------------*/
-async function loadProducts(category = null){
-  productsGrid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);padding:20px">Cargando...</div>';
-  try {
-    const snap = await db.collection('products').where('enabled','==',true).get();
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    allProducts = list;
-    // fill carousel images from products marked 'carrusel' or fallback to first 3 public images
-    carouselImages = list.filter(p=>p.type==='carrusel').map(p=>p.image);
-    if(carouselImages.length < 3){
-      const fallback = list.slice(0,3).map(p=>p.image).filter(Boolean);
-      carouselImages = [...new Set([...carouselImages, ...fallback])];
-    }
-    startCarousel();
-
-    let shown = list;
-    if(category) shown = list.filter(p => p.category === category);
-    renderProducts(shown);
-  } catch(e){
-    console.error('Error cargando productos', e);
-    productsGrid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);padding:20px">No se pudo cargar productos.</div>';
-  }
-}
-
-function filteredBySearch(q){
-  if(!q) return allProducts;
-  const low = q.toLowerCase();
-  return allProducts.filter(p => (p.name||'').toLowerCase().includes(low) || (p.description||'').toLowerCase().includes(low));
-}
-
-function renderProducts(list){
-  productsGrid.innerHTML = '';
-  if(!list || list.length === 0){
-    productsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 20px">No hay productos en esta categoría.</div>';
-    return;
-  }
-  list.forEach(p => {
-    const card = document.createElement('article');
-    card.className = 'card';
-    card.dataset.name = p.name || '';
-    card.dataset.price = p.priceNumber || p.price || 0;
-    card.innerHTML = `
-      <img src="${p.image || 'images/IMG_4852.jpeg'}" alt="${escapeHtml(p.name||'Producto')}">
-      <div class="meta">
-        <div class="title">${escapeHtml(p.name||'Sin nombre')}</div>
-        <div class="price">${p.priceFormatted || formatCurrency(p.priceNumber || Number(p.price || 0))}</div>
-        <button class="add-btn">Agregar al carrito</button>
-      </div>
-    `;
-    // click en tarjeta -> ir a producto (puedes crear páginas productoX.html si quieres)
-    card.onclick = ()=> { /* por ahora no navegamos */ };
-    // add btn handler
-    card.querySelector('.add-btn').onclick = (ev) => {
-      ev.stopPropagation();
-      addToCart({ name: p.name, price: (p.priceNumber || Number(p.price || 0)), id: p.id });
-    };
-    productsGrid.appendChild(card);
-  });
-}
-
-/* -------------------------
-  Carrito (NO persistente)
--------------------------*/
-function addToCart(item){
-  cart.push(item);
-  renderCart();
-  showToast('Producto agregado al carrito');
-}
-function renderCart(){
-  cartItemsWrap.innerHTML = '';
-  if(cart.length === 0){
-    cartItemsWrap.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
-    cartTotalEl.textContent = 'Total: $0';
-    return;
-  }
-  let total = 0;
-  cart.forEach((p,i)=>{
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `<span>${escapeHtml(p.name)}</span><span>$${Number(p.price).toLocaleString('es-MX')}</span><button onclick="removeItem(${i})">✕</button>`;
-    cartItemsWrap.appendChild(div);
-    total += Number(p.price);
-  });
-  cartTotalEl.textContent = 'Total: $' + total.toLocaleString('es-MX');
-}
-function removeItem(i){ cart.splice(i,1); renderCart(); }
-
-/* -------------------------
-  Carrusel simple
--------------------------*/
-function startCarousel(){
-  if(!carouselImages || carouselImages.length === 0) return;
-  carouselIndex = 0;
-  document.getElementById('carouselImg').src = carouselImages[0];
-  // clear previous interval if any
-  if(window._carouselInterval) clearInterval(window._carouselInterval);
-  window._carouselInterval = setInterval(()=>{
-    carouselIndex = (carouselIndex + 1) % carouselImages.length;
-    document.getElementById('carouselImg').src = carouselImages[carouselIndex];
-  }, 3500);
-}
-
-/* -------------------------
-  Helpers
--------------------------*/
-function formatCurrency(n){
-  try {
-    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(Number(n||0));
-  } catch(e) {
-    return '$' + Number(n||0).toFixed(2);
-  }
-}
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-/* -------------------------
-  Maintenance check
--------------------------*/
-async function checkMaintenance(){
-  try {
-    const ref = await db.collection('config').doc('maintenance').get();
-    const enabled = ref.exists && ref.data().enabled === true;
-    if(enabled && localStorage.getItem('admin') !== 'true'){
-      document.body.innerHTML = `
-        <div style="text-align:center;padding:60px;">
-          <h1>⚠️ Sitio en mantenimiento</h1>
-          <p>Estamos realizando mejoras. Vuelve más tarde.</p>
-        </div>`;
-      return;
-    }
-  } catch(e){ console.warn('checkMaintenance err', e); }
-}
-
-/* -------------------------
-  Inicialización
--------------------------*/
-async function init(){
-  await checkMaintenance();
-  await loadProducts();
-}
-init();
-
-/* -------------------------
-  Menu Admin prompt (acceso por contraseña secreta)
--------------------------*/
-function adminLoginPrompt(){
-  const pass = prompt('Ingrese contraseña admin:');
-  if(pass === 'BUENDIA-ADMIN-2025'){
-    localStorage.setItem('admin','true');
-    location.href = 'admin.html';
-  } else {
-    alert('Contraseña incorrecta.');
-  }
-}
-
-/* expose admin function to global (index has Admin link earlier) */
-window.adminLoginPrompt = adminLoginPrompt;
-
-/* Extras: link del menu 'Admin' (opcional) */
-const adminLink = document.createElement('div');
-adminLink.style.display = 'none'; // no show by default; si quieres lo pones visible
-// poner en header si quieres:
-// document.querySelector('.header-actions').appendChild(adminLink);
-</script>
-
+<!-- Firebase (usa tu firebase.js que te pasé) -->
+<script type="module" src="firebase.js"></script>
+<!-- App logic -->
+<script type="module" src="app.js"></script>
 </body>
 </html>
