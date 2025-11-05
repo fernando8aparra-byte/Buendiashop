@@ -4,17 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Boutique Buendía: Moda premium con tallas oversize, gorras, camisetas y más. Envíos a todo México." />
-  <title id="siteTitle">Boutique Buendía | Moda Premium</title>
+  <title>Boutique Buendía | Moda Premium</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" href="https://i.ibb.co/9yY7Y7K/logo-buendia.png" type="image/png">
 </head>
 <body>
-
-  <!-- MANTENIMIENTO (solo usuarios) -->
-  <div id="maintenanceBar" class="maintenance-bar hidden">
-    Página en mantenimiento. ¡Vuelve pronto!
-  </div>
 
   <!-- BARRA DE BIENVENIDA -->
   <div id="welcomeBar" class="welcome-bar hidden" role="status" aria-live="polite"></div>
@@ -28,7 +23,7 @@
 
       <div class="logo-container">
         <div class="logo" id="logoCenter">
-          <span id="logoText">Boutique Buendía</span>
+          <span>Boutique Buendía</span>
         </div>
         <button id="searchBtn" class="icon search-btn" title="Buscar" aria-label="Buscar productos">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -48,7 +43,7 @@
     <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar">
   </header>
 
-  <!-- MENU LATERAL -->
+  <!-- MENU LATERAL (funcional, con logos pequeños) -->
   <div id="menuOverlay" class="menu-overlay"></div>
   <nav id="menuDropdown" class="menu-dropdown" aria-hidden="true">
     <button id="menuClose" class="menu-close" aria-label="Cerrar menú">X</button>
@@ -120,9 +115,11 @@
     <button class="filter-btn" data-filter="precio-desc">Mayor precio</button>
   </section>
 
-  <!-- CARRUSEL (2 filas en mobile) -->
+  <!-- CARRUSEL (2 filas en móvil) -->
   <section class="carousel-wrap" id="carouselWrap">
-    <div class="carousel-grid" id="carouselGrid"></div>
+    <div class="carousel" id="carousel">
+      <!-- Productos carrusel se insertan aquí -->
+    </div>
   </section>
 
   <!-- MAIN -->
@@ -130,7 +127,7 @@
     <h1 class="page-title">Productos Destacados</h1>
     <div class="star-ads" id="starAds"></div>
     <section class="grid" id="productsGrid">
-      <div class="loading">Cargando...</div>
+      <div class="loading">Cargando productos...</div>
     </section>
   </main>
 
