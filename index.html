@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gorra Barbas Hats x CT "GALAXY CT" - Boutique Buendía</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gorra GALAXY CT - Boutique Buendía</title>
   <meta name="description" content='Edición limitada "GALAXY CT" con baño 24K en detalles.'>
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header-animated">
+  <!-- HEADER -->
+  <header class="header">
     <div class="header-inner">
       <!-- Menú Hamburguesa -->
-      <div id="menuBtn" class="icon-btn" aria-label="Abrir menú">
+      <button id="menuBtn" class="icon-btn" aria-label="Abrir menú">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <path d="M3 12h18M3 6h18M3 18h18"/>
         </svg>
-      </div>
+      </button>
 
-      <!-- Logo (centrado) -->
+      <!-- Logo centrado -->
       <div class="logo" id="logo">Boutique Buendía</div>
 
-      <!-- Derecha: Lupa + Carrito -->
+      <!-- Lupa + Carrito -->
       <div class="header-right">
-        <div id="searchBtn" class="icon-btn" aria-label="Buscar">
+        <button id="searchBtn" class="icon-btn" aria-label="Buscar">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <circle cx="11" cy="11" r="8"/>
             <path d="m21 21-4.35-4.35"/>
           </svg>
-        </div>
+        </button>
 
-        <div id="cartBtn" class="icon-btn" title="Carrito" aria-label="Abrir carrito">
+        <button id="cartBtn" class="icon-btn" aria-label="Abrir carrito">
           <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
           <span id="cartBadge">0</span>
-        </div>
+        </button>
       </div>
 
-      <!-- Barra de búsqueda (oculta) -->
+      <!-- Barra de búsqueda (oculta por defecto) -->
       <div class="search-container" id="searchContainer">
         <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="Buscar productos..." aria-label="Buscar">
+          <input type="text" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
           <button id="closeSearch" class="icon-btn" aria-label="Cerrar búsqueda">×</button>
         </div>
       </div>
@@ -53,117 +53,126 @@
   </header>
 
   <!-- Menú lateral -->
-  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
-  <div class="menu-dropdown" id="menuDropdown" aria-hidden="true">
-    <div class="menu-close" id="menuClose" aria-label="Cerrar menú">×</div>
-    <div class="menu-item" onclick="location.href='index.html'">Gorras</div>
-    <div class="menu-item prox">Camisetas <small>Próximamente</small></div>
-    <div class="menu-item prox">Sudaderas <small>Próximamente</small></div>
-    <div class="menu-item prox">Tenis <small>Próximamente</small></div>
-    <div class="menu-item prox">Fragancias <small>Próximamente</small></div>
-    <div class="menu-item prox">Relojes <small>Próximamente</small></div>
-    <div class="menu-item prox">Cintos <small>Próximamente</small></div>
-  </div>
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <nav class="menu-sidebar" id="menuSidebar">
+    <button class="menu-close" id="menuClose" aria-label="Cerrar menú">×</button>
+    <a href="#" class="menu-item">Gorras</a>
+    <a href="#" class="menu-item prox">Camisetas <small>Próximamente</small></a>
+    <a href="#" class="menu-item prox">Sudaderas <small>Próximamente</small></a>
+    <a href="#" class="menu-item prox">Tenis <small>Próximamente</small></a>
+    <a href="#" class="menu-item prox">Fragancias <small>Próximamente</small></a>
+    <a href="#" class="menu-item prox">Relojes <small>Próximamente</small></a>
+    <a href="#" class="menu-item prox">Cintos <small>Próximamente</small></a>
+  </nav>
 
-  <!-- Main -->
-  <main>
+  <!-- MAIN -->
+  <main class="main-container">
+    <!-- Breadcrumbs -->
     <nav class="breadcrumbs">
-      <a href="index.html">INICIO</a> > <a href="index.html">GORRAS</a> > GALAXY CT
+      <a href="#">INICIO</a> > <a href="#">GORRAS</a> > GALAXY CT
     </nav>
 
-    <section class="product-wrap">
+    <!-- Producto principal -->
+    <section class="product-detail">
       <!-- Galería -->
-      <div class="product-gallery" id="gallery">
-        <button class="gallery-nav prev" id="prevBtn">Previous</button>
-        <button class="gallery-nav next" id="nextBtn">Next</button>
+      <div class="product-gallery">
+        <button class="gallery-btn prev" id="prevBtn" aria-label="Anterior">Previous</button>
+        <button class="gallery-btn next" id="nextBtn" aria-label="Siguiente">Next</button>
+
         <div class="gallery-track" id="galleryTrack">
-          <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra GALAXY CT - Frente' class="gallery-img" loading="lazy">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt='Gorra GALAXY CT - Lateral' class="gallery-img" loading="lazy">
-          <img src="http://imgfz.com/i/P9gF7m8.webp" alt='Gorra GALAXY CT - Detalle' class="gallery-img" loading="lazy">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="Gorra GALAXY CT - Frente" class="gallery-img">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="Gorra GALAXY CT - Lateral" class="gallery-img">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="Gorra GALAXY CT - Detalle" class="gallery-img">
         </div>
-        <div class="gallery-dots" id="dots"></div>
-        <div class="gallery-thumbs" id="thumbs">
-          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="Thumb 1" class="thumb active" onclick="goToSlide(0)">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="Thumb 2" class="thumb" onclick="goToSlide(1)">
-          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="Thumb 3" class="thumb" onclick="goToSlide(2)">
+
+        <div class="gallery-dots" id="galleryDots"></div>
+
+        <div class="gallery-thumbs">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="Miniatura 1" class="thumb active" onclick="goToSlide(0)">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="Miniatura 2" class="thumb" onclick="goToSlide(1)">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="Miniatura 3" class="thumb" onclick="goToSlide(2)">
         </div>
       </div>
 
       <!-- Info -->
       <div class="product-info">
-        <h1 class="page-title">Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED</h1>
-        <div class="price">$18,000.00</div>
-        <p class="desc">
-          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado premium.
+        <h1 class="product-title">Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED</h1>
+        <div class="product-price">$18,000.00</div>
+        <p class="product-desc">
+          Edición limitada "GALAXY CT" con baño 24K en detalles. Bordado premium, ajuste regulable y materiales de alta calidad.
         </p>
-        <div class="qty-row">
-          <label for="qty">Cantidad</label>
-          <input id="qty" type="number" min="1" value="1">
+
+        <div class="qty-selector">
+          <label for="qty">Cantidad:</label>
+          <input type="number" id="qty" min="1" value="1">
         </div>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-          <button class="add-btn" id="addToCartBtn">Agregar al carrito</button>
+
+        <div class="action-buttons">
+          <button id="addToCartBtn" class="btn-primary">Agregar al carrito</button>
           <div class="payment-options" id="paymentOptions">
-            <button class="pay-btn paypal" onclick="paypalSimulate(event)">
-              <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> PayPal
-            </button>
-            <button class="pay-btn cardpay" onclick="cardSimulate(event)">
-              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Tarjeta"> Tarjeta
-            </button>
+            <button class="btn-pay paypal" onclick="paypalSimulate()">PayPal</button>
+            <button class="btn-pay card" onclick="cardSimulate()">Tarjeta</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Productos relacionados (con data-search) -->
-    <section class="related">
+    <!-- Productos relacionados: CARRUSEL -->
+    <section class="related-products">
       <h2>También podría interesarte</h2>
-      <div class="grid">
-        <div class="card" data-search="star ct gorra" onclick="location.href='producto2.html'">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
-            <div class="price">$4,500.00</div>
+      <div class="carousel">
+        <button class="carousel-btn prev" id="relatedPrev" aria-label="Anterior">Previous</button>
+        <div class="carousel-track-container">
+          <div class="carousel-track" id="relatedTrack">
+            <div class="product-card" data-search="star ct gorra barbas" onclick="location.href='producto2.html'">
+              <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
+              <div class="card-info">
+                <h3>Gorra "STAR CT"</h3>
+                <p class="price">$4,500.00</p>
+              </div>
+            </div>
+            <div class="product-card" data-search="oriental tumbado gorra" onclick="location.href='producto3.html'">
+              <img src="http://imgfz.com/i/P9gF7m8.webp" alt="ORIENTAL TUMBADO" loading="lazy">
+              <div class="card-info">
+                <h3>Gorra "ORIENTAL TUMBADO"</h3>
+                <p class="price">$3,300.00</p>
+              </div>
+            </div>
+            <div class="product-card" data-search="galaxy ct gorra oro" onclick="location.href='producto4.html'">
+              <img src="http://imgfz.com/i/TBumyjZ.webp" alt="GALAXY CT" loading="lazy">
+              <div class="card-info">
+                <h3>Gorra "GALAXY CT"</h3>
+                <p class="price">$18,000.00</p>
+              </div>
+            </div>
+            <div class="product-card" data-search="star ct gorra" onclick="location.href='producto5.html'">
+              <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
+              <div class="card-info">
+                <h3>Gorra "STAR CT"</h3>
+                <p class="price">$4,500.00</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card" data-search="oriental tumbado gorra" onclick="location.href='producto3.html'">
-          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="ORIENTAL TUMBADO" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "ORIENTAL TUMBADO"</div>
-            <div class="price">$3,300.00</div>
-          </div>
-        </div>
-        <div class="card" data-search="galaxy ct gorra oro" onclick="location.href='producto4.html'">
-          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="GALAXY CT" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "GALAXY CT"</div>
-            <div class="price">$18,000.00</div>
-          </div>
-        </div>
-        <div class="card" data-search="star ct gorra" onclick="location.href='producto5.html'">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
-          <div class="meta">
-            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
-            <div class="price">$4,500.00</div>
-          </div>
-        </div>
+        <button class="carousel-btn next" id="relatedNext" aria-label="Siguiente">Next</button>
       </div>
     </section>
   </main>
 
-  <!-- Carrito -->
-  <aside class="cart-panel" id="cartPanel" aria-hidden="true">
+  <!-- Carrito lateral -->
+  <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
-      <span>Carrito</span>
-      <span id="closeCart" style="cursor:pointer;">×</span>
+      <h3>Carrito</h3>
+      <button id="closeCart" class="icon-btn">×</button>
     </div>
     <div class="cart-items" id="cartItems">
-      <div class="cart-empty">Tu carrito está vacío</div>
+      <p class="empty-cart">Tu carrito está vacío</p>
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div class="payment-area" id="paymentArea">
-        <button class="pay-btn paypal" id="paypalCheckout">PayPal</button>
-        <button class="pay-btn cardpay" id="cardCheckout">Tarjeta</button>
+      <div class="checkout-buttons" id="checkoutButtons">
+        <button class="btn-pay paypal">PayPal</button>
+        <button class="btn-pay card">Tarjeta</button>
       </div>
     </div>
   </aside>
@@ -171,7 +180,7 @@
   <!-- Toast -->
   <div class="toast" id="toast">¡Producto agregado!</div>
 
-  <!-- JS -->
+  <!-- JavaScript -->
   <script src="js/script.js"></script>
 </body>
 </html>
