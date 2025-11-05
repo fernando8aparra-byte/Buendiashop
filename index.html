@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Boutique Buendía: Moda premium con tallas oversize, gorras, camisetas y más. Envíos a todo México." />
   <title>Boutique Buendía | Moda Premium</title>
   <link rel="stylesheet" href="css/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,42 +10,44 @@
 </head>
 <body>
 
-  <!-- BARRA DE BIENVENIDA -->
-  <div id="welcomeBar" class="welcome-bar hidden" role="status" aria-live="polite"></div>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
-      <button id="menuBtn" class="menu-btn" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
+      <!-- 3 RAYITAS LIMPIAS -->
+      <button id="menuBtn" class="menu-btn clean" aria-label="Menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
       </button>
 
-      <div class="logo-container">
-        <div class="logo" id="logoCenter">
-          <span>Boutique Buendía</span>
-        </div>
-        <button id="searchBtn" class="icon search-btn" title="Buscar" aria-label="Buscar productos">
+      <!-- LOGO -->
+      <div class="logo">Boutique Buendía</div>
+
+      <!-- LUPA + CARRITO -->
+      <div class="icons">
+        <button id="searchBtn" class="icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
         </button>
+        <button id="cartBtn" class="icon cart-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.5 12.5a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L23 6H6"/>
+          </svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
       </div>
-
-      <button id="cartBtn" class="icon cart-icon" title="Carrito" aria-label="Abrir carrito">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-          <path d="M1 1h4l2.5 12.5a2 2 0 0 0 2 1.5h9a2 2 0 0 0 2-1.5L23 6H6"/>
-        </svg>
-        <span class="cart-count" id="cartCount">0</span>
-      </button>
     </div>
-    <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar">
+
+    <!-- BUSCADOR -->
+    <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos...">
   </header>
 
-  <!-- MENU LATERAL (funcional, con logos pequeños) -->
+  <!-- MENU LATERAL -->
   <div id="menuOverlay" class="menu-overlay"></div>
-  <nav id="menuDropdown" class="menu-dropdown" aria-hidden="true">
-    <button id="menuClose" class="menu-close" aria-label="Cerrar menú">X</button>
+  <nav id="menuDropdown" class="menu-dropdown">
+    <button id="menuClose" class="menu-close">X</button>
 
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuCuentaBtn">
@@ -56,7 +57,8 @@
         </svg>
       </div>
       <div class="submenu" id="submenuCuenta">
-        <div class="menu-item" id="menuEstadoSesion">Iniciar sesión / Registrarse</div>
+        <div class="menu-item">Iniciar sesión</div>
+        <div class="menu-item">Registrarse</div>
       </div>
     </div>
 
@@ -89,6 +91,7 @@
       </div>
     </div>
 
+    <!-- CATEGORÍAS -->
     <div class="menu-section">
       <div class="menu-item menu-header" id="menuProductosBtn">
         <span>Categorías</span>
@@ -115,24 +118,19 @@
     <button class="filter-btn" data-filter="precio-desc">Mayor precio</button>
   </section>
 
-  <!-- CARRUSEL (2 filas en móvil) -->
-  <section class="carousel-wrap" id="carouselWrap">
-    <div class="carousel" id="carousel">
-      <!-- Productos carrusel se insertan aquí -->
-    </div>
+  <!-- CARRUSEL (2 filas) -->
+  <section class="carousel-wrap">
+    <div class="carousel-grid" id="carouselGrid"></div>
   </section>
 
   <!-- MAIN -->
   <main class="main">
     <h1 class="page-title">Productos Destacados</h1>
-    <div class="star-ads" id="starAds"></div>
-    <section class="grid" id="productsGrid">
-      <div class="loading">Cargando productos...</div>
-    </section>
+    <section class="grid" id="productsGrid"></section>
   </main>
 
   <!-- MODAL -->
-  <div class="modal" id="productModal" aria-hidden="true">
+  <div class="modal" id="productModal">
     <div class="modal-content">
       <button class="modal-close" id="modalClose">X</button>
       <div class="modal-body" id="modalBody"></div>
@@ -140,7 +138,7 @@
   </div>
 
   <!-- CARRITO -->
-  <aside class="cart-panel" id="cartPanel" aria-hidden="true">
+  <aside class="cart-panel" id="cartPanel">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
       <button id="closeCart" class="cart-close">X</button>
@@ -149,11 +147,11 @@
       <div class="cart-empty">Tu carrito está vacío</div>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
-      <div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div>
+      <div class="cart-total"><span>Total:</span> <strong id="cartTotal">$0</strong></div>
       <div class="payment-options">
-        <button id="paypalBtn" class="pay-btn paypal">PayPal</button>
-        <button id="cardBtn" class="pay-btn card">Tarjeta</button>
-        <button id="oxxoBtn" class="pay-btn oxxo">OXXO</button>
+        <button class="pay-btn paypal">PayPal</button>
+        <button class="pay-btn card">Tarjeta</button>
+        <button class="pay-btn oxxo">OXXO</button>
       </div>
     </div>
   </aside>
@@ -161,7 +159,6 @@
   <!-- TOAST -->
   <div id="toast" class="toast"></div>
 
-  <script type="module" src="js/firebase.js"></script>
-  <script type="module" src="js/script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
