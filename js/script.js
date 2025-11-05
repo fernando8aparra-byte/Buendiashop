@@ -1,6 +1,7 @@
 // js/script.js
-import { db, loadConfig } from "./firebase.js";
+import { db, loadConfig } from "./firebase.js"; // Firebase intacto
 
+/* ------------- DOM ------------- */
 const welcomeBar = document.getElementById("welcomeBar");
 const menuBtn = document.getElementById("menuBtn");
 const menuDropdown = document.getElementById("menuDropdown");
@@ -21,13 +22,14 @@ const closeCart = document.getElementById("closeCart");
 const cartItemsEl = document.getElementById("cartItems");
 const cartFooter = document.getElementById("cartFooter");
 const cartTotalEl = document.getElementById("cartTotal");
-const checkoutBtn = document.getElementById("checkoutBtn");
 const toastEl = document.getElementById("toast");
 const productsGrid = document.getElementById("productsGrid");
 const carouselTrack = document.getElementById("carouselTrack");
 const starAdsEl = document.getElementById("starAds");
+const headerInner = document.querySelector('.header-inner');
 const logoCenter = document.getElementById("logoCenter");
 
+/* ------------- Data (localStorage) ------------- */
 const SAMPLE_PRODUCTS = [
   { id: 'p1', nombre: 'Gorra Barbas Hats', descripcion:'Gorra con logo bordado', precio:120, stock:5, categoria:'Gorras', img:'https://i.ibb.co/gJTvCjp/gorra1.jpg', talla:[], estrella:true },
   { id: 'p2', nombre: 'Camiseta Oversize Negra', descripcion:'Camiseta oversize algodón 100%', precio:220, stock:12, categoria:'Camisetas', img:'https://i.ibb.co/DtkLMcy/playera1.jpg', talla:['S','M','L','XL'], estrella:false },
@@ -117,13 +119,8 @@ function renderCart(){
     const p = getStoredProducts().find(x=>x.id===item.id);
     if(!p) return;
     const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <button class="remove-btn" data-id="${item.id}">✕</button>
-      <img src="${p.img}" style="width:60px;height:60px;object-fit:cover;">
-      <div style="flex:1"><div style="font-weight:700">${p.nombre}</div><div style="color:var(--text-muted)">x${item.qty}</div></div>
-      <div style="font-weight:800">$${p.precio*item.qty}</div>
-    `;
+    div.style = 'display:flex; gap:12px; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:12px;';
+    div.innerHTML = `<img src="${p.img}" style="width:60px;height:60px;object-fit:cover;"><div style="flex:1"><div style="font-weight:700">${p.nombre}</div><div style="color:var(--text-muted)">x${item.qty}</div></div><div style="font-weight:800">$${p.precio*item.qty}</div>`;
     cartItemsEl.appendChild(div);
     totalItems += item.qty;
     total += p.precio * item.qty;
@@ -142,13 +139,6 @@ function addToCart(id){
   setTimeout(()=>cartBtn.classList.remove('cart-shake'), 1000);
   showToast('Agregado al carrito');
   renderCart();
-}
-function removeFromCart(id){
-  let cart = getCart();
-  cart = cart.filter(c => c.id !== id);
-  saveCart(cart);
-  renderCart();
-  showToast('Producto eliminado');
 }
 function showToast(text){
   toastEl.textContent = text;
@@ -174,51 +164,49 @@ productsGrid.addEventListener('click', (e)=>{
   if(view){ openProduct(view.dataset.id); return; }
 });
 
-/* search toggle */
+/* search expansion smooth */
 searchBtn.onclick = () => {
-  searchInput.classList.toggle('hidden');
-  logoCenter.style.opacity = searchInput.classList.contains('hidden') ? '1' : '0';
-  if(!searchInput.classList.contains('hidden')) searchInput.focus();
+  if(searchInput.style.display === 'none' || searchInput.style.display === '') {
+    searchInput.style.display = 'block';
+    setTimeout(() => {
+      searchInput.classList.add('visible');
+      headerInner.classList.add('search-active');
+    }, 10); // for smooth transition
+    searchInput.focus();
+  } else {
+    if(!searchInput.value) {
+      searchInput.classList.remove('visible');
+      setTimeout(() => {
+        searchInput.style.display = 'none';
+        headerInner.classList.remove('search-active');
+      }, 300);
+    }
+  }
 };
 searchInput.addEventListener('input', (e)=> renderProducts(searchProducts(e.target.value)));
 searchInput.addEventListener('blur', () => {
   if(!searchInput.value) {
-    searchInput.classList.add('hidden');
-    logoCenter.style.opacity = '1';
+    searchInput.classList.remove('visible');
+    setTimeout(() => {
+      searchInput.style.display = 'none';
+      headerInner.classList.remove('search-active');
+    }, 300);
   }
 });
 
 /* cart open/close */
 cartBtn.addEventListener('click', ()=> cartPanel.classList.toggle('open'));
-closeCart.addEventListener('click', ()=> cartPanel.classList.remove('open'));
-
-/* remove from cart */
-cartItemsEl.addEventListener('click', (e) => {
-  const remove = e.target.closest('.remove-btn');
-  if(remove) removeFromCart(remove.dataset.id);
-});
-
-/* checkout */
-checkoutBtn.addEventListener('click', () => {
-  const user = localStorage.getItem('usuarioActivo');
-  if(!user) {
-    if(confirm('Inicia sesión para pagar.')) location.href = 'login.html';
-  } else {
-    // Redirigir a pago (e.g., payment.html)
-    alert('Procediendo a pago...');
-  }
-});
+closeCart?.addEventListener('click', ()=> cartPanel.classList.remove('open'));
 
 /* menu social links */
-document.querySelectorAll('.social-icon').forEach(el=>{
-  el.addEventListener('click', (e) => {
-    e.preventDefault();
+document.querySelectorAll('.menu-dropdown .social').forEach(el=>{
+  el.addEventListener('click', ()=> {
     const url = el.dataset.url;
     if(url) window.open(url, '_blank');
   });
 });
 
-/* login / session handling (moved to account/pay) */
+/* login / session handling */
 function updateSessionUI(){
   const user = localStorage.getItem('usuarioActivo');
   if(user){
@@ -226,7 +214,7 @@ function updateSessionUI(){
     welcomeBar.classList.remove('hidden');
     welcomeBar.classList.add('visible');
     menuEstadoSesion.textContent = 'Cerrar sesión';
-    menuEstadoSesion.onclick = () => {
+    menuEstadoSesion.onclick = ()=> {
       localStorage.removeItem('usuarioActivo');
       location.reload();
     };
@@ -237,13 +225,14 @@ function updateSessionUI(){
     }, 5000);
   } else {
     menuEstadoSesion.textContent = 'Iniciar sesión / Registrarse';
-    menuEstadoSesion.onclick = () => location.href = 'login.html';
+    menuEstadoSesion.onclick = ()=> location.href = 'login.html';
     welcomeBar.classList.add('hidden');
   }
 }
 
 /* ---------- Init app ---------- */
 (async function init(){
+  // Firebase config (intacto)
   try {
     const cfg = await loadConfig();
     if(cfg){
