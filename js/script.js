@@ -1,65 +1,56 @@
 // js/script.js
-import { db, loadConfig } from "./firebase.js"; // Firebase intacto
+import { db, loadConfig } from "./firebase.js";
 
-/* ------------- DOM ------------- */
-const welcomeBar = document.getElementById("welcomeBar");
-const menuBtn = document.getElementById("menuBtn");
-const menuDropdown = document.getElementById("menuDropdown");
-const menuOverlay = document.getElementById("menuOverlay");
-const menuClose = document.getElementById("menuClose");
-const menuCuentaBtn = document.getElementById("menuCuentaBtn");
-const submenuCuenta = document.getElementById("submenuCuenta");
-const menuProductosBtn = document.getElementById("menuProductosBtn");
-const submenuProductos = document.getElementById("submenuProductos");
-const menuNosotrosBtn = document.getElementById("menuNosotrosBtn");
-const submenuNosotros = document.getElementById("submenuNosotros");
-const menuEstadoSesion = document.getElementById("menuEstadoSesion");
-const searchBtn = document.getElementById("searchBtn");
-const searchInput = document.getElementById("searchInput");
-const cartBtn = document.getElementById("cartBtn");
-const cartPanel = document.getElementById("cartPanel");
-const closeCart = document.getElementById("closeCart");
-const cartItemsEl = document.getElementById("cartItems");
-const cartFooter = document.getElementById("cartFooter");
-const cartTotalEl = document.getElementById("cartTotal");
-const toastEl = document.getElementById("toast");
-const productsGrid = document.getElementById("productsGrid");
-const carouselTrack = document.getElementById("carouselTrack");
-const starAdsEl = document.getElementById("starAds");
-const headerInner = document.querySelector(".header-inner");
-const logoCenter = document.getElementById("logoCenter");
+const DOM = {
+  welcomeBar: document.getElementById("welcomeBar"),
+  menuBtn: document.getElementById("menuBtn"),
+  menuDropdown: document.getElementById("menuDropdown"),
+  menuOverlay: document.getElementById("menuOverlay"),
+  menuClose: document.getElementById("menuClose"),
+  menuCuentaBtn: document.getElementById("menuCuentaBtn"),
+  submenuCuenta: document.getElementById("submenuCuenta"),
+  menuProductosBtn: document.getElementById("menuProductosBtn"),
+  submenuProductos: document.getElementById("submenuProductos"),
+  menuNosotrosBtn: document.getElementById("menuNosotrosBtn"),
+  submenuNosotros: document.getElementById("submenuNosotros"),
+  menuEstadoSesion: document.getElementById("menuEstadoSesion"),
+  searchBtn: document.getElementById("searchBtn"),
+  searchInput: document.getElementById("searchInput"),
+  cartBtn: document.getElementById("cartBtn"),
+  cartPanel: document.getElementById("cartPanel"),
+  closeCart: document.getElementById("closeCart"),
+  cartItemsEl: document.getElementById("cartItems"),
+  cartFooter: document.getElementById("cartFooter"),
+  cartTotalEl: document.getElementById("cartTotal"),
+  toastEl: document.getElementById("toast"),
+  productsGrid: document.getElementById("productsGrid"),
+  carouselTrack: document.getElementById("carouselTrack"),
+  starAdsEl: document.getElementById("starAds"),
+  logoCenter: document.getElementById("logoCenter"),
+  modal: document.getElementById("productModal"),
+  modalBody: document.getElementById("modalBody"),
+  modalClose: document.getElementById("modalClose"),
+  filters: document.getElementById("filters")
+};
 
-/* ------------- Data (localStorage) ------------- */
-const SAMPLE_PRODUCTS = [
-  { id: "p1", nombre: "Gorra Barbas Hats", descripcion: "Gorra con logo bordado", precio: 120, stock: 5, categoria: "Gorras", img: "https://i.ibb.co/gJTvCjp/gorra1.jpg", talla: [], estrella: true },
-  { id: "p2", nombre: "Camiseta Oversize Negra", descripcion: "Camiseta oversize algodón 100%", precio: 220, stock: 12, categoria: "Camisetas", img: "https://i.ibb.co/DtkLMcy/playera1.jpg", talla: ["S","M","L","XL"], estrella: false },
-  { id: "p3", nombre: "Tenis Runner Pro", descripcion: "Tenis deportivos", precio: 1350, stock: 4, categoria: "Tenis", img: "https://i.ibb.co/C0cMKC5/tenis1.jpg", talla: ["40","41","42","43"], estrella: true },
-  { id: "p4", nombre: "Pantalón Cargo Verde", descripcion: "Pantalón cargo resistente", precio: 450, stock: 8, categoria: "Pantalones", img: "https://i.ibb.co/Lp0pKqR/sudadera1.jpg", talla: ["M","L","XL"], estrella: false },
-  { id: "p5", nombre: "Sudadera Logo", descripcion: "Sudadera con capucha", precio: 580, stock: 7, categoria: "Sudaderas", img: "https://i.ibb.co/Lp0pKqR/sudadera1.jpg", talla: ["S","M","L"], estrella: false }
-];
+let products = [];
+let currentFilter = 'all';
 
-function getStoredProducts() {
-  const raw = localStorage.getItem("productos");
-  if (!raw) {
-    localStorage.setItem("productos", JSON.stringify(SAMPLE_PRODUCTS));
-    return SAMPLE_PRODUCTS.slice();
-  }
-  try { return JSON.parse(raw); }
-  catch (e) {
-    localStorage.setItem("productos", JSON.stringify(SAMPLE_PRODUCTS));
-    return SAMPLE_PRODUCTS.slice();
-  }
+// === LOCALSTORAGE ===
+const getProducts = () => JSON.parse(localStorage.getItem("productos") || "[]");
+const saveProducts = (p) => localStorage.setItem("productos", JSON.stringify(p));
+const getCart = () => JSON.parse(localStorage.getItem("cart") || "[]");
+const saveCart = (c) => localStorage.setItem("cart", JSON.stringify(c));
+
+// === INIT SAMPLE DATA ===
+if (!getProducts().length) {
+  const SAMPLE = [/* tus productos */];
+  saveProducts(SAMPLE);
 }
-function getCart() { return JSON.parse(localStorage.getItem("cart") || "[]"); }
-function saveCart(c) { localStorage.setItem("cart", JSON.stringify(c)); }
 
-/* ------------- Render products ------------- */
+// === RENDER ===
 function renderProducts(list) {
-  productsGrid.innerHTML = "";
-  if (!list.length) {
-    productsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No hay productos que coincidan</p>';
-    return;
-  }
+  DOM.productsGrid.innerHTML = list.length ? "" : '<p style="grid-column:1/-1;text-align:center;color:var(--text-muted)">No hay productos</p>';
   list.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
@@ -70,254 +61,192 @@ function renderProducts(list) {
         <div class="price">$${p.precio}</div>
         <div class="small-muted">${p.categoria} • Stock ${p.stock}</div>
         <div style="margin-top:8px;display:flex;gap:8px;">
-          <button class="addBtn" data-id="${p.id}">Agregar</button>
+          <button class="addBtn" data-id="${p.id}" ${!p.talla?.length ? '' : 'disabled'}>Agregar</button>
           <button class="viewBtn" data-id="${p.id}">Ver</button>
         </div>
       </div>
     `;
-    productsGrid.appendChild(card);
+    DOM.productsGrid.appendChild(card);
   });
 }
 
-/* ------------- Carousel & star-ads ------------- */
-function setupCarousel(products) {
-  const items = products.filter(p => p.estrella);
-  if (!items.length) { const cw = document.getElementById("carouselWrap"); if(cw) cw.style.display = "none"; return; }
-  const dup = items.concat(items);
-  if(!carouselTrack) return;
-  carouselTrack.innerHTML = "";
-  dup.forEach(p => {
-    const it = document.createElement("div");
-    it.className = "carousel-item";
-    it.innerHTML = `<img src="${p.img}" alt="${p.nombre}"><div><strong>${p.nombre}</strong><div style="color:var(--text-muted)">$${p.precio}</div></div>`;
-    carouselTrack.appendChild(it);
-  });
-}
-function setupStarAds(products) {
-  const ads = products.filter(p => p.estrella);
-  if (!ads.length) { if(starAdsEl) starAdsEl.style.display = "none"; return; }
-  starAdsEl.innerHTML = "";
-  ads.forEach(p => {
-    const a = document.createElement("div");
-    a.className = "ad";
-    a.innerHTML = `<img src="${p.img}" alt="${p.nombre}" style="width:60px;height:60px;object-fit:cover;margin-right:10px;"><div><strong>${p.nombre}</strong><div style="color:var(--text-muted)">$${p.precio} - ¡Oferta limitada!</div></div>`;
-    a.addEventListener("click", () => openProduct(p.id));
-    starAdsEl.appendChild(a);
-  });
+// === CARRUSEL (duplicado infinito) ===
+function setupCarousel(items) {
+  if (!items.length) return DOM.carouselWrap.style.display = "none";
+  const dup = [...items, ...items];
+  DOM.carouselTrack.innerHTML = dup.map(p => `
+    <div class="carousel-item">
+      <img src="${p.img}" alt="${p.nombre}">
+      <div><strong>${p.nombre}</strong><div style="color:var(--text-muted)">$${p.precio}</div></div>
+    </div>
+  `).join('');
+  DOM.carouselTrack.onmouseenter = () => DOM.carouselTrack.classList.add('paused');
+  DOM.carouselTrack.onmouseleave = () => DOM.carouselTrack.classList.remove('paused');
 }
 
-/* ------------- Search ------------- */
-function searchProducts(q) {
-  q = (q||"").trim().toLowerCase();
-  const products = getStoredProducts();
-  if (!q) return products;
-  const tokens = q.split(/\s+/).filter(Boolean);
-  return products.filter(p => {
-    const hay = (p.nombre + " " + (p.descripcion || "")).toLowerCase();
-    return tokens.every(tok => hay.includes(tok));
+// === MODAL ===
+function openModal(product) {
+  DOM.modalBody.innerHTML = `
+    <img src="${product.img}" alt="${product.nombre}">
+    <div class="modal-info">
+      <h2>${product.nombre}</h2>
+      <p>${product.descripcion}</p>
+      <div class="price">$${product.precio}</div>
+      ${product.talla?.length ? `
+        <div style="margin:16px 0;">
+          <strong>Talla:</strong><br>
+          ${product.talla.map(t => `<button class="talla-btn" data-talla="${t}">${t}</button>`).join('')}
+        </div>
+        <button id="addToCartModal" class="addBtn" style="width:100%;padding:12px;margin-top:8px;" disabled>Agregar al carrito</button>
+      ` : `<button id="addToCartModal" class="addBtn" style="width:100%;padding:12px;margin-top:8px;">Agregar al carrito</button>`}
+    </div>
+  `;
+  DOM.modal.classList.add("open");
+  let selectedTalla = null;
+
+  DOM.modalBody.querySelectorAll(".talla-btn").forEach(btn => {
+    btn.onclick = () => {
+      DOM.modalBody.querySelectorAll(".talla-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedTalla = btn.dataset.talla;
+      DOM.modalBody.querySelector("#addToCartModal").disabled = false;
+    };
   });
+
+  DOM.modalBody.querySelector("#addToCartModal").onclick = () => {
+    addToCart(product.id, selectedTalla);
+    closeModal();
+  };
 }
 
-/* ------------- Cart functions ------------- */
+function closeModal() {
+  DOM.modal.classList.remove("open");
+}
+
+// === CARRITO ===
 function renderCart() {
   const cart = getCart();
-  cartItemsEl.innerHTML = "";
+  DOM.cartItemsEl.innerHTML = cart.length ? "" : '<div class="cart-empty">Tu carrito está vacío</div>';
   if (!cart.length) {
-    cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
-    if(cartFooter) cartFooter.style.display = "none";
-    const cntEl = document.getElementById("cartCount");
-    if(cntEl) cntEl.textContent = "0";
+    DOM.cartFooter.style.display = "none";
+    DOM.cartCount.textContent = "0";
     return;
   }
-  if(cartFooter) cartFooter.style.display = "block";
-  let totalItems = 0, total = 0;
+  DOM.cartFooter.style.display = "block";
+  let total = 0;
   cart.forEach(item => {
-    const p = getStoredProducts().find(x => x.id === item.id);
+    const p = products.find(x => x.id === item.id);
     if (!p) return;
     const div = document.createElement("div");
     div.className = "cart-item";
     div.innerHTML = `
       <button class="remove-btn" data-id="${item.id}">✕</button>
-      <img src="${p.img}" style="width:60px;height:60px;object-fit:cover;">
-      <div style="flex:1"><div style="font-weight:700">${p.nombre}</div><div style="color:var(--text-muted)">x${item.qty}</div></div>
+      <img src="${p.img}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;">
+      <div style="flex:1"><div style="font-weight:700">${p.nombre}</div>${item.talla ? `<div style="color:var(--text-muted)">Talla: ${item.talla}</div>` : ''}<div style="color:var(--text-muted)">x${item.qty}</div></div>
       <div style="font-weight:800">$${p.precio * item.qty}</div>
     `;
-    cartItemsEl.appendChild(div);
-    totalItems += item.qty;
+    DOM.cartItemsEl.appendChild(div);
     total += p.precio * item.qty;
   });
-  const cntEl = document.getElementById("cartCount");
-  if(cntEl) cntEl.textContent = totalItems;
-  if(cartTotalEl) cartTotalEl.textContent = `$${total}`;
+  DOM.cartCount.textContent = cart.reduce((a,c) => a + c.qty, 0);
+  DOM.cartTotalEl.textContent = `$${total}`;
 }
-function addToCart(id) {
-  const p = getStoredProducts().find(x => x.id === id);
+
+function addToCart(id, talla = null) {
+  const p = products.find(x => x.id === id);
   if (!p) return;
   const cart = getCart();
-  const idx = cart.findIndex(c => c.id === id);
-  if (idx >= 0) cart[idx].qty += 1; else cart.push({ id, qty: 1 });
+  const key = talla ? `${id}-${talla}` : id;
+  const idx = cart.findIndex(c => (talla ? c.talla === talla && c.id === id : !c.talla && c.id === id));
+  if (idx >= 0) cart[idx].qty += 1;
+  else cart.push({ id, qty: 1, talla });
   saveCart(cart);
-  if(cartBtn) {
-    cartBtn.classList.add("cart-shake");
-    setTimeout(() => cartBtn.classList.remove("cart-shake"), 1000);
-  }
-  showToast("Agregado al carrito");
+  DOM.cartBtn.classList.add("cart-shake");
+  setTimeout(() => DOM.cartBtn.classList.remove("cart-shake"), 1000);
+  showToast(talla ? `Agregado talla ${talla}` : "Agregado al carrito");
   renderCart();
 }
-function removeFromCart(id) {
-  let cart = getCart().filter(c => c.id !== id);
+
+function removeFromCart(id, talla) {
+  let cart = getCart().filter(c => !(c.id === id && c.talla === talla));
   saveCart(cart);
   renderCart();
-  showToast("Producto eliminado");
+  showToast("Eliminado");
 }
-function showToast(text) {
-  if(!toastEl) return;
-  toastEl.textContent = text;
-  toastEl.classList.add("show");
-  setTimeout(() => toastEl.classList.remove("show"), 2000);
+
+// === FILTROS ===
+DOM.filters.addEventListener("click", e => {
+  const btn = e.target.closest(".filter-btn");
+  if (!btn) return;
+  DOM.filters.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  currentFilter = btn.dataset.filter;
+  filterProducts();
+});
+
+function filterProducts() {
+  let list = [...products];
+  const q = DOM.searchInput.value.trim().toLowerCase();
+  if (q) list = list.filter(p => (p.nombre + " " + (p.descripcion || "")).toLowerCase().includes(q));
+  if (currentFilter === "precio-asc") list.sort((a,b) => a.precio - b.precio);
+  if (currentFilter === "precio-desc") list.sort((a,b) => b.precio - a.precio);
+  renderProducts(list);
 }
-function openProduct(id) { window.location.href = `product.html?id=${id}`; }
 
-/* ------------- UI events ------------- */
-if(menuBtn) menuBtn.onclick = () => { menuDropdown.classList.add("open"); menuOverlay.classList.add("show"); };
-if(menuClose) menuClose.onclick = () => { menuDropdown.classList.remove("open"); menuOverlay.classList.remove("show"); };
-if(menuOverlay) menuOverlay.onclick = () => { menuDropdown.classList.remove("open"); menuOverlay.classList.remove("show"); };
+// === EVENTOS ===
+DOM.menuBtn.onclick = () => { DOM.menuDropdown.classList.add("open"); DOM.menuOverlay.classList.add("show"); };
+DOM.menuClose.onclick = DOM.menuOverlay.onclick = () => { DOM.menuDropdown.classList.remove("open"); DOM.menuOverlay.classList.remove("show"); };
+DOM.cartBtn.onclick = () => DOM.cartPanel.classList.toggle("open");
+DOM.closeCart.onclick = () => DOM.cartPanel.classList.remove("open");
+DOM.modalClose.onclick = closeModal;
+DOM.modal.onclick = e => e.target === DOM.modal && closeModal();
 
-if(menuCuentaBtn) menuCuentaBtn.onclick = () => submenuCuenta.classList.toggle("open");
-if(menuProductosBtn) menuProductosBtn.onclick = () => submenuProductos.classList.toggle("open");
-if(menuNosotrosBtn) menuNosotrosBtn.onclick = () => submenuNosotros.classList.toggle("open");
-
-/* product buttons (delegation) */
-if(productsGrid) productsGrid.addEventListener("click", (e) => {
-  const add = e.target.closest(".addBtn");
+DOM.productsGrid.addEventListener("click", e => {
   const view = e.target.closest(".viewBtn");
-  if (add) { addToCart(add.dataset.id); return; }
-  if (view) { openProduct(view.dataset.id); return; }
+  const add = e.target.closest(".addBtn");
+  if (view) { openModal(products.find(p => p.id === view.dataset.id)); }
+  if (add && !add.disabled) { addToCart(add.dataset.id); }
 });
 
-/* ---------- BUSCADOR CENTRADO FIJO + comportamiento de cierre al tocar fuera ---------- */
-/* Comportamiento:
-   - Al presionar searchBtn se muestra el input centrado dentro del header.
-   - Logo se desvanece (opacity 0).
-   - Si haces clic fuera (document) y el input está abierto, se cierra.
-   - Al escribir filtra productos en tiempo real.
-*/
-if (searchBtn && searchInput) {
-  // Prevent accidental page clicks from closing immediately when clicking the button
-  searchBtn.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-    // show centered input
-    searchBtn.style.display = "none";
-    logoCenter.style.opacity = "0";
-    searchInput.style.display = "block";
-    // small delay to allow CSS transition
-    setTimeout(()=> searchInput.classList.add("centered"), 10);
-    searchInput.focus();
-  });
-
-  // input filtering
-  searchInput.addEventListener("input", (e) => {
-    renderProducts(searchProducts(e.target.value));
-  });
-
-  // prevent clicks inside input from bubbling (so document click won't immediately close)
-  searchInput.addEventListener("click", (ev) => ev.stopPropagation());
-
-  // close on outside click (menu or cart clicks should not trigger closure if they contain the target)
-  document.addEventListener("click", (e) => {
-    const isOpen = searchInput.classList.contains("centered");
-    if (!isOpen) return;
-
-    const clickedInsideSearch = searchInput.contains(e.target) || searchBtn.contains(e.target);
-    // allow clicks on menuOverlay or cart to also close the search (that's intended)
-    if (!clickedInsideSearch) {
-      // hide centered input
-      searchInput.classList.remove("centered");
-      // small delay for transition then hide element and restore search button/logo
-      setTimeout(()=> {
-        searchInput.style.display = "none";
-        searchBtn.style.display = "flex";
-        logoCenter.style.opacity = "1";
-      }, 240); // match CSS transition ~0.3s
-    }
-  });
-}
-
-/* cart open/close */
-if (cartBtn) cartBtn.addEventListener("click", () => cartPanel.classList.toggle("open"));
-if (closeCart) closeCart.addEventListener("click", () => cartPanel.classList.remove("open"));
-
-/* close cart when clicking outside of it (but don't close if clicking the cart button itself) */
-document.addEventListener("click", (e) => {
-  if (!cartPanel) return;
-  if (cartPanel.classList.contains("open")) {
-    const clickedCart = cartPanel.contains(e.target) || cartBtn.contains(e.target);
-    if (!clickedCart) cartPanel.classList.remove("open");
-  }
-});
-
-/* remove from cart */
-if (cartItemsEl) cartItemsEl.addEventListener("click", (e) => {
+DOM.cartItemsEl.addEventListener("click", e => {
   const remove = e.target.closest(".remove-btn");
-  if (remove) removeFromCart(remove.dataset.id);
-});
-
-/* menu social links */
-document.querySelectorAll(".menu-dropdown .social").forEach(el=>{
-  el.addEventListener("click", ()=> {
-    const url = el.dataset.url;
-    if(url) window.open(url, '_blank');
-  });
-});
-
-/* login / session handling */
-function updateSessionUI() {
-  const user = localStorage.getItem("usuarioActivo");
-  if (user) {
-    welcomeBar.textContent = `Hola, ${user} 👋`;
-    welcomeBar.classList.remove("hidden");
-    welcomeBar.classList.add("visible");
-    if(menuEstadoSesion) {
-      menuEstadoSesion.textContent = "Cerrar sesión";
-      menuEstadoSesion.onclick = ()=> {
-        localStorage.removeItem('usuarioActivo');
-        location.reload();
-      };
-    }
-    // show only 3 seconds then hide smoothly
-    setTimeout(()=> {
-      welcomeBar.classList.remove("visible");
-      welcomeBar.classList.add("hide");
-      setTimeout(()=> welcomeBar.classList.add("hidden"), 400);
-    }, 3000);
-  } else {
-    if(menuEstadoSesion) {
-      menuEstadoSesion.textContent = "Iniciar sesión / Registrarse";
-      menuEstadoSesion.onclick = ()=> location.href = 'login.html';
-    }
-    if(welcomeBar) welcomeBar.classList.add('hidden');
+  if (remove) {
+    const item = getCart().find(c => c.id === remove.dataset.id);
+    removeFromCart(item.id, item.talla);
   }
-}
+});
 
-/* ---------- Init app ---------- */
-(async function init(){
-  try {
-    const cfg = await loadConfig();
-    if(cfg){
-      if(cfg.carouselEnabled === false) {
-        const cw = document.getElementById("carouselWrap");
-        if(cw) cw.style.display = 'none';
-      }
-      if(cfg.starAdsEnabled === false) {
-        if(starAdsEl) starAdsEl.style.display = 'none';
-      }
-    }
-  } catch(e){ /* ignore config load errors */ }
+DOM.searchBtn.onclick = (e) => {
+  e.stopPropagation();
+  DOM.searchBtn.style.display = "none";
+  DOM.logoCenter.style.opacity = "0";
+  DOM.searchInput.style.display = "block";
+  setTimeout(() => DOM.searchInput.classList.add("centered"), 10);
+  DOM.searchInput.focus();
+};
 
-  const products = getStoredProducts();
+DOM.searchInput.addEventListener("input", () => filterProducts());
+DOM.searchInput.addEventListener("click", e => e.stopPropagation());
+
+document.addEventListener("click", e => {
+  if (DOM.searchInput.classList.contains("centered") && !DOM.searchInput.contains(e.target) && !DOM.searchBtn.contains(e.target)) {
+    DOM.searchInput.classList.remove("centered");
+    setTimeout(() => {
+      DOM.searchInput.style.display = "none";
+      DOM.searchBtn.style.display = "flex";
+      DOM.logoCenter.style.opacity = "1";
+    }, 300);
+  }
+  if (DOM.cartPanel.classList.contains("open") && !DOM.cartPanel.contains(e.target) && !DOM.cartBtn.contains(e.target)) {
+    DOM.cartPanel.classList.remove("open");
+  }
+});
+
+// === INIT ===
+(async () => {
+  products = getProducts();
   renderProducts(products);
-  setupCarousel(products);
-  setupStarAds(products);
+  setupCarousel(products.filter(p => p.estrella));
   renderCart();
   updateSessionUI();
 })();
