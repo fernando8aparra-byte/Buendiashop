@@ -48,6 +48,7 @@
       padding: 12px 20px;
       max-width: 1400px;
       margin: 0 auto;
+      gap: 12px;
     }
 
     #menuBtn {
@@ -66,6 +67,36 @@
       display: flex;
       gap: 12px;
       align-items: center;
+    }
+
+    /* Barra de búsqueda */
+    .search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-bar input {
+      padding: 8px 12px 8px 34px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 180px;
+      transition: all 0.2s;
+    }
+
+    .search-bar input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+    }
+
+    .search-bar::before {
+      content: "🔍";
+      position: absolute;
+      left: 10px;
+      font-size: 16px;
+      color: var(--muted);
     }
 
     .icon img {
@@ -105,20 +136,78 @@
       align-items: flex-start;
     }
 
-    .product-media {
+    /* Galería de imágenes */
+    .product-gallery {
       flex: 1 1 420px;
       min-width: 300px;
       max-width: 520px;
-    }
-
-    .product-media img {
-      width: 100%;
-      height: auto;
+      position: relative;
+      overflow: hidden;
       border-radius: 12px;
       box-shadow: var(--shadow);
-      object-fit: contain;
       background: #fafafa;
+    }
+
+    .gallery-track {
+      display: flex;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      flex-shrink: 0;
       display: block;
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 10;
+      transition: all 0.2s;
+    }
+
+    .gallery-nav:hover {
+      background: #fff;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .gallery-nav.prev { left: 12px; }
+    .gallery-nav.next { right: 12px; }
+
+    .gallery-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: var(--accent);
     }
 
     .product-info {
@@ -184,13 +273,17 @@
       opacity: 0.95;
     }
 
-    /* Payment buttons */
+    /* Botones de pago ocultos por defecto */
     .payment-options {
-      display: flex;
+      display: none;
       flex-direction: column;
       gap: 10px;
       margin-top: 10px;
       max-width: 340px;
+    }
+
+    .payment-options.show {
+      display: flex;
     }
 
     .pay-btn {
@@ -245,6 +338,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 18px;
+      max-width: 1000px;
     }
 
     .card {
@@ -481,21 +575,26 @@
       .product-wrap {
         flex-direction: column;
       }
-      .product-media,
+      .product-gallery,
       .product-info {
         max-width: 100%;
       }
-      .payment-options {
-        max-width: 100%;
+      .search-bar input {
+        width: 140px;
       }
     }
 
     @media (max-width: 480px) {
       .header-inner {
         padding: 10px 16px;
+        flex-wrap: wrap;
       }
       .logo {
         font-size: 18px;
+      }
+      .search-bar input {
+        width: 120px;
+        font-size: 13px;
       }
       .cart-panel {
         width: 100%;
@@ -508,9 +607,12 @@
   <!-- Header -->
   <header>
     <div class="header-inner">
-      <div id="menuBtn" aria-label="Abrir menú">☰</div>
+      <div id="menuBtn" aria-label="Abrir menú">Menu</div>
       <div class="logo">Boutique Buendía</div>
       <div class="header-actions">
+        <div class="search-bar">
+          <input type="text" placeholder="Buscar..." aria-label="Buscar productos">
+        </div>
         <div id="cartBtn" class="icon" title="Carrito" aria-label="Abrir carrito">
           <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Carrito">
         </div>
@@ -521,25 +623,35 @@
   <!-- Menú lateral -->
   <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
   <div class="menu-dropdown" id="menuDropdown" aria-hidden="true">
-    <div class="menu-close" id="menuClose" aria-label="Cerrar menú">✕</div>
+    <div class="menu-close" id="menuClose" aria-label="Cerrar menú">X</div>
     <div class="menu-item" onclick="location.href='index.html'">Gorras</div>
-    <div class="menu-item prox"><span>🏷</span> Camisetas <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>🧥</span> Sudaderas <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>👟</span> Tenis <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>🕯</span> Fragancias <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>⌚</span> Relojes <small>Próximamente</small></div>
-    <div class="menu-item prox"><span>🎒</span> Cintos <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>Tag</span> Camisetas <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>Sweater</span> Sudaderas <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>Shoe</span> Tenis <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>Candle</span> Fragancias <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>Watch</span> Relojes <small>Próximamente</small></div>
+    <div class="menu-item prox"><span>Bag</span> Cintos <small>Próximamente</small></div>
   </div>
 
   <!-- Main Content -->
   <main>
     <nav class="breadcrumbs">
-      <a href="index.html">INICIO</a> &gt; <a href="index.html">GORRAS</a> &gt; GALAXY CT
+      <a href="index.html">INICIO</a> > <a href="index.html">GORRAS</a> > GALAXY CT
     </nav>
 
     <section class="product-wrap">
-      <div class="product-media">
-        <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra Barbas Hats x CT "GALAXY CT" GOLD 24K PLATED' loading="lazy">
+      <!-- Galería deslizable -->
+      <div class="product-gallery" id="gallery">
+        <button class="gallery-nav prev" id="prevBtn" aria-label="Imagen anterior">Left Arrow</button>
+        <button class="gallery-nav next" id="nextBtn" aria-label="Imagen siguiente">Right Arrow</button>
+        
+        <div class="gallery-track" id="galleryTrack">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt='Gorra GALAXY CT - Frente' class="gallery-img" loading="lazy">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt='Gorra GALAXY CT - Lateral' class="gallery-img" loading="lazy">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt='Gorra GALAXY CT - Detalle' class="gallery-img" loading="lazy">
+        </div>
+
+        <div class="gallery-dots" id="dots"></div>
       </div>
 
       <div class="product-info">
@@ -559,7 +671,8 @@
             Agregar al carrito
           </button>
 
-          <div class="payment-options" style="pointer-events:none;opacity:0.95;">
+          <!-- Botones de pago ocultos hasta agregar -->
+          <div class="payment-options" id="paymentOptions">
             <button class="pay-btn paypal" onclick="paypalSimulate(event)">
               <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal"> Pagar con PayPal
             </button>
@@ -571,12 +684,12 @@
       </div>
     </section>
 
-    <!-- Productos relacionados -->
+    <!-- Productos relacionados: 2 filas, 4 productos -->
     <section class="related">
       <h2>También podría interesarte</h2>
       <div class="grid">
         <div class="card" onclick="location.href='producto2.html'" role="link" tabindex="0">
-          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="Gorra Barbas Hats x CT STAR CT" loading="lazy">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
           <div class="meta">
             <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
             <div class="price">$4,500.00</div>
@@ -584,10 +697,27 @@
         </div>
 
         <div class="card" onclick="location.href='producto3.html'" role="link" tabindex="0">
-          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="Gorra Barbas Hats x CT ORIENTAL TUMBADO" loading="lazy">
+          <img src="http://imgfz.com/i/P9gF7m8.webp" alt="ORIENTAL TUMBADO" loading="lazy">
           <div class="meta">
             <div class="title">Gorra Barbas Hats x CT "ORIENTAL TUMBADO"</div>
             <div class="price">$3,300.00</div>
+          </div>
+        </div>
+
+        <!-- Duplicados para 2 filas -->
+        <div class="card" onclick="location.href='producto4.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/TBumyjZ.webp" alt="GALAXY CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "GALAXY CT"</div>
+            <div class="price">$18,000.00</div>
+          </div>
+        </div>
+
+        <div class="card" onclick="location.href='producto5.html'" role="link" tabindex="0">
+          <img src="http://imgfz.com/i/rTJ1Xnl.webp" alt="STAR CT" loading="lazy">
+          <div class="meta">
+            <div class="title">Gorra Barbas Hats x CT "STAR CT"</div>
+            <div class="price">$4,500.00</div>
           </div>
         </div>
       </div>
@@ -598,11 +728,11 @@
   <aside class="cart-panel" id="cartPanel" aria-hidden="true" role="region" aria-label="Carrito de compras">
     <div class="cart-header">
       <span>Carrito</span>
-      <span id="closeCart" style="cursor:pointer;" aria-label="Cerrar carrito">✕</span>
+      <span id="closeCart" style="cursor:pointer;" aria-label="Cerrar carrito">X</span>
     </div>
 
     <div class="cart-items" id="cartItems">
-      <div class="cart-empty">Tu carrito está vacío 🛍️</div>
+      <div class="cart-empty">Tu carrito está vacío Shopping Bag</div>
     </div>
 
     <div class="cart-footer">
@@ -619,7 +749,7 @@
   </aside>
 
   <!-- Toast -->
-  <div class="toast" id="toast" role="alert" aria-live="assertive">Producto agregado con éxito 🛒</div>
+  <div class="toast" id="toast" role="alert" aria-live="assertive">Producto agregado con éxito Shopping Bag</div>
 
   <script>
     /* ------------------------------
@@ -639,149 +769,11 @@
     const cartItemsEl = document.getElementById('cartItems');
     const cartTotalEl = document.getElementById('cartTotal');
     const paymentArea = document.getElementById('paymentArea');
+    const paymentOptions = document.getElementById('paymentOptions');
     const toast = document.getElementById('toast');
 
-    /* Carrito en memoria (no persiste) */
-    let cart = [];
-
-    /* ------------------------------
-       Menú lateral
-       ------------------------------ */
-    menuBtn.onclick = () => {
-      menuDropdown.classList.add('open');
-      menuOverlay.classList.add('show');
-      menuDropdown.setAttribute('aria-hidden', 'false');
-      menuOverlay.setAttribute('aria-hidden', 'false');
-    };
-
-    const closeMenu = () => {
-      menuDropdown.classList.remove('open');
-      menuOverlay.classList.remove('show');
-      menuDropdown.setAttribute('aria-hidden', 'true');
-      menuOverlay.setAttribute('aria-hidden', 'true');
-    };
-
-    menuClose.onclick = closeMenu;
-    menuOverlay.onclick = closeMenu;
-
-    /* ------------------------------
-       Carrito panel
-       ------------------------------ */
-    cartBtn.onclick = () => {
-      cartPanel.classList.add('open');
-      cartPanel.setAttribute('aria-hidden', 'false');
-    };
-
-    closeCart.onclick = () => {
-      cartPanel.classList.remove('open');
-      cartPanel.setAttribute('aria-hidden', 'true');
-    };
-
-    /* ------------------------------
-       Agregar al carrito
-       ------------------------------ */
-    addToCartBtn.onclick = (e) => {
-      e.preventDefault();
-      const qty = Math.max(1, parseInt(qtyInput.value) || 1);
-      const product = {
-        name: 'Gorra Barbas Hats x CT "GALAXY CT"',
-        price: 18000
-      };
-
-      for (let i = 0; i < qty; i++) {
-        cart.push(product);
-      }
-
-      renderCart();
-      animateCartIcon();
-      showToast('¡Producto agregado con éxito! 🛒');
-      qtyInput.value = 1;
-    };
-
-    /* ------------------------------
-       Renderizar carrito
-       ------------------------------ */
-    function renderCart() {
-      cartItemsEl.innerHTML = '';
-      if (cart.length === 0) {
-        cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛍️</div>';
-        cartTotalEl.textContent = 'Total: $0';
-        paymentArea.classList.remove('show');
-        return;
-      }
-
-      let total = 0;
-      cart.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'cart-item';
-        row.innerHTML = `
-          <div>${item.name}</div>
-          <div>$${item.price.toLocaleString('es-MX')}</div>
-          <button onclick="removeItem(${index})" aria-label="Eliminar item">✕</button>
-        `;
-        cartItemsEl.appendChild(row);
-        total += item.price;
-      });
-
-      cartTotalEl.textContent = `Total: $${total.toLocaleString('es-MX')}`;
-      paymentArea.classList.add('show');
-    }
-
-    /* ------------------------------
-       Eliminar item
-       ------------------------------ */
-    function removeItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-      showToast('Producto eliminado del carrito');
-    }
-
-    /* Exponer función global */
-    window.removeItem = removeItem;
-
-    /* ------------------------------
-       Animación icono carrito
-       ------------------------------ */
-    function animateCartIcon() {
-      const img = cartBtn.querySelector('img');
-      if (!img) return;
-      img.classList.add('shake');
-      setTimeout(() => img.classList.remove('shake'), 480);
-    }
-
-    /* ------------------------------
-       Toast
-       ------------------------------ */
-    let toastTimeout = null;
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2400);
-    }
-
-    /* ------------------------------
-       Simulación de pagos
-       ------------------------------ */
-    function paypalSimulate(e) {
-      e?.stopPropagation();
-      alert('Redirigiendo a PayPal (simulación)...');
-    }
-
-    function cardSimulate(e) {
-      e?.stopPropagation();
-      alert('Procesando pago con tarjeta (simulación)...');
-    }
-
-    document.getElementById('paypalCheckout').onclick = paypalSimulate;
-    document.getElementById('cardCheckout').onclick = cardSimulate;
-
-    /* ------------------------------
-       Inicialización
-       ------------------------------ */
-    renderCart();
-  </script>
-</body>
-</html>
+    // Galería
+    const galleryTrack = document.getElementById('galleryTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer =
