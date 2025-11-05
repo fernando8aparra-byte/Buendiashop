@@ -37,7 +37,7 @@ button, input {
   background: #fff;
   border-bottom: 1px solid #000;
   z-index: 1000;
-  padding: 12px 18px;
+  padding: 18px 22px; /* Más espacio + sin recortes */
 }
 .header-inner {
   display: grid;
