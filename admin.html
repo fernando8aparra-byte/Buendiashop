@@ -93,4 +93,59 @@ productsGrid.addEventListener('click', (e) => {
 // Modals
 addProductBtn.onclick = () => addProductModal.classList.remove('hidden');
 closeModal.onclick = () => addProductModal.classList.add('hidden');
-settingsBtn.onclick = ()
+settingsBtn.onclick = () => settingsModal.classList.remove('hidden');
+closeSettings.onclick = () => settingsModal.classList.add('hidden');
+
+// Save name
+saveNameBtn.onclick = () => {
+  document.title = 'Admin - ' + siteNameInput.value;
+  // Save to Firebase
+  alert('Nombre guardado');
+};
+
+// Maintenance
+maintenanceToggle.addEventListener('change', () => {
+  // Save to Firebase config
+  alert(maintenanceToggle.checked ? 'Página en mantenimiento' : 'Página habilitada');
+});
+
+// Estadísticas (sample)
+monthlyPurchases.textContent = samplePurchases.length;
+registrations.textContent = sampleRegistrations;
+samplePurchases.forEach(p => {
+  const li = document.createElement('li');
+  li.textContent = `${p.user} - ${p.date.toLocaleDateString()}`;
+  purchaseList.appendChild(li);
+});
+
+// Mapa
+const map = L.map('map').setView([23.6345, -102.5528], 5);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap'
+}).addTo(map);
+samplePurchases.forEach(p => {
+  const coord = stateCoords[p.location];
+  if(coord) L.marker([coord.lat, coord.lng], {icon: L.icon({iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41]})}).addTo(map).bindPopup(p.user);
+});
+
+// Social links edit (habilita si link)
+document.querySelectorAll('.submenu .menu-item input[type="text"]').forEach(input => {
+  input.addEventListener('change', () => {
+    const switchInput = input.nextElementSibling.querySelector('input');
+    if(input.value.trim()) {
+      switchInput.checked = true;
+    } else {
+      switchInput.checked = false;
+      alert('Ingresa tu link');
+    }
+    // Save to Firebase
+  });
+});
+
+// Init
+(async function init(){
+  const products = getStoredProducts();
+  renderProducts(products);
+  // Load stats from Firebase
+})();
