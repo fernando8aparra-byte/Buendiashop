@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES */
+    /* ESTILOS ANTERIORES (SIN CAMBIOS) */
     body {
       margin: 0;
       padding: 0;
@@ -389,7 +389,7 @@
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item welcome" id="welcomeMsg">¡Hola, Efraín!</div>
+    <div class="menu-item welcome" id="welcomeMsg"></div>
     
     <!-- PRODUCTOS DESPLEGABLE -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
@@ -419,7 +419,7 @@
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
 
-  <!-- CARRITO LATERAL (PAGO COMO ANTES) -->
+  <!-- CARRITO LATERAL -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -442,30 +442,12 @@
   <!-- PAYPAL SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
+  <!-- TU SCRIPT EXTERNO (100% FUNCIONAL) -->
+  <script src="js/script.js"></script>
+
+  <!-- LÓGICA EXTRA DEL MENÚ + LOGIN -->
   <script>
-    const products = [
-      { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
-      { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
-      { id: 3, name: "Mystery Box Gold", price: 2500, desc: "3 productos sorpresa", img: "https://imgfz.com/i/8Y5vN2k.webp", star: true },
-      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp" },
-      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true },
-      { id: 6, name: "Playera Premium White", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp" },
-      { id: 7, name: "Pantalón Cargo Black", price: 2200, desc: "Streetwear", img: "https://imgfz.com/i/cargo-black.jpg" },
-      { id: 8, name: "Cinturón Leather Pro", price: 890, desc: "Piel genuina", img: "https://imgfz.com/i/cinto-leather.jpg" },
-      { id: 9, name: "Tenis Urban White", price: 3500, desc: "Edición limitada", img: "https://imgfz.com/i/tenis-white.jpg", new: true },
-      { id: 10, name: "Sudadera Oversize Gray", price: 1900, desc: "Calidad premium", img: "https://imgfz.com/i/sudadera-gray.jpg", star: true },
-      { id: 11, name: "Overcide Hoodie Blue", price: 2100, desc: "Drop exclusivo", img: "https://imgfz.com/i/overcide-blue.jpg" },
-      { id: 12, name: "Gorra Snapback Red", price: 1400, oldPrice: 1800, desc: "Ajustable", img: "https://imgfz.com/i/gorra-red.webp" },
-      { id: 13, name: "Camiseta Graphic Tee", price: 799, desc: "Estampado único", img: "https://imgfz.com/i/graphic-tee.jpg", new: true },
-      { id: 14, name: "Mystery Box Silver", price: 1800, desc: "2 productos sorpresa", img: "https://imgfz.com/i/mystery-silver.jpg", star: true },
-      { id: 15, name: "Tenis High Top Black", price: 3900, desc: "Full comfort", img: "https://imgfz.com/i/tenis-high.jpg" },
-      { id: 16, name: "Sudadera Zip Black", price: 2200, desc: "Con cierre", img: "https://imgfz.com/i/sudadera-zip.jpg" }
-    ];
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-    let userName = localStorage.getItem('userName') || 'Efraín';
-
+    // === ELEMENTOS DEL MENÚ ===
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuSidebar = document.getElementById('menuSidebar');
@@ -479,51 +461,38 @@
     const searchBarHeader = document.getElementById('searchBarHeader');
     const closeSearchHeader = document.getElementById('closeSearchHeader');
     const headerOverlay = document.getElementById('headerOverlay');
-    const cartBtn = document.getElementById('cartBtn');
-    const cartSidebar = document.getElementById('cartSidebar');
-    const closeCart = document.getElementById('closeCart');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const cartBadge = document.getElementById('cartBadge');
-    const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const productsGrid = document.getElementById('productsGrid');
-    const newCarousel = document.getElementById('newCarousel');
-    const starCarousel = document.getElementById('starCarousel');
-    const toast = document.getElementById('toast');
 
-    // DETECCIÓN DE SESIÓN
+    // === SESIÓN CON LOCALSTORAGE ===
+    let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+    let userName = localStorage.getItem('userName') || '';
+
     function updateAuthUI() {
-      if (isLoggedIn) {
+      if (isLoggedIn && userName) {
         welcomeMsg.textContent = `¡Hola, ${userName}!`;
         authBtn.textContent = 'Cerrar sesión';
         authBtn.classList.add('logout-btn');
       } else {
-        welcomeMsg.textContent = '¡Hola, Efraín!';
+        welcomeMsg.textContent = '';
         authBtn.textContent = 'Inicia sesión o regístrate';
         authBtn.classList.remove('logout-btn');
       }
     }
 
+    // === BOTÓN LOGIN / LOGOUT ===
     authBtn.onclick = () => {
       if (isLoggedIn) {
         localStorage.removeItem('loggedIn');
         localStorage.removeItem('userName');
         isLoggedIn = false;
+        userName = '';
         showToast('Sesión cerrada');
+        updateAuthUI();
       } else {
-        const name = prompt('Nombre de usuario:');
-        if (name) {
-          localStorage.setItem('loggedIn', 'true');
-          localStorage.setItem('userName', name);
-          isLoggedIn = true;
-          userName = name;
-          showToast(`¡Bienvenido, ${name}!`);
-        }
+        window.location.href = 'login.html'; // REDIRIGE A LOGIN.HTML
       }
-      updateAuthUI();
     };
 
-    // DESPLEGABLES (PERFECTO AHORA)
+    // === DESPLEGABLES ===
     categoriesToggle.onclick = (e) => {
       e.stopPropagation();
       categoriesToggle.classList.toggle('open');
@@ -536,7 +505,7 @@
       contactDropdown.classList.toggle('open');
     };
 
-    // Cerrar al tocar fuera
+    // Cerrar menú al tocar fuera
     menuOverlay.onclick = () => {
       menuOverlay.classList.remove('show');
       menuSidebar.classList.remove('open');
@@ -547,152 +516,14 @@
     };
     menuSidebar.onclick = (e) => e.stopPropagation();
 
-    // RENDER FUNCTIONS
-    function renderProducts() {
-      productsGrid.innerHTML = '';
-      products.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <img src="${p.img}" alt="${p.name}" loading="lazy">
-          <div class="card-info">
-            <h3>${p.name}</h3>
-            <p class="desc">${p.desc}</p>
-            <div class="price-container">
-              ${p.oldPrice ? `<span class="old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
-              <span class="price ${p.oldPrice ? 'offer-price' : ''}">$${p.price.toLocaleString()}</span>
-            </div>
-            <button class="add-btn" onclick="addToCart(${p.id})">Agregar</button>
-          </div>
-        `;
-        productsGrid.appendChild(card);
-      });
-    }
-
-    function renderCarousel(container, filter) {
-      container.innerHTML = '';
-      const filtered = products.filter(filter);
-      [...filtered, ...filtered].forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'carousel-item';
-        item.innerHTML = `
-          <img src="${p.img}" alt="${p.name}" loading="lazy">
-          <div class="item-info">
-            <h4>${p.name}</h4>
-            <p>$${p.price.toLocaleString()}</p>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    function getTotal() {
-      return cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-    }
-
-    function addToCart(id) {
-      const product = products.find(p => p.id === id);
-      const existing = cart.find(i => i.id === id);
-      if (existing) existing.qty++;
-      else cart.push({ ...product, qty: 1 });
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCart();
-      showToast('¡Agregado al carrito!');
-    }
-
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCart();
-    }
-
-    function updateCart() {
-      cartItems.innerHTML = '';
-      let total = getTotal();
-      const badge = cart.reduce((sum, i) => sum + i.qty, 0);
-      cartBadge.style.display = badge > 0 ? 'flex' : 'none';
-      cartBadge.textContent = badge;
-
-      if (cart.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
-        document.querySelector('.go-to-pay').style.display = 'none';
-        document.getElementById('paypal-button-container').innerHTML = '';
-        return;
-      }
-
-      document.querySelector('.go-to-pay').style.display = 'block';
-
-      cart.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-          <img src="${item.img}" alt="${item.name}" class="thumb">
-          <div>
-            <div>${item.name}</div>
-            <small>x${item.qty} • $${(item.price * item.qty).toLocaleString()}</small>
-          </div>
-          <button onclick="removeFromCart(${i})">X</button>
-        `;
-        cartItems.appendChild(div);
-      });
-
-      cartTotal.textContent = `Total: $${total.toLocaleString()}`;
-      renderPayPalButton(total);
-    }
-
-    function renderPayPalButton(amount) {
-      const container = document.getElementById('paypal-button-container');
-      container.innerHTML = '';
-      if (amount === 0) return;
-
-      paypal.Buttons({
-        createOrder: function() {
-          return actions.order.create({
-            purchase_units: [{
-              amount: { value: (amount / 100).toFixed(2) }
-            }]
-          });
-        },
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(details => {
-            document.getElementById('message').innerHTML = `¡Pago exitoso! Orden: ${details.id}<br>Gracias, ${details.payer.name.given_name}`;
-            document.getElementById('message').className = 'success';
-            cart = [];
-            localStorage.setItem('cart', '[]');
-            updateCart();
-          });
-        },
-        onCancel: () => {
-          document.getElementById('message').innerHTML = 'Pago cancelado.';
-          document.getElementById('message').className = 'cancel';
-        },
-        onError: (err) => {
-          document.getElementById('message').innerHTML = 'Error: ' + err;
-          document.getElementById('message').className = 'error';
-        }
-      }).render('#paypal-button-container');
-    }
-
-    // EVENTOS
-    const openCart = () => {
-      cartSidebar.classList.add('open');
-      cartOverlay.classList.add('show');
-      updateCart();
-    };
-    const closeCartFunc = () => {
-      cartSidebar.classList.remove('open');
-      cartOverlay.classList.remove('show');
-    };
-
-    cartBtn.onclick = openCart;
-    closeCart.onclick = closeCartFunc;
-    cartOverlay.onclick = closeCartFunc;
-
+    // === ABRIR MENÚ ===
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
+      updateAuthUI(); // Actualiza nombre al abrir
     };
 
+    // === BÚSQUEDA ===
     searchBtn.onclick = () => {
       searchBarHeader.classList.add('active');
       headerOverlay.classList.add('show');
@@ -705,18 +536,16 @@
     closeSearchHeader.onclick = closeSearch;
     headerOverlay.onclick = closeSearch;
 
+    // === TOAST (del script.js también, pero por si acaso) ===
     function showToast(msg) {
+      const toast = document.getElementById('toast');
       toast.textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // INIT
+    // === INICIO ===
     updateAuthUI();
-    renderProducts();
-    renderCarousel(newCarousel, p => p.new);
-    renderCarousel(starCarousel, p => p.star);
-    updateCart();
   </script>
 </body>
 </html>
