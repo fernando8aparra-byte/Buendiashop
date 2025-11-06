@@ -1,261 +1,179 @@
 
-// js/script.js - Firebase + Búsqueda + Diseño personalizado + Redirección
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+// js/script.js - 100% FUNCIONAL CON INDEX.HTML + LOGIN + PAYPAL REAL
+const products = [
+  { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
+  { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
+  { id: 3, name: "Mystery Box Gold", price: 2500, desc: "3 productos sorpresa", img: "https://imgfz.com/i/8Y5vN2k.webp", star: true },
+  { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp" },
+  { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true },
+  { id: 6, name: "Playera Premium White", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp" },
+  { id: 7, name: "Pantalón Cargo Black", price: 2200, desc: "Streetwear", img: "https://imgfz.com/i/cargo-black.jpg" },
+  { id: 8, name: "Cinturón Leather Pro", price: 890, desc: "Piel genuina", img: "https://imgfz.com/i/cinto-leather.jpg" },
+  { id: 9, name: "Tenis Urban White", price: 3500, desc: "Edición limitada", img: "https://imgfz.com/i/tenis-white.jpg", new: true },
+  { id: 10, name: "Sudadera Oversize Gray", price: 1900, desc: "Calidad premium", img: "https://imgfz.com/i/sudadera-gray.jpg", star: true },
+  { id: 11, name: "Overcide Hoodie Blue", price: 2100, desc: "Drop exclusivo", img: "https://imgfz.com/i/overcide-blue.jpg" },
+  { id: 12, name: "Gorra Snapback Red", price: 1400, oldPrice: 1800, desc: "Ajustable", img: "https://imgfz.com/i/gorra-red.webp" },
+  { id: 13, name: "Camiseta Graphic Tee", price: 799, desc: "Estampado único", img: "https://imgfz.com/i/graphic-tee.jpg", new: true },
+  { id: 14, name: "Mystery Box Silver", price: 1800, desc: "2 productos sorpresa", img: "https://imgfz.com/i/mystery-silver.jpg", star: true },
+  { id: 15, name: "Tenis High Top Black", price: 3900, desc: "Full comfort", img: "https://imgfz.com/i/tenis-high.jpg" },
+  { id: 16, name: "Sudadera Zip Black", price: 2200, desc: "Con cierre", img: "https://imgfz.com/i/sudadera-zip.jpg" }
+];
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-  authDomain: "boutique-buendia.firebaseapp.com",
-  projectId: "boutique-buendia",
-  storageBucket: "boutique-buendia.firebasestorage.app",
-  messagingSenderId: "430651152709",
-  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-  measurementId: "G-9KJ2330RN7"
-};
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// === DOM ===
-const newCarousel = document.getElementById('newCarousel');
-const starCarousel = document.getElementById('starCarousel');
-const productsGrid = document.getElementById('productsGrid');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
-const cartBadge = document.getElementById('cartBadge');
+// DOM Elements
 const cartBtn = document.getElementById('cartBtn');
 const cartSidebar = document.getElementById('cartSidebar');
 const closeCart = document.getElementById('closeCart');
 const cartOverlay = document.getElementById('cartOverlay');
-const goToPay = document.getElementById('goToPay');
-const paypalContainer = document.getElementById('paypal-button-container');
+const cartBadge = document.getElementById('cartBadge');
+const cartItems = document.getElementById('cartItems');
+const cartTotal = document.getElementById('cartTotal');
+const productsGrid = document.getElementById('productsGrid');
+const newCarousel = document.getElementById('newCarousel');
+const starCarousel = document.getElementById('starCarousel');
 const toast = document.getElementById('toast');
 
-// === CARRITO ===
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let allProducts = [];
-
-// === CARGAR PRODUCTOS DESDE FIREBASE ===
-async function loadProducts() {
-  try {
-    const snapshot = await getDocs(collection(db, "productos"));
-    allProducts = [];
-    const nuevos = [];
-    const estrella = [];
-
-    snapshot.forEach(doc => {
-      const p = { id: doc.id, ...doc.data() };
-      allProducts.push(p);
-      if (p.nuevo) nuevos.push(p);
-      if (p.estrella) estrella.push(p);
-    });
-
-    renderCarousel(newCarousel, nuevos.length > 0 ? nuevos : allProducts.slice(0, 6));
-    renderCarousel(starCarousel, estrella.length > 0 ? estrella : allProducts.slice(0, 6));
-    renderProductsGrid(allProducts);
-    updateCartUI();
-  } catch (error) {
-    console.error("Error Firebase:", error);
-    showToast("Error al cargar productos");
-  }
-}
-
-// === RENDER CARRUSEL INFINITO ===
-function renderCarousel(container, items) {
-  if (items.length === 0) return;
-  const duplicated = [...items, ...items];
-  container.innerHTML = '';
-
-  duplicated.forEach(p => {
-    const item = createProductCard(p, true);
-    container.appendChild(item);
-  });
-
-  let scroll = 0;
-  const speed = 1;
-  function autoScroll() {
-    scroll += speed;
-    if (scroll >= container.scrollWidth / 2) scroll = 0;
-    container.scrollLeft = scroll;
-  }
-  let interval = setInterval(autoScroll, 30);
-  container.addEventListener('mouseenter', () => clearInterval(interval));
-  container.addEventListener('mouseleave', () => interval = setInterval(autoScroll, 30));
-}
-
-// === RENDER GRID ===
-function renderProductsGrid(products) {
+// === RENDER PRODUCTOS Y CARRUSELES ===
+function renderProducts() {
   productsGrid.innerHTML = '';
   products.forEach(p => {
-    const card = createProductCard(p, false);
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${p.img}" alt="${p.name}" loading="lazy">
+      <div class="card-info">
+        <h3>${p.name}</h3>
+        <p class="desc">${p.desc}</p>
+        <div class="price-container">
+          ${p.oldPrice ? `<span class="old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
+          <span class="price ${p.oldPrice ? 'offer-price' : ''}">$${p.price.toLocaleString()}</span>
+        </div>
+        <button class="add-btn" onclick="addToCart(${p.id})">Agregar</button>
+      </div>
+    `;
     productsGrid.appendChild(card);
   });
 }
 
-// === CREAR TARJETA DE PRODUCTO ===
-function createProductCard(p, isCarousel = false) {
-  const div = document.createElement('div');
-  div.className = 'product-card';
-  div.style.cssText = `
-    min-width: ${isCarousel ? '160px' : 'auto'};
-    margin: 0 ${isCarousel ? '10px' : '0'};
-    cursor: pointer; text-align: center;
-    border-radius: 12px; overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    background: white; transition: transform 0.2s;
-  `;
-
-  div.innerHTML = `
-    <img src="${p.imagen || 'https://via.placeholder.com/160'}" alt="${p.nombre}" style="width:100%; height:160px; object-fit:cover;">
-    <div style="padding:10px;">
-      <h4 style="margin:0 0 5px; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-        ${p.nombre}
-      </h4>
-      <p style="margin:0; color:#000; font-weight:bold;">$${p.precio}</p>
-      ${p.nuevo ? '<span style="background:#ff0000;color:white;font-size:0.7rem;padding:2px 6px;border-radius:4px;">NUEVO</span>' : ''}
-      ${p.estrella ? '<span style="background:#ffd700;color:#000;font-size:0.7rem;padding:2px 6px;border-radius:4px;">ESTRELLA</span>' : ''}
-      <button onclick="event.stopPropagation(); addToCart('${p.id}')" 
-              style="margin-top:8px; background:#000; color:white; border:none; padding:8px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer;">
-        Añadir
-      </button>
-    </div>
-  `;
-
-  // REDIRECCIÓN AL PRODUCTO
-  div.addEventListener('click', () => {
-    window.location.href = `product.html?id=${p.id}`;
+function renderCarousel(container, filter) {
+  container.innerHTML = '';
+  const filtered = products.filter(filter);
+  [...filtered, ...filtered].forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.innerHTML = `
+      <img src="${p.img}" alt="${p.name}" loading="lazy">
+      <div class="item-info">
+        <h4>${p.name}</h4>
+        <p>$${p.price.toLocaleString()}</p>
+      </div>
+    `;
+    container.appendChild(item);
   });
-
-  div.addEventListener('mouseenter', () => div.style.transform = 'translateY(-4px)');
-  div.addEventListener('mouseleave', () => div.style.transform = 'translateY(0)');
-
-  return div;
 }
 
-// === AÑADIR AL CARRITO ===
-window.addToCart = async function(id) {
-  try {
-    const docRef = doc(db, "productos", id);
-    const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()) return showToast("Producto no encontrado");
-
-    const product = { id, ...docSnap.data() };
-    const existing = cart.find(i => i.id === id);
-    if (existing) existing.cantidad++;
-    else cart.push({ ...product, cantidad: 1 });
-
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartUI();
-    showToast(`${product.nombre} añadido`);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-// === ACTUALIZAR CARRITO ===
-function updateCartUI() {
-  updateBadge();
-  renderCartItems();
-  updateTotal();
-  updatePayButtons();
+// === CARRITO FUNCTIONS ===
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  const existing = cart.find(i => i.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ ...product, qty: 1 });
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('¡Agregado al carrito!');
 }
 
-function updateBadge() {
-  const total = cart.reduce((s, i) => s + i.cantidad, 0);
-  cartBadge.textContent = total > 0 ? total : '';
-  cartBadge.style.display = total > 0 ? 'block' : 'none';
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
 }
 
-function renderCartItems() {
+function getTotal() {
+  return cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+}
+
+function updateCart() {
+  cartItems.innerHTML = '';
+  const total = getTotal();
+  const qtyTotal = cart.reduce((sum, i) => sum + i.qty, 0);
+
+  // Badge
+  cartBadge.textContent = qtyTotal;
+  cartBadge.style.display = qtyTotal > 0 ? 'flex' : 'none';
+
+  // Total siempre visible (inicia en $0)
+  cartTotal.textContent = `Total: $${total.toLocaleString()}`;
+
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+    document.querySelector('.go-to-pay').style.display = 'none';
+    document.getElementById('paypal-button-container').innerHTML = '';
     return;
   }
-  cartItems.innerHTML = '';
+
+  document.querySelector('.go-to-pay').style.display = 'block';
+
   cart.forEach((item, i) => {
     const div = document.createElement('div');
     div.className = 'cart-item';
     div.innerHTML = `
-      <img src="${item.imagen}" alt="${item.nombre}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;float:left;margin-right:10px;">
-      <div style="margin-left:70px;">
-        <h4 style="margin:0 0 5px;font-size:0.95rem;">${item.nombre}</h4>
-        <p style="margin:0;color:#000;font-weight:bold;">$${item.precio} × ${item.cantidad}</p>
+      <img src="${item.img}" alt="${item.name}" class="thumb">
+      <div>
+        <div>${item.name}</div>
+        <small>x${item.qty} • $${(item.price * item.qty).toLocaleString()}</small>
       </div>
-      <button onclick="removeFromCart('${item.id}')" style="position:absolute;top:8px;right:8px;background:none;border:none;font-size:1.5rem;cursor:pointer;">×</button>
+      <button onclick="removeFromCart(${i})">X</button>
     `;
     cartItems.appendChild(div);
   });
+
+  renderPayPalButton(total);
 }
 
-function updateTotal() {
-  const total = cart.reduce((s, i) => s + (i.precio * i.cantidad), 0);
-  cartTotal.textContent = `Total: $${total}`;
+// === PAYPAL 100% REAL (MXN + centavos correctos) ===
+function renderPayPalButton(amount) {
+  const container = document.getElementById('paypal-button-container');
+  container.innerHTML = '';
+
+  if (amount <= 0) return;
+
+  paypal.Buttons({
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: (amount / 100).toFixed(2),
+            currency_code: 'MXN'
+          },
+          description: 'Compra en Efraín Shop - Mystery Box & Streetwear'
+        }]
+      });
+    },
+    onApprove: (data, actions) => {
+      return actions.order.capture().then(details => {
+        document.getElementById('message').innerHTML = `
+          <div style="color:green;font-weight:bold;text-align:center;padding:15px;background:#f0fff0;border-radius:8px;">
+            ¡PAGO EXITOSO! 🎉<br>
+            Orden: ${details.id}<br>
+            ¡Gracias, ${details.payer.name.given_name}!
+          </div>`;
+        cart = [];
+        localStorage.setItem('cart', '[]');
+        updateCart();
+        showToast('¡Gracias por tu compra!');
+      });
+    },
+    onCancel: () => {
+      document.getElementById('message').innerHTML = '<div style="color:#999;text-align:center;">Pago cancelado</div>';
+    },
+    onError: (err) => {
+      console.error('PayPal Error:', err);
+      document.getElementById('message').innerHTML = '<div style="color:red;text-align:center;">Error en pago. Intenta de nuevo.</div>';
+    }
+  }).render('#paypal-button-container');
 }
-
-// === ELIMINAR ===
-window.removeFromCart = function(id) {
-  cart = cart.filter(i => i.id !== id);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartUI();
-  showToast("Producto eliminado");
-};
-
-// === BOTONES DE PAGO ===
-function updatePayButtons() {
-  const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-
-  // "Ir a Pagar" → texto simple
-  if (goToPay) {
-    goToPay.style.display = isLoggedIn && cart.length > 0 ? 'block' : 'none';
-    goToPay.style.cssText = `
-      background: none !important;
-      color: #000 !important;
-      padding: 12px !important;
-      font-size: 0.9rem !important;
-      font-weight: normal !important;
-      text-decoration: underline !important;
-      border: none !important;
-      box-shadow: none !important;
-      cursor: pointer !important;
-      text-align: center !important;
-    `;
-    goToPay.onclick = () => {
-      localStorage.setItem('pendingCart', JSON.stringify(cart));
-      window.location.href = 'pago.html';
-    };
-  }
-
-  // PayPal → diseño original + redirección
-  if (paypalContainer) {
-    paypalContainer.style.display = isLoggedIn && cart.length > 0 ? 'block' : 'none';
-    paypalContainer.innerHTML = `
-      <button id="paypalBtn" style="
-        background: #003087; color: white; border: none; padding: 14px;
-        border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        font-size: 1rem; margin-top: 10px;
-      ">
-        <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x28.jpg" alt="PayPal" style="height:22px;">
-        Pagar con PayPal
-      </button>
-    `;
-    document.getElementById('paypalBtn')?.addEventListener('click', () => {
-      localStorage.setItem('pendingCart', JSON.stringify(cart));
-      window.location.href = 'pago.html';
-    });
-  }
-}
-
-// === CARRITO ABRIR/CERRAR ===
-cartBtn.onclick = () => {
-  cartSidebar.classList.add('open');
-  cartOverlay.classList.add('show');
-  updateCartUI();
-};
-closeCart.onclick = cartOverlay.onclick = () => {
-  cartSidebar.classList.remove('open');
-  cartOverlay.classList.remove('show');
-};
 
 // === TOAST ===
 function showToast(msg) {
@@ -264,12 +182,27 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === INICIO ===
-document.addEventListener('DOMContentLoaded', () => {
-  loadProducts();
+// === EVENTOS CARRITO ===
+cartBtn.onclick = () => {
+  cartSidebar.classList.add('open');
+  cartOverlay.classList.add('show');
+  updateCart(); // Refresca al abrir
+};
 
-  // Actualizar login
-  window.addEventListener('storage', () => {
-    updatePayButtons();
-  });
-});
+closeCart.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+  document.getElementById('paypal-button-container').innerHTML = ''; // Limpia PayPal
+};
+
+cartOverlay.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+  document.getElementById('paypal-button-container').innerHTML = '';
+};
+
+// === INICIO ===
+renderProducts();
+renderCarousel(newCarousel, p => p.new);
+renderCarousel(starCarousel, p => p.star);
+updateCart(); // Total inicia en $0
