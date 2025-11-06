@@ -1,151 +1,177 @@
-// js/admin.js
-import { db, loadConfig } from "./firebase.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      padding-top: 60px;
+      background: #f8f8f8;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-const addProductBtn = document.getElementById("addProductBtn");
-const addProductModal = document.getElementById("addProductModal");
-const closeModal = document.getElementById("closeModal");
-const addProductForm = document.getElementById("addProductForm");
-const settingsBtn = document.getElementById("settingsBtn");
-const settingsModal = document.getElementById("settingsModal");
-const closeSettings = document.getElementById("closeSettings");
-const siteNameInput = document.getElementById("siteName");
-const saveNameBtn = document.getElementById("saveName");
-const maintenanceToggle = document.getElementById("maintenanceToggle");
-const monthlyPurchases = document.getElementById("monthlyPurchases");
-const purchaseList = document.getElementById("purchaseList");
-const registrations = document.getElementById("registrations");
-const productsGrid = document.getElementById("productsGrid");
+    /* HEADER */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: #000;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      height: 60px;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      padding: 0 15px;
+      box-sizing: border-box;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
 
-// Sample data (expand to Firebase)
-const samplePurchases = [
-  { user: 'User1', date: new Date(), location: 'Michoacán' },
-  { user: 'User2', date: new Date(), location: 'Jalisco' }
-];
-const sampleRegistrations = 5;
-const stateCoords = {
-  'Michoacán': { lat: 19.5667, lng: -101.8333 },
-  'Jalisco': { lat: 20.6597, lng: -103.3496 }
-  // Add more states
-};
+    /* BOTÓN DESARROLLADOR */
+    .dev-btn {
+      background: #fff;
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+    .dev-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .dev-btn img {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
 
-// Render products with edit/delete
-function renderProducts(list){
-  productsGrid.innerHTML = '';
-  list.forEach(p=>{
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <img src="${p.img}" alt="${p.nombre}" loading="lazy">
-      <div class="meta">
-        <div class="title">${p.nombre}</div>
-        <div class="price">$${p.precio.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div class="small-muted">${p.categoria} • Stock ${p.stock}</div>
-        <button class="editBtn" data-id="${p.id}">Editar</button>
-        <button class="deleteBtn" data-id="${p.id}">Eliminar</button>
+    /* CONTENIDO CENTRAL */
+    .maintenance-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .maintenance h1 {
+      font-size: 2.8rem;
+      margin: 0 0 20px;
+      color: #000;
+    }
+    .maintenance p {
+      font-size: 1.2rem;
+      color: #555;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    /* ANIMACIÓN DE CONSTRUCCIÓN */
+    .construction-animation {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin: 40px auto;
+    }
+    .helmet {
+      width: 60px;
+      height: 50px;
+      background: #ffcc00;
+      border-radius: 30px 30px 10px 10px;
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      animation: float 3s ease-in-out infinite;
+    }
+    .helmet::before {
+      content: '';
+      width: 70px;
+      height: 10px;
+      background: #e6b800;
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      border-radius: 5px;
+    }
+    .crane {
+      width: 8px;
+      height: 100px;
+      background: #666;
+      position: absolute;
+      top: 0;
+      left: 56px;
+      transform-origin: bottom;
+      animation: swing 2s ease-in-out infinite;
+    }
+    .crane::after {
+      content: '';
+      width: 40px;
+      height: 20px;
+      background: #ff4444;
+      position: absolute;
+      bottom: -20px;
+      left: -16px;
+      border-radius: 5px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    @keyframes swing {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">EFRAÍN</div>
+      <a href="https://instagram.com/ferv_hs" target="_blank" class="dev-btn">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
+        Desarrollado por @ferv_hs
+      </a>
+    </div>
+  </header>
+
+  <!-- PÁGINA EN MANTENIMIENTO -->
+  <main class="maintenance-container">
+    <div class="maintenance">
+      <h1>Página en mantenimiento</h1>
+      <p>Estamos trabajando en nuevas funciones para el panel de administrador.</p>
+      <div class="construction-animation">
+        <div class="helmet"></div>
+        <div class="crane"></div>
       </div>
-    `;
-    productsGrid.appendChild(card);
-  });
-}
+    </div>
+  </main>
 
-// Add product form
-addProductForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const newProduct = {
-    id: 'p' + (getStoredProducts().length + 1),
-    tipo: formData.get('tipo'),
-    nombre: formData.get('nombre'),
-    descripcion: formData.get('descripcion'),
-    precio: parseFloat(formData.get('precio')).toLocaleString('en-US', {minimumFractionDigits: 2, style: 'currency', currency: 'USD'}),
-    categoria: formData.get('categoria'),
-    stock: parseInt(formData.get('stock')),
-    talla: formData.get('talla').split(',').map(t => t.trim()),
-    img: formData.get('img'),
-    estrella: formData.get('tipo') === 'publicidad' || formData.get('tipo') === 'carrusel'
-  };
-  const products = getStoredProducts();
-  products.push(newProduct);
-  localStorage.setItem('productos', JSON.stringify(products));
-  renderProducts(products);
-  addProductModal.classList.add('hidden');
-  // Save to Firebase if needed
-});
-
-// Edit/Delete delegation
-productsGrid.addEventListener('click', (e) => {
-  const edit = e.target.closest('.editBtn');
-  const del = e.target.closest('.deleteBtn');
-  if(edit) {
-    alert('Editar producto ' + edit.dataset.id);
-    // Implement edit form
-  }
-  if(del) {
-    if(confirm('Eliminar?')) {
-      let products = getStoredProducts();
-      products = products.filter(p => p.id !== del.dataset.id);
-      localStorage.setItem('productos', JSON.stringify(products));
-      renderProducts(products);
-    }
-  }
-});
-
-// Modals
-addProductBtn.onclick = () => addProductModal.classList.remove('hidden');
-closeModal.onclick = () => addProductModal.classList.add('hidden');
-settingsBtn.onclick = () => settingsModal.classList.remove('hidden');
-closeSettings.onclick = () => settingsModal.classList.add('hidden');
-
-// Save name
-saveNameBtn.onclick = () => {
-  document.title = 'Admin - ' + siteNameInput.value;
-  // Save to Firebase
-  alert('Nombre guardado');
-};
-
-// Maintenance
-maintenanceToggle.addEventListener('change', () => {
-  // Save to Firebase config
-  alert(maintenanceToggle.checked ? 'Página en mantenimiento' : 'Página habilitada');
-});
-
-// Estadísticas (sample)
-monthlyPurchases.textContent = samplePurchases.length;
-registrations.textContent = sampleRegistrations;
-samplePurchases.forEach(p => {
-  const li = document.createElement('li');
-  li.textContent = `${p.user} - ${p.date.toLocaleDateString()}`;
-  purchaseList.appendChild(li);
-});
-
-// Mapa
-const map = L.map('map').setView([23.6345, -102.5528], 5);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap'
-}).addTo(map);
-samplePurchases.forEach(p => {
-  const coord = stateCoords[p.location];
-  if(coord) L.marker([coord.lat, coord.lng], {icon: L.icon({iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41]})}).addTo(map).bindPopup(p.user);
-});
-
-// Social links edit (habilita si link)
-document.querySelectorAll('.submenu .menu-item input[type="text"]').forEach(input => {
-  input.addEventListener('change', () => {
-    const switchInput = input.nextElementSibling.querySelector('input');
-    if(input.value.trim()) {
-      switchInput.checked = true;
-    } else {
-      switchInput.checked = false;
-      alert('Ingresa tu link');
-    }
-    // Save to Firebase
-  });
-});
-
-// Init
-(async function init(){
-  const products = getStoredProducts();
-  renderProducts(products);
-  // Load stats from Firebase
-})();
+</body>
+</html>
