@@ -261,7 +261,7 @@
             purchase_units: [{
               amount: { value: total.toFixed(2), currency_code: 'MXN' },
               description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
-              custom_id: JSON.stringify({ cart, address: savedAddress, user: localStorage.getItem('userName') })
+              custom_id: `efrain-${Date.now()}-${total.toFixed(0)}`
             }]
           });
         },
