@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + CAMBIOS EN HERO */
+    /* ESTILOS ANTERIORES + HERO RESTAURADO */
     body {
       margin: 0;
       padding: 0;
@@ -54,7 +54,7 @@
       color: #000;
     }
 
-    /* HERO BANNER ACTUALIZADO */
+    /* HERO BANNER RESTAURADO */
     .hero-banner {
       text-align: center;
       padding: 60px 20px;
@@ -68,21 +68,6 @@
     .hero-banner .tag {
       font-size: 1rem;
       color: #666;
-      margin-bottom: 20px;
-    }
-    .hero-banner .new-drop {
-      font-size: 1.4rem;
-      font-weight: bold;
-      margin: 20px 0;
-    }
-    .reserve-btn {
-      background: #000;
-      color: #fff;
-      padding: 15px 30px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      cursor: pointer;
     }
 
     /* BARRA DE BÚSQUEDA */
@@ -142,6 +127,44 @@
       visibility: visible;
     }
 
+    /* ITEMS DEL MENÚ */
+    .menu-item {
+      padding: 18px 20px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-item::after {
+      content: '▼';
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+    .menu-item.open::after {
+      transform: rotate(180deg);
+    }
+
+    /* DESPLEGABLES */
+    .submenu,
+    .contact-dropdown {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      background: #f9f9f9;
+      padding: 0 20px;
+    }
+    .submenu.open,
+    .contact-dropdown.open {
+      max-height: 400px;
+      padding: 20px;
+    }
+    .submenu-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
     /* BOTÓN LOGIN */
     .menu-item.login-btn {
       background: #000;
@@ -153,23 +176,11 @@
       font-weight: bold;
       cursor: pointer;
     }
+    .menu-item.login-btn::after {
+      display: none;
+    }
 
-    /* CONTACTO DESPLEGABLE */
-    .menu-item.contact-toggle {
-      cursor: pointer;
-      position: relative;
-    }
-    .contact-dropdown {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-      background: #f9f9f9;
-      padding: 0 20px;
-    }
-    .contact-dropdown.open {
-      max-height: 200px;
-      padding: 20px;
-    }
+    /* CONTACTO */
     .contact-text {
       margin-bottom: 20px;
       font-size: 0.9rem;
@@ -195,7 +206,7 @@
       background: #fff;
       z-index: 1000;
       transform: translateX(100%);
-      transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
       box-shadow: -2px 0 10px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
@@ -343,13 +354,11 @@
     </div>
   </header>
 
-  <!-- HERO BANNER ACTUALIZADO -->
+  <!-- HERO BANNER RESTAURADO -->
   <main class="main-container">
     <section class="hero-banner">
-      <h1>PRIMER DROPP MUY PRONTO</h1>
-      <p class="tag"></p>
-      <p class="new-drop">Las compras mayores a $1,500 tienen envio gratis </p>
-      <button class="reserve-btn">Reserva ahora</button>
+      <h1>Asegura tu Mystery Box</h1>
+      <p class="tag">Envío Gratis en compras +$1,500</p>
     </section>
 
     <section class="infinite-carousel-section">
@@ -372,22 +381,29 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL CON CONTACTO ACTUALIZADO -->
+  <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
-    <div class="menu-item dropdown-toggle">Categorías</div>
-    <div class="submenu">
+    
+    <!-- CATEGORÍAS DESPLEGABLE -->
+    <div class="menu-item dropdown-toggle" id="categoriesToggle">Categorías</div>
+    <div class="submenu" id="categoriesSubmenu">
       <div class="submenu-item">Gorras</div>
       <div class="submenu-item">Camisetas</div>
-      <div class="submenu-item">Accesorios</div>
+      <div class="submenu-item">Pantalones</div>
+      <div class="submenu-item">Cintos</div>
+      <div class="submenu-item">Tenis</div>
+      <div class="submenu-item">Sudaderas</div>
+      <div class="submenu-item">Overcide</div>
     </div>
+    
     <div class="menu-item">Ofertas</div>
     
     <!-- CONTACTO DESPLEGABLE -->
-    <div class="menu-item contact-toggle">Contacto</div>
+    <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
     <div class="contact-dropdown" id="contactDropdown">
-      <p class="contact-text">Sígueme en mis redes sociales</p>
+      <p class="contact-text">No te quedes sin tu Mystery Box</p>
       <div class="social-links">
         <a href="#"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
         <a href="#"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
@@ -424,13 +440,24 @@
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
+    // MÁS PRODUCTOS PARA LLENAR LA TIENDA
     const products = [
-      { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
-      { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
+      { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true, category: "Gorras" },
+      { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true, category: "Camisetas" },
       { id: 3, name: "Mystery Box Gold", price: 2500, desc: "3 productos sorpresa", img: "https://imgfz.com/i/8Y5vN2k.webp", star: true },
-      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp" },
-      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true },
-      { id: 6, name: "Playera Premium", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp" }
+      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp", category: "Accesorios" },
+      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true, category: "Gorras" },
+      { id: 6, name: "Playera Premium White", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp", category: "Camisetas" },
+      { id: 7, name: "Pantalón Cargo Black", price: 2200, desc: "Streetwear", img: "https://imgfz.com/i/cargo-black.jpg", category: "Pantalones" },
+      { id: 8, name: "Cinturón Leather Pro", price: 890, desc: "Piel genuina", img: "https://imgfz.com/i/cinto-leather.jpg", category: "Cintos" },
+      { id: 9, name: "Tenis Urban White", price: 3500, desc: "Edición limitada", img: "https://imgfz.com/i/tenis-white.jpg", new: true, category: "Tenis" },
+      { id: 10, name: "Sudadera Oversize Gray", price: 1900, desc: "Calidad premium", img: "https://imgfz.com/i/sudadera-gray.jpg", star: true, category: "Sudaderas" },
+      { id: 11, name: "Overcide Hoodie Blue", price: 2100, desc: "Drop exclusivo", img: "https://imgfz.com/i/overcide-blue.jpg", category: "Overcide" },
+      { id: 12, name: "Gorra Snapback Red", price: 1400, oldPrice: 1800, desc: "Ajustable", img: "https://imgfz.com/i/gorra-red.webp", category: "Gorras" },
+      { id: 13, name: "Camiseta Graphic Tee", price: 799, desc: "Estampado único", img: "https://imgfz.com/i/graphic-tee.jpg", new: true, category: "Camisetas" },
+      { id: 14, name: "Mystery Box Silver", price: 1800, desc: "2 productos sorpresa", img: "https://imgfz.com/i/mystery-silver.jpg", star: true },
+      { id: 15, name: "Tenis High Top Black", price: 3900, desc: "Full comfort", img: "https://imgfz.com/i/tenis-high.jpg", category: "Tenis" },
+      { id: 16, name: "Sudadera Zip Black", price: 2200, desc: "Con cierre", img: "https://imgfz.com/i/sudadera-zip.jpg", category: "Sudaderas" }
     ];
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -438,7 +465,9 @@
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuSidebar = document.getElementById('menuSidebar');
-    const contactToggle = document.querySelector('.contact-toggle');
+    const categoriesToggle = document.getElementById('categoriesToggle');
+    const categoriesSubmenu = document.getElementById('categoriesSubmenu');
+    const contactToggle = document.getElementById('contactToggle');
     const contactDropdown = document.getElementById('contactDropdown');
     const searchBtn = document.getElementById('searchBtn');
     const searchBarHeader = document.getElementById('searchBarHeader');
@@ -456,12 +485,17 @@
     const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
 
-    // DESPLEGABLE CONTACTO
+    // TOGGLES
+    categoriesToggle.onclick = () => {
+      categoriesToggle.classList.toggle('open');
+      categoriesSubmenu.classList.toggle('open');
+    };
     contactToggle.onclick = () => {
+      contactToggle.classList.toggle('open');
       contactDropdown.classList.toggle('open');
     };
 
-    // === RENDER FUNCTIONS ===
+    // RENDER TODOS LOS PRODUCTOS
     function renderProducts() {
       productsGrid.innerHTML = '';
       products.forEach(p => {
@@ -483,10 +517,12 @@
       });
     }
 
+    // CARRUSELES DUPLICADOS PARA INFINITO + MÁS ITEMS
     function renderCarousel(container, filter) {
       container.innerHTML = '';
       const filtered = products.filter(filter);
-      filtered.forEach(p => {
+      // Duplicar para efecto infinito
+      [...filtered, ...filtered].forEach(p => {
         const item = document.createElement('div');
         item.className = 'carousel-item';
         item.innerHTML = `
@@ -498,7 +534,6 @@
         `;
         container.appendChild(item);
       });
-      container.innerHTML += container.innerHTML;
     }
 
     function addToCart(id) {
@@ -536,7 +571,7 @@
       cart.forEach((item, i) => {
         total += item.price * item.qty;
         const div = document.createElement('div');
-        div.className = 'cart-item';
+        div.className = 'carousel-item';
         div.innerHTML = `
           <img src="${item.img}" alt="${item.name}" class="thumb">
           <div>
@@ -589,7 +624,7 @@
       }).render('#paypal-button-container');
     }
 
-    // CARRITO
+    // EVENTOS
     const openCart = () => {
       cartSidebar.classList.add('open');
       cartOverlay.classList.add('show');
@@ -602,11 +637,8 @@
     cartBtn.onclick = openCart;
     closeCart.onclick = closeCartFunc;
     cartOverlay.onclick = closeCartFunc;
-    cartSidebar.onclick = (e) => {
-      e.stopPropagation();
-    };
+    cartSidebar.onclick = (e) => e.stopPropagation();
 
-    // Menú hamburguesa
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
@@ -616,7 +648,6 @@
       menuSidebar.classList.remove('open'); 
     };
 
-    // Búsqueda
     searchBtn.onclick = () => {
       searchBarHeader.classList.add('active');
       headerOverlay.classList.add('show');
