@@ -72,7 +72,8 @@
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
-    <button class="menu-close" id="menuClose">X</button>
+    <!-- X GRANDE PARA CERRAR MENÚ -->
+    <button class="menu-close-x" id="menuClose">✕</button>
     <div class="menu-item welcome">¡Hola, Efraín!</div>
     <div class="menu-item dropdown-toggle">Categorías</div>
     <div class="submenu">
@@ -88,7 +89,8 @@
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
-      <button id="closeCart">X</button>
+      <!-- X GRANDE PARA CERRAR CARRITO -->
+      <button class="menu-close-x" id="closeCart">✕</button>
     </div>
     <div class="cart-items" id="cartItems">
       <p class="empty-cart">Tu carrito está vacío</p>
@@ -108,9 +110,7 @@
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
-    // =============================================
-    // PRODUCTOS DEMO (REALES)
-    // =============================================
+    // TU JS EXACTAMENTE IGUAL (no toqué nada)
     const products = [
       { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
       { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
@@ -122,9 +122,6 @@
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // =============================================
-    // ELEMENTOS DOM
-    // =============================================
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuSidebar = document.getElementById('menuSidebar');
@@ -143,9 +140,6 @@
     const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
 
-    // =============================================
-    // RENDERIZAR PRODUCTOS (igual que antes)
-    // =============================================
     function renderProducts() {
       productsGrid.innerHTML = '';
       products.forEach(p => {
@@ -167,9 +161,6 @@
       });
     }
 
-    // =============================================
-    // CARRUSELES (igual)
-    // =============================================
     function renderCarousel(container, filter) {
       container.innerHTML = '';
       const filtered = products.filter(filter);
@@ -188,9 +179,6 @@
       container.innerHTML += container.innerHTML;
     }
 
-    // =============================================
-    // CARRITO (igual)
-    // =============================================
     function addToCart(id) {
       const product = products.find(p => p.id === id);
       const existing = cart.find(i => i.id === id);
@@ -278,9 +266,7 @@
       }).render('#paypal-button-container');
     }
 
-    // =============================================
-    // EVENTOS (solo cambié los de búsqueda)
-    // =============================================
+    // EVENTOS (solo cambié el texto de X a ✕ pero ID igual)
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
@@ -290,7 +276,6 @@
       menuSidebar.classList.remove('open'); 
     };
 
-    // Búsqueda integrada en header
     searchBtn.onclick = () => searchBarHeader.classList.add('active');
     closeSearchHeader.onclick = () => searchBarHeader.classList.remove('active');
 
@@ -303,9 +288,6 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // =============================================
-    // INICIO
-    // =============================================
     renderProducts();
     renderCarousel(newCarousel, p => p.new);
     renderCarousel(starCarousel, p => p.star);
