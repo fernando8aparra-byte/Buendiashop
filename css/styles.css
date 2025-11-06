@@ -1,7 +1,7 @@
 /* =============================================
-   RESET AGRESIVO
+   FUENTE MODERNA: POPPINS
    ============================================= */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Orbitron:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 * {
   margin: 0;
@@ -10,26 +10,81 @@
 }
 
 html, body {
-  background: #111;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
+  background: #ffffff;
+  color: #111111;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* =============================================
-   HEADER - ULTRA AGRESIVO
+   TIPOGRAFÍA & JERARQUÍA
+   ============================================= */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+
+h1 { font-size: 2.8rem; line-height: 1.1; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.4rem; }
+
+p, .desc {
+  font-size: 0.95rem;
+  color: #555555;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+/* Precios */
+.price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111;
+  margin: 8px 0;
+}
+
+.old-price {
+  font-size: 1rem;
+  color: #999;
+  text-decoration: line-through;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.offer-price {
+  color: #e63946;
+  font-weight: 900;
+}
+
+/* Etiquetas */
+.tag {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.8px;
+  margin-top: 8px;
+}
+
+/* =============================================
+   HEADER
    ============================================= */
 .header {
   position: sticky;
   top: 0;
-  background: #000;
-  border-bottom: 4px solid #ff1a1a;
+  background: #fff;
+  border-bottom: 1px solid #eee;
   z-index: 1000;
-  padding: 14px 20px;
-  box-shadow: 0 4px 20px rgba(255,26,26,0.3);
+  padding: 16px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
 .header-inner {
@@ -42,77 +97,68 @@ html, body {
 }
 
 .logo {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 22px;
+  font-size: 1.5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #ff1a1a, #ff6b6b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 10px rgba(255,26,26,0.5);
-  letter-spacing: 2px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #111;
 }
 
 .icon-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 10px;
+  padding: 8px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s;
+  transition: background 0.2s;
 }
 
 .icon-btn:hover {
-  transform: scale(1.2) rotate(5deg);
+  background: #f5f5f5;
 }
 
 .icon-btn svg {
-  width: 22px;
-  height: 22px;
-  stroke: #ff1a1a;
-  stroke-width: 3;
+  width: 20px;
+  height: 20px;
+  stroke: #111;
+  stroke-width: 2;
   fill: none;
-  filter: drop-shadow(0 0 4px #ff1a1a);
 }
 
 #cartBadge {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #ff1a1a;
-  color: #000;
-  font-size: 11px;
-  font-weight: 900;
-  min-width: 20px;
-  height: 20px;
+  top: -6px;
+  right: -6px;
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 10px #ff1a1a;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 10px #ff1a1a; }
-  50% { box-shadow: 0 0 20px #ff1a1a; }
-  100% { box-shadow: 0 0 10px #ff1a1a; }
+  display: none;
 }
 
 /* =============================================
-   BÚSQUEDA - AGRESIVA
+   BÚSQUEDA
    ============================================= */
 .search-container {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  background: #000;
-  border-top: 3px solid #ff1a1a;
-  padding: 12px 20px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 16px 20px;
   display: none;
   z-index: 900;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .search-container.active {
@@ -122,37 +168,37 @@ html, body {
 .search-bar {
   display: flex;
   align-items: center;
-  border: 3px solid #ff1a1a;
+  border: 1.5px solid #111;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .search-bar input {
   flex: 1;
-  padding: 14px;
-  background: transparent;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 900;
+  padding: 12px 16px;
   border: none;
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .search-bar input::placeholder {
-  color: #ff6b6b;
+  color: #999;
 }
 
 #closeSearch {
-  color: #ff1a1a;
-  font-size: 28px;
-  padding: 0 16px;
+  padding: 10px 16px;
+  font-size: 20px;
+  color: #777;
 }
 
 /* =============================================
-   MENÚ LATERAL - BRUTAL
+   MENÚ LATERAL
    ============================================= */
 .menu-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.4);
   opacity: 0;
   visibility: hidden;
   transition: 0.3s;
@@ -167,17 +213,17 @@ html, body {
 .menu-sidebar {
   position: fixed;
   top: 0;
-  left: -320px;
-  width: 300px;
+  left: -300px;
+  width: 280px;
   height: 100%;
-  background: #000;
-  border-right: 4px solid #ff1a1a;
+  background: #fff;
+  border-right: 1px solid #eee;
   padding: 80px 24px 24px;
-  transition: left 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  transition: left 0.3s ease;
   z-index: 1100;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .menu-sidebar.open {
@@ -186,63 +232,43 @@ html, body {
 
 .menu-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 50px;
-  height: 50px;
-  background: #ff1a1a;
-  color: #000;
-  font-size: 30px;
-  border-radius: 0;
-  clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #777;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: rotate 2s infinite linear;
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.menu-close:hover {
+  background: #e0e0e0;
 }
 
 .menu-item {
   padding: 16px 0;
-  font-size: 18px;
-  color: #fff;
-  border-bottom: 2px dashed #ff1a1a;
-  position: relative;
-}
-
-.menu-item::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  width: 0;
-  height: 0;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-right: 8px solid #ff1a1a;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: 0.3s;
-}
-
-.menu-item:hover::before {
-  opacity: 1;
-  left: 0;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .menu-item:hover {
-  color: #ff1a1a;
-  padding-left: 16px;
+  color: #000;
+  font-weight: 700;
 }
 
 .dropdown-toggle {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
 }
 
 .submenu {
@@ -257,37 +283,35 @@ html, body {
 
 .submenu-item {
   padding: 12px 0;
-  font-size: 15px;
-  color: #ff6b6b;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
 }
 
 .submenu-item:hover {
-  color: #fff;
+  color: #111;
 }
 
 /* =============================================
-   MAIN - SIN FONDO
+   MAIN - ESPACIO EN BLANCO
    ============================================= */
 .main-container {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 40px 20px;
 }
 
 /* =============================================
-   CARRUSEL INFINITO - AGRESIVO
+   CARRUSEL INFINITO (NUEVOS / ESTRELLA)
    ============================================= */
 .infinite-carousel-section {
-  margin-bottom: 60px;
+  margin-bottom: 80px;
 }
 
 .infinite-carousel-section h2 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 26px;
-  color: #ff1a1a;
   text-align: center;
-  margin-bottom: 20px;
-  text-shadow: 0 0 10px #ff1a1a;
+  margin-bottom: 32px;
+  color: #111;
 }
 
 .infinite-carousel {
@@ -302,47 +326,50 @@ html, body {
 }
 
 .carousel-item {
-  min-width: 200px;
+  min-width: 220px;
   cursor: pointer;
-  position: relative;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .carousel-item:hover {
-  transform: scale(1.1) rotate(3deg);
+  transform: translateY(-8px);
 }
 
 .carousel-item img {
   width: 100%;
-  height: 220px;
+  height: 260px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px #ff1a1a);
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
 }
 
 .item-info {
-  margin-top: 12px;
   text-align: center;
 }
 
 .item-info h4 {
-  font-size: 16px;
-  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
   margin-bottom: 6px;
+  color: #111;
 }
 
 .item-info p {
-  font-size: 18px;
-  color: #ff1a1a;
-  font-weight: 900;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #111;
 }
 
 /* =============================================
-   GRID DE PRODUCTOS - SIN FONDO
+   GRID DE PRODUCTOS
    ============================================= */
 .products-grid {
   display: grid;
-  gap: 30px;
-  margin-top: 40px;
+  gap: 32px;
+  margin-top: 48px;
 }
 
 @media (max-width: 480px) {
@@ -358,117 +385,96 @@ html, body {
 .product-card {
   text-align: center;
   cursor: pointer;
-  position: relative;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-10px) scale(1.05);
+  transform: translateY(-10px);
 }
 
 .product-card img {
   width: 100%;
-  height: 200px;
+  height: 280px;
   object-fit: contain;
-  filter: drop-shadow(0 0 15px #7c4dff);
-}
-
-.card-info {
-  margin-top: 16px;
+  background: #fafafa;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
 }
 
 .card-info h3 {
-  font-size: 16px;
-  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
   margin-bottom: 8px;
-  font-weight: 900;
+  color: #111;
 }
 
 .card-info .desc {
-  font-size: 13px;
-  color: #aaa;
-  margin-bottom: 10px;
-  height: 40px;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 12px;
+  height: 44px;
   overflow: hidden;
 }
 
 .sizes {
-  font-size: 14px;
-  color: #7c4dff;
+  font-size: 0.85rem;
+  color: #888;
   margin: 8px 0;
+  font-weight: 500;
 }
 
-.card-info .price {
-  font-size: 20px;
-  color: #ff1a1a;
-  font-weight: 900;
-  margin: 10px 0;
+.price-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.out-stock {
-  color: #ff1a1a;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-/* BOTÓN SIN FONDO NI BORDE */
 .add-btn {
-  background: none;
+  background: #000;
+  color: #fff;
   border: none;
-  color: #ff1a1a;
-  font-size: 18px;
-  font-weight: 900;
-  padding: 12px;
-  margin-top: 12px;
-  position: relative;
-  overflow: hidden;
-}
-
-.add-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255,26,26,0.2);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-  z-index: -1;
-}
-
-.add-btn:hover::before {
-  width: 300px;
-  height: 300px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.2s;
+  width: 100%;
 }
 
 .add-btn:hover {
-  color: #fff;
-  text-shadow: 0 0 10px #ff1a1a;
+  background: #111;
+  transform: translateY(-2px);
 }
 
 .add-btn:disabled {
-  color: #555;
+  background: #ccc;
   cursor: not-allowed;
 }
 
 /* =============================================
-   CARRITO - ULTRA AGRESIVO
+   CARRITO LATERAL - LIMPIO
    ============================================= */
 .cart-sidebar {
   position: fixed;
   top: 0;
-  right: -360px;
-  width: 340px;
+  right: -340px;
+  width: 320px;
   max-width: 100vw;
   height: 100%;
-  background: #000;
-  border-left: 6px solid #ff1a1a;
-  transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  background: #fff;
+  border-left: 1px solid #eee;
+  transition: right 0.3s ease;
   z-index: 1200;
   display: flex;
   flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.08);
 }
 
 .cart-sidebar.open {
@@ -476,26 +482,30 @@ html, body {
 }
 
 .cart-header {
-  background: #ff1a1a;
-  color: #000;
   padding: 20px;
-  font-size: 20px;
-  font-weight: 900;
-  text-align: center;
-  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-header h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .cart-items {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 20px;
 }
 
 .empty-cart {
   text-align: center;
-  color: #ff6b6b;
-  font-size: 18px;
+  color: #999;
   padding: 60px 20px;
+  font-size: 1rem;
 }
 
 .cart-item {
@@ -503,133 +513,95 @@ html, body {
   align-items: center;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 2px dashed #ff1a1a;
-  position: relative;
-}
-
-.cart-item::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid #ff1a1a;
-  transform: translateY(-50%);
+  border-bottom: 1px solid #eee;
 }
 
 .cart-item img.thumb {
   width: 70px;
   height: 70px;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px #7c4dff);
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 8px;
 }
 
 .cart-item > div {
   flex: 1;
-  font-size: 15px;
-  color: #fff;
+}
+
+.cart-item > div div {
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .cart-item > div small {
-  color: #ff1a1a;
-  font-weight: 900;
+  color: #666;
+  font-size: 0.9rem;
 }
 
 .cart-item button {
   background: none;
   border: none;
-  color: #ff1a1a;
-  font-size: 28px;
-  font-weight: 900;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
-}
-
-.cart-item button:hover {
-  background: #ff1a1a;
-  color: #000;
-  transform: rotate(90deg);
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
 }
 
 .cart-footer {
-  background: #000;
-  padding: 24px;
-  border-top: 4px solid #ff1a1a;
+  padding: 20px;
+  border-top: 1px solid #eee;
 }
 
 .cart-total {
-  text-align: center;
-  font-size: 22px;
-  color: #ff1a1a;
-  margin-bottom: 20px;
-  font-weight: 900;
+  text-align: right;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 16px;
 }
 
 .payment-options {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .payment-options button {
-  background: none;
-  border: 3px solid #ff1a1a;
-  color: #ff1a1a;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 900;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.payment-options button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: #ff1a1a;
-  transition: 0.5s;
-  z-index: -1;
-}
-
-.payment-options button:hover::before {
-  left: 0;
+  padding: 14px;
+  border: 1.5px solid #111;
+  border-radius: 8px;
+  background: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .payment-options button:hover {
-  color: #000;
+  background: #111;
+  color: #fff;
 }
 
 /* =============================================
-   TOAST - AGRESIVO
+   TOAST
    ============================================= */
 .toast {
   position: fixed;
   bottom: 30px;
   left: 50%;
-  transform: translateX(-50%) translateY(30px);
-  background: #ff1a1a;
-  color: #000;
-  padding: 16px 32px;
-  font-size: 18px;
-  font-weight: 900;
-  box-shadow: 0 0 30px #ff1a1a;
+  transform: translateX(-50%) translateY(20px);
+  background: #000;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   opacity: 0;
   visibility: hidden;
-  transition: all 0.5s;
+  transition: all 0.35s ease;
   z-index: 1300;
-  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+  text-transform: uppercase;
 }
 
 .toast.show {
@@ -639,14 +611,14 @@ html, body {
 }
 
 /* =============================================
-   ANIMACIÓN CARRITO
+   ANIMACIONES
    ============================================= */
 @keyframes shake {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  25% { transform: translateX(-8px) rotate(-5deg); }
-  75% { transform: translateX(8px) rotate(5deg); }
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 .shake {
-  animation: shake 0.7s ease-in-out;
+  animation: shake 0.6s ease-in-out;
 }
