@@ -1,5 +1,5 @@
 /* =============================================
-   ESTILO CLON EXACTO DE DROP-SHOP.MX + MENÚ, BÚSQUEDA, CARRITO Y PAYPAL COMPLETO
+   ESTILO CLON EXACTO DE DROP-SHOP.MX + ICONOS SVG + X DE CIERRE + COMPATIBLE 100% CON EL INDEX.HTML
    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
@@ -94,7 +94,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   HEADER
+   HEADER + ICONOS SVG PERFECTOS
    ============================================= */
 .header {
   position: sticky;
@@ -107,8 +107,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 .header-inner {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  display triples: auto 1fr auto auto;
   align-items: center;
   gap: 16px;
   max-width: 1400px;
@@ -121,6 +120,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: #111111;
+  text-decoration: none;
 }
 
 .icon-btn {
@@ -146,6 +146,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   stroke: #111111;
   stroke-width: 2;
   fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 #cartBadge {
@@ -163,33 +165,36 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   align-items: center;
   justify-content: center;
   animation: pulse 2s infinite ease-in-out;
-  display: none;
 }
 
-/* ICONOS SVG INTEGRADOS EN LOS BOTONES */
-<button class="icon-btn" id="menuToggle">
-  <!-- ICONO HAMBURGUESA -->
-  <svg viewBox="0 0 24 24">
-    <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</button>
+/* =============================================
+   ICONOS X DE CIERRE (menú, búsqueda, carrito)
+   ============================================= */
+.close-x {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
 
-<button class="icon-btn" id="searchToggle">
-  <!-- ICONO LUPA -->
-  <svg viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="8"/>
-    <path d="m21 21-4.35-4.35" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</button>
+.close-x:hover {
+  background: #e0e0e0;
+}
 
-<button class="icon-btn" id="cartToggle">
-  <!-- ICONO CARRITO -->
-  <svg viewBox="0 0 24 24">
-    <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <span id="cartBadge">0</span>
-</button>
+.close-x svg {
+  width: 18px;
+  height: 18px;
+  stroke: #777777;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 /* =============================================
    BÚSQUEDA
@@ -233,17 +238,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   color: #999999;
 }
 
-#closeSearch {
-  padding: 10px 16px;
-  font-size: 20px;
-  color: #777777;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
 /* =============================================
-   MENÚ LATERAL
+   MENÚ LATERAL + DROPDOWN
    ============================================= */
 .menu-overlay {
   position: fixed;
@@ -280,26 +276,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   left: 0;
 }
 
-.menu-close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f0f0f0;
-  color: #777777;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.menu-close:hover {
-  background: #e0e0e0;
-}
-
 .menu-item {
   padding: 16px 0;
   border-bottom: 1px solid #eeeeee;
@@ -322,13 +298,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   align-items: center;
 }
 
-.dropdown-toggle::after {
-  content: '▼';
+.dropdown-toggle span {
   font-size: 0.8rem;
-}
-
-.dropdown-toggle.active::after {
-  content: '▲';
 }
 
 .submenu {
@@ -354,7 +325,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   MAIN
+   MAIN + HERO
    ============================================= */
 .main-container {
   max-width: 1300px;
@@ -385,6 +356,10 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   gap: 24px;
   width: max-content;
   animation: scroll 40s linear infinite;
+}
+
+.carousel-track:hover {
+  animation-play-state: paused;
 }
 
 .carousel-item {
@@ -492,13 +467,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transform: translateY(-2px);
 }
 
-.add-btn:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
-}
-
 /* =============================================
-   CARRITO LATERAL (MEJORADO CON PAYPAL)
+   CARRITO LATERAL
    ============================================= */
 .cart-sidebar {
   position: fixed;
@@ -594,7 +564,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   margin-bottom: 16px;
 }
 
-/* NUEVO: IR A PAGAR */
 .go-to-pay {
   font-weight: 800;
   font-size: 1.3rem;
@@ -605,13 +574,11 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   color: #111111;
 }
 
-/* BOTÓN PAYPAL OFICIAL */
 #paypal-button-container {
   margin: 0 auto 20px;
   max-width: 280px;
 }
 
-/* MENSAJES DE PAYPAL */
 #message {
   margin-top: 20px;
   padding: 12px 16px;
@@ -629,19 +596,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 /* =============================================
    ANIMACIONES
    ============================================= */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes scroll {
@@ -649,20 +606,12 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   to { transform: translateX(-50%); }
 }
 
-.fade-in { animation: fadeIn 0.5s ease-out forwards; }
-.pulse { animation: pulse 2s infinite ease-in-out; }
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+/* Duplicar track para loop perfecto */
+.carousel-track {
+  animation: scroll 40s linear infinite;
 }
 
-.shake { animation: shake 0.6s ease-in-out; }
-
-/* =============================================
-   TOAST
-   ============================================= */
+/* TOAST */
 .toast {
   position: fixed;
   bottom: 30px;
@@ -695,4 +644,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   .main-container { padding: 30px 15px; }
   .product-card img { height: 220px; }
   .carousel-item { min-width: 180px; }
+  .header-inner { gap: 12px; }
+  .icon-btn svg { width: 18px; height: 18px; }
 }
