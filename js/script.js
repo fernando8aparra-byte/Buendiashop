@@ -1,4 +1,4 @@
-// js/script.js - 100% FUNCIONAL CON INDEX.HTML + LOGIN + PAYPAL REAL
+// js/script.js - 100% FUNCIONAL CON INDEX.HTML + REDIRECCIÓN A product.html y pago.html
 const products = [
   { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
   { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
@@ -39,6 +39,8 @@ function renderProducts() {
   products.forEach(p => {
     const card = document.createElement('div');
     card.className = 'product-card';
+    card.style.cursor = 'pointer'; // Indicar que es clicable
+
     card.innerHTML = `
       <img src="${p.img}" alt="${p.name}" loading="lazy">
       <div class="card-info">
@@ -48,9 +50,15 @@ function renderProducts() {
           ${p.oldPrice ? `<span class="old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
           <span class="price ${p.oldPrice ? 'offer-price' : ''}">$${p.price.toLocaleString()}</span>
         </div>
-        <button class="add-btn" onclick="addToCart(${p.id})">Agregar</button>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})">Agregar</button>
       </div>
     `;
+
+    // === REDIRECCIÓN AL TOCAR PRODUCTO ===
+    card.addEventListener('click', () => {
+      window.location.href = `product.html?id=${p.id}`;
+    });
+
     productsGrid.appendChild(card);
   });
 }
@@ -61,6 +69,8 @@ function renderCarousel(container, filter) {
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
+    item.style.cursor = 'pointer';
+
     item.innerHTML = `
       <img src="${p.img}" alt="${p.name}" loading="lazy">
       <div class="item-info">
@@ -68,6 +78,12 @@ function renderCarousel(container, filter) {
         <p>$${p.price.toLocaleString()}</p>
       </div>
     `;
+
+    // === REDIRECCIÓN EN CARRUSEL ===
+    item.addEventListener('click', () => {
+      window.location.href = `product.html?id=${p.id}`;
+    });
+
     container.appendChild(item);
   });
 }
@@ -102,7 +118,7 @@ function updateCart() {
   cartBadge.textContent = qtyTotal;
   cartBadge.style.display = qtyTotal > 0 ? 'flex' : 'none';
 
-  // Total siempre visible (inicia en $0)
+  // Total siempre visible
   cartTotal.textContent = `Total: $${total.toLocaleString()}`;
 
   if (cart.length === 0) {
@@ -131,47 +147,38 @@ function updateCart() {
   renderPayPalButton(total);
 }
 
-// === PAYPAL 100% REAL (MXN + centavos correctos) ===
+// === BOTÓN PAYPAL → REDIRIGE A pago.html ===
 function renderPayPalButton(amount) {
   const container = document.getElementById('paypal-button-container');
   container.innerHTML = '';
 
   if (amount <= 0) return;
 
-  paypal.Buttons({
-    createOrder: (data, actions) => {
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: (amount / 100).toFixed(2),
-            currency_code: 'MXN'
-          },
-          description: 'Compra en Efraín Shop - Mystery Box & Streetwear'
-        }]
-      });
-    },
-    onApprove: (data, actions) => {
-      return actions.order.capture().then(details => {
-        document.getElementById('message').innerHTML = `
-          <div style="color:green;font-weight:bold;text-align:center;padding:15px;background:#f0fff0;border-radius:8px;">
-            ¡PAGO EXITOSO! 🎉<br>
-            Orden: ${details.id}<br>
-            ¡Gracias, ${details.payer.name.given_name}!
-          </div>`;
-        cart = [];
-        localStorage.setItem('cart', '[]');
-        updateCart();
-        showToast('¡Gracias por tu compra!');
-      });
-    },
-    onCancel: () => {
-      document.getElementById('message').innerHTML = '<div style="color:#999;text-align:center;">Pago cancelado</div>';
-    },
-    onError: (err) => {
-      console.error('PayPal Error:', err);
-      document.getElementById('message').innerHTML = '<div style="color:red;text-align:center;">Error en pago. Intenta de nuevo.</div>';
+  // Guardamos el monto para usarlo en pago.html
+  localStorage.setItem('pendingPaymentAmount', amount);
+
+  // Botón simulado que redirige
+  container.innerHTML = `
+    <button id="paypalRedirectBtn" style="
+      background: #003087; color: white; border: none; padding: 14px;
+      border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-size: 1rem; margin-top: 10px;
+    ">
+      <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x28.jpg" alt="PayPal" style="height:22px;">
+      Pagar con PayPal
+    </button>
+  `;
+
+  document.getElementById('paypalRedirectBtn').addEventListener('click', () => {
+    if (cart.length === 0) {
+      showToast("Carrito vacío");
+      return;
     }
-  }).render('#paypal-button-container');
+    // Guardamos carrito para pago.html
+    localStorage.setItem('pendingCart', JSON.stringify(cart));
+    window.location.href = 'pago.html';
+  });
 }
 
 // === TOAST ===
@@ -185,13 +192,13 @@ function showToast(msg) {
 cartBtn.onclick = () => {
   cartSidebar.classList.add('open');
   cartOverlay.classList.add('show');
-  updateCart(); // Refresca al abrir
+  updateCart();
 };
 
 closeCart.onclick = () => {
   cartSidebar.classList.remove('open');
   cartOverlay.classList.remove('show');
-  document.getElementById('paypal-button-container').innerHTML = ''; // Limpia PayPal
+  document.getElementById('paypal-button-container').innerHTML = '';
 };
 
 cartOverlay.onclick = () => {
@@ -204,4 +211,4 @@ cartOverlay.onclick = () => {
 renderProducts();
 renderCarousel(newCarousel, p => p.new);
 renderCarousel(starCarousel, p => p.star);
-updateCart(); // Total inicia en $0
+updateCart();
