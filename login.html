@@ -1,201 +1,177 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Iniciar sesión | Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #1f1f1f, #2e2e2e);
-      color: #fff;
-    }
+    body { margin: 0; padding: 0; padding-top: 60px; background: #f8f8f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; box-sizing: border-box; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+    .icon-btn { background: none; border: none; cursor: pointer; }
+    .icon-btn svg { stroke: #000; fill: none; }
 
-    .login-box {
-      background: rgba(255, 255, 255, 0.1);
+    .login-container {
+      max-width: 400px;
+      margin: 60px auto;
       padding: 40px 30px;
+      background: #fff;
       border-radius: 12px;
-      width: 90%;
-      max-width: 380px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       text-align: center;
-      backdrop-filter: blur(10px);
-      animation: fadeIn 0.6s ease;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      color: #00cec9;
-    }
-
-    input {
+    .login-container h1 { margin-bottom: 30px; font-size: 2rem; color: #000; }
+    .login-input {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 6px;
-      outline: none;
-      font-size: 14px;
+      padding: 15px;
+      margin: 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
-
-    button {
+    .login-btn {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
+      padding: 15px;
+      background: #000;
+      color: #fff;
       border: none;
-      border-radius: 6px;
-      background: #00b894;
-      color: white;
+      border-radius: 8px;
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 20px;
       transition: 0.3s;
     }
-
-    button:hover {
-      background: #019870;
-    }
-
-    .toggle {
-      margin-top: 15px;
-      font-size: 0.9em;
-      color: #00cec9;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .msg {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: #ffcc00;
-      min-height: 20px;
-    }
+    .login-btn:hover { background: #333; }
+    .back-link { display: block; margin-top: 30px; color: #000; text-decoration: none; font-weight: bold; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 15px 30px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
+    .toast.show { opacity: 1; }
+    .error { color: #ff4444; }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2 id="titulo">Iniciar sesión</h2>
-    <input type="text" id="nombre" placeholder="Nombre de usuario" style="display:none;" />
-    <input type="email" id="correo" placeholder="Correo electrónico" />
-    <input type="password" id="clave" placeholder="Contraseña" />
-    <button id="btnAccion">Iniciar sesión</button>
-    <div class="toggle" id="toggleForm">¿No tienes cuenta? Regístrate</div>
-    <div class="msg" id="msg"></div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div style="display:flex; align-items:center; gap:20px;">
+        <button onclick="window.location.href='index.html'" class="icon-btn">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
+          </svg>
+        </button>
+        <div class="logo">EFRAÍN</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOGIN / REGISTRO -->
+  <div class="login-container">
+    <h1 id="formTitle">Iniciar Sesión</h1>
+    <input type="email" id="email" class="login-input" placeholder="Correo electrónico" required>
+    <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
+    <button class="login-btn" id="mainBtn">Entrar</button>
+    <p style="margin-top:20px;">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
+    <a href="index.html" class="back-link">← Volver a la tienda</a>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
 
-    // 🔥 CONFIG FIREBASE
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <script>
+    // === TUS CREDENCIALES FIREBASE (reemplaza si cambian) ===
     const firebaseConfig = {
-      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-      measurementId: "G-9KJ2330RN7"
+      apiKey: "AIzaSyD7vY8Zc9xK0vJ5mN6bP7qR8sT9uV0wX1Y",
+      authDomain: "efrain-shop.firebaseapp.com",
+      projectId: "efrain-shop",
+      storageBucket: "efrain-shop.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef1234567890abcdef"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // INICIALIZAR FIREBASE
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    // 🧠 ELEMENTOS
-    const nombre = document.getElementById("nombre");
-    const correo = document.getElementById("correo");
-    const clave = document.getElementById("clave");
-    const btnAccion = document.getElementById("btnAccion");
-    const toggleForm = document.getElementById("toggleForm");
-    const msg = document.getElementById("msg");
-    const titulo = document.getElementById("titulo");
+    // ELEMENTOS
+    const formTitle = document.getElementById('formTitle');
+    const mainBtn = document.getElementById('mainBtn');
+    const toggleLink = document.getElementById('toggleLink');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const toast = document.getElementById('toast');
 
-    let modoRegistro = false;
+    let isLogin = true;
 
-    // 🟢 Redirigir si ya está logueado
-    const usuarioActivo = localStorage.getItem("usuarioActivo");
-    if (usuarioActivo) window.location.href = "index.html";
+    // TOAST
+    function showToast(msg, isError = false) {
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
 
-    toggleForm.addEventListener("click", () => {
-      modoRegistro = !modoRegistro;
-      nombre.style.display = modoRegistro ? "block" : "none";
-      titulo.textContent = modoRegistro ? "Crear cuenta" : "Iniciar sesión";
-      btnAccion.textContent = modoRegistro ? "Registrarme" : "Iniciar sesión";
-      toggleForm.textContent = modoRegistro
-        ? "¿Ya tienes cuenta? Inicia sesión"
-        : "¿No tienes cuenta? Regístrate";
-      msg.textContent = "";
-    });
+    // TOGGLE LOGIN / REGISTRO
+    toggleLink.onclick = (e) => {
+      e.preventDefault();
+      isLogin = !isLogin;
+      formTitle.textContent = isLogin ? 'Iniciar Sesión' : 'Crear Cuenta';
+      mainBtn.textContent = isLogin ? 'Entrar' : 'Registrarme';
+      toggleLink.textContent = isLogin ? 'Regístrate aquí' : 'Iniciar sesión';
+    };
 
-    btnAccion.addEventListener("click", async () => {
-      const nombreVal = nombre.value.trim();
-      const correoVal = correo.value.trim().toLowerCase();
-      const claveVal = clave.value.trim();
+    // ACCIÓN PRINCIPAL
+    mainBtn.onclick = () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
 
-      if ((modoRegistro && (!nombreVal || !correoVal || !claveVal)) ||
-          (!modoRegistro && (!correoVal || !claveVal))) {
-        msg.textContent = "Completa todos los campos.";
+      if (!email || !password) {
+        showToast('⚠️ Completa todos los campos', true);
         return;
       }
 
-      const usuariosRef = collection(db, "usuarios");
-
-      try {
-        const q = query(usuariosRef, where("correo", "==", correoVal));
-        const resultado = await getDocs(q);
-
-        // 🔹 REGISTRO
-        if (modoRegistro) {
-          if (!resultado.empty) {
-            msg.textContent = "Correo ya registrado. Inicia sesión.";
-            return;
-          }
-          await addDoc(usuariosRef, {
-            nombre: nombreVal,
-            correo: correoVal,
-            clave: claveVal
+      if (isLogin) {
+        // INICIAR SESIÓN
+        auth.signInWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('userName', user.displayName || user.email.split('@')[0]);
+            showToast('¡Bienvenido de vuelta! 🔥');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+          })
+          .catch((error) => {
+            showToast('Error: ' + error.message, true);
           });
-          localStorage.setItem("usuarioActivo", nombreVal);
-          msg.textContent = "✅ Registro exitoso. Redirigiendo...";
-          setTimeout(() => window.location.href = "index.html", 1200);
-          return;
-        }
-
-        // 🔹 INICIO DE SESIÓN
-        if (resultado.empty) {
-          msg.textContent = "Usuario no encontrado.";
-          return;
-        }
-
-        let usuarioEncontrado = false;
-        let nombreUsuario = "";
-        resultado.forEach((doc) => {
-          const data = doc.data();
-          if (data.clave === claveVal) {
-            usuarioEncontrado = true;
-            nombreUsuario = data.nombre;
-          }
-        });
-
-        if (usuarioEncontrado) {
-          localStorage.setItem("usuarioActivo", nombreUsuario);
-          msg.textContent = "✅ Inicio de sesión exitoso. Redirigiendo...";
-          setTimeout(() => window.location.href = "index.html", 1200);
-        } else {
-          msg.textContent = "Contraseña incorrecta.";
-        }
-      } catch (e) {
-        msg.textContent = "Error: " + e.message;
+      } else {
+        // REGISTRARSE
+        auth.createUserWithEmailAndPassword(email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            return user.updateProfile({ displayName: email.split('@')[0] });
+          })
+          .then(() => {
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('userName', email.split('@')[0]);
+            showToast('¡Cuenta creada! 🔥');
+            setTimeout(() => window.location.href = 'index.html', 1500);
+          })
+          .catch((error) => {
+            showToast('Error: ' + error.message, true);
+          });
       }
+    };
+
+    // ENTER = CLICK
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') mainBtn.click();
     });
   </script>
 </body>
