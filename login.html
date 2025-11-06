@@ -73,10 +73,12 @@
   <div class="login-container">
     <h1 id="formTitle">Iniciar Sesión</h1>
 
-    <!-- Campo que cambia: nombre o correo -->
+    <!-- Campo nombre (solo en registro, aparece primero) -->
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre" required>
+
+    <!-- Campo identificador: nombre o correo -->
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" required>
-    <!-- Campo nombre solo en registro -->
-    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" required>
+
     <!-- Contraseña -->
     <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
 
@@ -114,12 +116,16 @@
     const formTitle = document.getElementById('formTitle');
     const mainBtn = document.getElementById('mainBtn');
     const toggleLink = document.getElementById('toggleLink');
-    const identifierInput = document.getElementById('identifier');
     const nameInput = document.getElementById('name');
+    const identifierInput = document.getElementById('identifier');
     const passwordInput = document.getElementById('password');
     const toast = document.getElementById('toast');
 
     let isLogin = true;
+
+    // USUARIO ADMIN ESPECIAL
+    const ADMIN_NAME = "Buendia*]?~?£u837jwhwi";
+    const ADMIN_PASS = "&2)3)8:&?3828&/82$:!";
 
     // TOAST
     function showToast(msg, isError = false) {
@@ -164,7 +170,18 @@
 
       try {
         if (isLogin) {
-          // === INICIAR SESIÓN CON NOMBRE O CORREO ===
+          // === INICIAR SESIÓN ===
+
+          // Verificar si es el ADMIN ESPECIAL
+          if (identifier === ADMIN_NAME && password === ADMIN_PASS) {
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('userName', 'Admin');
+            localStorage.setItem('isAdmin', 'true');
+            showToast('Acceso de administrador');
+            setTimeout(() => window.location.href = 'admin.html', 1500);
+            return;
+          }
+
           let email = identifier;
 
           // Si no parece correo, buscar por nombre
