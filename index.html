@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + CAMBIOS NUEVOS */
+    /* ESTILOS ANTERIORES + CAMBIOS EN HERO */
     body {
       margin: 0;
       padding: 0;
@@ -52,6 +52,37 @@
       font-size: 1.5rem;
       font-weight: bold;
       color: #000;
+    }
+
+    /* HERO BANNER ACTUALIZADO */
+    .hero-banner {
+      text-align: center;
+      padding: 60px 20px;
+      background: #f8f8f8;
+    }
+    .hero-banner h1 {
+      font-size: 2.2rem;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+    }
+    .hero-banner .tag {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .hero-banner .new-drop {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .reserve-btn {
+      background: #000;
+      color: #fff;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
     }
 
     /* BARRA DE BÚSQUEDA */
@@ -136,7 +167,7 @@
       padding: 0 20px;
     }
     .contact-dropdown.open {
-      max-height: 200px; /* suficiente para el contenido */
+      max-height: 200px;
       padding: 20px;
     }
     .contact-text {
@@ -154,7 +185,7 @@
       height: 40px;
     }
 
-    /* CARRITO AL FRENTE + SCROLL TÁCTIL MEJORADO */
+    /* CARRITO AL FRENTE */
     .cart-sidebar {
       position: fixed;
       top: 60px;
@@ -162,7 +193,7 @@
       width: 350px;
       height: calc(100vh - 60px);
       background: #fff;
-      z-index: 1000; /* más alto que todo */
+      z-index: 1000;
       transform: translateX(100%);
       transition: transform 0.3s ease;
       box-shadow: -2px 0 10px rgba(0,0,0,0.1);
@@ -179,7 +210,7 @@
       width: 100%;
       height: calc(100vh - 60px);
       background: rgba(0,0,0,0.5);
-      z-index: 999; /* debajo del carrito */
+      z-index: 999;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease;
@@ -312,11 +343,13 @@
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- HERO BANNER ACTUALIZADO -->
   <main class="main-container">
     <section class="hero-banner">
-      <h1>Asegura tu Mystery Box</h1>
-      <p class="tag">Envío Gratis en compras +$1,500</p>
+      <h1>ASEGURA TU MYSTERY BOX</h1>
+      <p class="tag">ENVÍO GRATIS EN COMPRAS +$1,500</p>
+      <p class="new-drop">Primer drop de ropa muy pronto reserva ya</p>
+      <button class="reserve-btn">Reserva ahora</button>
     </section>
 
     <section class="infinite-carousel-section">
@@ -339,7 +372,7 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL CON CONTACTO DESPLEGABLE -->
+  <!-- MENÚ LATERAL CON CONTACTO ACTUALIZADO -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
@@ -354,9 +387,8 @@
     <!-- CONTACTO DESPLEGABLE -->
     <div class="menu-item contact-toggle">Contacto</div>
     <div class="contact-dropdown" id="contactDropdown">
-      <p class="contact-text">No te quedes sin la primera edición de mi marca</p>
+      <p class="contact-text">Sígueme en mis redes sociales</p>
       <div class="social-links">
-        <!-- REEMPLAZA ESTAS URLS CON TUS LOGOS REALES -->
         <a href="#"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
         <a href="#"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
         <a href="#"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
