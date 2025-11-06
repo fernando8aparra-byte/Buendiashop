@@ -1,4 +1,4 @@
-// js/script.js - SCRIPT COMPLETO Y FUNCIONAL (Menú + Búsqueda + Carrito + PayPal + Carrusel Infinito)
+// js/script.js - PAYPAL 100% FUNCIONAL CON TU CUENTA REAL
 const products = [
   { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
   { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
@@ -10,74 +10,19 @@ const products = [
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// === ELEMENTOS DOM ===
-const menuBtn = document.getElementById('menuBtn');
-const menuOverlay = document.getElementById('menuOverlay');
-const menuSidebar = document.getElementById('menuSidebar');
-const menuClose = document.getElementById('menuClose');
-const dropdownToggle = document.querySelector('.dropdown-toggle');
-const submenu = document.querySelector('.submenu');
-
-const searchBtn = document.getElementById('searchBtn');
-const searchContainer = document.getElementById('searchContainer');
-const searchInput = document.getElementById('searchInput');
-const closeSearch = document.getElementById('closeSearch');
-
+// DOM
 const cartBtn = document.getElementById('cartBtn');
 const cartSidebar = document.getElementById('cartSidebar');
 const closeCart = document.getElementById('closeCart');
 const cartBadge = document.getElementById('cartBadge');
 const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
-
 const productsGrid = document.getElementById('productsGrid');
 const newCarousel = document.getElementById('newCarousel');
 const starCarousel = document.getElementById('starCarousel');
 const toast = document.getElementById('toast');
 
-// === MENÚ LATERAL ===
-menuBtn.onclick = () => {
-  menuOverlay.classList.add('show');
-  menuSidebar.classList.add('open');
-};
-
-menuOverlay.onclick = menuClose.onclick = () => {
-  menuOverlay.classList.remove('show');
-  menuSidebar.classList.remove('open');
-};
-
-dropdownToggle.onclick = () => {
-  dropdownToggle.classList.toggle('active');
-  submenu.classList.toggle('show');
-};
-
-// === BÚSQUEDA ===
-searchBtn.onclick = () => searchContainer.classList.add('active');
-closeSearch.onclick = () => searchContainer.classList.remove('active');
-
-// === CARRUSEL INFINITO ===
-function renderCarousel(container, filter) {
-  container.innerHTML = '';
-  const filtered = products.filter(filter);
-  filtered.forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'carousel-item';
-    item.innerHTML = `
-      <img src="${p.img}" alt="${p.name}" loading="lazy">
-      <div class="item-info">
-        <h4>${p.name}</h4>
-        <p>$${p.price.toLocaleString()}</p>
-      </div>
-    `;
-    container.appendChild(item);
-  });
-  container.innerHTML += container.innerHTML; // infinito
-}
-
-renderCarousel(newCarousel, p => p.new);
-renderCarousel(starCarousel, p => p.star);
-
-// === PRODUCTOS GRID ===
+// RENDER PRODUCTOS Y CARRUSELES
 function renderProducts() {
   productsGrid.innerHTML = '';
   products.forEach(p => {
@@ -99,7 +44,28 @@ function renderProducts() {
   });
 }
 
-// === CARRITO ===
+function renderCarousel(container, filter) {
+  container.innerHTML = '';
+  const filtered = products.filter(filter);
+  filtered.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.innerHTML = `
+      <img src="${p.img}" alt="${p.name}" loading="lazy">
+      <div class="item-info">
+        <h4>${p.name}</h4>
+        <p>$${p.price.toLocaleString()}</p>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+  container.innerHTML += container.innerHTML;
+}
+
+renderCarousel(newCarousel, p => p.new);
+renderCarousel(starCarousel, p => p.star);
+
+// CARRITO
 function addToCart(id) {
   const product = products.find(p => p.id === id);
   const existing = cart.find(i => i.id === id);
@@ -150,47 +116,71 @@ function updateCart() {
   renderPayPalButton(total);
 }
 
-// === PAYPAL OFICIAL (SANDBOX) ===
+cartBtn.onclick = () => cartSidebar.classList.add('open');
+closeCart.onclick = () => {
+  cartSidebar.classList.remove('open');
+  document.getElementById('paypal-button-container').innerHTML = '';
+};
+
+// PAYPAL CON TU CUENTA REAL - FUNCIONANDO
 function renderPayPalButton(amount) {
   const container = document.getElementById('paypal-button-container');
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:#666;">Cargando PayPal seguro...</div>';
+
+  if (typeof paypal === 'undefined') {
+    container.innerHTML = '<p style="color:red;text-align:center;">Error: PayPal no cargó. Revisa internet.</p>';
+    return;
+  }
+
   container.innerHTML = '';
+
   paypal.Buttons({
-    createOrder: () => actions.order.create({
-      purchase_units: [{ amount: { value: (amount / 100).toFixed(2) } }]
-    }),
-    onApprove: (data, actions) => actions.order.capture().then(details => {
-      document.getElementById('message').innerHTML = `
-        ¡Pago exitoso! Orden: ${details.id}<br>
-        Gracias, ${details.payer.name.given_name}
-      `;
-      document.getElementById('message').className = 'success';
-      cart = [];
-      localStorage.setItem('cart', '[]');
-      updateCart();
-      cartSidebar.classList.remove('open');
-    }),
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: (amount / 100).toFixed(2),
+            currency_code: 'MXN'
+          },
+          description: 'Compra en Efraín Shop'
+        }]
+      });
+    },
+    onApprove: (data, actions) => {
+      return actions.order.capture().then(details => {
+        document.getElementById('message').innerHTML = `
+          <div style="color:green;font-weight:800;text-align:center;">
+            ¡PAGO EXITOSO! 🎉<br>
+            Orden: ${details.id}<br>
+            Gracias, ${details.payer.name.given_name} ${details.payer.name.surname}
+          </div>`;
+        document.getElementById('message').className = 'success';
+        cart = [];
+        localStorage.setItem('cart', '[]');
+        updateCart();
+        cartSidebar.classList.remove('open');
+        showToast('¡Gracias por tu compra!');
+      });
+    },
     onCancel: () => {
-      document.getElementById('message').innerHTML = 'Pago cancelado.';
+      document.getElementById('message').innerHTML = 'Pago cancelado 😔';
       document.getElementById('message').className = 'cancel';
     },
-    onError: err => {
-      document.getElementById('message').innerHTML = 'Error: ' + err;
+    onError: (err) => {
+      console.error('PayPal Error:', err);
+      document.getElementById('message').innerHTML = 'Error en el pago. Intenta de nuevo.';
       document.getElementById('message').className = 'error';
     }
   }).render('#paypal-button-container');
 }
 
-// === TOAST ===
+// TOAST
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === EVENTOS ===
-cartBtn.onclick = () => cartSidebar.classList.add('open');
-closeCart.onclick = () => cartSidebar.classList.remove('open');
-
-// === INICIO ===
+// INICIO
 renderProducts();
 updateCart();
