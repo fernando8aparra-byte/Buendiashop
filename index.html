@@ -251,22 +251,6 @@
       border-top: 1px solid #eee;
       background: #fff;
     }
-    .payment-options {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .payment-btn {
-      flex: 1;
-      padding: 12px;
-      text-align: center;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .paypal-btn { background: #ffc439; }
-    .card-btn { background: #f8f8f8; }
 
     /* X DE BÚSQUEDA Y CARRITO */
     #closeSearchHeader,
@@ -435,7 +419,7 @@
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
 
-  <!-- CARRITO LATERAL -->
+  <!-- CARRITO LATERAL (PAGO COMO ANTES) -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -447,13 +431,7 @@
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
       <div class="go-to-pay">Ir a Pagar</div>
-      
-      <div class="payment-options">
-        <div class="payment-btn paypal-btn" id="paypalBtn">PayPal</div>
-        <div class="payment-btn card-btn" id="cardBtn">💳 Tarjeta</div>
-      </div>
-      
-      <div id="paypal-button-container" style="margin-top: 15px;"></div>
+      <div id="paypal-button-container"></div>
       <div id="message"></div>
     </div>
   </aside>
@@ -512,10 +490,8 @@
     const newCarousel = document.getElementById('newCarousel');
     const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
-    const paypalBtn = document.getElementById('paypalBtn');
-    const cardBtn = document.getElementById('cardBtn');
 
-    // === DETECCIÓN DE SESIÓN ===
+    // DETECCIÓN DE SESIÓN
     function updateAuthUI() {
       if (isLoggedIn) {
         welcomeMsg.textContent = `¡Hola, ${userName}!`;
@@ -535,7 +511,6 @@
         isLoggedIn = false;
         showToast('Sesión cerrada');
       } else {
-        // Simular login
         const name = prompt('Nombre de usuario:');
         if (name) {
           localStorage.setItem('loggedIn', 'true');
@@ -548,7 +523,7 @@
       updateAuthUI();
     };
 
-    // === DESPLEGABLES (ARREGLADO) ===
+    // DESPLEGABLES (PERFECTO AHORA)
     categoriesToggle.onclick = (e) => {
       e.stopPropagation();
       categoriesToggle.classList.toggle('open');
@@ -561,8 +536,7 @@
       contactDropdown.classList.toggle('open');
     };
 
-    // Cerrar desplegables al tocar fuera
-    menuSidebar.onclick = (e) => e.stopPropagation();
+    // Cerrar al tocar fuera
     menuOverlay.onclick = () => {
       menuOverlay.classList.remove('show');
       menuSidebar.classList.remove('open');
@@ -571,20 +545,9 @@
       contactToggle.classList.remove('open');
       contactDropdown.classList.remove('open');
     };
+    menuSidebar.onclick = (e) => e.stopPropagation();
 
-    // === BOTONES DE PAGO ===
-    paypalBtn.onclick = () => {
-      document.getElementById('paypal-button-container').style.display = 'block';
-      renderPayPalButton(getTotal());
-    };
-
-    cardBtn.onclick = () => {
-      alert('Redirigiendo a pago con tarjeta (Mercado Pago / Stripe simulado)');
-      // Aquí puedes poner tu link real de pago con tarjeta
-      window.location.href = 'https://www.mercadopago.com.mx/';
- dofinans    };
-
-    // === RENDER FUNCTIONS ===
+    // RENDER FUNCTIONS
     function renderProducts() {
       productsGrid.innerHTML = '';
       products.forEach(p => {
@@ -674,6 +637,7 @@
       });
 
       cartTotal.textContent = `Total: $${total.toLocaleString()}`;
+      renderPayPalButton(total);
     }
 
     function renderPayPalButton(amount) {
@@ -691,17 +655,25 @@
         },
         onApprove: function(data, actions) {
           return actions.order.capture().then(details => {
-            document.getElementById('message').innerHTML = `¡Pago exitoso con PayPal! Orden: ${details.id}`;
+            document.getElementById('message').innerHTML = `¡Pago exitoso! Orden: ${details.id}<br>Gracias, ${details.payer.name.given_name}`;
             document.getElementById('message').className = 'success';
             cart = [];
             localStorage.setItem('cart', '[]');
             updateCart();
           });
+        },
+        onCancel: () => {
+          document.getElementById('message').innerHTML = 'Pago cancelado.';
+          document.getElementById('message').className = 'cancel';
+        },
+        onError: (err) => {
+          document.getElementById('message').innerHTML = 'Error: ' + err;
+          document.getElementById('message').className = 'error';
         }
       }).render('#paypal-button-container');
     }
 
-    // EVENTOS GENERALES
+    // EVENTOS
     const openCart = () => {
       cartSidebar.classList.add('open');
       cartOverlay.classList.add('show');
