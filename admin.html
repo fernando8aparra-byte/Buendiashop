@@ -200,7 +200,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
   <script>
-    // === FIREBASE ===
+    // === FIREBASE CONFIG ===
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -231,28 +231,21 @@
       .then(html => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        const main = doc.querySelector('.main-container');
-        if (main) {
-          document.getElementById('indexClone').innerHTML = main.innerHTML;
-          initAdmin();
-        }
+        const main = doc.querySelector('.main-container') || doc.body;
+        document.getElementById('indexClone').innerHTML = main.innerHTML;
+        initAdmin();
       });
 
     function initAdmin() {
-      // === CARGAR PRODUCTOS POR TIPO ===
-      const containers = {
-        principal: document.querySelector('#indexClone .hero'),
-        carrusel: document.querySelector('#indexClone .carrusel'),
-        publicidad: document.querySelector('#indexClone .publicidad'),
-        normal: document.querySelector('#indexClone .products-grid')
-      };
-
+      // === CARGAR PRODUCTOS ===
+      const productsGrid = document.querySelector('#indexClone .products-grid') || document.createElement('div');
+      productsGrid.className = 'products-grid';
+      document.getElementById('indexClone').appendChild(productsGrid);
       db.collection('productos').get().then(snapshot => {
         snapshot.forEach(doc => {
           const p = doc.data();
-          if (!p.habilitado && p.tipo !== 'normal') return;
           const card = createProductCard(p, doc.id);
-          if (containers[p.tipo]) containers[p.tipo].appendChild(card);
+          productsGrid.appendChild(card);
         });
       });
 
@@ -269,7 +262,7 @@
             <h3 class="product-title">${p.nombre}</h3>
             <p class="product-description">${p.descripcion}</p>
             <div class="price-container">
-              <span class="product-price">${p.precioFormateado}</span>
+              <span class="product-price">${p.precioFormateado || `$${Number(p.precio || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}</span>
             </div>
             <label class="switch switch-small" style="margin-top:8px;">
               <input type="checkbox" ${p.habilitado ? 'checked' : ''} onchange="toggleProduct('${id}', this.checked)">
@@ -281,7 +274,7 @@
       }
 
       // === TEXTOS EDITABLES ===
-      const editableEls = document.querySelectorAll('#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag, #indexClone .hero-title, #indexClone .hero-subtitle');
+      const editableEls = document.querySelectorAll('#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag');
       editableEls.forEach(el => {
         el.classList.add('editable');
         const editBtn = document.createElement('div');
@@ -298,9 +291,10 @@
       });
 
       function getTextPath(el) {
-        if (el.closest('.hero') && el.tagName === 'H1') return 'noticias/principal/titulo';
-        if (el.closest('.hero') && el.tagName === 'P') return 'noticias/principal/texto';
-        if (el.closest('.lanzamientos')) return 'lanzamientos/texto/subtitulo';
+        // Personaliza según tu HTML
+        if (el.tagName === 'H1') return 'noticias/principal/titulo';
+        if (el.tagName === 'P') return 'noticias/principal/texto';
+        if (el.tagName === 'H2') return 'lanzamientos/texto/subtitulo';
         return null;
       }
 
@@ -310,10 +304,9 @@
           const [col, doc, field] = currentTextPath.split('/');
           try {
             await db.collection(col).doc(doc).update({ [field]: document.getElementById('editTextInput').value });
-            currentTextElement.innerHTML = document.getElementById('editTextInput').value + 
-              `<div class="text-edit" onclick="editText(this, '${currentTextPath}')">Edit</div>`;
+            currentTextElement.innerText = document.getElementById('editTextInput').value;
             document.getElementById('editTextModal').classList.remove('active');
-          } catch (e) { alert('Error'); }
+          } catch (e) { alert('Error al guardar texto'); }
         }
       };
 
@@ -343,10 +336,13 @@
         const preview = document.getElementById('imagePreview');
         preview.src = URL.createObjectURL(file);
         preview.style.display = 'block';
-        const ref = storage.ref(`productos/${Date.now()}_${file.name}`);
-        await ref.put(file);
-        const url = await ref.getDownloadURL();
-        document.getElementById('productImageUrl').value = url;
+        try {
+          const ref = storage.ref(`productos/${Date.now()}_${file.name}`);
+          await ref.put(file);
+          const url = await ref.getDownloadURL();
+          document.getElementById('productImageUrl').value = url;
+          preview.src = url; // Actualiza vista previa con URL final
+        } catch (err) { alert('Error al subir imagen'); }
       };
 
       // === EDITAR PRODUCTO ===
@@ -361,9 +357,10 @@
           document.getElementById('productDesc').value = p.descripcion;
           document.getElementById('productType').value = p.tipo;
           document.getElementById('productImageUrl').value = p.imagen;
+          const preview = document.getElementById('imagePreview');
           if (p.imagen) {
-            document.getElementById('imagePreview').src = p.imagen;
-            document.getElementById('imagePreview').style.display = 'block';
+            preview.src = p.imagen;
+            preview.style.display = 'block';
           }
           modal.classList.add('active');
         }
@@ -371,14 +368,16 @@
 
       // === GUARDAR PRODUCTO ===
       document.getElementById('saveProductBtn').onclick = async () => {
+        const precio = parseFloat(document.getElementById('productPrice').value);
+        const precioFormateado = `$${precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
         const data = {
           nombre: document.getElementById('productName').value.trim(),
-          precio: parseFloat(document.getElementById('productPrice').value),
+          precio: precio,
+          precioFormateado: precioFormateado,
           descripcion: document.getElementById('productDesc').value.trim(),
           tipo: document.getElementById('productType').value,
           imagen: document.getElementById('productImageUrl').value,
           habilitado: true,
-          precioFormateado: `$${parseFloat(document.getElementById('productPrice').value).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
           fecha: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -415,13 +414,13 @@
       // === MANTENIMIENTO ===
       const maintenanceToggle = document.getElementById('maintenanceToggle');
       const banner = document.getElementById('maintenanceBanner');
-      maintenanceToggle.checked = localStorage.getItem('maintenance') !== 'true';
+      maintenanceToggle.checked = localStorage.getItem('mantenimiento') !== 'true';
       maintenanceToggle.onchange = () => {
         const isOn = maintenanceToggle.checked;
-        localStorage.setItem('maintenance', !isOn);
+        localStorage.setItem('mantenimiento', !isOn);
         banner.classList.toggle('show', !isOn);
       };
-      if (localStorage.getItem('maintenance') === 'true') banner.classList.add('show');
+      if (localStorage.getItem('mantenimiento') === 'true') banner.classList.add('show');
 
       // === CERRAR SESIÓN ===
       document.getElementById('logoutBtn').onclick = () => {
