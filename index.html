@@ -6,12 +6,29 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + NUEVOS CAMBIOS */
+    /* ESTILOS ANTERIORES + FIJAR HEADER Y MENÚS ARRIBA */
+    body {
+      margin: 0;
+      padding: 0;
+      padding-top: 60px; /* espacio para el header fijo */
+    }
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
     .header-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
+      height: 60px;
+      padding: 0 15px;
+      box-sizing: border-box;
     }
     .header-left {
       display: flex;
@@ -37,15 +54,15 @@
       color: #000;
     }
 
-    /* BARRA DE BÚSQUEDA: solo visible al tocar la lupa */
+    /* BARRA DE BÚSQUEDA */
     .search-bar-header {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #fff; /* barra blanca */
-      display: none; /* oculto por defecto */
+      background: #fff;
+      display: none;
       align-items: center;
       padding: 0 20px;
       z-index: 20;
@@ -61,13 +78,56 @@
       padding: 10px 0;
     }
 
-    /* CARRITO DENTRO DE LA BARRA BLANCA (header) */
-    #cartBtn {
-      position: relative;
-      z-index: 10;
+    /* MENÚS ARRIBA (fijos cuando abiertos) */
+    .menu-sidebar {
+      position: fixed;
+      top: 60px; /* justo debajo del header */
+      left: 0;
+      width: 300px;
+      height: calc(100vh - 60px);
+      background: #fff;
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .menu-sidebar.open {
+      transform: translateX(0);
+    }
+    .menu-overlay {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background: rgba(0,0,0,0.5);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+    .menu-overlay.show {
+      opacity: 1;
+      visibility: visible;
     }
 
-    /* === X GRANDES (solo búsqueda y carrito) === */
+    /* CARRITO ARRIBA (fijo a la derecha) */
+    .cart-sidebar {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      width: 350px;
+      height: calc(100vh - 60px);
+      background: #fff;
+      z-index: 999;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    }
+    .cart-sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* X DE BÚSQUEDA Y CARRITO */
     #closeSearchHeader,
     #closeCart {
       position: absolute;
@@ -86,13 +146,7 @@
       z-index: 30;
     }
 
-    /* Posicionar los contenedores */
-    .menu-sidebar,
-    .cart-sidebar {
-      position: relative;
-    }
-
-    /* === X PEQUEÑAS del carrito (eliminar producto) === */
+    /* X PEQUEÑAS EN CARRITO */
     .cart-item {
       position: relative;
       padding-right: 40px;
@@ -114,44 +168,45 @@
       font-weight: bold;
     }
 
-    /* Cerrar búsqueda también al tocar fuera (overlay) */
+    /* Overlay para búsqueda */
     .header-overlay {
       display: none;
       position: fixed;
-      top: 0;
+      top: 60px;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: calc(100vh - 60px);
       background: rgba(0,0,0,0.3);
       z-index: 15;
     }
     .header-overlay.show {
       display: block;
     }
+
+    /* Asegurar que el contenido principal baje */
+    .main-container {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- OVERLAY PARA CERRAR BÚSQUEDA AL TOCAR FUERA -->
+  <!-- OVERLAY PARA BÚSQUEDA -->
   <div class="header-overlay" id="headerOverlay"></div>
 
-  <!-- HEADER -->
+  <!-- HEADER FIJO ARRIBA -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
-        <!-- HAMBURGUESA NEGRA A LA IZQUIERDA -->
         <button id="menuBtn" class="icon-btn" aria-label="Menú">
           <svg viewBox="0 0 24 24" width="28" height="28">
             <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-
-        <!-- TÍTULO -->
         <div class="logo">EFRAÍN</div>
       </div>
 
       <div class="header-right">
-        <!-- LUPA NEGRA -->
         <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
           <svg viewBox="0 0 24 24" width="26" height="26">
             <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -159,7 +214,6 @@
           </svg>
         </button>
 
-        <!-- CARRITO NEGRO (siempre visible en header) -->
         <button id="cartBtn" class="icon-btn" aria-label="Carrito">
           <svg viewBox="0 0 24 24" width="28" height="28">
             <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
@@ -169,7 +223,6 @@
         </button>
       </div>
 
-      <!-- BARRA DE BÚSQUEDA (aparece encima del header al tocar lupa) -->
       <div class="search-bar-header" id="searchBarHeader">
         <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
         <button id="closeSearchHeader" class="close-search-btn">✕</button>
@@ -177,7 +230,7 @@
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- MAIN (productos se muestran debajo del header fijo) -->
   <main class="main-container">
     <section class="hero-banner">
       <h1>Asegura tu Mystery Box</h1>
@@ -204,7 +257,7 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL (X ELIMINADA) -->
+  <!-- MENÚ LATERAL (sin X, abre desde arriba) -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
@@ -218,7 +271,7 @@
     <div class="menu-item">Contacto</div>
   </aside>
 
-  <!-- CARRITO LATERAL -->
+  <!-- CARRITO LATERAL (abre desde arriba a la derecha) -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -242,7 +295,6 @@
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
-    // JS ACTUALIZADO CON NUEVOS CIERRES
     const products = [
       { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
       { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
@@ -272,16 +324,133 @@
     const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
 
-    // === RENDER FUNCTIONS (igual) ===
-    function renderProducts() { /* ... igual ... */ }
-    function renderCarousel(container, filter) { /* ... igual ... */ }
-    function addToCart(id) { /* ... igual ... */ }
-    function removeFromCart(index) { /* ... igual ... */ }
-    function updateCart() { /* ... igual ... */ }
-    function renderPayPalButton(amount) { /* ... igual ... */ }
+    function renderProducts() {
+      productsGrid.innerHTML = '';
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" loading="lazy">
+          <div class="card-info">
+            <h3>${p.name}</h3>
+            <p class="desc">${p.desc}</p>
+            <div class="price-container">
+              ${p.oldPrice ? `<span class="old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
+              <span class="price ${p.oldPrice ? 'offer-price' : ''}">$${p.price.toLocaleString()}</span>
+            </div>
+            <button class="add-btn" onclick="addToCart(${p.id})">Agregar</button>
+          </div>
+        `;
+        productsGrid.appendChild(card);
+      });
+    }
 
-    // === EVENTOS ACTUALIZADOS ===
-    // Menú: quitada la X → solo se cierra con overlay
+    function renderCarousel(container, filter) {
+      container.innerHTML = '';
+      const filtered = products.filter(filter);
+      filtered.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'carousel-item';
+        item.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" loading="lazy">
+          <div class="item-info">
+            <h4>${p.name}</h4>
+            <p>$${p.price.toLocaleString()}</p>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      container.innerHTML += container.innerHTML;
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.qty++;
+      else cart.push({ ...product, qty: 1 });
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      showToast('¡Agregado al carrito!');
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function updateCart() {
+      cartItems.innerHTML = '';
+      let total = 0;
+      const badge = cart.reduce((sum, i) => sum + i.qty, 0);
+      cartBadge.style.display = badge > 0 ? 'flex' : 'none';
+      cartBadge.textContent = badge;
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+        document.querySelector('.go-to-pay').style.display = 'none';
+        document.getElementById('paypal-button-container').innerHTML = '';
+        return;
+      }
+
+      document.querySelector('.go-to-pay').style.display = 'block';
+
+      cart.forEach((item, i) => {
+        total += item.price * item.qty;
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${item.img}" alt="${item.name}" class="thumb">
+          <div>
+            <div>${item.name}</div>
+            <small>x${item.qty} • $${(item.price * item.qty).toLocaleString()}</small>
+          </div>
+          <button onclick="removeFromCart(${i})">X</button>
+        `;
+        cartItems.appendChild(div);
+      });
+
+      cartTotal.textContent = `Total: $${total.toLocaleString()}`;
+      renderPayPalButton(total);
+    }
+
+    function renderPayPalButton(amount) {
+      const container = document.getElementById('paypal-button-container');
+      container.innerHTML = '';
+
+      paypal.Buttons({
+        createOrder: function() {
+          return actions.order.create({
+            purchase_units: [{
+              amount: { value: (amount / 100).toFixed(2) }
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(details => {
+            document.getElementById('message').innerHTML = `
+              ¡Pago exitoso! Orden: ${details.id}<br>
+              Gracias, ${details.payer.name.given_name}
+            `;
+            document.getElementById('message').className = 'success';
+            cart = [];
+            localStorage.setItem('cart', '[]');
+            updateCart();
+            cartSidebar.classList.remove('open');
+          });
+        },
+        onCancel: () => {
+          document.getElementById('message').innerHTML = 'Pago cancelado.';
+          document.getElementById('message').className = 'cancel';
+        },
+        onError: (err) => {
+          document.getElementById('message').innerHTML = 'Error: ' + err;
+          document.getElementById('message').className = 'error';
+        }
+      }).render('#paypal-button-container');
+    }
+
+    // EVENTOS
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
@@ -291,7 +460,6 @@
       menuSidebar.classList.remove('open'); 
     };
 
-    // Búsqueda: solo visible al tocar lupa, cierra con X o tocar fuera
     searchBtn.onclick = () => {
       searchBarHeader.classList.add('active');
       headerOverlay.classList.add('show');
@@ -304,7 +472,6 @@
     closeSearchHeader.onclick = closeSearch;
     headerOverlay.onclick = closeSearch;
 
-    // Carrito
     cartBtn.onclick = () => cartSidebar.classList.add('open');
     closeCart.onclick = () => cartSidebar.classList.remove('open');
 
