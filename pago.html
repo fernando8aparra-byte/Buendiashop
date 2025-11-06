@@ -6,58 +6,9 @@
   <title>Pago - Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    body { margin: 0; padding: 0; padding-top: 60px; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .icon-btn { color: #000 !important; background: none; }
-    .icon-btn svg { stroke: #000; fill: none; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-
-    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
-    .search-bar-header.active { display: flex; }
-    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
-
-    .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
-    .menu-sidebar.open { transform: translateX(0); }
-    .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .menu-overlay.show { opacity: 1; visibility: visible; }
-
-    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
-    .menu-item::after { display: none; }
-    .dropdown-toggle::after, .contact-toggle::after { content: '▼'; font-size: 0.8rem; transition: transform 0.3s ease; }
-    .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
-
-    .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
-    .submenu.open, .contact-dropdown.open { max-height: 500px; padding: 20px; }
-    .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
-
-    .menu-item.login-btn { background: #000; color: #fff; text-align: center; padding: 15px 20px; margin: 20px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .menu-item.logout-btn { background: #ff0000; color: #fff; }
-
-    .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
-    .social-links { display: flex; gap: 20px; justify-content: center; }
-    .social-links img { width: 40px; height: 40px; }
-
-    .cart-sidebar { position: fixed; top: 60px; right: 0; width: 350px; height: calc(100vh - 60px); background: #fff; z-index: 1000; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-    .cart-sidebar.open { transform: translateX(0); }
-    .cart-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .cart-overlay.show { opacity: 1; visibility: visible; }
-    .cart-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
-    .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
-    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
-
-    #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
-
-    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; }
-    .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-
-    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
-    .header-overlay.show { display: block; }
-
-    .main-container { padding: 20px; max-width: 800px; margin: 0 auto; }
-
+    body { margin: 0; padding: 0; background: #f8f8f8; font-family: 'Poppins', sans-serif; }
+    .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+    .header { background: #000; color: #fff; padding: 15px 20px; text-align: center; font-weight: 800; font-size: 1.4rem; text-transform: uppercase; }
     .form-section { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
     .form-section h3 { margin-top: 0; font-size: 1.4rem; text-transform: uppercase; }
 
@@ -66,204 +17,143 @@
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.95rem; }
     .form-group input, .form-group select { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 1rem; }
 
-    .btn-primary { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-    .btn-edit { background: #f0f0f0; color: #000; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; }
+    .btn-primary { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; font-size: 1.1rem; }
+    .btn-edit { background: #f0f0f0; color: #000; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; float: right; }
 
     .order-summary { background: #f8f8f8; padding: 20px; border-radius: 12px; }
     .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
     .order-total { font-weight: 800; font-size: 1.4rem; margin-top: 15px; text-align: right; }
 
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
+    .login-required { text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .login-required h2 { margin-bottom: 15px; }
+    .login-required p { color: #666; margin-bottom: 20px; }
+
+    .paypal-container { margin: 20px 0; text-align: center; }
+    .paypal-container p { margin-bottom: 15px; font-weight: 600; }
+
+    .footer { padding: 30px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; margin-top: 40px; }
     .footer a { color: #fff; text-decoration: underline; }
   </style>
 </head>
 <body>
 
-  <!-- OVERLAYS -->
-  <div class="header-overlay" id="headerOverlay"></div>
-  <div class="cart-overlay" id="cartOverlay"></div>
+  <!-- HEADER SIMPLE -->
+  <div class="header">EFRAÍN SHOP - PAGO SEGURO</div>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <button id="menuBtn" class="icon-btn" aria-label="Menú">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="logo">EFRAÍN</div>
-      </div>
+  <div class="container">
 
-      <div class="header-right">
-        <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
-          <svg viewBox="0 0 24 24" width="26" height="26">
-            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
-            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-
-        <button id="cartBtn" class="icon-btn" aria-label="Carrito">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="cartBadge"></span>
-        </button>
-      </div>
-
-      <div class="search-bar-header" id="searchBarHeader">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
-        <button id="closeSearchHeader" class="close-search-btn">x</button>
-      </div>
+    <!-- SI NO ESTÁ LOGUEADO -->
+    <div id="loginRequired" class="login-required" style="display:none;">
+      <h2>Debes iniciar sesión</h2>
+      <p>Para continuar con tu compra, necesitas estar registrado.</p>
+      <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
-  </header>
 
-  <!-- CONTENIDO -->
-  <main class="main-container">
-    <h1 style="text-align:center; margin:20px 0;">Finalizar Compra</h1>
+    <!-- FORMULARIO DE ENVÍO (DESPLEGADO DESDE EL INICIO) -->
+    <div id="paymentSection" style="display:none;">
 
-    <!-- DIRECCIÓN DE ENVÍO -->
-    <div class="form-section">
-      <h3>Dirección de Envío</h3>
-      <button class="btn-edit" id="editAddressBtn" style="float:right;">Editar</button>
-      <div id="addressDisplay">
-        <p><strong>Nombre:</strong> <span id="dispName">-</span></p>
-        <p><strong>Teléfono:</strong> <span id="dispPhone">-</span></p>
-        <p><strong>Dirección:</strong> <span id="dispAddress">-</span></p>
-        <p><strong>Estado:</strong> <span id="dispState">-</span></p>
-      </div>
+      <div class="form-section">
+        <h3>Dirección de Envío</h3>
+        <button class="btn-edit" id="editAddressBtn">Editar</button>
 
-      <form id="addressForm" style="display:none;">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Estado</label>
-            <select id="state" required>
-              <option value="">Seleccionar estado</option>
-              <option>Aguascalientes</option>
-              <option>Baja California</option>
-              <option>Baja California Sur</option>
-              <option>Campeche</option>
-              <option>Chiapas</option>
-              <option>Chihuahua</option>
-              <option>CDMX</option>
-              <option>Coahuila</option>
-              <option>Colima</option>
-              <option>Durango</option>
-              <option>Guanajuato</option>
-              <option>Guerrero</option>
-              <option>Hidalgo</option>
-              <option>Jalisco</option>
-              <option>México</option>
-              <option>Michoacán</option>
-              <option>Morelos</option>
-              <option>Nayarit</option>
-              <option>Nuevo León</option>
-              <option>Oaxaca</option>
-              <option>Puebla</option>
-              <option>Querétaro</option>
-              <option>Quintana Roo</option>
-              <option>San Luis Potosí</option>
-              <option>Sinaloa</option>
-              <option>Sonora</option>
-              <option>Tabasco</option>
-              <option>Tamaulipas</option>
-              <option>Tlaxcala</option>
-              <option>Veracruz</option>
-              <option>Yucatán</option>
-              <option>Zacatecas</option>
-            </select>
-          </div>
+        <div id="addressDisplay">
+          <p><strong>Nombre:</strong> <span id="dispName">-</span></p>
+          <p><strong>Teléfono:</strong> <span id="dispPhone">-</span></p>
+          <p><strong>Dirección:</strong> <span id="dispAddress">-</span></p>
+          <p><strong>Estado:</strong> <span id="dispState">-</span></p>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Calle y Número</label>
-            <input type="text" id="street" placeholder="Ej. Av. Principal 123" required>
-          </div>
-          <div class="form-group">
-            <label>Colonia</label>
-            <input type="text" id="colonia" placeholder="Ej. Centro" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Código Postal</label>
-            <input type="text" id="cp" placeholder="5 dígitos" maxlength="5" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre Completo (quien recibe)</label>
-            <input type="text" id="receiverName" placeholder="Ej. Juan Pérez" required>
-          </div>
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input type="text" id="phone" placeholder="10 dígitos" maxlength="10" required>
-          </div>
-        </div>
-        <button type="submit" class="btn-primary">Guardar Dirección</button>
-      </form>
-    </div>
 
-    <!-- RESUMEN DE PEDIDO -->
-    <div class="form-section order-summary">
-      <h3>Resumen del Pedido</h3>
-      <div id="orderItems"></div>
-      <div class="order-total" id="orderTotal">Total: $0</div>
-    </div>
+        <form id="addressForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Estado</label>
+              <select id="state" required>
+                <option value="">Seleccionar estado</option>
+                <option>Aguascalientes</option>
+                <option>Baja California</option>
+                <option>Baja California Sur</option>
+                <option>Campeche</option>
+                <option>Chiapas</option>
+                <option>Chihuahua</option>
+                <option>CDMX</option>
+                <option>Coahuila</option>
+                <option>Colima</option>
+                <option>Durango</option>
+                <option>Guanajuato</option>
+                <option>Guerrero</option>
+                <option>Hidalgo</option>
+                <option>Jalisco</option>
+                <option>México</option>
+                <option>Michoacán</option>
+                <option>Morelos</option>
+                <option>Nayarit</option>
+                <option>Nuevo León</option>
+                <option>Oaxaca</option>
+                <option>Puebla</option>
+                <option>Querétaro</option>
+                <option>Quintana Roo</option>
+                <option>San Luis Potosí</option>
+                <option>Sinaloa</option>
+                <option>Sonora</option>
+                <option>Tabasco</option>
+                <option>Tamaulipas</option>
+                <option>Tlaxcala</option>
+                <option>Veracruz</option>
+                <option>Yucatán</option>
+                <option>Zacatecas</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Calle y Número</label>
+              <input type="text" id="street" placeholder="Ej. Av. Principal 123" required>
+            </div>
+            <div class="form-group">
+              <label>Colonia</label>
+              <input type="text" id="colonia" placeholder="Ej. Centro" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Código Postal</label>
+              <input type="text" id="cp" placeholder="5 dígitos" maxlength="5" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre Completo (quien recibe)</label>
+              <input type="text" id="receiverName" placeholder="Ej. Juan Pérez" required>
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="text" id="phone" placeholder="10 dígitos" maxlength="10" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Guardar y Continuar</button>
+        </form>
+      </div>
 
-    <!-- BOTÓN DE PAGO -->
-    <div style="text-align:center;">
-      <button class="btn-primary" id="proceedToPay">Proceder al Pago con PayPal</button>
-    </div>
-  </main>
+      <!-- RESUMEN DE PEDIDO -->
+      <div class="form-section order-summary">
+        <h3>Resumen del Pedido</h3>
+        <div id="orderItems"></div>
+        <div class="order-total" id="orderTotal">Total: $0</div>
+      </div>
 
-  <!-- MENÚ LATERAL -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item welcome" id="welcomeMsg"></div>
-    <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
-    <div class="submenu" id="categoriesSubmenu">
-      <div class="submenu-item">Gorras</div>
-      <div class="submenu-item">Camisetas</div>
-      <div class="submenu-item">Pantalones</div>
-      <div class="submenu-item">Cintos</div>
-      <div class="submenu-item">Tenis</div>
-      <div class="submenu-item">Perfumes</div>
-      <div class="submenu-item">Sudaderas</div>
-    </div>
-    <div class="menu-item ofertas-btn">Ofertas</div>
-    <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
-    <div class="contact-dropdown" id="contactDropdown">
-      <p class="contact-text">No te quedes sin tu Mystery Box</p>
-      <div class="social-links">
-        <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
-        <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
-        <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
+      <!-- MÉTODOS DE PAGO -->
+      <div class="form-section">
+        <h3>Método de Pago</h3>
+        <div class="paypal-container">
+          <p>Paga de forma segura con PayPal</p>
+          <div id="paypal-button-container"></div>
+        </div>
+        <p style="text-align:center; margin-top:20px; color:#666; font-size:0.9rem;">
+          También aceptamos: <strong>Tarjeta de Crédito / Débito</strong> (a través de PayPal)
+        </p>
       </div>
     </div>
-    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
-  </aside>
-
-  <!-- CARRITO -->
-  <aside class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button class="menu-close-x" id="closeCart">x</button>
-    </div>
-    <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Tu carrito está vacío</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
-      <div id="message"></div>
-    </div>
-  </aside>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+  </div>
 
   <!-- PIE DE PÁGINA -->
   <footer class="footer">
@@ -271,45 +161,64 @@
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
-  <!-- PAYPAL SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
+  <!-- PAYPAL SDK (SANDBOX) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AW4TEmQjpm3qc6RrXVegfR9ni1wCPm59KC2s42nJb4npPz-tj3eVcxa9Wd59We8Vb-GAeu5Y67xeUHZL&currency=MXN&intent=capture"></script>
 
-  <!-- SCRIPT -->
+  <!-- SCRIPT PRINCIPAL -->
   <script>
-    // === CARRITO Y PRODUCTOS ===
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
     const cart = JSON.parse(localStorage.getItem('pendingPayment') || '[]');
-    const toast = document.getElementById('toast');
-    const orderItems = document.getElementById('orderItems');
-    const orderTotal = document.getElementById('orderTotal');
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;z-index:9999;opacity:0;transition:all 0.3s;';
+    document.body.appendChild(toast);
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.style.opacity = '1';
+      setTimeout(() => toast.style.opacity = '0', 3000);
+    }
+
+    // Verificar login
+    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+    const loginRequired = document.getElementById('loginRequired');
+    const paymentSection = document.getElementById('paymentSection');
+    const goToLogin = document.getElementById('goToLogin');
+
+    if (!isLoggedIn) {
+      loginRequired.style.display = 'block';
+      paymentSection.style.display = 'none';
+      localStorage.setItem('redirectAfterLogin', 'pago.html');
+      goToLogin.onclick = () => window.location.href = 'login.html';
+    } else {
+      loginRequired.style.display = 'none';
+      paymentSection.style.display = 'block';
+    }
+
+    // Cargar dirección
+    const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
     const addressForm = document.getElementById('addressForm');
     const addressDisplay = document.getElementById('addressDisplay');
     const editAddressBtn = document.getElementById('editAddressBtn');
 
-    // Cargar dirección guardada
-    const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
     if (savedAddress) {
       document.getElementById('dispName').textContent = savedAddress.name;
       document.getElementById('dispPhone').textContent = savedAddress.phone;
       document.getElementById('dispAddress').textContent = `${savedAddress.street}, ${savedAddress.colonia}, C.P. ${savedAddress.cp}`;
       document.getElementById('dispState').textContent = savedAddress.state;
+      addressForm.style.display = 'none';
+      addressDisplay.style.display = 'block';
+      editAddressBtn.style.display = 'block';
+    } else {
+      addressForm.style.display = 'block';
+      addressDisplay.style.display = 'none';
+      editAddressBtn.style.display = 'none';
     }
 
-    // Mostrar resumen
-    function renderOrder() {
-      orderItems.innerHTML = '';
-      let total = 0;
-      cart.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'order-item';
-        div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString()}</span>`;
-        orderItems.appendChild(div);
-        total += item.price * item.qty;
-      });
-      orderTotal.textContent = `Total: $${total.toLocaleString()}`;
-    }
+    editAddressBtn.onclick = () => {
+      addressForm.style.display = 'block';
+      addressDisplay.style.display = 'none';
+      editAddressBtn.style.display = 'none';
+    };
 
-    // Guardar dirección
     addressForm.onsubmit = (e) => {
       e.preventDefault();
       const address = {
@@ -324,135 +233,55 @@
       location.reload();
     };
 
-    editAddressBtn.onclick = () => {
-      addressDisplay.style.display = 'none';
-      addressForm.style.display = 'block';
-      editAddressBtn.style.display = 'none';
-    };
+    // Resumen del pedido
+    const orderItems = document.getElementById('orderItems');
+    const orderTotal = document.getElementById('orderTotal');
+    let total = 0;
 
-    // Pago con PayPal
-    document.getElementById('proceedToPay').onclick = () => {
-      if (!savedAddress) {
-        showToast('Completa tu dirección de envío');
-        return;
-      }
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-      if (total <= 0) return;
+    cart.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'order-item';
+      div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString()}</span>`;
+      orderItems.appendChild(div);
+      total += item.price * item.qty;
+    });
+    orderTotal.textContent = `Total: $${total.toLocaleString()}`;
 
+    // PayPal Button (original con logo)
+    if (total > 0 && savedAddress) {
       paypal.Buttons({
+        style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'paypal'
+        },
         createOrder: (data, actions) => {
           return actions.order.create({
             purchase_units: [{
               amount: { value: (total / 100).toFixed(2), currency_code: 'MXN' },
-              description: 'Compra en Efraín Shop',
-              custom_id: JSON.stringify({ cart, address: savedAddress })
+              description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
+              custom_id: JSON.stringify({ cart, address: savedAddress, user: localStorage.getItem('userName') })
             }]
           });
         },
         onApprove: (data, actions) => {
           return actions.order.capture().then(details => {
-            // Enviar a admin (simulado)
-            console.log('PEDIDO PARA ADMIN:', { cart, address: savedAddress, total, orderId: details.id });
+            console.log('PEDIDO PARA ADMIN:', { cart, address: savedAddress, total, orderId: details.id, user: details.payer });
             alert(`¡Pago exitoso! Orden: ${details.id}`);
             localStorage.removeItem('pendingPayment');
             localStorage.removeItem('cart');
             window.location.href = 'index.html';
           });
+        },
+        onError: (err) => {
+          console.error(err);
+          showToast('Error en el pago. Intenta de nuevo.');
         }
-      }).render('body');
-    };
-
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      }).render('#paypal-button-container');
+    } else if (total === 0) {
+      document.querySelector('.paypal-container').innerHTML = '<p style="color:#999;">No hay productos en el carrito.</p>';
     }
-
-    renderOrder();
-
-    // === MENÚ Y CARRITO (mismo que index) ===
-    const menuBtn = document.getElementById('menuBtn');
-    const menuOverlay = document.getElementById('menuOverlay');
-    const menuSidebar = document.getElementById('menuSidebar');
-    const categoriesToggle = document.getElementById('categoriesToggle');
-    const categoriesSubmenu = document.getElementById('categoriesSubmenu');
-    const contactToggle = document.getElementById('contactToggle');
-    const contactDropdown = document.getElementById('contactDropdown');
-    const authBtn = document.getElementById('authBtn');
-    const welcomeMsg = document.getElementById('welcomeMsg');
-    const helpBtn = document.getElementById('helpBtn');
-    const cartBtn = document.getElementById('cartBtn');
-    const cartSidebar = document.getElementById('cartSidebar');
-    const closeCart = document.getElementById('closeCart');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartBadge = document.getElementById('cartBadge');
-
-    let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-    let userName = localStorage.getItem('userName') || '';
-
-    function updateAuthUI() {
-      if (isLoggedIn && userName) {
-        welcomeMsg.textContent = `¡Hola, ${userName}!`;
-        authBtn.textContent = 'Cerrar sesión';
-        authBtn.classList.add('logout-btn');
-      } else {
-        welcomeMsg.textContent = '';
-        authBtn.textContent = 'Inicia sesión o regístrate';
-        authBtn.classList.remove('logout-btn');
-      }
-    }
-
-    authBtn.onclick = () => {
-      if (isLoggedIn) {
-        localStorage.removeItem('loggedIn');
-        localStorage.removeItem('userName');
-        isLoggedIn = false;
-        showToast('Sesión cerrada');
-        updateAuthUI();
-      } else {
-        window.location.href = 'login.html';
-      }
-    };
-
-    helpBtn.onclick = () => {
-      alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
-    };
-
-    menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); updateAuthUI(); };
-    menuOverlay.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
-    categoriesToggle.onclick = (e) => { e.stopPropagation(); categoriesToggle.classList.toggle('open'); categoriesSubmenu.classList.toggle('open'); };
-    contactToggle.onclick = (e) => { e.stopPropagation(); contactToggle.classList.toggle('open'); contactDropdown.classList.toggle('open'); };
-
-    cartBtn.onclick = () => { cartSidebar.classList.add('open'); cartOverlay.classList.add('show'); updateCart(); };
-    closeCart.onclick = () => { cartSidebar.classList.remove('open'); cartOverlay.classList.remove('show'); };
-    cartOverlay.onclick = () => { cartSidebar.classList.remove('open'); cartOverlay.classList.remove('show'); };
-
-    function updateCart() {
-      const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-      const qty = cart.reduce((s, i) => s + i.qty, 0);
-      cartBadge.textContent = qty;
-      cartBadge.style.display = qty > 0 ? 'flex' : 'none';
-      cartTotal.textContent = `Total: $${total.toLocaleString()}`;
-      cartItems.innerHTML = cart.length === 0 ? '<p class="empty-cart">Vacío</p>' : '';
-      cart.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `<div>${item.name} x${item.qty}</div><small>$${(item.price * item.qty).toLocaleString()}</small><button onclick="remove(${i})">X</button>`;
-        cartItems.appendChild(div);
-      });
-    }
-
-    window.remove = (i) => {
-      cart.splice(i, 1);
-      localStorage.setItem('pendingPayment', JSON.stringify(cart));
-      updateCart();
-      renderOrder();
-    };
-
-    updateCart();
-    updateAuthUI();
   </script>
 </body>
 </html>
