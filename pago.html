@@ -33,6 +33,48 @@
 
     .footer { padding: 30px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; margin-top: 40px; }
     .footer a { color: #fff; text-decoration: underline; }
+
+    /* NUEVO: PANTALLA DE ÉXITO */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    .success-screen h2 {
+      color: #28a745;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+    .success-screen .order-id {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 25px;
+    }
+    .success-items {
+      text-align: left;
+      background: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .success-items .item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .success-items .item:last-child { border-bottom: none; }
+    .success-total {
+      font-weight: 800;
+      font-size: 1.3rem;
+      text-align: right;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
@@ -153,6 +195,15 @@
         </p>
       </div>
     </div>
+
+    <!-- NUEVO: PANTALLA DE ÉXITO -->
+    <div id="successScreen" class="success-screen">
+      <h2>Pago realizado con éxito</h2>
+      <p class="order-id">Tu orden: <strong id="successOrderId"></strong></p>
+      <div class="success-items" id="successItems"></div>
+      <div class="success-total" id="successTotal"></div>
+      <button class="btn-primary" id="goHomeBtn">Ir al Inicio</button>
+    </div>
   </div>
 
   <!-- PIE DE PÁGINA -->
@@ -198,6 +249,7 @@
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     const loginRequired = document.getElementById('loginRequired');
     const paymentSection = document.getElementById('paymentSection');
+    const successScreen = document.getElementById('successScreen');
     const goToLogin = document.getElementById('goToLogin');
 
     if (!isLoggedIn) {
@@ -288,38 +340,7 @@
 
             // === MAPEO DE CÓDIGOS DE ESTADO ===
             const stateCodes = {
-              "Aguascalientes": "AGS",
-              "Baja California": "BC",
-              "Baja California Sur": "BCS",
-              "Campeche": "CAM",
-              "Chiapas": "CHIS",
-              "Chihuahua": "CHIH",
-              "CDMX": "CDMX",
-              "Coahuila": "COAH",
-              "Colima": "COL",
-              "Durango": "DGO",
-              "Guanajuato": "GTO",
-              "Guerrero": "GRO",
-              "Hidalgo": "HGO",
-              "Jalisco": "JAL",
-              "México": "MEX",
-              "Michoacán": "MICH",
-              "Morelos": "MOR",
-              "Nayarit": "NAY",
-              "Nuevo León": "NL",
-              "Oaxaca": "OAX",
-              "Puebla": "PUE",
-              "Querétaro": "QRO",
-              "Quintana Roo": "QROO",
-              "San Luis Potosí": "SLP",
-              "Sinaloa": "SIN",
-              "Sonora": "SON",
-              "Tabasco": "TAB",
-              "Tamaulipas": "TAM",
-              "Tlaxcala": "TLAX",
-              "Veracruz": "VER",
-              "Yucatán": "YUC",
-              "Zacatecas": "ZAC"
+              "Aguascalientes": "AGS","Baja California": "BC","Baja California Sur": "BCS","Campeche": "CAM","Chiapas": "CHIS","Chihuahua": "CHIH","CDMX": "CDMX","Coahuila": "COAH","Colima": "COL","Durango": "DGO","Guanajuato": "GTO","Guerrero": "GRO","Hidalgo": "HGO","Jalisco": "JAL","México": "MEX","Michoacán": "MICH","Morelos": "MOR","Nayarit": "NAY","Nuevo León": "NL","Oaxaca": "OAX","Puebla": "PUE","Querétaro": "QRO","Quintana Roo": "QROO","San Luis Potosí": "SLP","Sinaloa": "SIN","Sonora": "SON","Tabasco": "TAB","Tamaulipas": "TAM","Tlaxcala": "TLAX","Veracruz": "VER","Yucatán": "YUC","Zacatecas": "ZAC"
             };
 
             // === FORMATEAR Y ENVIAR A FIRESTORE ===
@@ -345,22 +366,38 @@
               }))
             };
 
-            // Guardar en colección "orders"
             db.collection('orders').doc(details.id).set(orderData)
               .then(() => {
                 console.log('Orden guardada en Firebase con ID:', details.id);
-                showToast('Pago exitoso y orden guardada');
               })
               .catch((error) => {
                 console.error('Error al guardar en Firebase:', error);
-                showToast('Pago exitoso, pero error al guardar. Contacta soporte.');
               });
 
-            alert(`¡Pago exitoso! Orden: ${details.id}`);
-            localStorage.removeItem('pendingPayment');
-            localStorage.removeItem('cart');
-            localStorage.removeItem('shippingAddress');
-            window.location.href = 'index.html';
+            // === MOSTRAR PANTALLA DE ÉXITO ===
+            paymentSection.style.display = 'none';
+            successScreen.style.display = 'block';
+
+            document.getElementById('successOrderId').textContent = details.id;
+
+            const successItems = document.getElementById('successItems');
+            successItems.innerHTML = '';
+            let successTotal = 0;
+            cart.forEach(item => {
+              const div = document.createElement('div');
+              div.className = 'item';
+              div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString()}</span>`;
+              successItems.appendChild(div);
+              successTotal += item.price * item.qty;
+            });
+            document.getElementById('successTotal').textContent = `Total: $${successTotal.toLocaleString()}`;
+
+            document.getElementById('goHomeBtn').onclick = () => {
+              localStorage.removeItem('pendingPayment');
+              localStorage.removeItem('cart');
+              localStorage.removeItem('shippingAddress');
+              window.location.href = 'index.html';
+            };
           });
         },
         onError: (err) => {
