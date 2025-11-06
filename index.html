@@ -312,7 +312,7 @@
 
     .main-container {
       margin-top: 20px;
-    }
+(nodes }
   </style>
 </head>
 <body>
@@ -391,15 +391,12 @@
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome" id="welcomeMsg"></div>
     
-    <!-- PRODUCTOS DESPLEGABLE -->
+    <!-- PRODUCTOS DESPLEGABLE (AHORA CON SOLO LAS CATEGORÍAS QUE PEDISTE) -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
     <div class="submenu" id="categoriesSubmenu">
-      <div class="submenu-item">Bótense de gorras</div>
+      <div class="submenu-item">Gorras</div>
       <div class="submenu-item">Camisetas</div>
       <div class="submenu-item">Pantalones</div>
-      <div class="submenu-item">Cintos</div>
-      <div class="submenu-item">Tenis</div>
-      <div class="submenu-item">Sudadera</div>
       <div class="submenu-item">Perfumes</div>
     </div>
     
@@ -536,7 +533,7 @@
     closeSearchHeader.onclick = closeSearch;
     headerOverlay.onclick = closeSearch;
 
-    // === TOAST (del script.js también, pero por si acaso) ===
+    // === TOAST ===
     function showToast(msg) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
