@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -72,9 +71,12 @@
     .search-results h3 { margin-top: 0; }
     .no-results { color: #666; font-style: italic; }
 
-    /* BOTÓN LOGIN EN CARRITO */
-    .login-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+    /* BOTÓN IR A PAGO */
     .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+    /* PIE DE PÁGINA */
+    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
+    .footer a { color: #fff; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -174,11 +176,13 @@
     <div class="contact-dropdown" id="contactDropdown">
       <p class="contact-text">No te quedes sin tu Mystery Box</p>
       <div class="social-links">
-        <a href="#"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
-        <a href="#"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
-        <a href="#"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
+        <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
+        <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
+        <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
       </div>
     </div>
+
+    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
@@ -194,15 +198,19 @@
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div id="loginToPay" class="login-to-pay" style="display:none;">Inicia sesión o regístrate para pagar</div>
-      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pagar</div>
-      <div id="paypal-button-container" style="display:none;"></div>
+      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
       <div id="message"></div>
     </div>
   </aside>
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+    <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
+    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
+  </footer>
 
   <!-- FIREBASE SDK -->
   <script type="module">
@@ -222,7 +230,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // === BÚSQUEDA ===
+    // === BÚSQUEDA MEJORADA ===
     const searchInput = document.getElementById('searchInput');
     const searchResultsContainer = document.getElementById('searchResultsContainer');
     const searchResults = document.getElementById('searchResults');
@@ -258,11 +266,15 @@
             div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
             div.style.padding = '10px 0';
             div.style.borderBottom = '1px solid #eee';
+            div.style.cursor = 'pointer';
+            div.addEventListener('click', () => {
+              window.location.href = `product.html?id=${doc.id}`;
+            });
             searchResults.appendChild(div);
           });
         }
         searchResultsContainer.style.display = 'block';
-      }, 500);
+      }, 300);
     });
 
     // Cerrar resultados al hacer clic fuera
@@ -271,28 +283,7 @@
         searchResultsContainer.style.display = 'none';
       }
     });
-
-    // === CARRITO Y PAGO ===
-    const loginToPay = document.getElementById('loginToPay');
-    const goToPay = document.getElementById('goToPay');
-    const paypalContainer = document.getElementById('paypal-button-container');
-
-    function updateCartFooter() {
-      const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-      loginToPay.style.display = isLoggedIn ? 'none' : 'block';
-      goToPay.style.display = isLoggedIn ? 'block' : 'none';
-      paypalContainer.style.display = isLoggedIn ? 'block' : 'none';
-    }
-
-    loginToPay.onclick = () => window.location.href = 'login.html';
-    updateCartFooter();
-
-    // Observar cambios en localStorage
-    window.addEventListener('storage', updateCartFooter);
   </script>
-
-  <!-- PAYPAL SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <!-- TU SCRIPT EXTERNO -->
   <script src="js/script.js"></script>
@@ -312,6 +303,7 @@
     const searchBarHeader = document.getElementById('searchBarHeader');
     const closeSearchHeader = document.getElementById('closeSearchHeader');
     const headerOverlay = document.getElementById('headerOverlay');
+    const helpBtn = document.getElementById('helpBtn');
 
     let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     let userName = localStorage.getItem('userName') || '';
@@ -337,10 +329,13 @@
         userName = '';
         showToast('Sesión cerrada');
         updateAuthUI();
-        updateCartFooter();
       } else {
         window.location.href = 'login.html';
       }
+    };
+
+    helpBtn.onclick = () => {
+      alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
     };
 
     categoriesToggle.onclick = (e) => { e.stopPropagation(); categoriesToggle.classList.toggle('open'); categoriesSubmenu.classList.toggle('open'); };
