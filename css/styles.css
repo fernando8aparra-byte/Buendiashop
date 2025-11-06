@@ -1,5 +1,5 @@
 /* =============================================
-   FUENTE: POPPINS (EXACTA DE DROP-SHOP.MX)
+   ESTILO CLON EXACTO DE DROP-SHOP.MX
    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
@@ -21,50 +21,23 @@ html, body {
 }
 
 /* =============================================
-   TIPOGRAFÍA EXACTA (VALORES COMPUTADOS)
+   TIPOGRAFÍA EXACTA
    ============================================= */
-/* Body */
-body {
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.6;
-  letter-spacing: 0.025em;
-  text-transform: none;
-}
-
-/* H1 - Hero y títulos principales */
-h1 {
+h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
-  font-size: 3.75rem; /* 60px */
-  line-height: 1.1;
-  letter-spacing: -0.025em;
   text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
 }
 
-/* H2 - Secciones (Nuevos, Estrella) */
-h2 {
-  font-weight: 700;
-  font-size: 2.25rem; /* 36px */
-  line-height: 1.2;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 32px;
-}
+h1 { font-size: 3.75rem; line-height: 1.1; letter-spacing: -0.025em; }
+h2 { font-size: 2.25rem; line-height: 1.2; letter-spacing: 0.05em; }
+h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 
-/* H3 - Subtítulos */
-h3 {
-  font-weight: 600;
-  font-size: 1.5rem; /* 24px */
-  line-height: 1.3;
-  letter-spacing: 0.025em;
-}
-
-/* Títulos de producto */
 .product-title,
 .card-info h3 {
   font-weight: 700;
-  font-size: 1.25rem; /* 20px */
+  font-size: 1.25rem;
   line-height: 1.4;
   letter-spacing: 0.015em;
   text-transform: none;
@@ -72,37 +45,33 @@ h3 {
   color: #111111;
 }
 
-/* Precios */
 .price,
 .product-price {
   font-weight: 800;
-  font-size: 1.875rem; /* 30px */
+  font-size: 1.875rem;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: #111111;
   margin: 8px 0;
 }
 
-/* Precio tachado (oferta) */
 .old-price {
   font-weight: 500;
-  font-size: 1rem; /* 16px */
+  font-size: 1rem;
   color: #999999;
   text-decoration: line-through;
   margin-right: 8px;
 }
 
-/* Precio oferta */
 .offer-price {
   color: #e63946;
   font-weight: 900;
 }
 
-/* Descripciones */
 .desc,
 .product-description {
   font-weight: 400;
-  font-size: 0.875rem; /* 14px */
+  font-size: 0.875rem;
   line-height: 1.6;
   letter-spacing: 0.01em;
   color: #555555;
@@ -111,7 +80,6 @@ h3 {
   overflow: hidden;
 }
 
-/* Etiquetas (e.g., "Envío Gratis") */
 .tag {
   display: inline-block;
   background: #000000;
@@ -126,7 +94,7 @@ h3 {
 }
 
 /* =============================================
-   HEADER (EXACTO)
+   HEADER
    ============================================= */
 .header {
   position: sticky;
@@ -346,7 +314,7 @@ h3 {
 }
 
 /* =============================================
-   MAIN - ESPACIO EXACTO
+   MAIN
    ============================================= */
 .main-container {
   max-width: 1300px;
@@ -354,7 +322,6 @@ h3 {
   padding: 40px 20px;
 }
 
-/* Hero Banner */
 .hero-banner {
   padding: 80px 20px;
   margin-bottom: 60px;
@@ -456,7 +423,6 @@ h3 {
   margin-bottom: 20px;
 }
 
-/* Precio con oferta */
 .price-container {
   display: flex;
   justify-content: center;
@@ -465,7 +431,6 @@ h3 {
   flex-wrap: wrap;
 }
 
-/* Botón */
 .add-btn {
   background: #000000;
   color: #ffffff;
@@ -492,7 +457,7 @@ h3 {
 }
 
 /* =============================================
-   CARRITO LATERAL
+   CARRITO LATERAL (MEJORADO CON PAYPAL)
    ============================================= */
 .cart-sidebar {
   position: fixed;
@@ -588,25 +553,40 @@ h3 {
   margin-bottom: 16px;
 }
 
-.payment-options button {
-  padding: 14px;
-  border: 1.5px solid #111111;
-  border-radius: 8px;
-  background: #ffffff;
-  font-weight: 700;
-  font-size: 0.95rem;
+/* NUEVO: IR A PAGAR */
+.go-to-pay {
+  font-weight: 800;
+  font-size: 1.3rem;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
+  letter-spacing: 1.2px;
+  text-align: center;
+  margin: 20px 0 16px;
+  color: #111111;
 }
 
-.payment-options button:hover {
-  background: #111111;
-  color: #ffffff;
+/* BOTÓN PAYPAL OFICIAL (NO TOCAR) */
+#paypal-button-container {
+  margin: 0 auto 20px;
+  max-width: 280px;
 }
+
+/* MENSAJES DE PAYPAL */
+#message {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  min-height: 20px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+#message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+#message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+#message.cancel { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
 
 /* =============================================
-   ANIMACIONES Y @KEYFRAMES
+   ANIMACIONES
    ============================================= */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
@@ -626,7 +606,6 @@ h3 {
 .fade-in { animation: fadeIn 0.5s ease-out forwards; }
 .pulse { animation: pulse 2s infinite ease-in-out; }
 
-/* Animación carrito */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-4px); }
@@ -661,4 +640,12 @@ h3 {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 480px) {
+  .main-container { padding: 30px 15px; }
+  .product-card img { height: 220px; }
 }
