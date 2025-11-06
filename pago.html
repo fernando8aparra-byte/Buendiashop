@@ -286,6 +286,42 @@
           return actions.order.capture().then(details => {
             console.log('PEDIDO PARA ADMIN:', { cart, address: savedAddress, total, orderId: details.id, user: details.payer });
 
+            // === MAPEO DE CÓDIGOS DE ESTADO ===
+            const stateCodes = {
+              "Aguascalientes": "AGS",
+              "Baja California": "BC",
+              "Baja California Sur": "BCS",
+              "Campeche": "CAM",
+              "Chiapas": "CHIS",
+              "Chihuahua": "CHIH",
+              "CDMX": "CDMX",
+              "Coahuila": "COAH",
+              "Colima": "COL",
+              "Durango": "DGO",
+              "Guanajuato": "GTO",
+              "Guerrero": "GRO",
+              "Hidalgo": "HGO",
+              "Jalisco": "JAL",
+              "México": "MEX",
+              "Michoacán": "MICH",
+              "Morelos": "MOR",
+              "Nayarit": "NAY",
+              "Nuevo León": "NL",
+              "Oaxaca": "OAX",
+              "Puebla": "PUE",
+              "Querétaro": "QRO",
+              "Quintana Roo": "QROO",
+              "San Luis Potosí": "SLP",
+              "Sinaloa": "SIN",
+              "Sonora": "SON",
+              "Tabasco": "TAB",
+              "Tamaulipas": "TAM",
+              "Tlaxcala": "TLAX",
+              "Veracruz": "VER",
+              "Yucatán": "YUC",
+              "Zacatecas": "ZAC"
+            };
+
             // === FORMATEAR Y ENVIAR A FIRESTORE ===
             const orderData = {
               userId: localStorage.getItem('userName') || 'anonimo',
@@ -300,7 +336,7 @@
                 colonia: savedAddress.colonia,
                 cp: savedAddress.cp,
                 state: savedAddress.state,
-                stateCode: savedAddress.state  // Puedes mapear códigos ISO si necesitas
+                stateCode: stateCodes[savedAddress.state] || savedAddress.state
               },
               products: cart.map(item => ({
                 name: item.name,
