@@ -3,141 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Efraín Shop - Pago con PayPal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    /* =============================================
-       ESTILO CLON EXACTO DE DROP-SHOP.MX
-       ============================================= */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      font-family: 'Poppins', sans-serif;
-      background: #ffffff;
-      color: #111111;
-      font-size: 16px;
-      line-height: 1.6;
-      letter-spacing: 0.025em;
-      -webkit-font-smoothing: antialiased;
-    }
-    h1, h2, h3 { text-transform: uppercase; letter-spacing: 1.2px; }
-    h1 { font-weight: 800; font-size: 3.75rem; line-height: 1.1; letter-spacing: -0.025em; }
-    h2 { font-weight: 700; font-size: 2.25rem; line-height: 1.2; letter-spacing: 0.05em; text-align: center; margin-bottom: 32px; }
-    h3 { font-weight: 600; font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
-
-    /* HEADER */
-    .header {
-      position: sticky; top: 0; background: #fff; border-bottom: 1px solid #eee;
-      z-index: 1000; padding: 16px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
-    .header-inner {
-      display: grid; grid-template-columns: auto 1fr auto auto; align-items: center;
-      gap: 16px; max-width: 1400px; margin: 0 auto;
-    }
-    .logo { font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1.5px; color: #111; }
-
-    /* MAIN */
-    .main-container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
-    .products-grid { display: grid; gap: 32px; margin-top: 48px; }
-    @media (max-width: 480px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 481px) and (max-width: 900px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 901px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
-
-    .product-card {
-      text-align: center; cursor: pointer; transition: transform 0.3s ease;
-      padding: 20px; background: #fafafa; border-radius: 16px;
-    }
-    .product-card:hover { transform: translateY(-10px); }
-    .product-card img { width: 100%; height: 280px; object-fit: contain; padding: 24px; }
-    .card-info h3 { font-weight: 700; font-size: 1.25rem; line-height: 1.4; letter-spacing: 0.015em; margin-bottom: 8px; }
-    .desc { font-size: 0.875rem; color: #555; margin-bottom: 12px; height: 44px; overflow: hidden; }
-    .price { font-weight: 800; font-size: 1.875rem; line-height: 1.2; color: #111; }
-    .old-price { font-size: 1rem; color: #999; text-decoration: line-through; margin-right: 8px; }
-    .offer-price { color: #e63946; font-weight: 900; }
-    .add-btn {
-      background: #000; color: #fff; border: none; padding: 12px 24px; border-radius: 8px;
-      font-size: 0.9rem; font-weight: 700; text-transform: uppercase; cursor: pointer;
-      margin-top: 16px; width: 100%; transition: all 0.2s;
-    }
-    .add-btn:hover { background: #111; transform: translateY(-2px); }
-
-    /* CARRITO LATERAL */
-    .cart-sidebar {
-      position: fixed; top: 0; right: -340px; width: 320px; max-width: 100vw; height: 100%;
-      background: #fff; border-left: 1px solid #eee; transition: right 0.3s ease;
-      z-index: 1200; display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.08);
-    }
-    .cart-sidebar.open { right: 0; }
-    .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    .cart-header h3 { font-weight: 800; font-size: 1.3rem; text-transform: uppercase; }
-    .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
-    .cart-item { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid #eee; }
-    .cart-item img.thumb { width: 70px; height: 70px; object-fit: contain; background: #fafafa; border-radius: 8px; padding: 8px; }
-    .cart-item > div { flex: 1; }
-    .cart-item button { background: none; border: none; color: #999; font-size: 20px; cursor: pointer; }
-    .cart-footer { padding: 20px; border-top: 1px solid #eee; }
-    .cart-total { text-align: right; font-weight: 800; font-size: 1.4rem; margin-bottom: 16px; }
-
-    /* NUEVO: IR A PAGAR + BOTÓN PAYPAL */
-    .go-to-pay {
-      font-weight: 800;
-      font-size: 1.3rem;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      text-align: center;
-      margin: 20px 0 16px;
-      color: #111;
-    }
-    #paypal-button-container {
-      margin: 0 auto 20px;
-      max-width: 280px;
-    }
-    #message {
-      margin-top: 20px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-weight: 500;
-      min-height: 20px;
-      text-align: center;
-    }
-    #message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    #message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    #message.cancel { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-
-    /* TOAST */
-    .toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: #000; color: #fff; padding: 14px 28px; border-radius: 8px;
-      font-weight: 700; font-size: 1rem; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      opacity: 0; visibility: hidden; transition: all 0.35s ease; z-index: 1300; text-transform: uppercase;
-    }
-    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-
-    /* RESPONSIVE */
-    @media (max-width: 480px) {
-      .main-container { padding: 30px 15px; }
-      .product-card img { height: 220px; }
-    }
-  </style>
+  <title>Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
-      <button id="menuBtn">Menu</button>
+      <button id="menuBtn" class="icon-btn">Menu</button>
       <div class="logo">EFRAÍN</div>
-      <button id="searchBtn">Search</button>
-      <button id="cartBtn">Cart</button>
+      <button id="searchBtn" class="icon-btn">Search</button>
+      <button id="cartBtn" class="icon-btn">Cart
+        <span id="cartBadge"></span>
+      </button>
     </div>
   </header>
 
   <!-- MAIN -->
   <main class="main-container">
-    <h2>Nuevos Productos</h2>
-    <div class="products-grid" id="productsGrid">
-      <!-- Productos generados por JS -->
-    </div>
+    <section class="hero-banner">
+      <h1>Asegura tu Mystery Box</h1>
+      <p class="tag">Envío Gratis en compras +$1,500</p>
+    </section>
+
+    <section class="infinite-carousel-section">
+      <h2>Nuevos Lanzamientos</h2>
+      <div class="infinite-carousel">
+        <div class="carousel-track" id="newCarousel"></div>
+      </div>
+    </section>
+
+    <section class="infinite-carousel-section">
+      <h2>Productos Estrella</h2>
+      <div class="infinite-carousel">
+        <div class="carousel-track" id="starCarousel"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Todos los Productos</h2>
+      <div class="products-grid" id="productsGrid"></div>
+    </section>
   </main>
+
+  <!-- MENÚ LATERAL -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <aside class="menu-sidebar" id="menuSidebar">
+    <button class="menu-close" id="menuClose">X</button>
+    <div class="menu-item welcome">¡Hola, Efraín!</div>
+    <div class="menu-item dropdown-toggle">Categorías</div>
+    <div class="submenu">
+      <div class="submenu-item">Gorras</div>
+      <div class="submenu-item">Camisetas</div>
+      <div class="submenu-item">Accesorios</div>
+    </div>
+    <div class="menu-item">Ofertas</div>
+    <div class="menu-item">Contacto</div>
+  </aside>
+
+  <!-- BÚSQUEDA -->
+  <div class="search-container" id="searchContainer">
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar productos...">
+      <button id="closeSearch">X</button>
+    </div>
+  </div>
 
   <!-- CARRITO LATERAL -->
   <aside class="cart-sidebar" id="cartSidebar">
@@ -150,9 +81,7 @@
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
-      <!-- NUEVO: IR A PAGAR -->
       <div class="go-to-pay">Ir a Pagar</div>
-      <!-- BOTÓN PAYPAL OFICIAL -->
       <div id="paypal-button-container"></div>
       <div id="message"></div>
     </div>
@@ -161,26 +90,43 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- SDK PAYPAL (SANDBOX) -->
+  <!-- PAYPAL SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
     // =============================================
-    // DATOS DE PRODUCTOS (LOCALSTORAGE)
+    // PRODUCTOS DEMO (REALES)
     // =============================================
-    let products = JSON.parse(localStorage.getItem('products')) || [
-      { id: 1, name: "Gorra GALAXY CT", price: 18000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp" },
-      { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp" }
+    const products = [
+      { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
+      { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
+      { id: 3, name: "Mystery Box Gold", price: 2500, desc: "3 productos sorpresa", img: "https://imgfz.com/i/8Y5vN2k.webp", star: true },
+      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp" },
+      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true },
+      { id: 6, name: "Playera Premium", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp" }
     ];
-    if (!localStorage.getItem('products')) localStorage.setItem('products', JSON.stringify(products));
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const productsGrid = document.getElementById('productsGrid');
-    const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
+
+    // =============================================
+    // ELEMENTOS DOM
+    // =============================================
+    const menuBtn = document.getElementById('menuBtn');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuSidebar = document.getElementById('menuSidebar');
+    const menuClose = document.getElementById('menuClose');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchContainer = document.getElementById('searchContainer');
+    const closeSearch = document.getElementById('closeSearch');
+    const cartBtn = document.getElementById('cartBtn');
     const cartSidebar = document.getElementById('cartSidebar');
     const closeCart = document.getElementById('closeCart');
-    const cartBtn = document.getElementById('cartBtn');
+    const cartBadge = document.getElementById('cartBadge');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const productsGrid = document.getElementById('productsGrid');
+    const newCarousel = document.getElementById('newCarousel');
+    const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
 
     // =============================================
@@ -192,16 +138,41 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <img src="${p.img}" alt="${p.name}">
+          <img src="${p.img}" alt="${p.name}" loading="lazy">
           <div class="card-info">
             <h3>${p.name}</h3>
             <p class="desc">${p.desc}</p>
-            <p class="price">$${p.price.toLocaleString()}</p>
+            <div class="price-container">
+              ${p.oldPrice ? `<span class="old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
+              <span class="price ${p.oldPrice ? 'offer-price' : ''}">$${p.price.toLocaleString()}</span>
+            </div>
             <button class="add-btn" onclick="addToCart(${p.id})">Agregar</button>
           </div>
         `;
         productsGrid.appendChild(card);
       });
+    }
+
+    // =============================================
+    // CARRUSELES
+    // =============================================
+    function renderCarousel(container, filter) {
+      container.innerHTML = '';
+      const filtered = products.filter(filter);
+      filtered.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'carousel-item';
+        item.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" loading="lazy">
+          <div class="item-info">
+            <h4>${p.name}</h4>
+            <p>$${p.price.toLocaleString()}</p>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      // Duplicar para infinito
+      container.innerHTML += container.innerHTML;
     }
 
     // =============================================
@@ -214,7 +185,7 @@
       else cart.push({ ...product, qty: 1 });
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-      showToast('¡Agregado!');
+      showToast('¡Agregado al carrito!');
     }
 
     function removeFromCart(index) {
@@ -226,12 +197,17 @@
     function updateCart() {
       cartItems.innerHTML = '';
       let total = 0;
+      const badge = cart.reduce((sum, i) => sum + i.qty, 0);
+      cartBadge.style.display = badge > 0 ? 'flex' : 'none';
+      cartBadge.textContent = badge;
+
       if (cart.length === 0) {
         cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
-        document.querySelector('.go Rong-to-pay')?.style.display = 'none';
+        document.querySelector('.go-to-pay').style.display = 'none';
         document.getElementById('paypal-button-container').innerHTML = '';
         return;
       }
+
       document.querySelector('.go-to-pay').style.display = 'block';
 
       cart.forEach((item, i) => {
@@ -248,22 +224,23 @@
         `;
         cartItems.appendChild(div);
       });
+
       cartTotal.textContent = `Total: $${total.toLocaleString()}`;
       renderPayPalButton(total);
     }
 
     // =============================================
-    // BOTÓN PAYPAL OFICIAL (SMART BUTTONS)
+    // BOTÓN PAYPAL OFICIAL
     // =============================================
     function renderPayPalButton(amount) {
       const container = document.getElementById('paypal-button-container');
-      container.innerHTML = ''; // Limpiar botón anterior
+      container.innerHTML = '';
 
       paypal.Buttons({
         createOrder: function() {
           return actions.order.create({
             purchase_units: [{
-              amount: { value: (amount / 100).toFixed(2) } // MXN: 18000 → 180.00
+              amount: { value: (amount / 100).toFixed(2) }
             }]
           });
         },
@@ -280,11 +257,11 @@
             cartSidebar.classList.remove('open');
           });
         },
-        onCancel: function() {
+        onCancel: () => {
           document.getElementById('message').innerHTML = 'Pago cancelado.';
           document.getElementById('message').className = 'cancel';
         },
-        onError: function(err) {
+        onError: (err) => {
           document.getElementById('message').innerHTML = 'Error: ' + err;
           document.getElementById('message').className = 'error';
         }
@@ -294,6 +271,10 @@
     // =============================================
     // EVENTOS
     // =============================================
+    menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); };
+    menuOverlay.onclick = menuClose.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
+    searchBtn.onclick = () => searchContainer.classList.add('active');
+    closeSearch.onclick = () => searchContainer.classList.remove('active');
     cartBtn.onclick = () => cartSidebar.classList.add('open');
     closeCart.onclick = () => cartSidebar.classList.remove('open');
 
@@ -303,16 +284,13 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
+    // =============================================
     // INICIO
+    // =============================================
     renderProducts();
+    renderCarousel(newCarousel, p => p.new);
+    renderCarousel(starCarousel, p => p.star);
     updateCart();
-
-    /* =============================================
-       INSTRUCCIONES:
-       - Client ID: Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS (sandbox)
-       - Prueba con cuenta sandbox: https://developer.paypal.com
-       - Para producción: cambia &client-id=... y quita &environment=sandbox
-       ============================================= */
   </script>
 </body>
 </html>
