@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES (SIN CAMBIOS) */
+    /* ESTILOS ANTERIORES (CON MEJORAS) */
     body {
       margin: 0;
       padding: 0;
@@ -137,12 +137,20 @@
       justify-content: space-between;
       align-items: center;
     }
+    /* QUITAMOS EL TRIÁNGULO DE TODOS LOS ITEMS NORMALES */
     .menu-item::after {
+      display: none;
+    }
+
+    /* SOLO LOS DESPLEGABLES TIENEN TRIÁNGULO */
+    .dropdown-toggle::after,
+    .contact-toggle::after {
       content: '▼';
       font-size: 0.8rem;
       transition: transform 0.3s ease;
     }
-    .menu-item.open::after {
+    .dropdown-toggle.open::after,
+    .contact-toggle.open::after {
       transform: rotate(180deg);
     }
 
@@ -164,6 +172,21 @@
       padding: 12px 0;
       border-bottom: 1px solid #ddd;
       cursor: pointer;
+    }
+
+    /* OFERTAS COMO BOTÓN (NEGRO) */
+    .menu-item.ofertas-btn {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 15px 20px;
+      margin: 20px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .menu-item.ofertas-btn::after {
+      display: none;
     }
 
     /* BOTÓN LOGIN / LOGOUT */
@@ -312,7 +335,7 @@
 
     .main-container {
       margin-top: 20px;
-(nodes }
+    }
   </style>
 </head>
 <body>
@@ -391,7 +414,7 @@
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome" id="welcomeMsg"></div>
     
-    <!-- PRODUCTOS DESPLEGABLE (AHORA CON SOLO LAS CATEGORÍAS QUE PEDISTE) -->
+    <!-- PRODUCTOS DESPLEGABLE -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
     <div class="submenu" id="categoriesSubmenu">
       <div class="submenu-item">Gorras</div>
@@ -400,7 +423,8 @@
       <div class="submenu-item">Perfumes</div>
     </div>
     
-    <div class="menu-item">Ofertas</div>
+    <!-- OFERTAS COMO BOTÓN NEGRO -->
+    <div class="menu-item ofertas-btn">Ofertas</div>
     
     <!-- CONTACTO -->
     <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
@@ -439,7 +463,7 @@
   <!-- PAYPAL SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
-  <!-- TU SCRIPT EXTERNO (100% FUNCIONAL) -->
+  <!-- TU SCRIPT EXTERNO -->
   <script src="js/script.js"></script>
 
   <!-- LÓGICA EXTRA DEL MENÚ + LOGIN -->
@@ -485,7 +509,7 @@
         showToast('Sesión cerrada');
         updateAuthUI();
       } else {
-        window.location.href = 'login.html'; // REDIRIGE A LOGIN.HTML
+        window.location.href = 'login.html';
       }
     };
 
@@ -517,7 +541,7 @@
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
-      updateAuthUI(); // Actualiza nombre al abrir
+      updateAuthUI();
     };
 
     // === BÚSQUEDA ===
