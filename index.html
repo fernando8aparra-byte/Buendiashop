@@ -174,19 +174,15 @@
       cursor: pointer;
     }
 
-    /* OFERTAS COMO BOTÓN (NEGRO) */
+    /* OFERTAS COMO TEXTO NORMAL (SIN BOTÓN NEGRO) */
     .menu-item.ofertas-btn {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      padding: 15px 20px;
-      margin: 20px 15px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .menu-item.ofertas-btn::after {
-      display: none;
+      background: none;
+      color: #000;
+      text-align: left;
+      padding: 18px 20px;
+      margin: 0;
+      border-radius: 0;
+      font-weight: normal;
     }
 
     /* BOTÓN LOGIN / LOGOUT */
@@ -377,7 +373,7 @@
 
       <div class="search-bar-header" id="searchBarHeader">
         <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
-        <button id="closeSearchHeader" class="close-search-btn">✕</button>
+        <button id="closeSearchHeader" class="close-search-btn">x</button>
       </div>
     </div>
   </header>
@@ -420,10 +416,13 @@
       <div class="submenu-item">Gorras</div>
       <div class="submenu-item">Camisetas</div>
       <div class="submenu-item">Pantalones</div>
+      <div class="submenu-item">Cintos</div>
+      <div class="submenu-item">Tenis</div>
       <div class="submenu-item">Perfumes</div>
+      <div class="submenu-item">Sudaderas</div>
     </div>
     
-    <!-- OFERTAS COMO BOTÓN NEGRO -->
+    <!-- OFERTAS COMO TEXTO NORMAL -->
     <div class="menu-item ofertas-btn">Ofertas</div>
     
     <!-- CONTACTO -->
@@ -444,7 +443,7 @@
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
-      <button class="menu-close-x" id="closeCart">✕</button>
+      <button class="menu-close-x" id="closeCart">x</button>
     </div>
     <div class="cart-items" id="cartItems">
       <p class="empty-cart">Tu carrito está vacío</p>
@@ -504,6 +503,7 @@
       if (isLoggedIn) {
         localStorage.removeItem('loggedIn');
         localStorage.removeItem('userName');
+        localStorage.removeItem('isAdmin');
         isLoggedIn = false;
         userName = '';
         showToast('Sesión cerrada');
