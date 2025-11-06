@@ -50,6 +50,7 @@
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 15px 30px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
     .toast.show { opacity: 1; }
     .error { color: #ff4444; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -71,8 +72,14 @@
   <!-- LOGIN / REGISTRO -->
   <div class="login-container">
     <h1 id="formTitle">Iniciar Sesión</h1>
-    <input type="email" id="email" class="login-input" placeholder="Correo electrónico" required>
+
+    <!-- Campo que cambia: nombre o correo -->
+    <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" required>
+    <!-- Campo nombre solo en registro -->
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" required>
+    <!-- Contraseña -->
     <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
+
     <button class="login-btn" id="mainBtn">Entrar</button>
     <p style="margin-top:20px;">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
     <a href="index.html" class="back-link">← Volver a la tienda</a>
@@ -85,7 +92,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     // TUS CREDENCIALES
     const firebaseConfig = {
@@ -107,7 +114,8 @@
     const formTitle = document.getElementById('formTitle');
     const mainBtn = document.getElementById('mainBtn');
     const toggleLink = document.getElementById('toggleLink');
-    const emailInput = document.getElementById('email');
+    const identifierInput = document.getElementById('identifier');
+    const nameInput = document.getElementById('name');
     const passwordInput = document.getElementById('password');
     const toast = document.getElementById('toast');
 
@@ -125,65 +133,98 @@
     toggleLink.onclick = (e) => {
       e.preventDefault();
       isLogin = !isLogin;
-      formTitle.textContent = isLogin ? 'Iniciar Sesión' : 'Crear Cuenta';
-      mainBtn.textContent = isLogin ? 'Entrar' : 'Registrarme';
-      toggleLink.textContent = isLogin ? 'Regístrate aquí' : 'Iniciar sesión';
+
+      if (isLogin) {
+        formTitle.textContent = 'Iniciar Sesión';
+        mainBtn.textContent = 'Entrar';
+        toggleLink.textContent = 'Regístrate aquí';
+        identifierInput.placeholder = 'Nombre o correo electrónico';
+        nameInput.classList.add('hidden');
+        nameInput.removeAttribute('required');
+      } else {
+        formTitle.textContent = 'Crear Cuenta';
+        mainBtn.textContent = 'Registrarme';
+        toggleLink.textContent = 'Iniciar sesión';
+        identifierInput.placeholder = 'Correo electrónico';
+        nameInput.classList.remove('hidden');
+        nameInput.setAttribute('required', '');
+      }
     };
 
     // ACCIÓN PRINCIPAL
     mainBtn.onclick = async () => {
-      const email = emailInput.value.trim();
+      const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
+      const nombre = nameInput.value.trim();
 
-      if (!email || !password) {
-        showToast('⚠️ Completa todos los campos', true);
+      if (!identifier || !password || (!isLogin && !nombre)) {
+        showToast('Completa todos los campos', true);
         return;
       }
 
       try {
         if (isLogin) {
-          // INICIAR SESIÓN
+          // === INICIAR SESIÓN CON NOMBRE O CORREO ===
+          let email = identifier;
+
+          // Si no parece correo, buscar por nombre
+          if (!identifier.includes('@')) {
+            const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+              showToast('Nombre o correo no encontrado', true);
+              return;
+            }
+            email = querySnapshot.docs[0].data().correo;
+          }
+
+          // Iniciar sesión con correo
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
 
-          // Verificar en Firestore
           const userDoc = await getDoc(doc(db, "usuarios", user.uid));
           if (!userDoc.exists()) {
-            showToast('Usuario no encontrado en la base de datos', true);
-            await auth.signOut();
+            showToast('Error de datos', true);
             return;
           }
 
           const data = userDoc.data();
           localStorage.setItem('loggedIn', 'true');
-          localStorage.setItem('userName', data.correo.split('@')[0]);
-          showToast('¡Bienvenido de vuelta! 🔥');
+          localStorage.setItem('userName', data.nombre);
+          showToast(`¡Bienvenido, ${data.nombre.split(' ')[0]}!`);
           setTimeout(() => window.location.href = 'index.html', 1500);
 
         } else {
-          // REGISTRARSE
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          // === REGISTRO ===
+          if (!identifier.includes('@')) {
+            showToast('Ingresa un correo válido', true);
+            return;
+          }
+
+          const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
           const user = userCredential.user;
 
           // Guardar en Firestore
           await setDoc(doc(db, "usuarios", user.uid), {
-            correo: email,
-            clave: password  // ¡Cuidado! No es seguro guardar contraseñas en texto plano
+            nombre: nombre,
+            correo: identifier
           });
 
           localStorage.setItem('loggedIn', 'true');
-          localStorage.setItem('userName', email.split('@')[0]);
-          showToast('¡Cuenta creada con éxito! 🔥');
+          localStorage.setItem('userName', nombre);
+          showToast('¡Cuenta creada con éxito!');
           setTimeout(() => window.location.href = 'index.html', 1500);
         }
       } catch (error) {
         let msg = 'Error desconocido';
-        if (error.code === 'auth/email-already-in-use') msg = 'Este correo ya está registrado';
-        else if (error.code === 'auth/invalid-email') msg = 'Correo inválido';
-        else if (error.code === 'auth/weak-password') msg = 'Contraseña muy débil (mínimo 6 caracteres)';
-        else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') msg = 'Correo o contraseña incorrectos';
-        else msg = error.message;
-
+        switch (error.code) {
+          case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
+          case 'auth/invalid-email': msg = 'Correo inválido'; break;
+          case 'auth/weak-password': msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
+          case 'auth/user-not-found':
+          case 'auth/wrong-password': msg = 'Correo, nombre o contraseña incorrectos'; break;
+          default: msg = error.message;
+        }
         showToast('Error: ' + msg, true);
       }
     };
