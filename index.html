@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + HERO RESTAURADO */
+    /* ESTILOS ANTERIORES (sin cambios) */
     body {
       margin: 0;
       padding: 0;
@@ -54,7 +54,7 @@
       color: #000;
     }
 
-    /* HERO BANNER RESTAURADO */
+    /* HERO BANNER */
     .hero-banner {
       text-align: center;
       padding: 60px 20px;
@@ -157,7 +157,7 @@
     }
     .submenu.open,
     .contact-dropdown.open {
-      max-height: 400px;
+      max-height: 500px; /* más espacio para nuevas categorías */
       padding: 20px;
     }
     .submenu-item {
@@ -196,7 +196,7 @@
       height: 40px;
     }
 
-    /* CARRITO AL FRENTE */
+    /* CARRITO */
     .cart-sidebar {
       position: fixed;
       top: 60px;
@@ -206,7 +206,7 @@
       background: #fff;
       z-index: 1000;
       transform: translateX(100%);
-  transition: transform 0.3s ease;
+      transition: transform 0.3s ease;
       box-shadow: -2px 0 10px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
@@ -354,7 +354,7 @@
     </div>
   </header>
 
-  <!-- HERO BANNER RESTAURADO -->
+  <!-- HERO BANNER -->
   <main class="main-container">
     <section class="hero-banner">
       <h1>Asegura tu Mystery Box</h1>
@@ -381,26 +381,26 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL -->
+  <!-- MENÚ LATERAL CON CATEGORÍAS ACTUALIZADAS -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
     
-    <!-- CATEGORÍAS DESPLEGABLE -->
-    <div class="menu-item dropdown-toggle" id="categoriesToggle">Categorías</div>
+    <!-- PRODUCTOS DESPLEGABLE (cambiado de Categorías a Productos) -->
+    <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
     <div class="submenu" id="categoriesSubmenu">
-      <div class="submenu-item">Gorras</div>
+      <div class="submenu-item">Bótense de gorras</div>
       <div class="submenu-item">Camisetas</div>
       <div class="submenu-item">Pantalones</div>
       <div class="submenu-item">Cintos</div>
       <div class="submenu-item">Tenis</div>
-      <div class="submenu-item">Sudaderas</div>
-      <div class="submenu-item">Overcide</div>
+      <div class="submenu-item">Sudadera</div>
+      <div class="submenu-item">Perfumes</div>
     </div>
     
     <div class="menu-item">Ofertas</div>
     
-    <!-- CONTACTO DESPLEGABLE -->
+    <!-- CONTACTO -->
     <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
     <div class="contact-dropdown" id="contactDropdown">
       <p class="contact-text">No te quedes sin tu Mystery Box</p>
@@ -440,24 +440,24 @@
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
-    // MÁS PRODUCTOS PARA LLENAR LA TIENDA
+    // PRODUCTOS (mantengo los 16 para que siga llena la tienda)
     const products = [
-      { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true, category: "Gorras" },
-      { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true, category: "Camisetas" },
+      { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
+      { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
       { id: 3, name: "Mystery Box Gold", price: 2500, desc: "3 productos sorpresa", img: "https://imgfz.com/i/8Y5vN2k.webp", star: true },
-      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp", category: "Accesorios" },
-      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true, category: "Gorras" },
-      { id: 6, name: "Playera Premium White", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp", category: "Camisetas" },
-      { id: 7, name: "Pantalón Cargo Black", price: 2200, desc: "Streetwear", img: "https://imgfz.com/i/cargo-black.jpg", category: "Pantalones" },
-      { id: 8, name: "Cinturón Leather Pro", price: 890, desc: "Piel genuina", img: "https://imgfz.com/i/cinto-leather.jpg", category: "Cintos" },
-      { id: 9, name: "Tenis Urban White", price: 3500, desc: "Edición limitada", img: "https://imgfz.com/i/tenis-white.jpg", new: true, category: "Tenis" },
-      { id: 10, name: "Sudadera Oversize Gray", price: 1900, desc: "Calidad premium", img: "https://imgfz.com/i/sudadera-gray.jpg", star: true, category: "Sudaderas" },
-      { id: 11, name: "Overcide Hoodie Blue", price: 2100, desc: "Drop exclusivo", img: "https://imgfz.com/i/overcide-blue.jpg", category: "Overcide" },
-      { id: 12, name: "Gorra Snapback Red", price: 1400, oldPrice: 1800, desc: "Ajustable", img: "https://imgfz.com/i/gorra-red.webp", category: "Gorras" },
-      { id: 13, name: "Camiseta Graphic Tee", price: 799, desc: "Estampado único", img: "https://imgfz.com/i/graphic-tee.jpg", new: true, category: "Camisetas" },
+      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp" },
+      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true },
+      { id: 6, name: "Playera Premium White", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp" },
+      { id: 7, name: "Pantalón Cargo Black", price: 2200, desc: "Streetwear", img: "https://imgfz.com/i/cargo-black.jpg" },
+      { id: 8, name: "Cinturón Leather Pro", price: 890, desc: "Piel genuina", img: "https://imgfz.com/i/cinto-leather.jpg" },
+      { id: 9, name: "Tenis Urban White", price: 3500, desc: "Edición limitada", img: "https://imgfz.com/i/tenis-white.jpg", new: true },
+      { id: 10, name: "Sudadera Oversize Gray", price: 1900, desc: "Calidad premium", img: "https://imgfz.com/i/sudadera-gray.jpg", star: true },
+      { id: 11, name: "Overcide Hoodie Blue", price: 2100, desc: "Drop exclusivo", img: "https://imgfz.com/i/overcide-blue.jpg" },
+      { id: 12, name: "Gorra Snapback Red", price: 1400, oldPrice: 1800, desc: "Ajustable", img: "https://imgfz.com/i/gorra-red.webp" },
+      { id: 13, name: "Camiseta Graphic Tee", price: 799, desc: "Estampado único", img: "https://imgfz.com/i/graphic-tee.jpg", new: true },
       { id: 14, name: "Mystery Box Silver", price: 1800, desc: "2 productos sorpresa", img: "https://imgfz.com/i/mystery-silver.jpg", star: true },
-      { id: 15, name: "Tenis High Top Black", price: 3900, desc: "Full comfort", img: "https://imgfz.com/i/tenis-high.jpg", category: "Tenis" },
-      { id: 16, name: "Sudadera Zip Black", price: 2200, desc: "Con cierre", img: "https://imgfz.com/i/sudadera-zip.jpg", category: "Sudaderas" }
+      { id: 15, name: "Tenis High Top Black", price: 3900, desc: "Full comfort", img: "https://imgfz.com/i/tenis-high.jpg" },
+      { id: 16, name: "Sudadera Zip Black", price: 2200, desc: "Con cierre", img: "https://imgfz.com/i/sudadera-zip.jpg" }
     ];
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -495,7 +495,7 @@
       contactDropdown.classList.toggle('open');
     };
 
-    // RENDER TODOS LOS PRODUCTOS
+    // RENDER FUNCTIONS
     function renderProducts() {
       productsGrid.innerHTML = '';
       products.forEach(p => {
@@ -517,11 +517,9 @@
       });
     }
 
-    // CARRUSELES DUPLICADOS PARA INFINITO + MÁS ITEMS
     function renderCarousel(container, filter) {
       container.innerHTML = '';
       const filtered = products.filter(filter);
-      // Duplicar para efecto infinito
       [...filtered, ...filtered].forEach(p => {
         const item = document.createElement('div');
         item.className = 'carousel-item';
@@ -571,7 +569,7 @@
       cart.forEach((item, i) => {
         total += item.price * item.qty;
         const div = document.createElement('div');
-        div.className = 'carousel-item';
+        div.className = 'cart-item';
         div.innerHTML = `
           <img src="${item.img}" alt="${item.name}" class="thumb">
           <div>
