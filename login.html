@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | Efraín Shop</title>
+  <title>Login | Boutique Buendía</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
     body { margin: 0; padding: 0; padding-top: 60px; background: #f8f8f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -63,7 +63,7 @@
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
           </svg>
         </button>
-        <div class="logo">EFRAÍN</div>
+        <div class="logo">BOUTIQUE BUENDÍA</div>
       </div>
     </div>
   </header>
@@ -81,24 +81,27 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- FIREBASE SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <!-- FIREBASE SDK v9+ MODULAR -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-  <script>
-    // === TUS CREDENCIALES FIREBASE (reemplaza si cambian) ===
+    // TUS CREDENCIALES
     const firebaseConfig = {
-      apiKey: "AIzaSyD7vY8Zc9xK0vJ5mN6bP7qR8sT9uV0wX1Y",
-      authDomain: "efrain-shop.firebaseapp.com",
-      projectId: "efrain-shop",
-      storageBucket: "efrain-shop.appspot.com",
-      messagingSenderId: "123456789012",
-      appId: "1:123456789012:web:abcdef1234567890abcdef"
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
     };
 
-    // INICIALIZAR FIREBASE
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    // INICIALIZAR
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // ELEMENTOS
     const formTitle = document.getElementById('formTitle');
@@ -128,7 +131,7 @@
     };
 
     // ACCIÓN PRINCIPAL
-    mainBtn.onclick = () => {
+    mainBtn.onclick = async () => {
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
@@ -137,35 +140,51 @@
         return;
       }
 
-      if (isLogin) {
-        // INICIAR SESIÓN
-        auth.signInWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            localStorage.setItem('loggedIn', 'true');
-            localStorage.setItem('userName', user.displayName || user.email.split('@')[0]);
-            showToast('¡Bienvenido de vuelta! 🔥');
-            setTimeout(() => window.location.href = 'index.html', 1500);
-          })
-          .catch((error) => {
-            showToast('Error: ' + error.message, true);
+      try {
+        if (isLogin) {
+          // INICIAR SESIÓN
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          // Verificar en Firestore
+          const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+          if (!userDoc.exists()) {
+            showToast('Usuario no encontrado en la base de datos', true);
+            await auth.signOut();
+            return;
+          }
+
+          const data = userDoc.data();
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userName', data.correo.split('@')[0]);
+          showToast('¡Bienvenido de vuelta! 🔥');
+          setTimeout(() => window.location.href = 'index.html', 1500);
+
+        } else {
+          // REGISTRARSE
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          // Guardar en Firestore
+          await setDoc(doc(db, "usuarios", user.uid), {
+            correo: email,
+            clave: password  // ¡Cuidado! No es seguro guardar contraseñas en texto plano
           });
-      } else {
-        // REGISTRARSE
-        auth.createUserWithEmailAndPassword(email, password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            return user.updateProfile({ displayName: email.split('@')[0] });
-          })
-          .then(() => {
-            localStorage.setItem('loggedIn', 'true');
-            localStorage.setItem('userName', email.split('@')[0]);
-            showToast('¡Cuenta creada! 🔥');
-            setTimeout(() => window.location.href = 'index.html', 1500);
-          })
-          .catch((error) => {
-            showToast('Error: ' + error.message, true);
-          });
+
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userName', email.split('@')[0]);
+          showToast('¡Cuenta creada con éxito! 🔥');
+          setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+      } catch (error) {
+        let msg = 'Error desconocido';
+        if (error.code === 'auth/email-already-in-use') msg = 'Este correo ya está registrado';
+        else if (error.code === 'auth/invalid-email') msg = 'Correo inválido';
+        else if (error.code === 'auth/weak-password') msg = 'Contraseña muy débil (mínimo 6 caracteres)';
+        else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') msg = 'Correo o contraseña incorrectos';
+        else msg = error.message;
+
+        showToast('Error: ' + msg, true);
       }
     };
 
