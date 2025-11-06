@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,31 +8,51 @@
   <link rel="stylesheet" href="css/styles.css">
   <style>
     body { margin: 0; padding: 0; background: #f8f8f8; font-family: 'Poppins', sans-serif; }
-    .container { max-width: 800px; margin: 20px auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 15px 20px; text-align: center; font-weight: 800; font-size: 1.4rem; text-transform: uppercase; }
-    .form-section { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .form-section h3 { margin-top: 0; font-size: 1.4rem; text-transform: uppercase; }
+    .container { max-width: 900px; margin: 30px auto; padding: 25px; }
+    .header { background: #000; color: #fff; padding: 18px 20px; text-align: center; font-weight: 800; font-size: 1.6rem; text-transform: uppercase; }
+    
+    .form-section { background: #fff; padding: 32px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 28px; }
+    .form-section h3 { margin-top: 0; font-size: 1.55rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.8px; }
 
-    .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+    .form-row { display: flex; gap: 18px; margin-bottom: 18px; }
     .form-group { flex: 1; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.95rem; }
-    .form-group input, .form-group select { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 1.05rem; color: #222; }
+    .form-group input, .form-group select { 
+      width: 100%; padding: 16px; border: 2px solid #ccc; border-radius: 10px; 
+      font-size: 1.1rem; transition: border 0.3s; 
+    }
+    .form-group input:focus, .form-group select:focus { border-color: #000; outline: none; }
 
-    .btn-primary { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; font-size: 1.1rem; }
-    .btn-edit { background: #f0f0f0; color: #000; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; float: right; }
+    .btn-primary { 
+      background: #000; color: #fff; padding: 18px; text-align: center; border-radius: 12px; 
+      font-weight: 800; cursor: pointer; margin-top: 25px; width: 100%; font-size: 1.3rem; 
+      text-transform: uppercase; letter-spacing: 1.2px; transition: background 0.3s; 
+    }
+    .btn-primary:hover { background: #111; }
 
-    .order-summary { background: #f8f8f8; padding: 20px; border-radius: 12px; }
-    .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .order-total { font-weight: 800; font-size: 1.4rem; margin-top: 15px; text-align: right; }
+    .btn-edit { 
+      background: #f0f0f0; color: #000; padding: 10px 16px; font-size: 0.9rem; 
+      border-radius: 8px; cursor: pointer; float: right; font-weight: 600; 
+    }
 
-    .login-required { text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .login-required h2 { margin-bottom: 15px; }
-    .login-required p { color: #666; margin-bottom: 20px; }
+    .order-summary { background: #f8f8f8; padding: 28px; border-radius: 16px; }
+    .order-item { display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.1rem; border-bottom: 1px solid #ddd; }
+    .order-total { font-weight: 900; font-size: 1.7rem; margin-top: 18px; text-align: right; color: #000; }
 
-    .paypal-container { margin: 20px 0; text-align: center; }
-    .paypal-container p { margin-bottom: 15px; font-weight: 600; }
+    .login-required { text-align: center; padding: 50px 20px; background: #fff; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+    .login-required h2 { font-size: 1.8rem; margin-bottom: 16px; }
+    .login-required p { color: #555; margin-bottom: 25px; font-size: 1.1rem; }
 
-    .footer { padding: 30px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; margin-top: 40px; }
+    .payment-methods { text-align: center; margin: 30px 0; }
+    .payment-methods p { font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; color: #222; }
+    .payment-logos { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+    .payment-logos img { height: 70px; transition: transform 0.3s; } /* Aumentado de 60px a 70px */
+    .payment-logos img:hover { transform: scale(1.1); }
+
+    .paypal-container { margin: 30px 0; text-align: center; }
+    .paypal-container p { font-weight: 700; font-size: 1.3rem; margin-bottom: 18px; color: #222; }
+
+    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.95rem; margin-top: 50px; }
     .footer a { color: #fff; text-decoration: underline; }
   </style>
 </head>
@@ -49,9 +70,10 @@
       <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
 
-    <!-- FORMULARIO DE ENVÍO (DESPLEGADO DESDE EL INICIO) -->
+    <!-- SECCIÓN DE PAGO -->
     <div id="paymentSection" style="display:none;">
 
+      <!-- DIRECCIÓN DE ENVÍO -->
       <div class="form-section">
         <h3>Dirección de Envío</h3>
         <button class="btn-edit" id="editAddressBtn">Editar</button>
@@ -69,37 +91,14 @@
               <label>Estado</label>
               <select id="state" required>
                 <option value="">Seleccionar estado</option>
-                <option>Aguascalientes</option>
-                <option>Baja California</option>
-                <option>Baja California Sur</option>
-                <option>Campeche</option>
-                <option>Chiapas</option>
-                <option>Chihuahua</option>
-                <option>CDMX</option>
-                <option>Coahuila</option>
-                <option>Colima</option>
-                <option>Durango</option>
-                <option>Guanajuato</option>
-                <option>Guerrero</option>
-                <option>Hidalgo</option>
-                <option>Jalisco</option>
-                <option>México</option>
-                <option>Michoacán</option>
-                <option>Morelos</option>
-                <option>Nayarit</option>
-                <option>Nuevo León</option>
-                <option>Oaxaca</option>
-                <option>Puebla</option>
-                <option>Querétaro</option>
-                <option>Quintana Roo</option>
-                <option>San Luis Potosí</option>
-                <option>Sinaloa</option>
-                <option>Sonora</option>
-                <option>Tabasco</option>
-                <option>Tamaulipas</option>
-                <option>Tlaxcala</option>
-                <option>Veracruz</option>
-                <option>Yucatán</option>
+                <option>Aguascalientes</option><option>Baja California</option><option>Baja California Sur</option>
+                <option>Campeche</option><option>Chiapas</option><option>Chihuahua</option><option>CDMX</option>
+                <option>Coahuila</option><option>Colima</option><option>Durango</option><option>Guanajuato</option>
+                <option>Guerrero</option><option>Hidalgo</option><option>Jalisco</option><option>México</option>
+                <option>Michoacán</option><option>Morelos</option><option>Nayarit</option><option>Nuevo León</option>
+                <option>Oaxaca</option><option>Puebla</option><option>Querétaro</option><option>Quintana Roo</option>
+                <option>San Luis Potosí</option><option>Sinaloa</option><option>Sonora</option><option>Tabasco</option>
+                <option>Tamaulipas</option><option>Tlaxcala</option><option>Veracruz</option><option>Yucatán</option>
                 <option>Zacatecas</option>
               </select>
             </div>
@@ -144,12 +143,26 @@
       <!-- MÉTODOS DE PAGO -->
       <div class="form-section">
         <h3>Método de Pago</h3>
+
+        <!-- LOGOS DE PAGO -->
+        <div class="payment-methods">
+          <p>Aceptamos:</p>
+          <div class="payment-logos">
+            <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/PP_Acceptance_Marks_for_LogoCenter_266x142.png" alt="PayPal">
+            <img src="https://img.icons8.com/color/96/000000/visa.png" alt="Visa">
+            <img src="https://img.icons8.com/color/96/000000/mastercard.png" alt="Mastercard">
+            <img src="https://img.icons8.com/color/96/000000/amex.png" alt="American Express">
+          </div>
+        </div>
+
+        <!-- BOTÓN PAYPAL OFICIAL -->
         <div class="paypal-container">
           <p>Paga de forma segura con PayPal</p>
           <div id="paypal-button-container"></div>
         </div>
-        <p style="text-align:center; margin-top:20px; color:#666; font-size:0.9rem;">
-          También aceptamos: <strong>Tarjeta de Crédito / Débito</strong> (a través de PayPal)
+
+        <p style="text-align:center; margin-top:25px; color:#555; font-size:1rem;">
+          También puedes usar <strong>tarjeta de crédito o débito</strong> directamente en PayPal.
         </p>
       </div>
     </div>
@@ -168,7 +181,7 @@
   <script>
     const cart = JSON.parse(localStorage.getItem('pendingPayment') || '[]');
     const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;z-index:9999;opacity:0;transition:all 0.3s;';
+    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:16px 32px;border-radius:12px;font-weight:700;z-index:9999;opacity:0;transition:all 0.3s;font-size:1rem;';
     document.body.appendChild(toast);
 
     function showToast(msg) {
@@ -247,14 +260,15 @@
     });
     orderTotal.textContent = `Total: $${total.toLocaleString()}`;
 
-    // PayPal Button (original con logo)
+    // PayPal Button (botón oficial más grande)
     if (total > 0 && savedAddress) {
       paypal.Buttons({
         style: {
           shape: 'rect',
           color: 'gold',
           layout: 'vertical',
-          label: 'paypal'
+          label: 'paypal',
+          height: 65  // Aumentado de 55 a 65 para mayor tamaño
         },
         createOrder: (data, actions) => {
           return actions.order.create({
@@ -267,7 +281,7 @@
         },
         onApprove: (data, actions) => {
           return actions.order.capture().then(details => {
-            console.log('PEDIDO PARA ADMIN:', { cart, address: savedAddress, total, orderId: details.id, user: details.payer });
+            console.log('PEDIDO COMPLETO:', { cart, address: savedAddress, total, orderId: details.id, payer: details.payer });
             alert(`¡Pago exitoso! Orden: ${details.id}`);
             localStorage.removeItem('pendingPayment');
             localStorage.removeItem('cart');
@@ -275,12 +289,12 @@
           });
         },
         onError: (err) => {
-          console.error(err);
+          console.error('Error PayPal:', err);
           showToast('Error en el pago. Intenta de nuevo.');
         }
       }).render('#paypal-button-container');
     } else if (total === 0) {
-      document.querySelector('.paypal-container').innerHTML = '<p style="color:#999;">No hay productos en el carrito.</p>';
+      document.querySelector('.paypal-container').innerHTML = '<p style="color:#999; font-size:1.1rem;">No hay productos en el carrito.</p>';
     }
   </script>
 </body>
