@@ -5,42 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* SOLO LOS ESTILOS NECESARIOS PARA LOS CAMBIOS VISUALES */
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .icon-btn {
+      color: #000 !important;
+      background: none;
+    }
+    .icon-btn svg {
+      stroke: #000;
+      fill: none;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #000;
+    }
+    /* X de cerrar sin fondo y negras */
+    .menu-close-x,
+    #closeSearchHeader,
+    .cart-item button {
+      background: none !important;
+      border: none !important;
+      color: #000 !important;
+      font-size: 2rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .cart-item button {
+      font-size: 1.5rem;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- HEADER - AHORA USA SOLO EL CSS DE styles.css -->
- <link rel="stylesheet" href="css/styles.css">
-</head>
-  <header class="header styled-header">
+  <!-- HEADER -->
+  <header class="header">
     <div class="header-inner">
-      <button id="menuBtn" class="icon-btn" aria-label="Menú">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="header-left">
+        <!-- HAMBURGUESA NEGRA A LA IZQUIERDA -->
+        <button id="menuBtn" class="icon-btn" aria-label="Menú">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
 
-      <div class="logo">EFRAÍN</div>
-
-      <!-- BARRA DE BÚSQUEDA INTEGRADA EN EL HEADER -->
-      <div class="search-bar-header" id="searchBarHeader">
-        <input type="text" placeholder="Buscar productos..." id="searchInput">
-        <button id="closeSearchHeader" class="close-search-btn">✕</button>
+        <!-- TÍTULO -->
+        <div class="logo">EFRAÍN</div>
       </div>
 
-      <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
-        <svg viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
-          <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="header-right">
+        <!-- BARRA DE BÚSQUEDA INTEGRADA -->
+        <div class="search-bar-header" id="searchBarHeader">
+          <input type="text" placeholder="Buscar productos..." id="searchInput">
+          <button id="closeSearchHeader" class="close-search-btn">✕</button>
+        </div>
 
-      <button id="cartBtn" class="icon-btn" aria-label="Carrito">
-        <svg viewBox="0 0 24 24">
-          <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span id="cartBadge"></span>
-      </button>
+        <!-- LUPA NEGRA -->
+        <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" width="26" height="26">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <!-- CARRITO NEGRO -->
+        <button id="cartBtn" class="icon-btn" aria-label="Carrito">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="cartBadge"></span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -74,6 +129,7 @@
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
+    <!-- X GRANDE PARA CERRAR MENÚ -->
     <button class="menu-close-x" id="menuClose">✕</button>
     <div class="menu-item welcome">¡Hola, Efraín!</div>
     <div class="menu-item dropdown-toggle">Categorías</div>
@@ -90,6 +146,7 @@
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
+      <!-- X GRANDE PARA CERRAR CARRITO -->
       <button class="menu-close-x" id="closeCart">✕</button>
     </div>
     <div class="cart-items" id="cartItems">
@@ -266,6 +323,7 @@
       }).render('#paypal-button-container');
     }
 
+    // EVENTOS (solo cambié el texto de X a ✕ pero ID igual)
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
