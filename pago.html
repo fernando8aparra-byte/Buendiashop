@@ -119,34 +119,29 @@
       </div>
       <div class="form-section">
         <h3>Método de Pago</h3>
+        <!-- SOLO PAYPAL Y TARJETA -->
         <div class="payment-methods">
-          <p>Aceptamos:</p>
+          <p>Solo aceptamos:</p>
           <div class="payment-logos">
-            <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/PP_Acceptance_Marks_for_LogoCenter_266x142.png" alt="PayPal">
-            <img src="https://img.icons8.com/color/96/000000/visa.png" alt="Visa">
-            <img src="https://img.icons8.com/color/96/000000/mastercard.png" alt="Mastercard">
-            <img src="https://img.icons8.com/color/96/000000/amex.png" alt="American Express">
+            <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/PP_Acceptance_Marks_for_LogoCenter_266x142.png" alt="PayPal" style="height: 50px;">
           </div>
         </div>
         <div class="paypal-container">
-          <p>Paga de forma segura con PayPal</p>
+          <p>Paga con PayPal o <strong>tarjeta de crédito/débito</strong></p>
           <div id="paypal-button-container"></div>
         </div>
-        <p style="text-align:center; margin-top:25px; color:#555; font-size:1rem;">
-          También puedes usar <strong>tarjeta de crédito o débito</strong> directamente en PayPal.
-        </p>
-      </div>
+      </  </div>
     </div>
   </div>
   <footer class="footer">
     <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
-    <p><a href="mailto:contacto@efraínshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
+    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
   <!-- PAYPAL SDK (SANDBOX) -->
   <script src="https://www.paypal.com/sdk/js?client-id=AW4TEmQjpm3qc6RrXVegfR9ni1wCPm59KC2s42nJb4npPz-tj3eVcxa9Wd59We8Vb-GAeu5Y67xeUHZL&currency=MXN&intent=capture"></script>
 
-  <!-- SCRIPT PRINCIPAL CORREGIDO -->
+  <!-- SCRIPT FUNCIONAL -->
   <script>
     const cart = JSON.parse(localStorage.getItem('pendingPayment') || '[]');
     const toast = document.createElement('div');
@@ -159,7 +154,6 @@
       setTimeout(() => toast.style.opacity = '0', 3000);
     }
 
-    // Verificar login
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     const loginRequired = document.getElementById('loginRequired');
     const paymentSection = document.getElementById('paymentSection');
@@ -175,7 +169,6 @@
       paymentSection.style.display = 'block';
     }
 
-    // Cargar dirección
     const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
     const addressForm = document.getElementById('addressForm');
     const addressDisplay = document.getElementById('addressDisplay');
@@ -215,7 +208,6 @@
       location.reload();
     };
 
-    // Resumen del pedido
     const orderItems = document.getElementById('orderItems');
     const orderTotal = document.getElementById('orderTotal');
     let total = 0;
@@ -229,7 +221,6 @@
     });
     orderTotal.textContent = `Total: $${total.toLocaleString('es-MX')}`;
 
-    // PayPal Button
     if (total > 0 && savedAddress) {
       paypal.Buttons({
         style: {
@@ -243,7 +234,7 @@
           return actions.order.create({
             purchase_units: [{
               amount: {
-                value: total.toFixed(2),  // ¡CORREGIDO! Ya no divides entre 100
+                value: total.toFixed(2),
                 currency_code: 'MXN'
               },
               description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
@@ -253,21 +244,6 @@
         },
         onApprove: (data, actions) => {
           return actions.order.capture().then(details => {
-            console.log('PEDIDO COMPLETO:', { cart, address: savedAddress, total, orderId: details.id, payer: details.payer });
             alert(`¡Pago exitoso! Orden: ${details.id}`);
             localStorage.removeItem('pendingPayment');
-            localStorage.removeItem('cart');
-            window.location.href = 'index.html';
-          });
-        },
-        onError: (err) => {
-          console.error('Error PayPal:', err);
-          showToast('Error en el pago. Intenta de nuevo.');
-        }
-      }).render('#paypal-button-container');
-    } else if (total === 0) {
-      document.querySelector('.paypal-container').innerHTML = '<p style="color:#999; font-size:1.1rem;">No hay productos en el carrito.</p>';
-    }
-  </script>
-</body>
-</html>
+            localStorage.removeIte
