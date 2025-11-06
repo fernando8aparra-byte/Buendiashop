@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + OVERLAY PARA CARRITO */
+    /* ESTILOS ANTERIORES + CAMBIOS NUEVOS */
     body {
       margin: 0;
       padding: 0;
@@ -123,7 +123,38 @@
       cursor: pointer;
     }
 
-    /* CARRITO CON OVERLAY */
+    /* CONTACTO DESPLEGABLE */
+    .menu-item.contact-toggle {
+      cursor: pointer;
+      position: relative;
+    }
+    .contact-dropdown {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      background: #f9f9f9;
+      padding: 0 20px;
+    }
+    .contact-dropdown.open {
+      max-height: 200px; /* suficiente para el contenido */
+      padding: 20px;
+    }
+    .contact-text {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .social-links {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .social-links img {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* CARRITO AL FRENTE + SCROLL TÁCTIL MEJORADO */
     .cart-sidebar {
       position: fixed;
       top: 60px;
@@ -131,7 +162,7 @@
       width: 350px;
       height: calc(100vh - 60px);
       background: #fff;
-      z-index: 999;
+      z-index: 1000; /* más alto que todo */
       transform: translateX(100%);
       transition: transform 0.3s ease;
       box-shadow: -2px 0 10px rgba(0,0,0,0.1);
@@ -148,7 +179,7 @@
       width: 100%;
       height: calc(100vh - 60px);
       background: rgba(0,0,0,0.5);
-      z-index: 998;
+      z-index: 999; /* debajo del carrito */
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease;
@@ -242,7 +273,7 @@
   <!-- OVERLAY PARA BÚSQUEDA -->
   <div class="header-overlay" id="headerOverlay"></div>
 
-  <!-- OVERLAY PARA CARRITO (nuevo) -->
+  <!-- OVERLAY PARA CARRITO -->
   <div class="cart-overlay" id="cartOverlay"></div>
 
   <!-- HEADER FIJO ARRIBA -->
@@ -308,7 +339,7 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL -->
+  <!-- MENÚ LATERAL CON CONTACTO DESPLEGABLE -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
@@ -319,7 +350,18 @@
       <div class="submenu-item">Accesorios</div>
     </div>
     <div class="menu-item">Ofertas</div>
-    <div class="menu-item">Contacto</div>
+    
+    <!-- CONTACTO DESPLEGABLE -->
+    <div class="menu-item contact-toggle">Contacto</div>
+    <div class="contact-dropdown" id="contactDropdown">
+      <p class="contact-text">No te quedes sin la primera edición de mi marca</p>
+      <div class="social-links">
+        <!-- REEMPLAZA ESTAS URLS CON TUS LOGOS REALES -->
+        <a href="#"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
+        <a href="#"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
+        <a href="#"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
+      </div>
+    </div>
     
     <div class="menu-item login-btn">
       Inicia sesión o regístrate
@@ -364,6 +406,8 @@
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuSidebar = document.getElementById('menuSidebar');
+    const contactToggle = document.querySelector('.contact-toggle');
+    const contactDropdown = document.getElementById('contactDropdown');
     const searchBtn = document.getElementById('searchBtn');
     const searchBarHeader = document.getElementById('searchBarHeader');
     const closeSearchHeader = document.getElementById('closeSearchHeader');
@@ -371,7 +415,7 @@
     const cartBtn = document.getElementById('cartBtn');
     const cartSidebar = document.getElementById('cartSidebar');
     const closeCart = document.getElementById('closeCart');
-    const cartOverlay = document.getElementById('cartOverlay'); // NUEVO
+    const cartOverlay = document.getElementById('cartOverlay');
     const cartBadge = document.getElementById('cartBadge');
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
@@ -380,6 +424,12 @@
     const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
 
+    // DESPLEGABLE CONTACTO
+    contactToggle.onclick = () => {
+      contactDropdown.classList.toggle('open');
+    };
+
+    // === RENDER FUNCTIONS ===
     function renderProducts() {
       productsGrid.innerHTML = '';
       products.forEach(p => {
@@ -493,7 +543,7 @@
             localStorage.setItem('cart', '[]');
             updateCart();
             cartSidebar.classList.remove('open');
-            cartOverlay.classList.remove('show'); // cerrar overlay también
+            cartOverlay.classList.remove('show');
           });
         },
         onCancel: () => {
@@ -507,7 +557,7 @@
       }).render('#paypal-button-container');
     }
 
-    // === EVENTOS ACTUALIZADOS PARA CARRITO ===
+    // CARRITO
     const openCart = () => {
       cartSidebar.classList.add('open');
       cartOverlay.classList.add('show');
@@ -520,13 +570,11 @@
     cartBtn.onclick = openCart;
     closeCart.onclick = closeCartFunc;
     cartOverlay.onclick = closeCartFunc;
-
-    // Prevenir que toque dentro del carrito cierre
     cartSidebar.onclick = (e) => {
       e.stopPropagation();
     };
 
-    // Menú hamburguesa (igual)
+    // Menú hamburguesa
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
