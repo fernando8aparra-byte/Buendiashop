@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,7 +45,7 @@
     .payment-methods { text-align: center; margin: 30px 0; }
     .payment-methods p { font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; color: #222; }
     .payment-logos { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-    .payment-logos img { height: 70px; transition: transform 0.3s; } /* Aumentado de 60px a 70px */
+    .payment-logos img { height: 60px; transition: transform 0.3s; } /* Regresado a 60px */
     .payment-logos img:hover { transform: scale(1.1); }
 
     .paypal-container { margin: 30px 0; text-align: center; }
@@ -260,7 +259,7 @@
     });
     orderTotal.textContent = `Total: $${total.toLocaleString()}`;
 
-    // PayPal Button (botón oficial más grande)
+    // PayPal Button (botón más grande y funcional)
     if (total > 0 && savedAddress) {
       paypal.Buttons({
         style: {
@@ -268,14 +267,21 @@
           color: 'gold',
           layout: 'vertical',
           label: 'paypal',
-          height: 65  // Aumentado de 55 a 65 para mayor tamaño
+          height: 65  // Más grande que antes
         },
         createOrder: (data, actions) => {
           return actions.order.create({
             purchase_units: [{
-              amount: { value: (total / 100).toFixed(2), currency_code: 'MXN' },
+              amount: { 
+                value: (total / 100).toFixed(2), 
+                currency_code: 'MXN' 
+              },
               description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
-              custom_id: JSON.stringify({ cart, address: savedAddress, user: localStorage.getItem('userName') })
+              custom_id: JSON.stringify({ 
+                cart, 
+                address: savedAddress, 
+                user: localStorage.getItem('userName') 
+              })
             }]
           });
         },
