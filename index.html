@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* SOLO LOS ESTILOS NECESARIOS PARA LOS CAMBIOS VISUALES */
+    /* ESTILOS ANTERIORES + NUEVOS PARA LAS X */
     .header-inner {
       display: flex;
       align-items: center;
@@ -35,23 +35,57 @@
       font-weight: bold;
       color: #000;
     }
-    /* X de cerrar sin fondo y negras */
+
+    /* === X GRANDES (menú, búsqueda, carrito) === */
+    /* Esquina superior derecha, grandes y sin fondo */
     .menu-close-x,
     #closeSearchHeader,
-    .cart-item button {
+    #closeCart {
+      position: absolute;
+      top: 15px;
+      right: 15px;
       background: none !important;
       border: none !important;
       color: #000 !important;
-      font-size: 2rem;
-      width: 40px;
-      height: 40px;
+      font-size: 2.2rem;
+      width: 50px;
+      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      z-index: 10;
+    }
+
+    /* Posicionar los contenedores para que las X queden bien */
+    .menu-sidebar,
+    .cart-sidebar {
+      position: relative;
+    }
+    .search-bar-header {
+      position: relative;
+    }
+
+    /* === X PEQUEÑAS del carrito (eliminar producto) === */
+    .cart-item {
+      position: relative;
+      padding-right: 40px; /* espacio para la X */
     }
     .cart-item button {
-      font-size: 1.5rem;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none !important;
+      border: none !important;
+      color: #000 !important;
+      font-size: 1.1rem; /* más pequeña */
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -129,7 +163,7 @@
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
-    <!-- X GRANDE PARA CERRAR MENÚ -->
+    <!-- X GRANDE ARRIBA DERECHA -->
     <button class="menu-close-x" id="menuClose">✕</button>
     <div class="menu-item welcome">¡Hola, Efraín!</div>
     <div class="menu-item dropdown-toggle">Categorías</div>
@@ -146,7 +180,7 @@
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
-      <!-- X GRANDE PARA CERRAR CARRITO -->
+      <!-- X GRANDE ARRIBA DERECHA -->
       <button class="menu-close-x" id="closeCart">✕</button>
     </div>
     <div class="cart-items" id="cartItems">
@@ -167,7 +201,7 @@
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
-    // TU JS EXACTAMENTE IGUAL (no toqué nada)
+    // TU JS EXACTAMENTE IGUAL
     const products = [
       { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
       { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
@@ -323,7 +357,6 @@
       }).render('#paypal-button-container');
     }
 
-    // EVENTOS (solo cambié el texto de X a ✕ pero ID igual)
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
