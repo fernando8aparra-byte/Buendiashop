@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + NUEVOS CAMBIOS */
+    /* ESTILOS ANTERIORES + OVERLAY PARA CARRITO */
     body {
       margin: 0;
       padding: 0;
@@ -111,7 +111,7 @@
       visibility: visible;
     }
 
-    /* BOTÓN INICIA SESIÓN O REGÍSTRATE (listo para estirar con CSS) */
+    /* BOTÓN LOGIN */
     .menu-item.login-btn {
       background: #000;
       color: #fff;
@@ -123,7 +123,7 @@
       cursor: pointer;
     }
 
-    /* CARRITO CON SCROLL TÁCTIL */
+    /* CARRITO CON OVERLAY */
     .cart-sidebar {
       position: fixed;
       top: 60px;
@@ -141,10 +141,26 @@
     .cart-sidebar.open {
       transform: translateX(0);
     }
+    .cart-overlay {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background: rgba(0,0,0,0.5);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+    .cart-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
     .cart-items {
       flex: 1;
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch; /* scroll suave con dedo en móvil */
+      -webkit-overflow-scrolling: touch;
       padding: 20px;
     }
     .cart-header {
@@ -226,6 +242,9 @@
   <!-- OVERLAY PARA BÚSQUEDA -->
   <div class="header-overlay" id="headerOverlay"></div>
 
+  <!-- OVERLAY PARA CARRITO (nuevo) -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+
   <!-- HEADER FIJO ARRIBA -->
   <header class="header">
     <div class="header-inner">
@@ -289,7 +308,7 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL CON BOTÓN DE INICIO/REGISTRO -->
+  <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
@@ -302,13 +321,12 @@
     <div class="menu-item">Ofertas</div>
     <div class="menu-item">Contacto</div>
     
-    <!-- BOTÓN INICIA SESIÓN O REGÍSTRATE (estira con CSS como quieras) -->
     <div class="menu-item login-btn">
       Inicia sesión o regístrate
     </div>
   </aside>
 
-  <!-- CARRITO LATERAL CON SCROLL TÁCTIL -->
+  <!-- CARRITO LATERAL -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -353,6 +371,7 @@
     const cartBtn = document.getElementById('cartBtn');
     const cartSidebar = document.getElementById('cartSidebar');
     const closeCart = document.getElementById('closeCart');
+    const cartOverlay = document.getElementById('cartOverlay'); // NUEVO
     const cartBadge = document.getElementById('cartBadge');
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
@@ -474,6 +493,7 @@
             localStorage.setItem('cart', '[]');
             updateCart();
             cartSidebar.classList.remove('open');
+            cartOverlay.classList.remove('show'); // cerrar overlay también
           });
         },
         onCancel: () => {
@@ -487,6 +507,26 @@
       }).render('#paypal-button-container');
     }
 
+    // === EVENTOS ACTUALIZADOS PARA CARRITO ===
+    const openCart = () => {
+      cartSidebar.classList.add('open');
+      cartOverlay.classList.add('show');
+    };
+    const closeCartFunc = () => {
+      cartSidebar.classList.remove('open');
+      cartOverlay.classList.remove('show');
+    };
+
+    cartBtn.onclick = openCart;
+    closeCart.onclick = closeCartFunc;
+    cartOverlay.onclick = closeCartFunc;
+
+    // Prevenir que toque dentro del carrito cierre
+    cartSidebar.onclick = (e) => {
+      e.stopPropagation();
+    };
+
+    // Menú hamburguesa (igual)
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
@@ -496,6 +536,7 @@
       menuSidebar.classList.remove('open'); 
     };
 
+    // Búsqueda
     searchBtn.onclick = () => {
       searchBarHeader.classList.add('active');
       headerOverlay.classList.add('show');
@@ -507,9 +548,6 @@
     };
     closeSearchHeader.onclick = closeSearch;
     headerOverlay.onclick = closeSearch;
-
-    cartBtn.onclick = () => cartSidebar.classList.add('open');
-    closeCart.onclick = () => cartSidebar.classList.remove('open');
 
     function showToast(msg) {
       toast.textContent = msg;
