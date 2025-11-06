@@ -37,42 +37,14 @@
       cursor: pointer; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
     }
 
-    /* CONTENEDOR PRINCIPAL */
-    .main-container { padding: 20px; }
+    /* VISTA PREVIA */
+    .main-container { padding: 20px; position: relative; }
+    .product-card, .editable {
+      position: relative; transition: all 0.3s;
+    }
+    .product-card:hover, .editable:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-    /* SECCIÓN CONTENIDO FIRESTORE */
-    .content-editor {
-      background: #f8f8f8; padding: 25px; margin-bottom: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .content-editor h2 {
-      margin-top: 0; font-size: 1.5rem; text-transform: uppercase; margin-bottom: 20px; color: #000;
-    }
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; color: #333;
-    }
-    .form-group input, .form-group textarea, .form-group select {
-      width: 100%; padding: 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 1rem;
-      font-family: inherit; resize: vertical;
-    }
-    .btn-save-content {
-      background: #000; color: #fff; padding: 14px 24px; border: none; border-radius: 8px;
-      font-weight: bold; font-size: 1rem; cursor: pointer; text-transform: uppercase;
-    }
-    .btn-save-content:hover { background: #111; }
-
-    /* PRODUCTOS EN GRID */
-    .products-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;
-    }
-    .product-card {
-      background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative;
-    }
-    .product-card img { width: 100%; height: 180px; object-fit: cover; }
-    .card-info { padding: 16px; }
-    .product-title { margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; }
-    .product-description { font-size: 0.9rem; color: #666; margin-bottom: 12px; }
-    .product-price { font-size: 1.3rem; font-weight: 800; color: #000; }
+    /* ACCIONES EN PRODUCTOS */
     .product-actions {
       position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.3s;
     }
@@ -81,7 +53,20 @@
       background: #000; color: #fff; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
     }
 
-    /* MODAL PRODUCTO */
+    /* ICONO LÁPIZ PARA TEXTOS */
+    .text-edit {
+      position: absolute; top: 4px; right: 4px; background: #000; color: #fff; width: 28px; height: 28px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.3s; cursor: pointer;
+    }
+    .editable:hover .text-edit { opacity: 1; }
+
+    /* SWITCH HABILITADO */
+    .switch-small { width: 40px; height: 20px; }
+    .switch-small .slider:before { height: 16px; width: 16px; left: 2px; bottom: 2px; }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    /* MODAL */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000;
       align-items: center; justify-content: center;
@@ -92,6 +77,11 @@
     }
     .modal-close {
       position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #000;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 1rem;
     }
     .btn-save { background: #000; color: #fff; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
@@ -105,15 +95,6 @@
     .image-preview {
       margin-top: 10px; max-width: 100%; max-height: 150px; border-radius: 8px; display: none;
     }
-
-    /* TEXTOS EDITABLES */
-    .editable {
-      position: relative; cursor: pointer; min-height: 1.2em;
-    }
-    .text-actions {
-      position: absolute; top: 4px; right: 4px; opacity: 0; transition: opacity 0.3s;
-    }
-    .editable:hover .text-actions { opacity: 1; }
 
     /* MANTENIMIENTO */
     .maintenance-banner {
@@ -144,6 +125,7 @@
         <a href="admin-map.html">Mapa de Compras</a>
         <a href="admin-compras.html">Compras</a>
         <a href="admin-stats.html">Estadísticas</a>
+        <a href="admin-nosotros.html">Nosotros</a>
       </div>
       <button class="add-btn" id="addProductBtn">+</button>
     </div>
@@ -157,34 +139,8 @@
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <div class="main-container">
-
-    <!-- EDICIÓN DE CONTENIDO -->
-    <div class="content-editor">
-      <h2>Editar Contenido Principal</h2>
-      <div class="form-group">
-        <label>Título (noticias/principal)</label>
-        <input type="text" id="tituloInput">
-      </div>
-      <div class="form-group">
-        <label>Texto (noticias/principal)</label>
-        <textarea id="textoInput" rows="4"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Subtítulo (lanzamientos/texto)</label>
-        <textarea id="subtituloInput" rows="3"></textarea>
-      </div>
-      <button class="btn-save-content" id="saveContentBtn">Guardar Cambios</button>
-      <p id="saveStatus" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></p>
-    </div>
-
-    <!-- VISTA PREVIA DEL INDEX -->
-    <div class="content-editor">
-      <h2>Vista Previa de la Tienda</h2>
-      <div id="indexClone"></div>
-    </div>
-  </div>
+  <!-- VISTA PREVIA -->
+  <div class="main-container" id="indexClone"></div>
 
   <!-- MODAL PRODUCTO -->
   <div class="modal" id="productModal">
@@ -267,47 +223,9 @@
     // === VARIABLES GLOBALES ===
     let currentProductId = null;
     let currentTextElement = null;
-    let currentTextDocPath = null;
+    let currentTextPath = null;
 
-    // === CARGAR CONTENIDO NOTICIAS Y LANZAMIENTOS ===
-    async function loadContent() {
-      try {
-        const noticiaDoc = await db.collection('noticias').doc('principal').get();
-        const lanzamientoDoc = await db.collection('lanzamientos').doc('texto').get();
-
-        if (noticiaDoc.exists) {
-          const data = noticiaDoc.data();
-          document.getElementById('tituloInput').value = data.titulo || '';
-          document.getElementById('textoInput').value = data.texto || '';
-        }
-        if (lanzamientoDoc.exists) {
-          const data = lanzamientoDoc.data();
-          document.getElementById('subtituloInput').value = data.subtitulo || '';
-        }
-      } catch (e) { console.error(e); }
-    }
-
-    // === GUARDAR CONTENIDO ===
-    document.getElementById('saveContentBtn').onclick = async () => {
-      const status = document.getElementById('saveStatus');
-      status.textContent = 'Guardando...'; status.style.color = '#666';
-      try {
-        await db.collection('noticias').doc('principal').set({
-          titulo: document.getElementById('tituloInput').value.trim(),
-          texto: document.getElementById('textoInput').value.trim()
-        }, { merge: true });
-
-        await db.collection('lanzamientos').doc('texto').set({
-          subtitulo: document.getElementById('subtituloInput').value.trim()
-        }, { merge: true });
-
-        status.textContent = '¡Cambios guardados!'; status.style.color = '#28a745';
-      } catch (e) {
-        status.textContent = 'Error'; status.style.color = '#e63946';
-      }
-    };
-
-    // === CLONAR INDEX Y CARGAR PRODUCTOS ===
+    // === CLONAR INDEX ===
     fetch('index.html')
       .then(r => r.text())
       .then(html => {
@@ -317,25 +235,24 @@
         if (main) {
           document.getElementById('indexClone').innerHTML = main.innerHTML;
           initAdmin();
-          loadContent();
         }
       });
 
     function initAdmin() {
       // === CARGAR PRODUCTOS POR TIPO ===
-      const heroContainer = document.querySelector('#indexClone .hero') || document.createElement('div');
-      const carruselContainer = document.querySelector('#indexClone .carrusel') || document.createElement('div');
-      const publicidadContainer = document.querySelector('#indexClone .publicidad') || document.createElement('div');
-      const normalGrid = document.querySelector('#indexClone .products-grid');
+      const containers = {
+        principal: document.querySelector('#indexClone .hero'),
+        carrusel: document.querySelector('#indexClone .carrusel'),
+        publicidad: document.querySelector('#indexClone .publicidad'),
+        normal: document.querySelector('#indexClone .products-grid')
+      };
 
-      db.collection('productos').where('habilitado', '==', true).get().then(snapshot => {
+      db.collection('productos').get().then(snapshot => {
         snapshot.forEach(doc => {
           const p = doc.data();
+          if (!p.habilitado && p.tipo !== 'normal') return;
           const card = createProductCard(p, doc.id);
-          if (p.tipo === 'principal' && heroContainer) heroContainer.appendChild(card.cloneNode(true));
-          if (p.tipo === 'carrusel' && carruselContainer) carruselContainer.appendChild(card.cloneNode(true));
-          if (p.tipo === 'publicidad' && publicidadContainer) publicidadContainer.appendChild(card.cloneNode(true));
-          if (p.tipo === 'normal' && normalGrid) normalGrid.appendChild(card);
+          if (containers[p.tipo]) containers[p.tipo].appendChild(card);
         });
       });
 
@@ -352,53 +269,56 @@
             <h3 class="product-title">${p.nombre}</h3>
             <p class="product-description">${p.descripcion}</p>
             <div class="price-container">
-              <span class="product-price">${p.precioFormateado || `$${(p.precio || 0).toFixed(2)}`}</span>
+              <span class="product-price">${p.precioFormateado}</span>
             </div>
+            <label class="switch switch-small" style="margin-top:8px;">
+              <input type="checkbox" ${p.habilitado ? 'checked' : ''} onchange="toggleProduct('${id}', this.checked)">
+              <span class="slider"></span>
+            </label>
           </div>
         `;
         return div;
       }
 
-      // === TEXTOS EDITABLES CON GUARDADO EN FIRESTORE ===
-      const editableSelectors = '#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag, #indexClone .hero-title, #indexClone .hero-subtitle';
-      document.querySelectorAll(editableSelectors).forEach(el => {
+      // === TEXTOS EDITABLES ===
+      const editableEls = document.querySelectorAll('#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag, #indexClone .hero-title, #indexClone .hero-subtitle');
+      editableEls.forEach(el => {
         el.classList.add('editable');
-        const actions = document.createElement('div');
-        actions.className = 'text-actions';
-        actions.innerHTML = `<button class="action-btn" onclick="editText(this, '${getTextPath(el)}')">Edit</button>`;
-        el.appendChild(actions);
+        const editBtn = document.createElement('div');
+        editBtn.className = 'text-edit';
+        editBtn.innerHTML = 'Edit';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          currentTextElement = el;
+          currentTextPath = getTextPath(el);
+          document.getElementById('editTextInput').value = el.innerText.trim();
+          document.getElementById('editTextModal').classList.add('active');
+        };
+        el.appendChild(editBtn);
       });
 
       function getTextPath(el) {
-        if (el.closest('.hero')) return 'noticias/principal/titulo';
-        if (el.classList.contains('hero-subtitle')) return 'noticias/principal/texto';
+        if (el.closest('.hero') && el.tagName === 'H1') return 'noticias/principal/titulo';
+        if (el.closest('.hero') && el.tagName === 'P') return 'noticias/principal/texto';
         if (el.closest('.lanzamientos')) return 'lanzamientos/texto/subtitulo';
         return null;
       }
 
-      window.editText = (btn, path) => {
-        currentTextElement = btn.parentElement.parentElement;
-        currentTextDocPath = path;
-        document.getElementById('editTextInput').value = currentTextElement.innerText.trim();
-        document.getElementById('editTextModal').classList.add('active');
-      };
-
+      // === GUARDAR TEXTO ===
       document.getElementById('saveTextBtn').onclick = async () => {
-        if (currentTextElement && currentTextDocPath) {
-          const [collection, doc, field] = currentTextDocPath.split('/');
+        if (currentTextElement && currentTextPath) {
+          const [col, doc, field] = currentTextPath.split('/');
           try {
-            await db.collection(collection).doc(doc).update({ [field]: document.getElementById('editTextInput').value });
-            currentTextElement.innerHTML = document.getElementById('editTextInput').value +
-              '<div class="text-actions"><button class="action-btn" onclick="editText(this, \'' + currentTextDocPath + '\')">Edit</button></div>';
+            await db.collection(col).doc(doc).update({ [field]: document.getElementById('editTextInput').value });
+            currentTextElement.innerHTML = document.getElementById('editTextInput').value + 
+              `<div class="text-edit" onclick="editText(this, '${currentTextPath}')">Edit</div>`;
             document.getElementById('editTextModal').classList.remove('active');
-          } catch (e) { alert('Error al guardar texto'); }
+          } catch (e) { alert('Error'); }
         }
       };
 
       // === MODAL PRODUCTO ===
       const modal = document.getElementById('productModal');
-      const closeModal = document.getElementById('closeProductModal');
-
       document.getElementById('addProductBtn').onclick = () => {
         currentProductId = null;
         document.getElementById('modalTitle').textContent = 'Agregar Producto';
@@ -406,112 +326,90 @@
         modal.classList.add('active');
       };
 
-      closeModal.onclick = () => modal.classList.remove('active');
-      window.onclick = (e) => { if (e.target === modal || e.target === document.getElementById('editTextModal')) modal.classList.remove('active'); };
+      document.getElementById('closeProductModal').onclick = () => modal.classList.remove('active');
+      document.getElementById('closeTextModal').onclick = () => document.getElementById('editTextModal').classList.remove('active');
 
       function clearProductForm() {
-        document.getElementById('productName').value = '';
-        document.getElementById('productPrice').value = '';
-        document.getElementById('productDesc').value = '';
+        ['productName', 'productPrice', 'productDesc', 'productImageUrl'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('productType').value = 'normal';
-        document.getElementById('productImageUrl').value = '';
         document.getElementById('imagePreview').style.display = 'none';
-        document.getElementById('imageUpload').querySelector('p').textContent = 'Haz clic para subir imagen';
       }
 
       // === SUBIDA DE IMAGEN ===
-      const imageInput = document.getElementById('imageInput');
-      const imagePreview = document.getElementById('imagePreview');
-      const imageUrlInput = document.getElementById('productImageUrl');
-
-      document.getElementById('imageUpload').onclick = () => imageInput.click();
-      imageInput.onchange = async (e) => {
+      document.getElementById('imageUpload').onclick = () => document.getElementById('imageInput').click();
+      document.getElementById('imageInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        imagePreview.src = URL.createObjectURL(file);
-        imagePreview.style.display = 'block';
-        try {
-          const ref = storage.ref(`productos/${Date.now()}_${file.name}`);
-          await ref.put(file);
-          const url = await ref.getDownloadURL();
-          imageUrlInput.value = url;
-        } catch (err) { alert('Error al subir imagen'); }
+        const preview = document.getElementById('imagePreview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+        const ref = storage.ref(`productos/${Date.now()}_${file.name}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        document.getElementById('productImageUrl').value = url;
       };
 
       // === EDITAR PRODUCTO ===
       window.editProduct = async (id) => {
         currentProductId = id;
         document.getElementById('modalTitle').textContent = 'Editar Producto';
-        try {
-          const doc = await db.collection('productos').doc(id).get();
-          if (doc.exists) {
-            const p = doc.data();
-            document.getElementById('productName').value = p.nombre || '';
-            document.getElementById('productPrice').value = p.precio || '';
-            document.getElementById('productDesc').value = p.descripcion || '';
-            document.getElementById('productType').value = p.tipo || 'normal';
-            document.getElementById('productImageUrl').value = p.imagen || '';
-            if (p.imagen) {
-              imagePreview.src = p.imagen;
-              imagePreview.style.display = 'block';
-            } else {
-              imagePreview.style.display = 'none';
-            }
-            modal.classList.add('active');
+        const doc = await db.collection('productos').doc(id).get();
+        if (doc.exists) {
+          const p = doc.data();
+          document.getElementById('productName').value = p.nombre;
+          document.getElementById('productPrice').value = p.precio;
+          document.getElementById('productDesc').value = p.descripcion;
+          document.getElementById('productType').value = p.tipo;
+          document.getElementById('productImageUrl').value = p.imagen;
+          if (p.imagen) {
+            document.getElementById('imagePreview').src = p.imagen;
+            document.getElementById('imagePreview').style.display = 'block';
           }
-        } catch (e) { alert('Error al cargar producto'); }
+          modal.classList.add('active');
+        }
       };
 
       // === GUARDAR PRODUCTO ===
       document.getElementById('saveProductBtn').onclick = async () => {
-        const nombre = document.getElementById('productName').value.trim();
-        const precio = parseFloat(document.getElementById('productPrice').value);
-        const descripcion = document.getElementById('productDesc').value.trim();
-        const tipo = document.getElementById('productType').value;
-        const imagen = document.getElementById('productImageUrl').value.trim();
-
-        if (!nombre || isNaN(precio) || !imagen) {
-          alert('Completa nombre, precio e imagen');
-          return;
-        }
-
-        const precioFormateado = `$${precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
-        const data = { nombre, precio, precioFormateado, descripcion, tipo, imagen, habilitado: true, fecha: firebase.firestore.FieldValue.serverTimestamp() };
+        const data = {
+          nombre: document.getElementById('productName').value.trim(),
+          precio: parseFloat(document.getElementById('productPrice').value),
+          descripcion: document.getElementById('productDesc').value.trim(),
+          tipo: document.getElementById('productType').value,
+          imagen: document.getElementById('productImageUrl').value,
+          habilitado: true,
+          precioFormateado: `$${parseFloat(document.getElementById('productPrice').value).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+          fecha: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
         try {
           if (currentProductId) {
             await db.collection('productos').doc(currentProductId).update(data);
-            alert('Producto actualizado');
           } else {
             await db.collection('productos').add(data);
-            alert('Producto agregado');
           }
           modal.classList.remove('active');
-          location.reload(); // Recarga suave para reubicar por tipo
-        } catch (e) {
-          alert('Error al guardar');
-        }
+          location.reload();
+        } catch (e) { alert('Error'); }
       };
 
-      // === ELIMINAR PRODUCTO ===
+      // === TOGGLE HABILITADO ===
+      window.toggleProduct = async (id, enabled) => {
+        await db.collection('productos').doc(id).update({ habilitado: enabled });
+      };
+
+      // === ELIMINAR ===
       window.deleteProduct = async (id) => {
-        if (confirm('¿Eliminar este producto?')) {
-          try {
-            await db.collection('productos').doc(id).delete();
-            location.reload();
-          } catch (e) {
-            alert('Error al eliminar');
-          }
+        if (confirm('¿Eliminar?')) {
+          await db.collection('productos').doc(id).delete();
+          location.reload();
         }
       };
 
-      // === MENÚ DESPLEGABLE ===
+      // === MENÚ ===
       const settingsBtn = document.getElementById('settingsBtn');
       const settingsMenu = document.getElementById('settingsMenu');
-      settingsBtn.onclick = (e) => {
-        e.stopPropagation();
-        settingsMenu.classList.toggle('active');
-      };
+      settingsBtn.onclick = (e) => { e.stopPropagation(); settingsMenu.classList.toggle('active'); };
       document.addEventListener('click', () => settingsMenu.classList.remove('active'));
 
       // === MANTENIMIENTO ===
@@ -528,7 +426,6 @@
       // === CERRAR SESIÓN ===
       document.getElementById('logoutBtn').onclick = () => {
         localStorage.removeItem('isAdmin');
-        localStorage.removeItem('loggedIn');
         window.location.href = 'index.html';
       };
     }
