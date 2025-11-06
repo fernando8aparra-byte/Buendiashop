@@ -237,7 +237,7 @@
       container.innerHTML = '';
 
       paypal.Buttons({
-        createOrder: function(data, actions) { ... }
+        createOrder: function() {
           return actions.order.create({
             purchase_units: [{
               amount: { value: (amount / 100).toFixed(2) }
