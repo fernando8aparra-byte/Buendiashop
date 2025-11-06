@@ -259,7 +259,7 @@
         createOrder: (data, actions) => {
           return actions.order.create({
             purchase_units: [{
-              amount: { value: (total / 100).toFixed(2), currency_code: 'MXN' },
+              amount: { value: total.toFixed(2), currency_code: 'MXN' },
               description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
               custom_id: JSON.stringify({ cart, address: savedAddress, user: localStorage.getItem('userName') })
             }]
