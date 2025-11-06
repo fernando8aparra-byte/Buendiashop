@@ -12,78 +12,59 @@
     
     .form-section { background: #fff; padding: 32px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); margin-bottom: 28px; }
     .form-section h3 { margin-top: 0; font-size: 1.55rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.8px; }
-
     .form-row { display: flex; gap: 18px; margin-bottom: 18px; }
     .form-group { flex: 1; }
     .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 1.05rem; color: #222; }
-    .form-group input, .form-group select { 
-      width: 100%; padding: 16px; border: 2px solid #ccc; border-radius: 10px; 
-      font-size: 1.1rem; transition: border 0.3s; 
+    .form-group input, .form-group select {
+      width: 100%; padding: 16px; border: 2px solid #ccc; border-radius: 10px;
+      font-size: 1.1rem; transition: border 0.3s;
     }
     .form-group input:focus, .form-group select:focus { border-color: #000; outline: none; }
-
-    .btn-primary { 
-      background: #000; color: #fff; padding: 18px; text-align: center; border-radius: 12px; 
-      font-weight: 800; cursor: pointer; margin-top: 25px; width: 100%; font-size: 1.3rem; 
-      text-transform: uppercase; letter-spacing: 1.2px; transition: background 0.3s; 
+    .btn-primary {
+      background: #000; color: #fff; padding: 18px; text-align: center; border-radius: 12px;
+      font-weight: 800; cursor: pointer; margin-top: 25px; width: 100%; font-size: 1.3rem;
+      text-transform: uppercase; letter-spacing: 1.2px; transition: background 0.3s;
     }
     .btn-primary:hover { background: #111; }
-
-    .btn-edit { 
-      background: #f0f0f0; color: #000; padding: 10px 16px; font-size: 0.9rem; 
-      border-radius: 8px; cursor: pointer; float: right; font-weight: 600; 
+    .btn-edit {
+      background: #f0f0f0; color: #000; padding: 10px 16px; font-size: 0.9rem;
+      border-radius: 8px; cursor: pointer; float: right; font-weight: 600;
     }
-
     .order-summary { background: #f8f8f8; padding: 28px; border-radius: 16px; }
     .order-item { display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.1rem; border-bottom: 1px solid #ddd; }
     .order-total { font-weight: 900; font-size: 1.7rem; margin-top: 18px; text-align: right; color: #000; }
-
     .login-required { text-align: center; padding: 50px 20px; background: #fff; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
     .login-required h2 { font-size: 1.8rem; margin-bottom: 16px; }
     .login-required p { color: #555; margin-bottom: 25px; font-size: 1.1rem; }
-
     .payment-methods { text-align: center; margin: 30px 0; }
     .payment-methods p { font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; color: #222; }
     .payment-logos { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-    .payment-logos img { height: 60px; transition: transform 0.3s; } /* Regresado a 60px */
+    .payment-logos img { height: 60px; transition: transform 0.3s; }
     .payment-logos img:hover { transform: scale(1.1); }
-
     .paypal-container { margin: 30px 0; text-align: center; }
     .paypal-container p { font-weight: 700; font-size: 1.3rem; margin-bottom: 18px; color: #222; }
-
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.95rem; margin-top: 50px; }
     .footer a { color: #fff; text-decoration: underline; }
   </style>
 </head>
 <body>
-
-  <!-- HEADER SIMPLE -->
   <div class="header">EFRAÍN SHOP - PAGO SEGURO</div>
-
   <div class="container">
-
-    <!-- SI NO ESTÁ LOGUEADO -->
     <div id="loginRequired" class="login-required" style="display:none;">
       <h2>Debes iniciar sesión</h2>
       <p>Para continuar con tu compra, necesitas estar registrado.</p>
       <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
-
-    <!-- SECCIÓN DE PAGO -->
     <div id="paymentSection" style="display:none;">
-
-      <!-- DIRECCIÓN DE ENVÍO -->
       <div class="form-section">
         <h3>Dirección de Envío</h3>
         <button class="btn-edit" id="editAddressBtn">Editar</button>
-
         <div id="addressDisplay">
           <p><strong>Nombre:</strong> <span id="dispName">-</span></p>
           <p><strong>Teléfono:</strong> <span id="dispPhone">-</span></p>
           <p><strong>Dirección:</strong> <span id="dispAddress">-</span></p>
           <p><strong>Estado:</strong> <span id="dispState">-</span></p>
         </div>
-
         <form id="addressForm">
           <div class="form-row">
             <div class="form-group">
@@ -131,19 +112,13 @@
           <button type="submit" class="btn-primary">Guardar y Continuar</button>
         </form>
       </div>
-
-      <!-- RESUMEN DE PEDIDO -->
       <div class="form-section order-summary">
         <h3>Resumen del Pedido</h3>
         <div id="orderItems"></div>
         <div class="order-total" id="orderTotal">Total: $0</div>
       </div>
-
-      <!-- MÉTODOS DE PAGO -->
       <div class="form-section">
         <h3>Método de Pago</h3>
-
-        <!-- LOGOS DE PAGO -->
         <div class="payment-methods">
           <p>Aceptamos:</p>
           <div class="payment-logos">
@@ -153,30 +128,25 @@
             <img src="https://img.icons8.com/color/96/000000/amex.png" alt="American Express">
           </div>
         </div>
-
-        <!-- BOTÓN PAYPAL OFICIAL -->
         <div class="paypal-container">
           <p>Paga de forma segura con PayPal</p>
           <div id="paypal-button-container"></div>
         </div>
-
         <p style="text-align:center; margin-top:25px; color:#555; font-size:1rem;">
           También puedes usar <strong>tarjeta de crédito o débito</strong> directamente en PayPal.
         </p>
       </div>
     </div>
   </div>
-
-  <!-- PIE DE PÁGINA -->
   <footer class="footer">
     <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
-    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
+    <p><a href="mailto:contacto@efraínshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
   <!-- PAYPAL SDK (SANDBOX) -->
   <script src="https://www.paypal.com/sdk/js?client-id=AW4TEmQjpm3qc6RrXVegfR9ni1wCPm59KC2s42nJb4npPz-tj3eVcxa9Wd59We8Vb-GAeu5Y67xeUHZL&currency=MXN&intent=capture"></script>
 
-  <!-- SCRIPT PRINCIPAL -->
+  <!-- SCRIPT PRINCIPAL CORREGIDO -->
   <script>
     const cart = JSON.parse(localStorage.getItem('pendingPayment') || '[]');
     const toast = document.createElement('div');
@@ -253,13 +223,13 @@
     cart.forEach(item => {
       const div = document.createElement('div');
       div.className = 'order-item';
-      div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString()}</span>`;
+      div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString('es-MX')}</span>`;
       orderItems.appendChild(div);
       total += item.price * item.qty;
     });
-    orderTotal.textContent = `Total: $${total.toLocaleString()}`;
+    orderTotal.textContent = `Total: $${total.toLocaleString('es-MX')}`;
 
-    // PayPal Button (botón más grande y funcional)
+    // PayPal Button
     if (total > 0 && savedAddress) {
       paypal.Buttons({
         style: {
@@ -267,21 +237,17 @@
           color: 'gold',
           layout: 'vertical',
           label: 'paypal',
-          height: 65  // Más grande que antes
+          height: 55
         },
         createOrder: (data, actions) => {
           return actions.order.create({
             purchase_units: [{
-              amount: { 
-                value: (total / 100).toFixed(2), 
-                currency_code: 'MXN' 
+              amount: {
+                value: total.toFixed(2),  // ¡CORREGIDO! Ya no divides entre 100
+                currency_code: 'MXN'
               },
               description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
-              custom_id: JSON.stringify({ 
-                cart, 
-                address: savedAddress, 
-                user: localStorage.getItem('userName') 
-              })
+              custom_id: JSON.stringify({ cart, address: savedAddress, user: localStorage.getItem('userName') })
             }]
           });
         },
