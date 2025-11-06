@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES (sin cambios) */
+    /* ESTILOS ANTERIORES */
     body {
       margin: 0;
       padding: 0;
@@ -157,15 +157,16 @@
     }
     .submenu.open,
     .contact-dropdown.open {
-      max-height: 500px; /* más espacio para nuevas categorías */
+      max-height: 500px;
       padding: 20px;
     }
     .submenu-item {
       padding: 12px 0;
       border-bottom: 1px solid #ddd;
+      cursor: pointer;
     }
 
-    /* BOTÓN LOGIN */
+    /* BOTÓN LOGIN / LOGOUT */
     .menu-item.login-btn {
       background: #000;
       color: #fff;
@@ -178,6 +179,10 @@
     }
     .menu-item.login-btn::after {
       display: none;
+    }
+    .menu-item.logout-btn {
+      background: #ff0000;
+      color: #fff;
     }
 
     /* CONTACTO */
@@ -246,6 +251,22 @@
       border-top: 1px solid #eee;
       background: #fff;
     }
+    .payment-options {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .payment-btn {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .paypal-btn { background: #ffc439; }
+    .card-btn { background: #f8f8f8; }
 
     /* X DE BÚSQUEDA Y CARRITO */
     #closeSearchHeader,
@@ -381,12 +402,12 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL CON CATEGORÍAS ACTUALIZADAS -->
+  <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item welcome">¡Hola, Efraín!</div>
+    <div class="menu-item welcome" id="welcomeMsg">¡Hola, Efraín!</div>
     
-    <!-- PRODUCTOS DESPLEGABLE (cambiado de Categorías a Productos) -->
+    <!-- PRODUCTOS DESPLEGABLE -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
     <div class="submenu" id="categoriesSubmenu">
       <div class="submenu-item">Bótense de gorras</div>
@@ -411,9 +432,7 @@
       </div>
     </div>
     
-    <div class="menu-item login-btn">
-      Inicia sesión o regístrate
-    </div>
+    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
 
   <!-- CARRITO LATERAL -->
@@ -428,7 +447,13 @@
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
       <div class="go-to-pay">Ir a Pagar</div>
-      <div id="paypal-button-container"></div>
+      
+      <div class="payment-options">
+        <div class="payment-btn paypal-btn" id="paypalBtn">PayPal</div>
+        <div class="payment-btn card-btn" id="cardBtn">💳 Tarjeta</div>
+      </div>
+      
+      <div id="paypal-button-container" style="margin-top: 15px;"></div>
       <div id="message"></div>
     </div>
   </aside>
@@ -440,7 +465,6 @@
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <script>
-    // PRODUCTOS (mantengo los 16 para que siga llena la tienda)
     const products = [
       { id: 1, name: "Gorra GALAXY CT", price: 1800, oldPrice: 2200, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
       { id: 2, name: "Camiseta Oversize Black", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
@@ -461,6 +485,8 @@
     ];
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+    let userName = localStorage.getItem('userName') || 'Efraín';
 
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
@@ -469,6 +495,8 @@
     const categoriesSubmenu = document.getElementById('categoriesSubmenu');
     const contactToggle = document.getElementById('contactToggle');
     const contactDropdown = document.getElementById('contactDropdown');
+    const authBtn = document.getElementById('authBtn');
+    const welcomeMsg = document.getElementById('welcomeMsg');
     const searchBtn = document.getElementById('searchBtn');
     const searchBarHeader = document.getElementById('searchBarHeader');
     const closeSearchHeader = document.getElementById('closeSearchHeader');
@@ -484,18 +512,79 @@
     const newCarousel = document.getElementById('newCarousel');
     const starCarousel = document.getElementById('starCarousel');
     const toast = document.getElementById('toast');
+    const paypalBtn = document.getElementById('paypalBtn');
+    const cardBtn = document.getElementById('cardBtn');
 
-    // TOGGLES
-    categoriesToggle.onclick = () => {
+    // === DETECCIÓN DE SESIÓN ===
+    function updateAuthUI() {
+      if (isLoggedIn) {
+        welcomeMsg.textContent = `¡Hola, ${userName}!`;
+        authBtn.textContent = 'Cerrar sesión';
+        authBtn.classList.add('logout-btn');
+      } else {
+        welcomeMsg.textContent = '¡Hola, Efraín!';
+        authBtn.textContent = 'Inicia sesión o regístrate';
+        authBtn.classList.remove('logout-btn');
+      }
+    }
+
+    authBtn.onclick = () => {
+      if (isLoggedIn) {
+        localStorage.removeItem('loggedIn');
+        localStorage.removeItem('userName');
+        isLoggedIn = false;
+        showToast('Sesión cerrada');
+      } else {
+        // Simular login
+        const name = prompt('Nombre de usuario:');
+        if (name) {
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userName', name);
+          isLoggedIn = true;
+          userName = name;
+          showToast(`¡Bienvenido, ${name}!`);
+        }
+      }
+      updateAuthUI();
+    };
+
+    // === DESPLEGABLES (ARREGLADO) ===
+    categoriesToggle.onclick = (e) => {
+      e.stopPropagation();
       categoriesToggle.classList.toggle('open');
       categoriesSubmenu.classList.toggle('open');
     };
-    contactToggle.onclick = () => {
+
+    contactToggle.onclick = (e) => {
+      e.stopPropagation();
       contactToggle.classList.toggle('open');
       contactDropdown.classList.toggle('open');
     };
 
-    // RENDER FUNCTIONS
+    // Cerrar desplegables al tocar fuera
+    menuSidebar.onclick = (e) => e.stopPropagation();
+    menuOverlay.onclick = () => {
+      menuOverlay.classList.remove('show');
+      menuSidebar.classList.remove('open');
+      categoriesToggle.classList.remove('open');
+      categoriesSubmenu.classList.remove('open');
+      contactToggle.classList.remove('open');
+      contactDropdown.classList.remove('open');
+    };
+
+    // === BOTONES DE PAGO ===
+    paypalBtn.onclick = () => {
+      document.getElementById('paypal-button-container').style.display = 'block';
+      renderPayPalButton(getTotal());
+    };
+
+    cardBtn.onclick = () => {
+      alert('Redirigiendo a pago con tarjeta (Mercado Pago / Stripe simulado)');
+      // Aquí puedes poner tu link real de pago con tarjeta
+      window.location.href = 'https://www.mercadopago.com.mx/';
+ dofinans    };
+
+    // === RENDER FUNCTIONS ===
     function renderProducts() {
       productsGrid.innerHTML = '';
       products.forEach(p => {
@@ -534,6 +623,10 @@
       });
     }
 
+    function getTotal() {
+      return cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    }
+
     function addToCart(id) {
       const product = products.find(p => p.id === id);
       const existing = cart.find(i => i.id === id);
@@ -552,7 +645,7 @@
 
     function updateCart() {
       cartItems.innerHTML = '';
-      let total = 0;
+      let total = getTotal();
       const badge = cart.reduce((sum, i) => sum + i.qty, 0);
       cartBadge.style.display = badge > 0 ? 'flex' : 'none';
       cartBadge.textContent = badge;
@@ -567,7 +660,6 @@
       document.querySelector('.go-to-pay').style.display = 'block';
 
       cart.forEach((item, i) => {
-        total += item.price * item.qty;
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
@@ -582,12 +674,12 @@
       });
 
       cartTotal.textContent = `Total: $${total.toLocaleString()}`;
-      renderPayPalButton(total);
     }
 
     function renderPayPalButton(amount) {
       const container = document.getElementById('paypal-button-container');
       container.innerHTML = '';
+      if (amount === 0) return;
 
       paypal.Buttons({
         createOrder: function() {
@@ -599,33 +691,21 @@
         },
         onApprove: function(data, actions) {
           return actions.order.capture().then(details => {
-            document.getElementById('message').innerHTML = `
-              ¡Pago exitoso! Orden: ${details.id}<br>
-              Gracias, ${details.payer.name.given_name}
-            `;
+            document.getElementById('message').innerHTML = `¡Pago exitoso con PayPal! Orden: ${details.id}`;
             document.getElementById('message').className = 'success';
             cart = [];
             localStorage.setItem('cart', '[]');
             updateCart();
-            cartSidebar.classList.remove('open');
-            cartOverlay.classList.remove('show');
           });
-        },
-        onCancel: () => {
-          document.getElementById('message').innerHTML = 'Pago cancelado.';
-          document.getElementById('message').className = 'cancel';
-        },
-        onError: (err) => {
-          document.getElementById('message').innerHTML = 'Error: ' + err;
-          document.getElementById('message').className = 'error';
         }
       }).render('#paypal-button-container');
     }
 
-    // EVENTOS
+    // EVENTOS GENERALES
     const openCart = () => {
       cartSidebar.classList.add('open');
       cartOverlay.classList.add('show');
+      updateCart();
     };
     const closeCartFunc = () => {
       cartSidebar.classList.remove('open');
@@ -635,15 +715,10 @@
     cartBtn.onclick = openCart;
     closeCart.onclick = closeCartFunc;
     cartOverlay.onclick = closeCartFunc;
-    cartSidebar.onclick = (e) => e.stopPropagation();
 
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
-    };
-    menuOverlay.onclick = () => { 
-      menuOverlay.classList.remove('show'); 
-      menuSidebar.classList.remove('open'); 
     };
 
     searchBtn.onclick = () => {
@@ -664,6 +739,8 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
+    // INIT
+    updateAuthUI();
     renderProducts();
     renderCarousel(newCarousel, p => p.new);
     renderCarousel(starCarousel, p => p.star);
