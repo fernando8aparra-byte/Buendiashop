@@ -6,11 +6,11 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES + FIJAR HEADER Y MENÚS ARRIBA */
+    /* ESTILOS ANTERIORES + NUEVOS CAMBIOS */
     body {
       margin: 0;
       padding: 0;
-      padding-top: 60px; /* espacio para el header fijo */
+      padding-top: 60px;
     }
     .header {
       position: fixed;
@@ -78,10 +78,10 @@
       padding: 10px 0;
     }
 
-    /* MENÚS ARRIBA (fijos cuando abiertos) */
+    /* MENÚS ARRIBA */
     .menu-sidebar {
       position: fixed;
-      top: 60px; /* justo debajo del header */
+      top: 60px;
       left: 0;
       width: 300px;
       height: calc(100vh - 60px);
@@ -89,6 +89,7 @@
       z-index: 999;
       transform: translateX(-100%);
       transition: transform 0.3s ease;
+      overflow-y: auto;
     }
     .menu-sidebar.open {
       transform: translateX(0);
@@ -110,7 +111,19 @@
       visibility: visible;
     }
 
-    /* CARRITO ARRIBA (fijo a la derecha) */
+    /* BOTÓN INICIA SESIÓN O REGÍSTRATE (listo para estirar con CSS) */
+    .menu-item.login-btn {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 15px 20px;
+      margin: 20px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* CARRITO CON SCROLL TÁCTIL */
     .cart-sidebar {
       position: fixed;
       top: 60px;
@@ -122,9 +135,27 @@
       transform: translateX(100%);
       transition: transform 0.3s ease;
       box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
     }
     .cart-sidebar.open {
       transform: translateX(0);
+    }
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch; /* scroll suave con dedo en móvil */
+      padding: 20px;
+    }
+    .cart-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      position: relative;
+    }
+    .cart-footer {
+      padding: 20px;
+      border-top: 1px solid #eee;
+      background: #fff;
     }
 
     /* X DE BÚSQUEDA Y CARRITO */
@@ -150,6 +181,8 @@
     .cart-item {
       position: relative;
       padding-right: 40px;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
     }
     .cart-item button {
       position: absolute;
@@ -183,7 +216,6 @@
       display: block;
     }
 
-    /* Asegurar que el contenido principal baje */
     .main-container {
       margin-top: 20px;
     }
@@ -230,7 +262,7 @@
     </div>
   </header>
 
-  <!-- MAIN (productos se muestran debajo del header fijo) -->
+  <!-- MAIN -->
   <main class="main-container">
     <section class="hero-banner">
       <h1>Asegura tu Mystery Box</h1>
@@ -257,7 +289,7 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL (sin X, abre desde arriba) -->
+  <!-- MENÚ LATERAL CON BOTÓN DE INICIO/REGISTRO -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome">¡Hola, Efraín!</div>
@@ -269,9 +301,14 @@
     </div>
     <div class="menu-item">Ofertas</div>
     <div class="menu-item">Contacto</div>
+    
+    <!-- BOTÓN INICIA SESIÓN O REGÍSTRATE (estira con CSS como quieras) -->
+    <div class="menu-item login-btn">
+      Inicia sesión o regístrate
+    </div>
   </aside>
 
-  <!-- CARRITO LATERAL (abre desde arriba a la derecha) -->
+  <!-- CARRITO LATERAL CON SCROLL TÁCTIL -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -450,7 +487,6 @@
       }).render('#paypal-button-container');
     }
 
-    // EVENTOS
     menuBtn.onclick = () => { 
       menuOverlay.classList.add('show'); 
       menuSidebar.classList.add('open'); 
