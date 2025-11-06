@@ -1,296 +1,513 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efraín - Tienda Oficial</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- PayPal SDK (producción: usa tu CLIENT_ID real cuando estés listo) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=MXN"></script>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <button id="menuBtn" class="icon-btn">Menu</button>
-      <div class="logo">EFRAÍN</div>
-      <button id="searchBtn" class="icon-btn">Search</button>
-      <button id="cartBtn" class="icon-btn">Cart
-        <span id="cartBadge"></span>
-      </button>
-    </div>
-  </header>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <!-- MENÚ HAMBURGUESA -->
+            <button class="icon-btn" id="menuToggle" aria-label="Menú">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
 
-  <!-- MAIN -->
-  <main class="main-container">
-    <section class="hero-banner">
-      <h1>Asegura tu Mystery Box</h1>
-      <p class="tag">Envío Gratis en compras +$1,500</p>
-    </section>
+            <!-- LOGO / NOMBRE DE LA PÁGINA -->
+            <div class="logo" id="siteName">Efraín</div>
 
-    <section class="infinite-carousel-section">
-      <h2>Nuevos Lanzamientos</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="newCarousel"></div>
-      </div>
-    </section>
+            <!-- BOTONES DERECHA -->
+            <div style="display:flex; gap:16px; align-items:center;">
+                <!-- LOGIN / BIENVENIDA -->
+                <div id="userWelcome" style="font-weight:600; display:none;"></div>
+                <button id="loginBtn" class="icon-btn" style="font-size:0.9rem; padding:8px 12px; background:#000; color:#fff; border-radius:8px;">
+                    Iniciar sesión
+                </button>
 
-    <section class="infinite-carousel-section">
-      <h2>Productos Estrella</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="starCarousel"></div>
-      </div>
-    </section>
+                <!-- BÚSQUEDA -->
+                <button class="icon-btn" id="searchToggle" aria-label="Buscar">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
 
-    <section>
-      <h2>Todos los Productos</h2>
-      <div class="products-grid" id="productsGrid"></div>
-    </section>
-  </main>
-
-  <!-- MENÚ LATERAL -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <aside class="menu-sidebar" id="menuSidebar">
-    <button class="menu-close" id="menuClose">X</button>
-    <div class="menu-item welcome">¡Hola, Efraín!</div>
-    <div class="menu-item dropdown-toggle">Categorías</div>
-    <div class="submenu">
-      <div class="submenu-item">Gorras</div>
-      <div class="submenu-item">Camisetas</div>
-      <div class="submenu-item">Accesorios</div>
-    </div>
-    <div class="menu-item">Ofertas</div>
-    <div class="menu-item">Contacto</div>
-  </aside>
-
-  <!-- BÚSQUEDA -->
-  <div class="search-container" id="searchContainer">
-    <div class="search-bar">
-      <input type="text" placeholder="Buscar productos...">
-      <button id="closeSearch">X</button>
-    </div>
-  </div>
-
-  <!-- CARRITO LATERAL -->
-  <aside class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button id="closeCart">X</button>
-    </div>
-    <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Tu carrito está vacío</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div class="go-to-pay">Ir a Pagar</div>
-      <div id="paypal-button-container"></div>
-      <div id="message"></div>
-    </div>
-  </aside>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
-
-  <!-- PAYPAL SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
-
-  <script>
-    // =============================================
-    // PRODUCTOS DEMO (REALES)
-    // =============================================
-    const products = [
-      { id: 1, name: "Gorra GALAXY CT", price: 18000, oldPrice: 22000, desc: "Edición limitada 24K", img: "https://imgfz.com/i/TBumyjZ.webp", star: true },
-      { id: 2, name: "Camiseta Oversize", price: 850, desc: "Algodón premium", img: "https://imgfz.com/i/rTJ1Xnl.webp", new: true },
-      { id: 3, name: "Mystery Box Gold", price: 2500, desc: "3 productos sorpresa", img: "https://imgfz.com/i/8Y5vN2k.webp", star: true },
-      { id: 4, name: "Cadena Silver", price: 1200, oldPrice: 1800, desc: "Acero inoxidable", img: "https://imgfz.com/i/3pR8m7L.webp" },
-      { id: 5, name: "Gorra BLACKOUT", price: 1600, desc: "Full black edition", img: "https://imgfz.com/i/1kLmPqR.webp", new: true },
-      { id: 6, name: "Playera Premium", price: 950, desc: "Talla única", img: "https://imgfz.com/i/9xV2wZk.webp" }
-    ];
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    // =============================================
-    // ELEMENTOS DOM
-    // =============================================
-    const menuBtn = document.getElementById('menuBtn');
-    const menuOverlay = document.getElementById('menuOverlay');
-    const menuSidebar = document.getElementById('menuSidebar');
-    const menuClose = document.getElementById('menuClose');
-    const searchBtn = document.getElementById('searchBtn');
-    const searchContainer = document.getElementById('searchContainer');
-    const closeSearch = document.getElementById('closeSearch');
-    const cartBtn = document.getElementById('cartBtn');
-    const cartSidebar = document.getElementById('cartSidebar');
-    const closeCart = document.getElementById('closeCart');
-    const cartBadge = document.getElementById('cartBadge');
-    const cartItems = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const productsGrid = document.getElementById('productsGrid');
-    const newCarousel = document.getElementById('newCarousel');
-    const starCarousel = document.getElementById('starCarousel');
-    const toast = document.getElementById('toast');
-
-    // =============================================
-    // RENDERIZAR PRODUCTOS
-    // =============================================
-    function renderProducts() {
-      productsGrid.innerHTML = '';
-      products.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <img src="${p.img}" alt="${p.name}" loading="lazy">
-          <div class="card-info">
-            <h3>${p.name}</h3>
-            <p class="desc">${p.desc}</p>
-            <div class="price-container">
-              ${p.oldPrice ? `<span class="old-price">$${p.oldPrice.toLocaleString()}</span>` : ''}
-              <span class="price ${p.oldPrice ? 'offer-price' : ''}">$${p.price.toLocaleString()}</span>
+                <!-- CARRITO -->
+                <button class="icon-btn" id="cartToggle" aria-label="Carrito">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span id="cartBadge">0</span>
+                </button>
             </div>
-            <button class="add-btn" onclick="addToCart(${p.id})">Agregar</button>
-          </div>
-        `;
-        productsGrid.appendChild(card);
-      });
-    }
+        </div>
 
-    // =============================================
-    // CARRUSELES
-    // =============================================
-    function renderCarousel(container, filter) {
-      container.innerHTML = '';
-      const filtered = products.filter(filter);
-      filtered.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'carousel-item';
-        item.innerHTML = `
-          <img src="${p.img}" alt="${p.name}" loading="lazy">
-          <div class="item-info">
-            <h4>${p.name}</h4>
-            <p>$${p.price.toLocaleString()}</p>
-          </div>
-        `;
-        container.appendChild(item);
-      });
-      // Duplicar para infinito
-      container.innerHTML += container.innerHTML;
-    }
+        <!-- BARRA DE BÚSQUEDA -->
+        <div class="search-container" id="searchContainer">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
+                <button id="closeSearch" aria-label="Cerrar">×</button>
+            </div>
+            <div id="searchResults" style="margin-top:16px; max-height:60vh; overflow-y:auto;"></div>
+        </div>
+    </header>
 
-    // =============================================
-    // CARRITO
-    // =============================================
-    function addToCart(id) {
-      const product = products.find(p => p.id === id);
-      const existing = cart.find(i => i.id === id);
-      if (existing) existing.qty++;
-      else cart.push({ ...product, qty: 1 });
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCart();
-      showToast('¡Agregado al carrito!');
-    }
+    <!-- MENÚ LATERAL -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <aside class="menu-sidebar" id="menuSidebar">
+        <div class="menu-close" id="menuClose">×</div>
+        <div class="menu-item">Cuenta</div>
+        <div class="menu-item">Mis compras</div>
+        
+        <div class="menu-item">
+            <div class="dropdown-toggle" data-target="categorias">Productos</div>
+            <div class="submenu" id="categorias">
+                <div class="submenu-item" data-cat="gorras">Gorras</div>
+                <div class="submenu-item" data-cat="camisetas">Camisetas</div>
+                <div class="submenu-item" data-cat="cintos">Cintos</div>
+                <div class="submenu-item" data-cat="pantalones">Pantalones</div>
+                <div class="submenu-item" data-cat="tenis">Tenis</div>
+                <div class="submenu-item" data-cat="sudaderas">Sudaderas</div>
+            </div>
+        </div>
 
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCart();
-    }
+        <div class="menu-item">
+            <div class="dropdown-toggle" data-target="nosotros">Nosotros</div>
+            <div class="submenu" id="nosotros">
+                <div class="submenu-item"><a href="#" target="_blank">Instagram</a></div>
+                <div class="submenu-item"><a href="#" target="_blank">Facebook</a></div>
+                <div class="submenu-item"><a href="#" target="_blank">X</a></div>
+                <div class="submenu-item"><a href="#" target="_blank">Youtube</a></div>
+            </div>
+        </div>
 
-    function updateCart() {
-      cartItems.innerHTML = '';
-      let total = 0;
-      const badge = cart.reduce((sum, i) => sum + i.qty, 0);
-      cartBadge.style.display = badge > 0 ? 'flex' : 'none';
-      cartBadge.textContent = badge;
+        <div class="menu-item" id="logoutBtn" style="display:none;">Salir de mi cuenta</div>
+    </aside>
 
-      if (cart.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
-        document.querySelector('.go-to-pay').style.display = 'none';
-        document.getElementById('paypal-button-container').innerHTML = '';
-        return;
-      }
+    <!-- CARRITO LATERAL -->
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Carrito</h3>
+            <div class="menu-close" id="cartClose">×</div>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="empty-cart">Tu carrito está vacío</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">Total: $<span id="cartTotal">0</span></div>
+            <div class="go-to-pay">Ir a pagar</div>
+            <div id="paypal-button-container"></div>
+            <div id="message"></div>
+        </div>
+    </aside>
 
-      document.querySelector('.go-to-pay').style.display = 'block';
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
 
-      cart.forEach((item, i) => {
-        total += item.price * item.qty;
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-          <img src="${item.img}" alt="${item.name}" class="thumb">
-          <div>
-            <div>${item.name}</div>
-            <small>x${item.qty} • $${(item.price * item.qty).toLocaleString()}</small>
-          </div>
-          <button onclick="removeFromCart(${i})">X</button>
-        `;
-        cartItems.appendChild(div);
-      });
+    <!-- MAINTENANCE MODE -->
+    <div id="maintenance" style="display:none; position:fixed; inset:0; background:#fff; z-index:9999; text-align:center; padding-top:20vh; font-size:2rem;">
+        Página en mantenimiento
+    </div>
 
-      cartTotal.textContent = `Total: $${total.toLocaleString()}`;
-      renderPayPalButton(total);
-    }
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-container">
 
-    // =============================================
-    // BOTÓN PAYPAL OFICIAL
-    // =============================================
-    function renderPayPalButton(amount) {
-      const container = document.getElementById('paypal-button-container');
-      container.innerHTML = '';
+        <!-- HERO BANNER (opcional) -->
+        <section class="hero-banner">
+            <h1 id="heroTitle">Bienvenido a Efraín</h1>
+            <p>Los mejores productos al mejor precio</p>
+        </section>
 
-      paypal.Buttons({
-        createOrder:
-          return actions.order.create({
-            purchase_units: [{
-              amount: { value: (amount / 100).toFixed(2) }
-            }]
-          });
-        },
-        onApprove: function(data, actions) {
-          return actions.order.capture().then(details => {
-            document.getElementById('message').innerHTML = `
-              ¡Pago exitoso! Orden: ${details.id}<br>
-              Gracias, ${details.payer.name.given_name}
-            `;
-            document.getElementById('message').className = 'success';
-            cart = [];
-            localStorage.setItem('cart', '[]');
-            updateCart();
-            cartSidebar.classList.remove('open');
-          });
-        },
-        onCancel: () => {
-          document.getElementById('message').innerHTML = 'Pago cancelado.';
-          document.getElementById('message').className = 'cancel';
-        },
-        onError: (err) => {
-          document.getElementById('message').innerHTML = 'Error: ' + err;
-          document.getElementById('message').className = 'error';
+        <!-- CARRUSEL INFINITO (productos estrella) -->
+        <section class="infinite-carousel-section">
+            <h2 style="text-align:center; margin-bottom:24px;">Productos Estrella</h2>
+            <div class="infinite-carousel">
+                <div class="carousel-track" id="starCarouselTrack">
+                    <!-- Duplicado para infinito -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CARRUSEL NUEVOS PRODUCTOS -->
+        <section class="infinite-carousel-section">
+            <h2 style="text-align:center; margin-bottom:24px;">Nuevos Productos</h2>
+            <div class="infinite-carousel">
+                <div class="carousel-track" id="newCarouselTrack">
+                    <!-- Duplicado para infinito -->
+                </div>
+            </div>
+        </section>
+
+        <!-- GRID DE TODOS LOS PRODUCTOS -->
+        <section>
+            <h2 style="text-align:center; margin:48px 0;">Todos los productos</h2>
+            <div class="products-grid" id="productsGrid"></div>
+        </section>
+
+    </main>
+
+    <script>
+        // ==================== CONFIGURACIÓN ADMIN (localStorage) ====================
+        const adminConfig = {
+            siteName: "Efraín",
+            maintenance: false,
+            heroTitle: "Bienvenido a Efraín",
+            payments: {
+                paypal: true,
+                card: true,
+                oxxo: true,
+                clave: true
+            },
+            social: {
+                instagram: "https://instagram.com/",
+                facebook: "https://facebook.com/",
+                x: "https://x.com/",
+                youtube: "https://youtube.com/"
+            }
+        };
+        // Guarda config inicial si no existe
+        if (!localStorage.getItem('adminConfig')) {
+            localStorage.setItem('adminConfig', JSON.stringify(adminConfig));
+        } else {
+            Object.assign(adminConfig, JSON.parse(localStorage.getItem('adminConfig')));
         }
-      }).render('#paypal-button-container');
-    }
 
-    // =============================================
-    // EVENTOS
-    // =============================================
-    menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); };
-    menuOverlay.onclick = menuClose.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
-    searchBtn.onclick = () => searchContainer.classList.add('active');
-    closeSearch.onclick = () => searchContainer.classList.remove('active');
-    cartBtn.onclick = () => cartSidebar.classList.add('open');
-    closeCart.onclick = () => cartSidebar.classList.remove('open');
+        // ==================== DATOS DE PRODUCTOS (localStorage) ====================
+        let products = JSON.parse(localStorage.getItem('products')) || [
+            // Ejemplos (admin los modificará)
+            {id:1, title:"Gorra Barbas Hats", cat:"gorras", price:399, oldPrice:599, desc:"Gorra premium ajustable", img:"https://via.placeholder.com/300x300/000000/ffffff?text=Gorra", stock:10, featured:true, new:true, tallas:["Unitalla"]},
+            {id:2, title:"Camiseta Oversize Negra", cat:"camisetas", price:449, oldPrice:699, desc:"Algodón 100% oversize", img:"https://via.placeholder.com/300x300/111111/ffffff?text=Camiseta", stock:15, featured:false, new:true, tallas:["S","M","L","XL"]},
+            {id:3, title:"Tenis Urban Blancos", cat:"tenis", price:1299, oldPrice:1799, desc:"Edición limitada", img:"https://via.placeholder.com/300x300/ffffff/000000?text=Tenis", stock:5, featured:true, new:false, tallas:["25","26","27","28"]},
+        ];
+        localStorage.setItem('products', JSON.stringify(products));
 
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
+        // ==================== USUARIO ====================
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
-    // =============================================
-    // INICIO
-    // =============================================
-    renderProducts();
-    renderCarousel(newCarousel, p => p.new);
-    renderCarousel(starCarousel, p => p.star);
-    updateCart();
-  </script>
+        // ==================== CARRITO ====================
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            if (adminConfig.maintenance && !currentUser?.isAdmin) {
+                document.getElementById('maintenance').style.display = 'block';
+                document.querySelector('main').style.display = 'none';
+                return;
+            }
+            loadConfig();
+            renderProducts();
+            renderCarousels();
+            updateCartUI();
+            updateUserUI();
+            initPayPal();
+        });
+
+        function loadConfig() {
+            document.getElementById('siteName').textContent = adminConfig.siteName;
+            document.getElementById('heroTitle').textContent = adminConfig.heroTitle;
+            // Social links
+            document.querySelectorAll('#nosotros a')[0].href = adminConfig.social.instagram;
+            document.querySelectorAll('#nosotros a')[1].href = adminConfig.social.facebook;
+            document.querySelectorAll('#nosotros a')[2].href = adminConfig.social.x;
+            document.querySelectorAll('#nosotros a')[3].href = adminConfig.social.youtube;
+        }
+
+        // ==================== RENDER PRODUCTOS ====================
+        function renderProducts(filter = '') {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            const filtered = products.filter(p => 
+                p.title.toLowerCase().includes(filter) || 
+                p.desc.toLowerCase().includes(filter) ||
+                p.cat.toLowerCase().includes(filter)
+            );
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => location.href = `product.html?id=${p.id}`;
+                card.innerHTML = `
+                    <img src="${p.img}" alt="${p.title}">
+                    <div class="product-title">${p.title}</div>
+                    <div class="product-description">${p.desc}</div>
+                    <div class="price-container">
+                        ${p.oldPrice ? `<span class="old-price">$${p.oldPrice}</span>` : ''}
+                        <span class="price">$${p.price}</span>
+                    </div>
+                    ${p.stock === 0 ? '<div class="tag">Agotado</div>' : ''}
+                    <button class="add-btn" ${p.stock === 0 ? 'disabled' : ''} data-id="${p.id}">
+                        Agregar al carrito
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Eventos agregar
+            document.querySelectorAll('.add-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.dataset.id);
+                    addToCart(id);
+                });
+            });
+        }
+
+        // ==================== CARRUSELES ====================
+        function renderCarousels() {
+            const star = products.filter(p => p.featured);
+            const newP = products.filter(p => p.new);
+            renderCarousel('starCarouselTrack', star);
+            renderCarousel('newCarouselTrack', newP);
+        }
+        function renderCarousel(containerId, items) {
+            const track = document.getElementById(containerId);
+            track.innerHTML = '';
+            const dup = [...items, ...items]; // duplicar para infinito
+            dup.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.onclick = () => location.href = `product.html?id=${p.id}`;
+                item.innerHTML = `
+                    <img src="${p.img}" alt="${p.title}">
+                    <div class="item-info">
+                        <h4>${p.title}</h4>
+                        <p>$${p.price}</p>
+                    </div>
+                `;
+                track.appendChild(item);
+            });
+        }
+
+        // ==================== CARRITO ====================
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || product.stock === 0) return;
+            const existing = cart.find(i => i.id === productId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({id: productId, qty: 1});
+            }
+            product.stock--;
+            localStorage.setItem('products', JSON.stringify(products));
+            saveCart();
+            showToast('¡Agregado al carrito!', 'success');
+            renderProducts(); // actualiza stock
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cartBadge');
+            const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+            badge.textContent = totalItems;
+            badge.style.display = totalItems > 0 ? 'flex' : 'none';
+
+            const itemsContainer = document.getElementById('cartItems');
+            const totalEl = document.getElementById('cartTotal');
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
+                totalEl.textContent = '0';
+                document.querySelector('.go-to-pay').style.display = 'none';
+                document.getElementById('paypal-button-container').innerHTML = '';
+                return;
+            }
+            document.querySelector('.go-to-pay').style.display = 'block';
+            itemsContainer.innerHTML = '';
+            let total = 0;
+            cart.forEach((item, idx) => {
+                const prod = products.find(p => p.id === item.id);
+                if (!prod) return;
+                total += prod.price * item.qty;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <img class="thumb" src="${prod.img}" alt="${prod.title}">
+                    <div>
+                        <div>${prod.title}</div>
+                        <small>x${item.qty} • Talla: ${prod.tallas[0]}</small>
+                        <div>$${prod.price * item.qty}</div>
+                    </div>
+                    <button onclick="removeFromCart(${idx})">×</button>
+                `;
+                itemsContainer.appendChild(div);
+            });
+            totalEl.textContent = total;
+        }
+
+        window.removeFromCart = function(idx) {
+            const item = cart[idx];
+            const prod = products.find(p => p.id === item.id);
+            prod.stock += item.qty;
+            cart.splice(idx, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            saveCart();
+            renderProducts();
+        }
+
+        // ==================== PAYPAL ====================
+        function initPayPal() {
+            if (!adminConfig.payments.paypal) return;
+            paypal.Buttons({
+                createOrder: (data, actions) => {
+                    const total = cart.reduce((s, i) => {
+                        const p = products.find(pr => pr.id === i.id);
+                        return s + p.price * i.qty;
+                    }, 0);
+                    return actions.order.create({
+                        purchase_units: [{ amount: { value: total.toFixed(2) } }]
+                    });
+                },
+                onApprove: (data, actions) => {
+                    return actions.order.capture().then(details => {
+                        document.getElementById('message').className = 'success';
+                        document.getElementById('message').textContent = '¡Pago exitoso! Gracias ' + details.payer.name.given_name;
+                        cart = [];
+                        saveCart();
+                    });
+                },
+                onError: err => {
+                    document.getElementById('message').className = 'error';
+                    document.getElementById('message').textContent = 'Error en el pago';
+                },
+                onCancel: () => {
+                    document.getElementById('message').className = 'cancel';
+                    document.getElementById('message').textContent = 'Pago cancelado';
+                }
+            }).render('#paypal-button-container');
+        }
+
+        // ==================== BÚSQUEDA ====================
+        document.getElementById('searchInput').addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().trim();
+            const results = document.getElementById('searchResults');
+            if (term.length < 2) {
+                results.innerHTML = '';
+                return;
+            }
+            const matches = products.filter(p => 
+                p.title.toLowerCase().includes(term) || 
+                p.desc.toLowerCase().includes(term) ||
+                p.cat.toLowerCase().includes(term)
+            ).slice(0, 8);
+            results.innerHTML = matches.map(p => `
+                <div style="padding:12px; border-bottom:1px solid #eee; cursor:pointer;" onclick="location.href='product.html?id=${p.id}'">
+                    <strong>${p.title}</strong> - $${p.price}
+                </div>
+            `).join('');
+        });
+
+        // ==================== MENÚS ====================
+        const menuToggle = document.getElementById('menuToggle');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuSidebar = document.getElementById('menuSidebar');
+        const menuClose = document.getElementById('menuClose');
+        menuToggle.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); };
+        menuClose.onclick = menuOverlay.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
+
+        // Dropdowns menú
+        document.querySelectorAll('.dropdown-toggle').forEach(t => {
+            t.onclick = () => {
+                t.classList.toggle('active');
+                const sub = document.getElementById(t.dataset.target);
+                sub.classList.toggle('show');
+            };
+        });
+
+        // Filtros por categoría
+        document.querySelectorAll('.submenu-item[data-cat]').forEach(item => {
+            item.onclick = () => {
+                const cat = item.dataset.cat;
+                renderProducts(cat);
+                menuOverlay.click(); // cerrar menú
+            };
+        });
+
+        // ==================== CARRITO SIDEBAR ====================
+        const cartToggle = document.getElementById('cartToggle');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartClose = document.getElementById('cartClose');
+        cartToggle.onclick = () => cartSidebar.classList.add('open');
+        cartClose.onclick = () => cartSidebar.classList.remove('open');
+        // Cerrar al tocar fuera (overlay)
+        document.addEventListener('click', e => {
+            if (!cartSidebar.contains(e.target) && !cartToggle.contains(e.target) && cartSidebar.classList.contains('open')) {
+                cartSidebar.classList.remove('open');
+            }
+        });
+
+        // Shake al agregar
+        function shakeCart() {
+            cartToggle.classList.add('shake');
+            setTimeout(() => cartToggle.classList.remove('shake'), 600);
+        }
+        const originalAddToCart = addToCart;
+        window.addToCart = id => {
+            originalAddToCart(id);
+            shakeCart();
+        };
+
+        // ==================== BÚSQUEDA SIDEBAR ====================
+        const searchToggle = document.getElementById('searchToggle');
+        const searchContainer = document.getElementById('searchContainer');
+        const closeSearch = document.getElementById('closeSearch');
+        searchToggle.onclick = () => searchContainer.classList.add('active');
+        closeSearch.onclick = () => searchContainer.classList.remove('active');
+
+        // ==================== TOAST ====================
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = type === 'success' ? '#000' : '#e63946';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ==================== USUARIO ====================
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('userWelcome').textContent = `Bienvenido, ${currentUser.name}`;
+                document.getElementById('userWelcome').style.display = 'block';
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'block';
+            } else {
+                document.getElementById('userWelcome').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'none';
+            }
+        }
+
+        // Login simple (demo)
+        document.getElementById('loginBtn').onclick = () => {
+            const name = prompt('Nombre de usuario:');
+            if (name) {
+                currentUser = {name, isAdmin: name.toLowerCase() === 'admin'};
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUserUI();
+                showToast('¡Bienvenido ' + name + '!');
+            }
+        };
+        document.getElementById('logoutBtn').onclick = () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateUserUI();
+            showToast('Sesión cerrada');
+        };
+
+        // ==================== ANIMACIONES CARRUSEL (duplicar para infinito real) ====================
+        document.querySelectorAll('.carousel-track').forEach(track => {
+            track.innerHTML += track.innerHTML; // duplicar para loop perfecto
+        });
+
+    </script>
 </body>
 </html>
