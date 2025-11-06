@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,343 +7,83 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ESTILOS ANTERIORES (CON MEJORAS) */
-    body {
-      margin: 0;
-      padding: 0;
-      padding-top: 60px;
-    }
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-      background: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      height: 60px;
-      padding: 0 15px;
-      box-sizing: border-box;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .icon-btn {
-      color: #000 !important;
-      background: none;
-    }
-    .icon-btn svg {
-      stroke: #000;
-      fill: none;
-    }
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #000;
-    }
+    /* === TUS ESTILOS ANTERIORES (sin cambios) === */
+    body { margin: 0; padding: 0; padding-top: 60px; }
+    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .icon-btn { color: #000 !important; background: none; }
+    .icon-btn svg { stroke: #000; fill: none; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
 
-    /* HERO BANNER */
-    .hero-banner {
-      text-align: center;
-      padding: 60px 20px;
-      background: #f8f8f8;
-    }
-    .hero-banner h1 {
-      font-size: 2.2rem;
-      margin: 0 0 10px;
-      text-transform: uppercase;
-    }
-    .hero-banner .tag {
-      font-size: 1rem;
-      color: #666;
-    }
+    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; }
+    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
+    .hero-banner .tag { font-size: 1rem; color: #666; }
 
-    /* BARRA DE BÚSQUEDA */
-    .search-bar-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      display: none;
-      align-items: center;
-      padding: 0 20px;
-      z-index: 20;
-    }
-    .search-bar-header.active {
-      display: flex;
-    }
-    .search-bar-header input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      padding: 10px 0;
-    }
+    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
+    .search-bar-header.active { display: flex; }
+    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
 
-    /* MENÚS ARRIBA */
-    .menu-sidebar {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 300px;
-      height: calc(100vh - 60px);
-      background: #fff;
-      z-index: 999;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      overflow-y: auto;
-    }
-    .menu-sidebar.open {
-      transform: translateX(0);
-    }
-    .menu-overlay {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 100%;
-      height: calc(100vh - 60px);
-      background: rgba(0,0,0,0.5);
-      z-index: 998;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-    }
-    .menu-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
+    .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
+    .menu-sidebar.open { transform: translateX(0); }
+    .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+    .menu-overlay.show { opacity: 1; visibility: visible; }
 
-    /* ITEMS DEL MENÚ */
-    .menu-item {
-      padding: 18px 20px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    /* QUITAMOS EL TRIÁNGULO DE TODOS LOS ITEMS NORMALES */
-    .menu-item::after {
-      display: none;
-    }
+    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
+    .menu-item::after { display: none; }
+    .dropdown-toggle::after, .contact-toggle::after { content: '▼'; font-size: 0.8rem; transition: transform 0.3s ease; }
+    .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
 
-    /* SOLO LOS DESPLEGABLES TIENEN TRIÁNGULO */
-    .dropdown-toggle::after,
-    .contact-toggle::after {
-      content: '▼';
-      font-size: 0.8rem;
-      transition: transform 0.3s ease;
-    }
-    .dropdown-toggle.open::after,
-    .contact-toggle.open::after {
-      transform: rotate(180deg);
-    }
+    .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
+    .submenu.open, .contact-dropdown.open { max-height: 500px; padding: 20px; }
+    .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
 
-    /* DESPLEGABLES */
-    .submenu,
-    .contact-dropdown {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-      background: #f9f9f9;
-      padding: 0 20px;
-    }
-    .submenu.open,
-    .contact-dropdown.open {
-      max-height: 500px;
-      padding: 20px;
-    }
-    .submenu-item {
-      padding: 12px 0;
-      border-bottom: 1px solid #ddd;
-      cursor: pointer;
-    }
+    .menu-item.ofertas-btn { background: none; color: #000; text-align: left; padding: 18px 20px; margin: 0; border-radius: 0; font-weight: normal; }
 
-    /* OFERTAS COMO TEXTO NORMAL (SIN BOTÓN NEGRO) */
-    .menu-item.ofertas-btn {
-      background: none;
-      color: #000;
-      text-align: left;
-      padding: 18px 20px;
-      margin: 0;
-      border-radius: 0;
-      font-weight: normal;
-    }
+    .menu-item.login-btn { background: #000; color: #fff; text-align: center; padding: 15px 20px; margin: 20px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .menu-item.login-btn::after { display: none; }
+    .menu-item.logout-btn { background: #ff0000; color: #fff; }
 
-    /* BOTÓN LOGIN / LOGOUT */
-    .menu-item.login-btn {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      padding: 15px 20px;
-      margin: 20px 15px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .menu-item.login-btn::after {
-      display: none;
-    }
-    .menu-item.logout-btn {
-      background: #ff0000;
-      color: #fff;
-    }
+    .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
+    .social-links { display: flex; gap: 20px; justify-content: center; }
+    .social-links img { width: 40px; height: 40px; }
 
-    /* CONTACTO */
-    .contact-text {
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-    .social-links {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-    }
-    .social-links img {
-      width: 40px;
-      height: 40px;
-    }
+    .cart-sidebar { position: fixed; top: 60px; right: 0; width: 350px; height: calc(100vh - 60px); background: #fff; z-index: 1000; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+    .cart-sidebar.open { transform: translateX(0); }
+    .cart-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+    .cart-overlay.show { opacity: 1; visibility: visible; }
+    .cart-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
+    .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
+    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
 
-    /* CARRITO */
-    .cart-sidebar {
-      position: fixed;
-      top: 60px;
-      right: 0;
-      width: 350px;
-      height: calc(100vh - 60px);
-      background: #fff;
-      z-index: 1000;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-    }
-    .cart-sidebar.open {
-      transform: translateX(0);
-    }
-    .cart-overlay {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 100%;
-      height: calc(100vh - 60px);
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-    }
-    .cart-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .cart-items {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 20px;
-    }
-    .cart-header {
-      padding: 20px;
-      border-bottom: 1px solid #eee;
-      position: relative;
-    }
-    .cart-footer {
-      padding: 20px;
-      border-top: 1px solid #eee;
-      background: #fff;
-    }
+    #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
 
-    /* X DE BÚSQUEDA Y CARRITO */
-    #closeSearchHeader,
-    #closeCart {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: none !important;
-      border: none !important;
-      color: #000 !important;
-      font-size: 2.2rem;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 30;
-    }
+    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
 
-    /* X PEQUEÑAS EN CARRITO */
-    .cart-item {
-      position: relative;
-      padding-right: 40px;
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .cart-item button {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: none !important;
-      border: none !important;
-      color: #000 !important;
-      font-size: 1.1rem;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
+    .header-overlay.show { display: block; }
 
-    /* Overlay para búsqueda */
-    .header-overlay {
-      display: none;
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 100%;
-      height: calc(100vh - 60px);
-      background: rgba(0,0,0,0.3);
-      z-index: 15;
-    }
-    .header-overlay.show {
-      display: block;
-    }
+    .main-container { margin-top: 20px; }
 
-    .main-container {
-      margin-top: 20px;
-    }
+    /* RESULTADOS DE BÚSQUEDA */
+    .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .search-results h3 { margin-top: 0; }
+    .no-results { color: #666; font-style: italic; }
+
+    /* BOTÓN LOGIN EN CARRITO */
+    .login-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <!-- OVERLAY PARA BÚSQUEDA -->
+  <!-- OVERLAYS -->
   <div class="header-overlay" id="headerOverlay"></div>
-
-  <!-- OVERLAY PARA CARRITO -->
   <div class="cart-overlay" id="cartOverlay"></div>
 
-  <!-- HEADER FIJO ARRIBA -->
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
@@ -378,7 +119,13 @@
     </div>
   </header>
 
-  <!-- HERO BANNER -->
+  <!-- RESULTADOS DE BÚSQUEDA -->
+  <div id="searchResultsContainer" class="search-results" style="display:none;">
+    <h3>Resultados de búsqueda</h3>
+    <div id="searchResults"></div>
+  </div>
+
+  <!-- CONTENIDO -->
   <main class="main-container">
     <section class="hero-banner">
       <h1>Asegura tu Mystery Box</h1>
@@ -410,7 +157,6 @@
   <aside class="menu-sidebar" id="menuSidebar">
     <div class="menu-item welcome" id="welcomeMsg"></div>
     
-    <!-- PRODUCTOS DESPLEGABLE -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
     <div class="submenu" id="categoriesSubmenu">
       <div class="submenu-item">Gorras</div>
@@ -422,10 +168,8 @@
       <div class="submenu-item">Sudaderas</div>
     </div>
     
-    <!-- OFERTAS COMO TEXTO NORMAL -->
     <div class="menu-item ofertas-btn">Ofertas</div>
     
-    <!-- CONTACTO -->
     <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
     <div class="contact-dropdown" id="contactDropdown">
       <p class="contact-text">No te quedes sin tu Mystery Box</p>
@@ -439,7 +183,7 @@
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
 
-  <!-- CARRITO LATERAL -->
+  <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -450,8 +194,9 @@
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div class="go-to-pay">Ir a Pagar</div>
-      <div id="paypal-button-container"></div>
+      <div id="loginToPay" class="login-to-pay" style="display:none;">Inicia sesión o regístrate para pagar</div>
+      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pagar</div>
+      <div id="paypal-button-container" style="display:none;"></div>
       <div id="message"></div>
     </div>
   </aside>
@@ -459,15 +204,101 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
+  <!-- FIREBASE SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, or } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // === BÚSQUEDA ===
+    const searchInput = document.getElementById('searchInput');
+    const searchResultsContainer = document.getElementById('searchResultsContainer');
+    const searchResults = document.getElementById('searchResults');
+
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      const term = searchInput.value.trim().toLowerCase();
+      if (term.length < 2) {
+        searchResultsContainer.style.display = 'none';
+        return;
+      }
+
+      searchTimeout = setTimeout(async () => {
+        const q = query(
+          collection(db, "productos"),
+          or(
+            where("nombre", ">=", term),
+            where("nombre", "<=", term + '\uf8ff'),
+            where("descripcion", ">=", term),
+            where("descripcion", "<=", term + '\uf8ff')
+          )
+        );
+
+        const snapshot = await getDocs(q);
+        searchResults.innerHTML = '';
+        if (snapshot.empty) {
+          searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+        } else {
+          snapshot.forEach(doc => {
+            const p = doc.data();
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
+            div.style.padding = '10px 0';
+            div.style.borderBottom = '1px solid #eee';
+            searchResults.appendChild(div);
+          });
+        }
+        searchResultsContainer.style.display = 'block';
+      }, 500);
+    });
+
+    // Cerrar resultados al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+        searchResultsContainer.style.display = 'none';
+      }
+    });
+
+    // === CARRITO Y PAGO ===
+    const loginToPay = document.getElementById('loginToPay');
+    const goToPay = document.getElementById('goToPay');
+    const paypalContainer = document.getElementById('paypal-button-container');
+
+    function updateCartFooter() {
+      const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+      loginToPay.style.display = isLoggedIn ? 'none' : 'block';
+      goToPay.style.display = isLoggedIn ? 'block' : 'none';
+      paypalContainer.style.display = isLoggedIn ? 'block' : 'none';
+    }
+
+    loginToPay.onclick = () => window.location.href = 'login.html';
+    updateCartFooter();
+
+    // Observar cambios en localStorage
+    window.addEventListener('storage', updateCartFooter);
+  </script>
+
   <!-- PAYPAL SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=Ac-wWdXisC56JfcJK1clrMaIe-Wpcyd4C_6gkoAn12k_M-LlGEJOTdhh6aZwghHM0k1lrJl3nQdE0HCS&currency=MXN&intent=capture"></script>
 
   <!-- TU SCRIPT EXTERNO -->
   <script src="js/script.js"></script>
 
-  <!-- LÓGICA EXTRA DEL MENÚ + LOGIN -->
+  <!-- LÓGICA DEL MENÚ -->
   <script>
-    // === ELEMENTOS DEL MENÚ ===
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuSidebar = document.getElementById('menuSidebar');
@@ -482,7 +313,6 @@
     const closeSearchHeader = document.getElementById('closeSearchHeader');
     const headerOverlay = document.getElementById('headerOverlay');
 
-    // === SESIÓN CON LOCALSTORAGE ===
     let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     let userName = localStorage.getItem('userName') || '';
 
@@ -498,7 +328,6 @@
       }
     }
 
-    // === BOTÓN LOGIN / LOGOUT ===
     authBtn.onclick = () => {
       if (isLoggedIn) {
         localStorage.removeItem('loggedIn');
@@ -508,56 +337,25 @@
         userName = '';
         showToast('Sesión cerrada');
         updateAuthUI();
+        updateCartFooter();
       } else {
         window.location.href = 'login.html';
       }
     };
 
-    // === DESPLEGABLES ===
-    categoriesToggle.onclick = (e) => {
-      e.stopPropagation();
-      categoriesToggle.classList.toggle('open');
-      categoriesSubmenu.classList.toggle('open');
-    };
+    categoriesToggle.onclick = (e) => { e.stopPropagation(); categoriesToggle.classList.toggle('open'); categoriesSubmenu.classList.toggle('open'); };
+    contactToggle.onclick = (e) => { e.stopPropagation(); contactToggle.classList.toggle('open'); contactDropdown.classList.toggle('open'); };
 
-    contactToggle.onclick = (e) => {
-      e.stopPropagation();
-      contactToggle.classList.toggle('open');
-      contactDropdown.classList.toggle('open');
-    };
-
-    // Cerrar menú al tocar fuera
-    menuOverlay.onclick = () => {
-      menuOverlay.classList.remove('show');
-      menuSidebar.classList.remove('open');
-      categoriesToggle.classList.remove('open');
-      categoriesSubmenu.classList.remove('open');
-      contactToggle.classList.remove('open');
-      contactDropdown.classList.remove('open');
-    };
+    menuOverlay.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); categoriesToggle.classList.remove('open'); categoriesSubmenu.classList.remove('open'); contactToggle.classList.remove('open'); contactDropdown.classList.remove('open'); };
     menuSidebar.onclick = (e) => e.stopPropagation();
 
-    // === ABRIR MENÚ ===
-    menuBtn.onclick = () => { 
-      menuOverlay.classList.add('show'); 
-      menuSidebar.classList.add('open'); 
-      updateAuthUI();
-    };
+    menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); updateAuthUI(); };
 
-    // === BÚSQUEDA ===
-    searchBtn.onclick = () => {
-      searchBarHeader.classList.add('active');
-      headerOverlay.classList.add('show');
-      document.getElementById('searchInput').focus();
-    };
-    const closeSearch = () => {
-      searchBarHeader.classList.remove('active');
-      headerOverlay.classList.remove('show');
-    };
+    searchBtn.onclick = () => { searchBarHeader.classList.add('active'); headerOverlay.classList.add('show'); document.getElementById('searchInput').focus(); };
+    const closeSearch = () => { searchBarHeader.classList.remove('active'); headerOverlay.classList.remove('show'); searchResultsContainer.style.display = 'none'; };
     closeSearchHeader.onclick = closeSearch;
     headerOverlay.onclick = closeSearch;
 
-    // === TOAST ===
     function showToast(msg) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -565,7 +363,6 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // === INICIO ===
     updateAuthUI();
   </script>
 </body>
