@@ -1,190 +1,269 @@
 // js/script.js
-// =============================================
-// SCRIPT COMPLETO: CARRITO + CARRUSEL INFINITO + PRODUCTOS + ANIMACIONES
-// =============================================
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-const cart = JSON.parse(localStorage.getItem('cart')) || [];
+const db = getFirestore();
+
+// === ELEMENTOS DEL DOM ===
 const newCarousel = document.getElementById('newCarousel');
 const starCarousel = document.getElementById('starCarousel');
 const productsGrid = document.getElementById('productsGrid');
-const cartItemsContainer = document.getElementById('cartItems');
+const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const cartBadge = document.getElementById('cartBadge');
-const toast = document.getElementById('toast');
+const closeCart = document.getElementById('closeCart');
+const cartBtn = document.getElementById('cartBtn');
+const cartSidebar = document.getElementById('cartSidebar');
+const cartOverlay = document.getElementById('cartOverlay');
+const goToPay = document.getElementById('goToPay');
+const paypalContainer = document.getElementById('paypal-button-container');
+const messageDiv = document.getElementById('message');
 
-// === FIREBASE CONFIG (ya inicializado en index.html) ===
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const db = getFirestore();
+// === CARRITO EN LOCALSTORAGE ===
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// === CARGAR PRODUCTOS DESDE FIREBASE ===
+// === CARGAR PRODUCTOS ===
 async function loadProducts() {
-  const snapshot = await getDocs(collection(db, "productos"));
-  const products = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    data.id = doc.id;
-    products.push(data);
-  });
-  renderProducts(products);
-  renderCarousels(products);
-}
+  try {
+    const snapshot = await getDocs(collection(db, "productos"));
+    const products = [];
+    const newProducts = [];
+    const starProducts = [];
 
-// === RENDERIZAR GRID DE PRODUCTOS ===
-function renderProducts(products) {
-  productsGrid.innerHTML = '';
-  products.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-      <div class="card-info">
-        <h3>${p.nombre}</h3>
-        <div class="price-container">
-          ${p.precioOferta ? `<span class="old-price">$${p.precio}</span>` : ''}
-          <span class="offer-price">$${p.precioOferta || p.precio}</span>
-        </div>
-        <button class="add-btn" data-id="${p.id}">Añadir al carrito</button>
-      </div>
-    `;
-    productsGrid.appendChild(card);
-  });
-
-  // Añadir al carrito
-  document.querySelectorAll('.add-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      const product = products.find(p => p.id === id);
-      addToCart(product);
+    snapshot.forEach(doc => {
+      const p = { id: doc.id, ...doc.data() };
+      products.push(p);
+      if (p.nuevo) newProducts.push(p);
+      if (p.estrella) starProducts.push(p);
     });
-  });
+
+    renderCarousel(newCarousel, newProducts.length > 0 ? newProducts : products.slice(0, 6));
+    renderCarousel(starCarousel, starProducts.length > 0 ? starProducts : products.slice(0, 6));
+    renderProductsGrid(products);
+    updateCartUI();
+  } catch (error) {
+    console.error("Error cargando productos:", error);
+    showToast("Error al cargar productos");
+  }
 }
 
-// === RENDERIZAR CARRUSELES (solo imagen) ===
-function renderCarousels(products) {
-  const nuevos = products.filter(p => p.esNuevo);
-  const destacados = products.filter(p => p.esDestacado);
-
-  renderCarousel(newCarousel, nuevos);
-  renderCarousel(starCarousel, destacados);
-  duplicateForInfinite(); // Duplicar para efecto infinito
-}
-
+// === RENDER CARRUSEL INFINITO ===
 function renderCarousel(container, items) {
+  if (items.length === 0) return;
+
+  // Duplicar para efecto infinito
+  const duplicated = [...items, ...items];
   container.innerHTML = '';
-  items.forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'carousel-item';
-    item.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy">`;
+
+  duplicated.forEach(product => {
+    const item = createProductCard(product);
     container.appendChild(item);
   });
+
+  // Auto-scroll infinito
+  let scrollAmount = 0;
+  const speed = 1;
+  const itemWidth = 180; // Ancho aproximado de cada card
+
+  function autoScroll() {
+    scrollAmount += speed;
+    if (scrollAmount >= container.scrollWidth / 2) {
+      scrollAmount = 0;
+    }
+    container.scrollLeft = scrollAmount;
+  }
+
+  let scrollInterval = setInterval(autoScroll, 30);
+
+  // Pausar al hover
+  container.addEventListener('mouseenter', () => clearInterval(scrollInterval));
+  container.addEventListener('mouseleave', () => scrollInterval = setInterval(autoScroll, 30));
 }
 
-// === DUPLICAR PARA EFECTO INFINITO ===
-function duplicateForInfinite() {
-  [newCarousel, starCarousel].forEach(track => {
-    const items = track.innerHTML;
-    track.innerHTML += items; // Duplicar contenido
+// === RENDER GRID DE PRODUCTOS ===
+function renderProductsGrid(products) {
+  productsGrid.innerHTML = '';
+  products.forEach(product => {
+    const card = createProductCard(product);
+    productsGrid.appendChild(card);
   });
 }
 
-// === CARRITO ===
-function addToCart(product) {
-  const existing = cart.find(item => item.id === product.id);
-  if (existing) {
-    existing.cantidad += 1;
-  } else {
-    cart.push({ ...product, cantidad: 1 });
-  }
-  saveCart();
-  updateCartUI();
-  showToast('¡Añadido al carrito!');
+// === CREAR TARJETA DE PRODUCTO (reusable) ===
+function createProductCard(product) {
+  const div = document.createElement('div');
+  div.className = 'product-card';
+  div.style.cssText = `
+    min-width: 160px; margin: 0 10px; cursor: pointer; text-align: center;
+    border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background: white; transition: transform 0.2s;
+  `;
+  div.innerHTML = `
+    <img src="${product.imagen || 'https://via.placeholder.com/160'}" alt="${product.nombre}" style="width:100%; height:160px; object-fit: cover;">
+    <div style="padding:10px;">
+      <h4 style="margin:0 0 5px; font-size:0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${product.nombre}</h4>
+      <p style="margin:0; color:#000; font-weight:bold;">$${product.precio}</p>
+      ${product.nuevo ? '<span style="background:#ff0000; color:white; font-size:0.7rem; padding:2px 6px; border-radius:4px;">NUEVO</span>' : ''}
+      ${product.estrella ? '<span style="background:#ffd700; color:#000; font-size:0.7rem; padding:2px 6px; border-radius:4px;">★ ESTRELLA</span>' : ''}
+    </div>
+  `;
+
+  // === REDIRECCIÓN AL TOCAR PRODUCTO ===
+  div.addEventListener('click', () => {
+    window.location.href = `product.html?id=${product.id}`;
+  });
+
+  div.addEventListener('mouseenter', () => div.style.transform = 'translateY(-4px)');
+  div.addEventListener('mouseleave', () => div.style.transform = 'translateY(0)');
+
+  return div;
 }
 
-function removeFromCart(id) {
-  const index = cart.findIndex(item => item.id === id);
-  if (index !== -1) {
-    if (cart[index].cantidad > 1) {
-      cart[index].cantidad -= 1;
-    } else {
-      cart.splice(index, 1);
+// === CARRITO: AÑADIR PRODUCTO ===
+window.addToCart = async function(productId) {
+  try {
+    const docRef = doc(db, "productos", productId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      showToast("Producto no encontrado");
+      return;
     }
-    saveCart();
+
+    const product = { id: docSnap.id, ...docSnap.data() };
+    const existing = cart.find(item => item.id === productId);
+
+    if (existing) {
+      existing.cantidad += 1;
+    } else {
+      cart.push({ ...product, cantidad: 1 });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
-    showToast('Producto eliminado');
+    showToast(`${product.nombre} añadido al carrito`);
+  } catch (error) {
+    console.error("Error añadiendo al carrito:", error);
   }
-}
+};
 
-function saveCart() {
-  localStorage.setItem('cart', JSON.stringify(cart));
-}
-
+// === ACTUALIZAR UI DEL CARRITO ===
 function updateCartUI() {
+  updateCartBadge();
   renderCartItems();
   updateTotal();
-  updateBadge();
-  updateCartFooter(); // PayPal visibility
+  updatePaypalButton();
+}
+
+function updateCartBadge() {
+  const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+  cartBadge.textContent = totalItems > 0 ? totalItems : '';
+  cartBadge.style.display = totalItems > 0 ? 'block' : 'none';
 }
 
 function renderCartItems() {
-  cartItemsContainer.innerHTML = cart.length === 0
-    ? '<p class="empty-cart">Tu carrito está vacío</p>'
-    : '';
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+    return;
+  }
 
+  cartItems.innerHTML = '';
   cart.forEach(item => {
     const div = document.createElement('div');
     div.className = 'cart-item';
     div.innerHTML = `
-      <div>
-        <strong>${item.nombre}</strong><br>
-        <small>$${item.precioOferta || item.precio} × ${item.cantidad}</small>
+      <img src="${item.imagen || 'https://via.placeholder.com/60'}" alt="${item.nombre}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; float:left; margin-right:10px;">
+      <div style="margin-left:70px;">
+        <h4 style="margin:0 0 5px; font-size:0.95rem;">${item.nombre}</h4>
+        <p style="margin:0; color:#000; font-weight:bold;">$${item.precio} x ${item.cantidad}</p>
       </div>
-      <button data-id="${item.id}">x</button>
+      <button onclick="removeFromCart('${item.id}')">×</button>
     `;
-    cartItemsContainer.appendChild(div);
-  });
-
-  // Botón eliminar
-  document.querySelectorAll('.cart-item button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      removeFromCart(btn.dataset.id);
-    });
+    cartItems.appendChild(div);
   });
 }
 
 function updateTotal() {
-  const total = cart.reduce((sum, item) => {
-    const precio = item.precioOferta || item.precio;
-    return sum + (precio * item.cantidad);
-  }, 0);
-  cartTotal.textContent = `Total: $${total}`;
+  const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  cartTotal.textContent = `Total: $${total.toFixed(2)}`;
 }
 
-function updateBadge() {
-  const count = cart.reduce((sum, item) => sum + item.cantidad, 0);
-  cartBadge.textContent = count;
-  cartBadge.style.display = count > 0 ? 'flex' : 'none';
+// === REMOVER DEL CARRITO ===
+window.removeFromCart = function(productId) {
+  cart = cart.filter(item => item.id !== productId);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartUI();
+  showToast("Producto eliminado");
+};
+
+// === ABRIR/CERRAR CARRITO ===
+cartBtn.onclick = () => {
+  cartSidebar.classList.add('open');
+  cartOverlay.classList.add('show');
+  updateCartUI();
+};
+
+closeCart.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+cartOverlay.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+// === IR A PAGAR ===
+goToPay.onclick = () => {
+  if (cart.length === 0) {
+    showToast("Tu carrito está vacío");
+    return;
+  }
+  window.location.href = 'checkout.html';
+};
+
+// === PAYPAL BUTTON ===
+function updatePaypalButton() {
+  if (typeof paypal === 'undefined' || cart.length === 0) return;
+
+  paypalContainer.innerHTML = '';
+  paypal.Buttons({
+    createOrder: (data, actions) => {
+      const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+      return actions.order.create({
+        purchase_units: [{
+          amount: { value: total.toFixed(2), currency_code: 'MXN' }
+        }]
+      });
+    },
+    onApprove: (data, actions) => {
+      return actions.order.capture().then(details => {
+        showToast('¡Pago exitoso! Gracias ' + details.payer.name.given_name);
+        cart = [];
+        localStorage.removeItem('cart');
+        updateCartUI();
+        cartSidebar.classList.remove('open');
+        cartOverlay.classList.remove('show');
+      });
+    },
+    onError: (err) => {
+      console.error(err);
+      showToast('Error en el pago');
+    }
+  }).render('#paypal-button-container');
 }
 
 // === TOAST ===
 function showToast(msg) {
+  const toast = document.getElementById('toast');
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === ACTUALIZAR VISIBILIDAD PAYPAL ===
-function updateCartFooter() {
-  const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-  const hasItems = cart.length > 0;
-  document.getElementById('goToPay').style.display = (isLoggedIn && hasItems) ? 'block' : 'none';
-  document.getElementById('paypal-button-container').style.display = (isLoggedIn && hasItems) ? 'block' : 'none';
-}
-
 // === INICIAR ===
-loadProducts();
-updateCartUI();
+document.addEventListener('DOMContentLoaded', () => {
+  loadProducts();
 
-// Escuchar cambios en localStorage (login/logout)
-window.addEventListener('storage', () => {
-  updateCartUI();
+  // Exponer función global para botones en HTML si los usas
+  window.addToCart = window.addToCart;
+  window.removeFromCart = window.removeFromCart;
 });
