@@ -164,8 +164,25 @@
   <!-- PAYPAL SDK (SANDBOX) -->
   <script src="https://www.paypal.com/sdk/js?client-id=AdB6bEc3xx0Ned5sYc6Wy6prEgKeZQrfMKtfrCU-tIcvrJNgf8og5nlRkbQKfBRxcIHPmfjY8JsWE6zo&currency=MXN&intent=capture"></script>
 
+  <!-- FIREBASE SDK (v9 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <!-- SCRIPT PRINCIPAL -->
   <script>
+    // === INICIALIZAR FIREBASE ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const cart = JSON.parse(localStorage.getItem('pendingPayment') || '[]');
     const toast = document.createElement('div');
     toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;z-index:9999;opacity:0;transition:all 0.3s;';
@@ -247,7 +264,7 @@
     });
     orderTotal.textContent = `Total: $${total.toLocaleString()}`;
 
-    // PayPal Button (original con logo)
+    // PayPal Button
     if (total > 0 && savedAddress) {
       paypal.Buttons({
         style: {
@@ -268,9 +285,45 @@
         onApprove: (data, actions) => {
           return actions.order.capture().then(details => {
             console.log('PEDIDO PARA ADMIN:', { cart, address: savedAddress, total, orderId: details.id, user: details.payer });
+
+            // === FORMATEAR Y ENVIAR A FIRESTORE ===
+            const orderData = {
+              userId: localStorage.getItem('userName') || 'anonimo',
+              date: firebase.firestore.FieldValue.serverTimestamp(),
+              total: total,
+              paymentId: details.id,
+              status: "paid",
+              address: {
+                name: savedAddress.name,
+                phone: savedAddress.phone,
+                street: savedAddress.street,
+                colonia: savedAddress.colonia,
+                cp: savedAddress.cp,
+                state: savedAddress.state,
+                stateCode: savedAddress.state  // Puedes mapear códigos ISO si necesitas
+              },
+              products: cart.map(item => ({
+                name: item.name,
+                qty: item.qty,
+                price: item.price
+              }))
+            };
+
+            // Guardar en colección "orders"
+            db.collection('orders').doc(details.id).set(orderData)
+              .then(() => {
+                console.log('Orden guardada en Firebase con ID:', details.id);
+                showToast('Pago exitoso y orden guardada');
+              })
+              .catch((error) => {
+                console.error('Error al guardar en Firebase:', error);
+                showToast('Pago exitoso, pero error al guardar. Contacta soporte.');
+              });
+
             alert(`¡Pago exitoso! Orden: ${details.id}`);
             localStorage.removeItem('pendingPayment');
             localStorage.removeItem('cart');
+            localStorage.removeItem('shippingAddress');
             window.location.href = 'index.html';
           });
         },
