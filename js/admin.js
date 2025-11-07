@@ -1,9 +1,8 @@
-
 // js/admin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-const firebaseConfig = { /* TU CONFIG */ };
+const firebaseConfig = { /* PEGA TUS CREDENCIALES */ };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -13,7 +12,6 @@ if (!localStorage.getItem('isAdmin')) {
 }
 
 let products = {};
-let showDemos = true;
 
 async function loadProducts() {
   const snapshot = await getDocs(collection(db, "productos"));
@@ -32,10 +30,10 @@ function renderAll() {
   renderGrid('productsGrid', 'normal');
 }
 
-function renderCarousel(id, section) {
-  const track = document.getElementById(id);
-  const items = Object.values(products).filter(p => p.section === section && (showDemos || !p.esDemo));
-  track.innerHTML = items.map(p => `
+function renderCarousel(containerId, section) {
+  const container = document.getElementById(containerId);
+  const items = Object.values(products).filter(p => p.section === section);
+  container.innerHTML = items.map(p => `
     <div class="carousel-item" data-id="${p.id}">
       <img src="${p.imagen}" alt="${p.nombre}">
       <div class="product-actions">
@@ -46,14 +44,14 @@ function renderCarousel(id, section) {
   `).join('');
 }
 
-function renderGrid(id, section) {
-  const grid = document.getElementById(id);
-  const items = Object.values(products).filter(p => p.section === section && (showDemos || !p.esDemo));
-  grid.innerHTML = items.map(p => `
+function renderGrid(containerId, section) {
+  const container = document.getElementById(containerId);
+  const items = Object.values(products).filter(p => p.section === section);
+  container.innerHTML = items.map(p => `
     <div class="product-card" data-id="${p.id}">
       <img src="${p.imagen}" alt="${p.nombre}">
-      <h3>${p.nombre}</h3>
-      <p>$${p.precio}</p>
+      <h3 class="product-title">${p.nombre}</h3>
+      <p class="price">$${p.precio}</p>
       <div class="product-actions">
         <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
         <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
@@ -61,13 +59,6 @@ function renderGrid(id, section) {
     </div>
   `).join('');
 }
-
-// TOGGLE DEMOS
-document.getElementById('toggleDemo').onclick = () => {
-  showDemos = !showDemos;
-  document.getElementById('toggleDemo').textContent = showDemos ? 'Ocultar Demos' : 'Mostrar Demos';
-  renderAll();
-};
 
 // AGREGAR
 document.getElementById('addPostBtn').onclick = () => {
@@ -81,8 +72,7 @@ document.getElementById('savePost').onclick = async () => {
     nombre: document.getElementById('postName').value,
     precio: parseFloat(document.getElementById('postPrice').value),
     imagen: document.getElementById('postImage').value,
-    section: section,
-    esDemo: false
+    section: section
   };
   await setDoc(doc(db, "productos", id), data);
   products[id] = { id, ...data };
@@ -91,11 +81,73 @@ document.getElementById('savePost').onclick = async () => {
   closeModal('addPostModal');
 };
 
-// EDITAR / ELIMINAR
-window.editProduct = (id) => { /* modal */ };
-window.deleteProduct = async (id) => { /* eliminar */ };
+// EDITAR
+window.editProduct = (id) => {
+  const p = products[id];
+  document.getElementById('editName').value = p.nombre;
+  document.getElementById('editPrice').value = p.precio;
+  document.getElementById('editImage').value = p.imagen;
+  document.getElementById('editProductModal').classList.add('active');
+  window.currentEditId = id;
+};
+
+document.getElementById('saveEdit').onclick = async () => {
+  const id = window.currentEditId;
+  const updated = {
+    nombre: document.getElementById('editName').value,
+    precio: parseFloat(document.getElementById('editPrice').value),
+    imagen: document.getElementById('editImage').value
+  };
+  await updateDoc(doc(db, "productos", id), updated);
+  products[id] = { ...products[id], ...updated };
+  renderAll();
+  showToast("Actualizado");
+  closeModal('editProductModal');
+};
+
+// ELIMINAR
+window.deleteProduct = async (id) => {
+  if (confirm("¿Quitar este producto?")) {
+    await deleteDoc(doc(db, "productos", id));
+    delete products[id];
+    renderAll();
+    showToast("Eliminado");
+  }
+};
 
 // REDES
-document.querySelectorAll('.edit-social').forEach(el => { /* editar link */ });
+document.querySelectorAll('.edit-social').forEach(el => {
+  el.onclick = (e) => {
+    e.preventDefault();
+    const type = el.dataset.type;
+    const url = prompt(`Editar ${type}`, document.getElementById(type + 'Link').href);
+    if (url) {
+      document.getElementById(type + 'Link').href = url;
+      setDoc(doc(db, "config", "redes"), { [type]: url }, { merge: true });
+    }
+  };
+});
 
-// MENÚ (usa script.js original)
+// MENÚ
+document.getElementById('menuBtn').onclick = () => {
+  document.getElementById('menuSidebar').classList.add('open');
+  document.getElementById('menuOverlay').classList.add('show');
+};
+document.getElementById('closeMenu').onclick = () => {
+  document.getElementById('menuSidebar').classList.remove('open');
+  document.getElementById('menuOverlay').classList.remove('show');
+};
+
+// MODALES
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+document.querySelectorAll('[id^="cancel"]').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
+
+// TOAST
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
