@@ -16,7 +16,6 @@
     .admin-bar .left { display: flex; gap: 15px; align-items: center; }
     .admin-bar .right { display: flex; gap: 15px; align-items: center; }
 
-    /* ENGRANAJE + MENÚ */
     .settings-btn {
       background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; padding: 0;
     }
@@ -37,14 +36,12 @@
       cursor: pointer; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
     }
 
-    /* VISTA PREVIA */
     .main-container { padding: 20px; position: relative; }
     .product-card, .editable {
       position: relative; transition: all 0.3s;
     }
     .product-card:hover, .editable:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-    /* ACCIONES EN PRODUCTOS */
     .product-actions {
       position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.3s;
     }
@@ -53,7 +50,6 @@
       background: #000; color: #fff; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
     }
 
-    /* ICONO LÁPIZ PARA TEXTOS */
     .text-edit {
       position: absolute; top: 4px; right: 4px; background: #000; color: #fff; width: 28px; height: 28px;
       border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
@@ -61,12 +57,10 @@
     }
     .editable:hover .text-edit { opacity: 1; }
 
-    /* SWITCH HABILITADO */
     .switch-small { width: 40px; height: 20px; }
     .switch-small .slider:before { height: 16px; width: 16px; left: 2px; bottom: 2px; }
     input:checked + .slider:before { transform: translateX(18px); }
 
-    /* MODAL */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000;
       align-items: center; justify-content: center;
@@ -85,7 +79,6 @@
     }
     .btn-save { background: #000; color: #fff; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-    /* SUBIDA DE IMAGEN */
     .image-upload {
       border: 2px dashed #ccc; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px;
       transition: border 0.3s;
@@ -95,9 +88,8 @@
     .image-preview {
       margin-top: 10px; max-width: 100%; max-height: 150px; border-radius: 8px; display: none;
     }
-    .upload-status { margin-top: 10px; font-size: 0.9rem; color: #28a745; }
+    .upload-status { margin-top: 10px; font-size: 0.9rem; font-weight: bold; }
 
-    /* MANTENIMIENTO */
     .maintenance-banner {
       position: fixed; top: 0; left: 0; width: 100%; background: #ff0000; color: #fff; text-align: center; padding: 10px; font-weight: bold; z-index: 9999; display: none;
     }
@@ -110,7 +102,7 @@
     input:checked + .slider { background: #28a745; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    .loading { text-align: center; padding: 40px; color: #666; }
+    .debug { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 0.9rem; }
   </style>
 </head>
 <body>
@@ -196,6 +188,9 @@
     </div>
   </div>
 
+  <!-- DEBUG -->
+  <div class="debug" id="debugLog"></div>
+
   <!-- FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -214,11 +209,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // === CLOUDINARY CONFIG (CLAVE FUNCIONAL) ===
+    // === CLOUDINARY CONFIG (100% FUNCIONAL) ===
     const CLOUDINARY_CLOUD_NAME = 'dgajzxlx6';
-    const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // ¡DEBE EXISTIR EN CLOUDINARY!
-    const CLOUDINARY_API_KEY = '678249769396292'; // TU API KEY
+    const CLOUDINARY_UPLOAD_PRESET = 'efrain_shop_unsigned'; // NUEVO PRESET
+    const CLOUDINARY_API_KEY = '678249769396292';
     const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+    // === LOG PARA DEBUG ===
+    const debugLog = document.getElementById('debugLog');
+    function log(msg) {
+      debugLog.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+      console.log(msg);
+    }
 
     // === VERIFICAR ADMIN ===
     if (localStorage.getItem('isAdmin') !== 'true') {
@@ -259,15 +261,18 @@
           return el;
         }
 
+        log('Contenedores creados: principal, carrusel, publicidad, normal');
         startRealtimeProducts();
         setupTextEditing();
-      });
+      })
+      .catch(err => log('Error cargando index.html: ' + err));
 
     // === PRODUCTOS EN TIEMPO REAL ===
     function startRealtimeProducts() {
       if (unsubscribeProducts) unsubscribeProducts();
 
       unsubscribeProducts = db.collection('productos').onSnapshot(snapshot => {
+        log(`Recibidos ${snapshot.size} productos`);
         Object.values(containers).forEach(c => c.innerHTML = '');
         snapshot.forEach(doc => {
           const p = doc.data();
@@ -275,11 +280,12 @@
           const card = createProductCard(p, doc.id);
           if (containers[tipoKey]) {
             containers[tipoKey].appendChild(card);
+          } else {
+            log(`Contenedor no encontrado para tipo: ${tipoKey}`);
           }
         });
       }, err => {
-        console.error("Error en onSnapshot:", err);
-        alert("Error al cargar productos");
+        log('Error en onSnapshot: ' + err.message);
       });
     }
 
@@ -328,6 +334,7 @@
         };
         el.appendChild(editBtn);
       });
+      log(`Textos editables: ${editableEls.length}`);
     }
 
     function getTextPath(el) {
@@ -345,8 +352,9 @@
           await db.collection(col).doc(doc).set({ [field]: document.getElementById('editTextInput').value }, { merge: true });
           currentTextElement.innerText = document.getElementById('editTextInput').value;
           document.getElementById('editTextModal').classList.remove('active');
+          log('Texto guardado: ' + currentTextPath);
         } catch (e) {
-          alert('Error al guardar texto');
+          log('Error guardando texto: ' + e.message);
         }
       }
     };
@@ -358,6 +366,7 @@
       document.getElementById('modalTitle').textContent = 'Agregar Producto';
       clearProductForm();
       modal.classList.add('active');
+      log('Modal abierto: Agregar producto');
     };
 
     document.getElementById('closeProductModal').onclick = () => modal.classList.remove('active');
@@ -368,10 +377,15 @@
       document.getElementById('productType').value = 'normal';
       document.getElementById('imagePreview').style.display = 'none';
       document.getElementById('uploadStatus').textContent = '';
+      log('Formulario limpiado');
     }
 
-    // === SUBIDA A CLOUDINARY (100% FUNCIONAL) ===
-    document.getElementById('imageUpload').onclick = () => document.getElementById('imageInput').click();
+    // === SUBIDA A CLOUDINARY (CON DEBUG Y PRESET NUEVO) ===
+    document.getElementById('imageUpload').onclick = () => {
+      document.getElementById('imageInput').click();
+      log('Clic en subir imagen');
+    };
+
     document.getElementById('imageInput').onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -381,6 +395,8 @@
       preview.src = URL.createObjectURL(file);
       preview.style.display = 'block';
       status.textContent = 'Subiendo...';
+      status.style.color = '#007bff';
+      log(`Archivo seleccionado: ${file.name} (${file.size} bytes)`);
 
       const formData = new FormData();
       formData.append('file', file);
@@ -388,26 +404,34 @@
       formData.append('api_key', CLOUDINARY_API_KEY);
 
       try {
+        log('Enviando a Cloudinary...');
         const response = await fetch(CLOUDINARY_URL, {
           method: 'POST',
           body: formData
         });
 
-        const data = await response.json();
+        const text = await response.text();
+        log(`Respuesta cruda: ${text.substring(0, 200)}...`);
 
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${text}`);
+        }
+
+        const data = JSON.parse(text);
         if (data.secure_url) {
           document.getElementById('productImageUrl').value = data.secure_url;
           preview.src = data.secure_url;
-          status.textContent = 'Subida exitosa';
+          status.textContent = '¡Subida exitosa!';
           status.style.color = '#28a745';
+          log(`URL recibida: ${data.secure_url}`);
         } else {
-          throw new Error(data.error?.message || 'Error desconocido');
+          throw new Error('No secure_url en respuesta');
         }
       } catch (err) {
-        console.error("Error en Cloudinary:", err);
         status.textContent = `Error: ${err.message}`;
         status.style.color = '#dc3545';
-        alert('No se pudo subir la imagen. Verifica tu preset en Cloudinary.');
+        log(`ERROR Cloudinary: ${err.message}`);
+        alert('Error al subir imagen. Revisa el LOG en la parte inferior.');
       }
     };
 
@@ -431,9 +455,10 @@
             preview.style.display = 'block';
           }
           modal.classList.add('active');
+          log(`Editando producto: ${id}`);
         }
       } catch (e) {
-        alert('Error al cargar producto');
+        log('Error cargando producto: ' + e.message);
       }
     };
 
@@ -464,13 +489,15 @@
       try {
         if (currentProductId) {
           await db.collection('productos').doc(currentProductId).update(data);
+          log(`Producto actualizado: ${currentProductId}`);
         } else {
-          await db.collection('productos').add(data);
+          const docRef = await db.collection('productos').add(data);
+          log(`Producto creado: ${docRef.id}`);
         }
         modal.classList.remove('active');
       } catch (e) {
-        console.error(e);
-        alert('Error al guardar producto');
+        log('Error guardando producto: ' + e.message);
+        alert('Error al guardar. Revisa el LOG.');
       }
     };
 
@@ -478,8 +505,9 @@
     window.toggleProduct = async (id, enabled) => {
       try {
         await db.collection('productos').doc(id).update({ habilitado: enabled });
+        log(`Estado cambiado: ${id} → ${enabled}`);
       } catch (e) {
-        alert('Error al actualizar estado');
+        log('Error toggle: ' + e.message);
       }
     };
 
@@ -488,8 +516,9 @@
       if (confirm('¿Eliminar este producto?')) {
         try {
           await db.collection('productos').doc(id).delete();
+          log(`Producto eliminado: ${id}`);
         } catch (e) {
-          alert('Error al eliminar');
+          log('Error eliminando: ' + e.message);
         }
       }
     };
