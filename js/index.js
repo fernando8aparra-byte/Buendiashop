@@ -1,60 +1,3 @@
-// js/index.js - BÚSQUEDA POR TIPO + RENDERIZADO CORRECTO
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-  authDomain: "boutique-buendia.firebaseapp.com",
-  projectId: "boutique-buendia",
-  storageBucket: "boutique-buendia.firebasestorage.app",
-  messagingSenderId: "430651152709",
-  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// === ELEMENTOS ===
-const carouselTrack = document.getElementById('carouselTrack');
-const anunciosTrack = document.getElementById('anunciosTrack');
-const productsGrid = document.getElementById('productsGrid');
-const cartBadge = document.getElementById('cartBadge');
-const cartItems = document.getElementById('cartItems');
-const cartTotal = document.getElementById('cartTotal');
-const goToPay = document.getElementById('goToPay');
-const toast = document.getElementById('toast');
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-const searchResultsContainer = document.getElementById('searchResultsContainer');
-
-// === CARRITO ===
-let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-function updateCart() {
-  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-  const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
-
-  cartBadge.textContent = totalQty;
-  cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
-  cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
-
-  cartItems.innerHTML = '';
-  if (cart.length === 0) {
-    cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
-    goToPay.style.display = 'none';
-    return;
-  }
-
-  goToPay.style.display = 'block';
-  cart.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
       <div>
         <div>${item.nombre}</div>
         <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
@@ -91,10 +34,12 @@ goToPay.onclick = () => {
   window.location.href = 'pago.html';
 };
 
-// === RENDER ===
+// === CARGA EN TIEMPO REAL ===
+let allProducts = [];
+
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
-  const filtered = window.allProducts.filter(filterFn);
+  const filtered = allProducts.filter(filterFn);
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -106,8 +51,7 @@ function renderCarousel(container, filterFn) {
 
 function renderGrid() {
   productsGrid.innerHTML = '';
-  const normales = window.allProducts.filter(p => !p.carrusel && !p.anuncios);
-  normales.forEach(p => {
+  allProducts.forEach(p => {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
@@ -127,9 +71,7 @@ function renderGrid() {
   });
 }
 
-// === ESCUCHAR FIRESTORE ===
-let allProducts = [];
-
+// === ESCUCHAR CAMBIOS EN FIRESTORE ===
 const productosRef = collection(db, "productos");
 onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
@@ -137,70 +79,20 @@ onSnapshot(productosRef, (snapshot) => {
     const data = doc.data();
     allProducts.push({
       id: doc.id,
-      nombre: data.nombre || '',
-      precio: data.precio || 0,
+      nombre: data.nombre,
+      precio: data.precio,
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
-      imagen: data.imagen || '',
-      carrusel: data.carrusel || false,
-      anuncios: data.anuncios || false
+      imagen: data.imagen,
+      nuevo: data.nuevo || false,
+      estrella: data.estrella || false
     });
   });
 
-  // Renderizar por tipo
-  renderCarousel(carouselTrack, p => p.carrusel);
-  renderCarousel(anunciosTrack, p => p.anuncios);
-  renderGrid(); // Solo normales
+  renderCarousel(newCarousel, p => p.nuevo);
+  renderCarousel(starCarousel, p => p.estrella);
+  renderGrid();
   window.allProducts = allProducts;
-});
-
-// === BÚSQUEDA POR TIPO ===
-let searchTimeout;
-searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  const term = searchInput.value.trim().toLowerCase();
-  if (term.length < 2) {
-    searchResultsContainer.style.display = 'none';
-    return;
-  }
-
-  searchTimeout = setTimeout(() => {
-    const results = allProducts.filter(p =>
-      (p.nombre.toLowerCase().includes(term) || 
-       (p.descripcion && p.descripcion.toLowerCase().includes(term)))
-    );
-
-    searchResults.innerHTML = '';
-    if (results.length === 0) {
-      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
-    } else {
-      results.forEach(p => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <strong>${p.nombre}</strong>
-          <br><small>${p.descripcion || 'Sin descripción'}</small>
-          <br><strong>$${p.precio.toLocaleString()}</strong>
-          <br><small style="color:#0066cc;">
-            ${p.carrusel ? 'Carrusel' : p.anuncios ? 'Anuncios' : 'Producto normal'}
-          </small>
-        `;
-        div.style.padding = '10px 0';
-        div.style.borderBottom = '1px solid #eee';
-        div.style.cursor = 'pointer';
-        div.onclick = () => window.location.href = `product.html?id=${p.id}`;
-        searchResults.appendChild(div);
-      });
-    }
-    searchResultsContainer.style.display = 'block';
-  }, 300);
-});
-
-// Cerrar búsqueda
-document.addEventListener('click', (e) => {
-  if (!document.getElementById('searchBarHeader').contains(e.target) && 
-      !searchResultsContainer.contains(e.target)) {
-    searchResultsContainer.style.display = 'none';
-  }
 });
 
 // === TOAST ===
@@ -212,3 +104,5 @@ function showToast(msg) {
 
 // === INICIO ===
 updateCart();
+
+// === BÚSQUEDA (ya tienes en index.html, no tocar) ===
