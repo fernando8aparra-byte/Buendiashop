@@ -113,7 +113,7 @@
       </div>
 
       <div class="header-right">
-        <!-- BOTÓN + -->
+        <!-- BOTÓN + (ahora para agregar productos) -->
         <div class="add-post-btn" id="addPostBtn">+</div>
       </div>
     </div>
@@ -203,19 +203,31 @@
     </div>
   </div>
 
-  <div class="modal" id="addPostModal">
+  <!-- NUEVO MODAL: Agregar Producto -->
+  <div class="modal" id="addProductModal">
     <div class="modal-content">
-      <h3>Nueva Publicación</h3>
-      <select id="postType">
-        <option value="normal">Normal</option>
-        <option value="carrusel">Carrusel</option>
-        <option value="anuncio">Anuncio</option>
+      <h3>Agregar Nuevo Producto</h3>
+      <input type="text" id="addName" placeholder="Nombre del producto">
+      <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
+      <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
+      <textarea id="addDesc" placeholder="Descripción"></textarea>
+      <select id="addCategory">
+        <option value="gorra">Gorra</option>
+        <option value="camiseta">Camiseta</option>
+        <option value="pantalon">Pantalón</option>
+        <option value="cinto">Cinto</option>
+        <option value="tenis">Tenis</option>
+        <option value="perfume">Perfume</option>
+        <option value="sudadera">Sudadera</option>
       </select>
-      <input type="text" id="postTitle" placeholder="Título">
-      <textarea id="postContent" placeholder="Contenido"></textarea>
-      <input type="text" id="postImage" placeholder="URL de imagen">
-      <button id="savePost">Publicar</button>
-      <button id="cancelPost" style="background:#999;">Cancelar</button>
+      <select id="addType">
+        <option value="normal">Normal (Todos los Productos)</option>
+        <option value="carrusel">Carrusel (Nuevos Lanzamientos)</option>
+        <option value="publicidad">Publicidad (Productos Estrella)</option>
+      </select>
+      <input type="text" id="addImage" placeholder="URL de imagen">
+      <button id="saveNewProduct">Guardar Producto</button>
+      <button id="cancelAdd" style="background:#999;">Cancelar</button>
     </div>
   </div>
 
