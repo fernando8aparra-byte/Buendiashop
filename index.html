@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* === TODOS TUS ESTILOS ORIGINALES (SIN CAMBIOS) === */
+    /* === TUS ESTILOS ORIGINALES (SIN CAMBIOS) === */
     body { margin: 0; padding: 0; padding-top: 60px; }
     .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
@@ -39,9 +39,7 @@
     .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
 
     .menu-item.ofertas-btn { background: none; color: #000; text-align: left; padding: 18px 20px; margin: 0; border-radius: 0; font-weight: normal; }
-
     .menu-item.login-btn { background: #000; color: #fff; text-align: center; padding: 15px 20px; margin: 20px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .menu-item.login-btn::after { display: none; }
     .menu-item.logout-btn { background: #ff0000; color: #fff; }
 
     .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
@@ -66,15 +64,12 @@
 
     .main-container { margin-top: 20px; }
 
-    /* RESULTADOS DE BÚSQUEDA */
     .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .search-results h3 { margin-top: 0; }
     .no-results { color: #666; font-style: italic; }
 
-    /* BOTÓN IR A PAGO */
     .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-    /* PIE DE PÁGINA */
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
   </style>
@@ -134,22 +129,25 @@
       <p class="tag">Envío Gratis en compras +$1,500</p>
     </section>
 
+    <!-- CARRUSEL -->
     <section class="infinite-carousel-section">
-      <h2>Nuevos Lanzamientos</h2>
+      <h2>Carrusel</h2>
       <div class="infinite-carousel">
-        <div class="carousel-track" id="newCarousel"></div>
+        <div class="carousel-track" id="carouselTrack"></div>
       </div>
     </section>
 
+    <!-- ANUNCIOS -->
     <section class="infinite-carousel-section">
-      <h2>Productos Estrella</h2>
+      <h2>Anuncios</h2>
       <div class="infinite-carousel">
-        <div class="carousel-track" id="starCarousel"></div>
+        <div class="carousel-track" id="anunciosTrack"></div>
       </div>
     </section>
 
+    <!-- PRODUCTOS -->
     <section>
-      <h2>Todos los Productos</h2>
+      <h2>Productos</h2>
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
@@ -212,7 +210,7 @@
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
-  <!-- NUEVO SCRIPT DINÁMICO -->
+  <!-- SCRIPT DINÁMICO -->
   <script type="module" src="js/index.js"></script>
 </body>
 </html>
