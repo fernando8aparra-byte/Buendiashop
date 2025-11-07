@@ -108,7 +108,7 @@ goToPay.onclick = () => {
   window.location.href = 'pago.html';
 };
 
-// === RENDER ===
+// === RENDER CARRUSEL ===
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
   const filtered = window.allProducts.filter(filterFn);
@@ -126,9 +126,10 @@ function renderCarousel(container, filterFn) {
   });
 }
 
+// === RENDER GRILLA (solo productos normales) ===
 function renderGrid() {
   productsGrid.innerHTML = '';
-  const normales = window.allProducts.filter(p => p.tipo?.normal === true);
+  const normales = window.allProducts.filter(p => p.type === 'normal');
 
   if (normales.length === 0) {
     productsGrid.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos disponibles</p>';
@@ -162,7 +163,7 @@ onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
     const data = doc.data();
-    const tipo = data.tipo || { normal: true }; // por defecto normal
+    const type = data.type || 'normal'; // ← Usa 'type' como string
 
     allProducts.push({
       id: doc.id,
@@ -171,7 +172,7 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
-      tipo: tipo, // { normal: true, carrusel: false, ... }
+      type: type, // ← "normal", "carrusel", "publicidad"
       nuevo: data.nuevo === true,
       estrella: data.estrella === true
     });
@@ -179,11 +180,11 @@ onSnapshot(productosRef, (snapshot) => {
 
   window.allProducts = allProducts;
 
-  // CARRUSELES: solo productos con tipo.carrusel === true
-  renderCarousel(newCarousel, p => p.tipo?.carrusel === true && p.nuevo);
-  renderCarousel(starCarousel, p => p.tipo?.carrusel === true && p.estrella);
+  // CARRUSELES: solo productos con type === "carrusel"
+  renderCarousel(newCarousel, p => p.type === 'carrusel' && p.nuevo);
+  renderCarousel(starCarousel, p => p.type === 'carrusel' && p.estrella);
 
-  // GRILLA: solo productos con tipo.normal === true
+  // GRILLA: solo productos con type === "normal"
   renderGrid();
 });
 
