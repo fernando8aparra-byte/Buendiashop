@@ -25,12 +25,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// === PROTEGER ADMIN: SIN SESIÓN → LOGIN ===
+// === PROTEGER ADMIN ===
 if (!localStorage.getItem('isAdmin')) {
   window.location.href = 'login.html';
 }
 
-// === CARGAR PRODUCTOS POR TIPO ===
+// === CARGAR PRODUCTOS ===
 function loadProductsByType(type, containerId) {
   const q = query(collection(db, "productos"), where("type", "==", type));
   const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -108,7 +108,7 @@ function createProductCard(p, sectionType) {
   return div;
 }
 
-// === EDITAR PRODUCTO ===
+// === EDITAR ===
 window.editProduct = (id) => {
   const card = document.querySelector(`.product-card[data-id="${id}"]`);
   if (!card) return;
@@ -218,7 +218,7 @@ document.getElementById('saveNewProduct').onclick = async () => {
   closeModal('addProductModal');
 };
 
-// === CERRAR SESIÓN CON CONFIRMACIÓN ===
+// === CERRAR SESIÓN ===
 document.getElementById('logoutBtn').onclick = () => {
   if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
     localStorage.removeItem('isAdmin');
@@ -226,10 +226,10 @@ document.getElementById('logoutBtn').onclick = () => {
   }
 };
 
-// === MODAL REDES SOCIALES ===
+// === REDES SOCIALES ===
 document.getElementById('openSocialModal').onclick = () => {
   document.getElementById('socialLinksModal').classList.add('active');
-  loadSocialLinks(); // Cargar actuales
+  loadSocialLinks();
 };
 
 document.getElementById('cancelSocial').onclick = () => closeModal('socialLinksModal');
@@ -247,13 +247,11 @@ document.getElementById('saveSocialLinks').onclick = async () => {
     await setDoc(doc(db, "links", "social"), links, { merge: true });
     showToast("Redes sociales guardadas");
     closeModal('socialLinksModal');
-    updateSocialLinksInMenu(links);
   } catch (error) {
     showToast("Error: " + error.message);
   }
 };
 
-// === CARGAR REDES DESDE FIRESTORE ===
 function loadSocialLinks() {
   onSnapshot(doc(db, "links", "social"), (docSnap) => {
     if (docSnap.exists()) {
@@ -263,17 +261,8 @@ function loadSocialLinks() {
       document.getElementById('facebookInput').value = data.facebook || '';
       document.getElementById('xInput').value = data.x || '';
       document.getElementById('whatsappInput').value = data.whatsapp || '';
-      updateSocialLinksInMenu(data);
     }
   });
-}
-
-function updateSocialLinksInMenu(links) {
-  document.getElementById('tiktokLink').href = links.tiktok || '#';
-  document.getElementById('instagramLink').href = links.instagram || '#';
-  document.getElementById('facebookLink').href = links.facebook || '#';
-  document.getElementById('xLink').href = links.x || '#';
-  document.getElementById('whatsappLink').href = links.whatsapp || '#';
 }
 
 // === MODALES ===
@@ -300,13 +289,5 @@ document.getElementById('adminGear').onclick = e => {
 };
 document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
-// === CERRAR SESIÓN EN MENÚ LATERAL (opcional) ===
-document.getElementById('authBtn').onclick = () => {
-  if (confirm("¿Cerrar sesión?")) {
-    localStorage.removeItem('isAdmin');
-    window.location.href = 'login.html';
-  }
-};
-
-// === INICIAR CARGA DE REDES ===
+// === INICIAR REDES ===
 loadSocialLinks();
