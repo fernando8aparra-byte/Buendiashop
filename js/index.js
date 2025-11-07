@@ -1,12 +1,9 @@
-// js/index.js - 100% DINÁMICO DESDE FIRESTORE
+// js/index.js - BÚSQUEDA POR TIPO + RENDERIZADO CORRECTO
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { 
   getFirestore, 
   collection, 
-  onSnapshot,
-  query,
-  where,
-  or
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -109,7 +106,8 @@ function renderCarousel(container, filterFn) {
 
 function renderGrid() {
   productsGrid.innerHTML = '';
-  window.allProducts.forEach(p => {
+  const normales = window.allProducts.filter(p => !p.carrusel && !p.anuncios);
+  normales.forEach(p => {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
@@ -149,13 +147,14 @@ onSnapshot(productosRef, (snapshot) => {
     });
   });
 
+  // Renderizar por tipo
   renderCarousel(carouselTrack, p => p.carrusel);
   renderCarousel(anunciosTrack, p => p.anuncios);
-  renderGrid();
+  renderGrid(); // Solo normales
   window.allProducts = allProducts;
 });
 
-// === BÚSQUEDA ===
+// === BÚSQUEDA POR TIPO ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
@@ -167,8 +166,8 @@ searchInput.addEventListener('input', () => {
 
   searchTimeout = setTimeout(() => {
     const results = allProducts.filter(p =>
-      p.nombre.toLowerCase().includes(term) ||
-      (p.descripcion && p.descripcion.toLowerCase().includes(term))
+      (p.nombre.toLowerCase().includes(term) || 
+       (p.descripcion && p.descripcion.toLowerCase().includes(term)))
     );
 
     searchResults.innerHTML = '';
@@ -177,7 +176,14 @@ searchInput.addEventListener('input', () => {
     } else {
       results.forEach(p => {
         const div = document.createElement('div');
-        div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
+        div.innerHTML = `
+          <strong>${p.nombre}</strong>
+          <br><small>${p.descripcion || 'Sin descripción'}</small>
+          <br><strong>$${p.precio.toLocaleString()}</strong>
+          <br><small style="color:#0066cc;">
+            ${p.carrusel ? 'Carrusel' : p.anuncios ? 'Anuncios' : 'Producto normal'}
+          </small>
+        `;
         div.style.padding = '10px 0';
         div.style.borderBottom = '1px solid #eee';
         div.style.cursor = 'pointer';
@@ -189,7 +195,7 @@ searchInput.addEventListener('input', () => {
   }, 300);
 });
 
-// Cerrar búsqueda al hacer clic fuera
+// Cerrar búsqueda
 document.addEventListener('click', (e) => {
   if (!document.getElementById('searchBarHeader').contains(e.target) && 
       !searchResultsContainer.contains(e.target)) {
@@ -206,5 +212,3 @@ function showToast(msg) {
 
 // === INICIO ===
 updateCart();
-
-// === LÓGICA DE MENÚS (ya tienes en tu HTML) ===
