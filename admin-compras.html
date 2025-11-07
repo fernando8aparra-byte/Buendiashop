@@ -15,7 +15,7 @@
     .icon-btn svg { stroke: #000; fill: none; }
     .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
 
-    .main-container { padding: 20px 15px; }
+    .main-container { padding: 20px 15px; max-width: 800px; margin: 0 auto; }
 
     /* BOTÓN REGRESAR */
     .back-btn {
@@ -23,6 +23,43 @@
       color: #000; text-decoration: none; cursor: pointer;
     }
     .back-btn svg { width: 20px; height: 20px; }
+
+    /* TOTAL COMPRAS (SUMA REAL) */
+    .total-compras {
+      font-size: 1.3rem; font-weight: bold; color: #000;
+    }
+
+    /* ORDENAR */
+    .sort-btn {
+      position: absolute; top: 10px; right: 15px; background: #000; color: #fff;
+      padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; z-index: 10;
+    }
+    .sort-btn svg { width: 16px; height: 16px; }
+
+    /* CONTENEDOR DE COMPRAS */
+    .orders-container {
+      margin-top: 50px; /* Espacio para el botón ordenar */
+      max-height: calc(100vh - 180px); /* Altura fija */
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+    .orders-container::-webkit-scrollbar { width: 6px; }
+    .orders-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .orders-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+    /* TARJETA DE COMPRA GRANDE */
+    .order-card {
+      background: #fff; border: 1px solid #eee; border-radius: 12px;
+      padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .order-header { font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
+    .order-id { font-size: 0.85rem; color: #666; margin-bottom: 8px; }
+    .order-total { font-weight: bold; font-size: 1.2rem; color: #000; margin: 10px 0; }
+    .order-products { margin: 12px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; }
+    .order-product { font-size: 0.95rem; margin: 6px 0; display: flex; justify-content: space-between; }
+    .order-address { font-size: 0.9rem; color: #444; margin-top: 12px; line-height: 1.5; }
+    .order-date { font-size: 0.8rem; color: #888; margin-top: 10px; text-align: right; }
 
     /* NOTIFICACIONES */
     .notifications {
@@ -36,36 +73,6 @@
     }
     .notification-item:last-child { border-bottom: none; }
     .notification-time { font-size: 0.75rem; color: #666; }
-
-    /* TOTAL COMPRAS */
-    .total-compras {
-      text-align: center; margin: 20px 0; font-size: 1.3rem; font-weight: bold;
-    }
-
-    /* ORDENAR */
-    .sort-btn {
-      position: absolute; top: 10px; right: 15px; background: #000; color: #fff;
-      padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .sort-btn svg { width: 16px; height: 16px; }
-
-    /* LISTA DE COMPRAS */
-    .orders-container {
-      overflow-x: auto; white-space: nowrap; padding: 10px 0;
-      -webkit-overflow-scrolling: touch;
-    }
-    .order-card {
-      display: inline-block; width: 320px; background: #fff; border: 1px solid #eee;
-      border-radius: 12px; padding: 16px; margin-right: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      vertical-align: top;
-    }
-    .order-header { font-weight: bold; margin-bottom: 10px; font-size: 1rem; }
-    .order-id { font-size: 0.85rem; color: #666; }
-    .order-total { font-weight: bold; color: #000; margin: 8px 0; }
-    .order-products { margin: 10px 0; }
-    .order-product { font-size: 0.9rem; margin: 4px 0; }
-    .order-address { font-size: 0.85rem; color: #555; margin-top: 10px; line-height: 1.4; }
 
     /* TOAST */
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
@@ -112,7 +119,7 @@
         <div class="logo">EFRAÍN</div>
       </div>
       <div class="header-right">
-        <div class="total-compras" id="totalCompras">Total: 0 compras</div>
+        <div class="total-compras" id="totalCompras">Total: $0</div>
       </div>
     </div>
   </header>
@@ -124,7 +131,7 @@
 
   <!-- CONTENIDO -->
   <main class="main-container">
-    <div style="position:relative;">
+    <div style="position:relative; margin-bottom:20px;">
       <button class="sort-btn" id="sortBtn">
         <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z" fill="currentColor"/><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
         Ordenar
