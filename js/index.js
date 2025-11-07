@@ -113,9 +113,10 @@ function renderCarousel(container, filterFn) {
   container.innerHTML = '';
   const filtered = window.allProducts.filter(filterFn);
   if (filtered.length === 0) {
-    container.innerHTML = '<p style="color:#999; padding:20px;">No hay productos</p>';
+    container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
     return;
   }
+  // Duplicar para efecto infinito
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -127,7 +128,14 @@ function renderCarousel(container, filterFn) {
 
 function renderGrid() {
   productsGrid.innerHTML = '';
-  window.allProducts.forEach(p => {
+  const normales = window.allProducts.filter(p => p.tipo?.normal === true);
+
+  if (normales.length === 0) {
+    productsGrid.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos disponibles</p>';
+    return;
+  }
+
+  normales.forEach(p => {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
@@ -154,6 +162,8 @@ onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
     const data = doc.data();
+    const tipo = data.tipo || { normal: true }; // por defecto normal
+
     allProducts.push({
       id: doc.id,
       nombre: data.nombre || '',
@@ -161,14 +171,19 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
+      tipo: tipo, // { normal: true, carrusel: false, ... }
       nuevo: data.nuevo === true,
       estrella: data.estrella === true
     });
   });
 
   window.allProducts = allProducts;
-  renderCarousel(newCarousel, p => p.nuevo);
-  renderCarousel(starCarousel, p => p.estrella);
+
+  // CARRUSELES: solo productos con tipo.carrusel === true
+  renderCarousel(newCarousel, p => p.tipo?.carrusel === true && p.nuevo);
+  renderCarousel(starCarousel, p => p.tipo?.carrusel === true && p.estrella);
+
+  // GRILLA: solo productos con tipo.normal === true
   renderGrid();
 });
 
