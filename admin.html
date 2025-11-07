@@ -15,9 +15,7 @@
     .admin-bar .left { display: flex; gap: 15px; align-items: center; }
     .admin-bar .right { display: flex; gap: 15px; align-items: center; }
 
-    .settings-btn {
-      background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; padding: 0;
-    }
+    .settings-btn { background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; }
     .settings-menu {
       position: absolute; top: 60px; left: 20px; background: #000; border-radius: 8px; overflow: hidden;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; min-width: 200px; z-index: 3000;
@@ -30,23 +28,26 @@
     .settings-menu a:last-child { border-bottom: none; }
     .settings-menu a:hover { background: #333; }
 
-    .add-btn {
-      background: none; border: none; color: #fff; font-size: 1.8rem; font-weight: 800;
-      cursor: pointer; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    .add-btn, .fix-btn {
+      background: #28a745; color: #fff; border: none; font-size: 1.6rem; font-weight: 800;
+      cursor: pointer; padding: 0; width: 40px; height: 40px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(40,167,69,0.4);
     }
+    .fix-btn { background: #ffc107; font-size: 1.2rem; }
 
     .main-container { padding: 20px; position: relative; }
     .product-card, .editable {
-      position: relative; transition: all 0.3s;
+      position: relative; transition: all 0.3s; border-radius: 12px; overflow: hidden;
     }
-    .product-card:hover, .editable:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    .product-card:hover, .editable:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
 
     .product-actions {
       position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.3s;
     }
     .product-card:hover .product-actions { opacity: 1; }
     .action-btn {
-      background: #000; color: #fff; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+      background: #000; color: #fff; border: none; width: 36px; height: 36px; border-radius: 8px;
+      cursor: pointer; font-size: 0.9rem; font-weight: bold;
     }
 
     .text-edit {
@@ -90,7 +91,7 @@
     .upload-status { margin-top: 10px; font-size: 0.9rem; font-weight: bold; }
 
     .maintenance-banner {
-      position: fixed; top: 0; left: 0; width: 100%; background: #ff0000; color: #fff; text-align: center; padding: 10px; font-weight: bold; z-index: 9999; display: none;
+      position: fixed; top: 0; left: 0; width: 100%; background: #dc3545; color: #fff; text-align: center; padding: 10px; font-weight: bold; z-index: 9999; display: none;
     }
     .maintenance-banner.show { display: block; }
 
@@ -101,7 +102,8 @@
     input:checked + .slider { background: #28a745; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    .debug { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 0.9rem; }
+    .debug { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 0.9rem; max-height: 200px; overflow-y: auto; }
+    .demo-badge { background: #ffc107; color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
   </style>
 </head>
 <body>
@@ -119,7 +121,8 @@
         <a href="admin-stats.html">Estadísticas</a>
         <a href="admin-nosotros.html">Nosotros</a>
       </div>
-      <button class="add-btn" id="addProductBtn">+</button>
+      <button class="add-btn" id="addProductBtn" title="Agregar Producto">+</button>
+      <button class="fix-btn" id="fixTypesBtn" title="Corregir Tipos">Fix</button>
     </div>
     <div class="right">
       <label>Página en Servicio</label>
@@ -174,7 +177,7 @@
     </div>
   </div>
 
-  <!-- MODAL EDITAR TEXTO -->
+  <!-- MODAL EDITAR ANUNCIO -->
   <div class="modal" id="editTextModal">
     <div class="modal-content">
       <button class="modal-close" id="closeTextModal">X</button>
@@ -196,7 +199,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
   <script>
-    // === FIREBASE CONFIG ===
+    // === CONFIG ===
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -213,8 +216,10 @@
     // === LOG ===
     const debugLog = document.getElementById('debugLog');
     function log(msg) {
-      debugLog.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+      const time = new Date().toLocaleTimeString();
+      debugLog.innerHTML += `<div>${time}: ${msg}</div>`;
       console.log(msg);
+      debugLog.scrollTop = debugLog.scrollHeight;
     }
 
     // === VERIFICAR ADMIN ===
@@ -226,7 +231,6 @@
     // === VARIABLES ===
     let currentProductId = null;
     let currentTextElement = null;
-    let currentTextPath = null;
     let containers = {};
     let unsubscribeProducts = null;
 
@@ -259,23 +263,40 @@
         log('Contenedores creados');
         startRealtimeProducts();
         setupTextEditing();
-        loadAnuncioTexto(); // Cargar texto del anuncio
+        loadAnuncioTexto();
       })
-      .catch(err => log('Error: ' + err));
+      .catch(err => log('Error cargando index.html: ' + err));
+
+    // === OBTENER TIPO SEGURO ===
+    function getTipoKey(p) {
+      if (p.tipo && typeof p.tipo === 'object' && !Array.isArray(p.tipo)) {
+        return Object.keys(p.tipo).find(k => p.tipo[k]) || 'normal';
+      }
+      if (Array.isArray(p.tipo)) {
+        const found = p.tipo.map(t => t.trim()).find(t => ['normal','carrusel','principal','publicidad'].includes(t));
+        return found || 'normal';
+      }
+      if (typeof p.tipo === 'string') {
+        const t = p.tipo.trim();
+        return ['normal','carrusel','principal','publicidad'].includes(t) ? t : 'normal';
+      }
+      return 'normal';
+    }
 
     // === PRODUCTOS EN TIEMPO REAL ===
     function startRealtimeProducts() {
       if (unsubscribeProducts) unsubscribeProducts();
-
       unsubscribeProducts = db.collection('productos').onSnapshot(snapshot => {
         log(`Recibidos ${snapshot.size} productos`);
         Object.values(containers).forEach(c => c.innerHTML = '');
         snapshot.forEach(doc => {
           const p = doc.data();
-          const tipoKey = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+          const tipoKey = getTipoKey(p);
           const card = createProductCard(p, doc.id);
           if (containers[tipoKey]) {
             containers[tipoKey].appendChild(card);
+          } else {
+            log(`Contenedor no encontrado: ${tipoKey}`);
           }
         });
       });
@@ -285,14 +306,15 @@
       const div = document.createElement('div');
       div.className = 'product-card';
       const formattedPrice = p.precioFormateado || `$${Number(p.precio || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+      const isDemo = id.startsWith('demo_');
       div.innerHTML = `
         <div class="product-actions">
           <button class="action-btn" onclick="editProduct('${id}')">Edit</button>
           <button class="action-btn" onclick="deleteProduct('${id}')">Delete</button>
         </div>
         <img src="${p.imagen}" alt="${p.nombre}" style="width:100%; height:auto; border-radius:8px;">
-        <div class="card-info">
-          <h3 class="product-title">${p.nombre}</h3>
+        <div class="card-info" style="padding:10px;">
+          <h3 class="product-title">${p.nombre} ${isDemo ? '<span class="demo-badge">DEMO</span>' : ''}</h3>
           <p class="product-description">${p.descripcion}</p>
           <div class="price-container">
             <span class="product-price">${formattedPrice}</span>
@@ -306,7 +328,7 @@
       return div;
     }
 
-    // === EDITAR TEXTO DEL ANUNCIO ===
+    // === EDITAR ANUNCIO ===
     function setupTextEditing() {
       const anuncio = document.querySelector('#indexClone .contact-text');
       if (anuncio) {
@@ -327,30 +349,24 @@
     async function loadAnuncioTexto() {
       try {
         const doc = await db.collection('config').doc('anuncio').get();
-        if (doc.exists) {
-          const texto = doc.data().texto || 'No te quedes sin tu Mystery Box';
-          const el = document.querySelector('#indexClone .contact-text');
-          if (el) el.innerText = texto;
-        }
-      } catch (e) {
-        log('Error cargando anuncio: ' + e.message);
-      }
+        const texto = doc.exists ? doc.data().texto : 'No te quedes sin tu Mystery Box';
+        const el = document.querySelector('#indexClone .contact-text');
+        if (el) el.innerText = texto;
+      } catch (e) { log('Error anuncio: ' + e.message); }
     }
 
     document.getElementById('saveTextBtn').onclick = async () => {
-      const nuevoTexto = document.getElementById('editTextInput').value.trim();
-      if (!nuevoTexto) return alert('Escribe algo');
+      const texto = document.getElementById('editTextInput').value.trim();
+      if (!texto) return alert('Escribe algo');
       try {
-        await db.collection('config').doc('anuncio').set({ texto: nuevoTexto }, { merge: true });
-        if (currentTextElement) currentTextElement.innerText = nuevoTexto;
+        await db.collection('config').doc('anuncio').set({ texto }, { merge: true });
+        if (currentTextElement) currentTextElement.innerText = texto;
         document.getElementById('editTextModal').classList.remove('active');
         log('Anuncio actualizado');
-      } catch (e) {
-        log('Error: ' + e.message);
-      }
+      } catch (e) { log('Error: ' + e.message); }
     };
 
-    // === SUBIDA A FIREBASE STORAGE ===
+    // === SUBIDA IMAGEN ===
     document.getElementById('imageUpload').onclick = () => document.getElementById('imageInput').click();
     document.getElementById('imageInput').onchange = async (e) => {
       const file = e.target.files[0];
@@ -360,6 +376,7 @@
       preview.src = URL.createObjectURL(file);
       preview.style.display = 'block';
       status.textContent = 'Subiendo...';
+      status.style.color = '#007bff';
 
       try {
         const fileName = `productos/${Date.now()}_${file.name}`;
@@ -370,6 +387,7 @@
         preview.src = url;
         status.textContent = '¡Subida exitosa!';
         status.style.color = '#28a745';
+        log('Imagen subida: ' + url);
       } catch (err) {
         status.textContent = 'Error: ' + err.message;
         status.style.color = '#dc3545';
@@ -398,8 +416,10 @@
       try {
         if (currentProductId) {
           await db.collection('productos').doc(currentProductId).update(data);
+          log(`Actualizado: ${currentProductId}`);
         } else {
-          await db.collection('productos').add(data);
+          const docRef = await db.collection('productos').add(data);
+          log(`Creado: ${docRef.id}`);
         }
         document.getElementById('productModal').classList.remove('active');
       } catch (e) {
@@ -417,16 +437,47 @@
         document.getElementById('productName').value = p.nombre;
         document.getElementById('productPrice').value = p.precio;
         document.getElementById('productDesc').value = p.descripcion;
-        document.getElementById('productType').value = Object.keys(p.tipo).find(k => p.tipo[k]) || 'normal';
+        document.getElementById('productType').value = getTipoKey(p);
         document.getElementById('productImageUrl').value = p.imagen;
-        document.getElementById('imagePreview').src = p.imagen;
-        document.getElementById('imagePreview').style.display = 'block';
+        const preview = document.getElementById('imagePreview');
+        preview.src = p.imagen;
+        preview.style.display = 'block';
         document.getElementById('productModal').classList.add('active');
       }
     };
 
-    window.deleteProduct = (id) => confirm('¿Eliminar?') && db.collection('productos').doc(id).delete();
-    window.toggleProduct = (id, enabled) => db.collection('productos').doc(id).update({ habilitado: enabled });
+    window.deleteProduct = (id) => {
+      if (confirm('¿Eliminar este producto?')) {
+        db.collection('productos').doc(id).delete().then(() => {
+          log(`Eliminado: ${id}`);
+        });
+      }
+    };
+
+    window.toggleProduct = (id, enabled) => {
+      db.collection('productos').doc(id).update({ habilitado: enabled });
+    };
+
+    // === BOTÓN CORREGIR TIPOS ===
+    document.getElementById('fixTypesBtn').onclick = () => {
+      if (!confirm('¿Corregir todos los tipos de productos?')) return;
+      db.collection('productos').get().then(snapshot => {
+        const batch = db.batch();
+        let count = 0;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          let nuevoTipo = { normal: false, carrusel: false, principal: false, publicidad: false };
+          const tipoKey = getTipoKey(data);
+          nuevoTipo[tipoKey] = true;
+          batch.update(doc.ref, { tipo: nuevoTipo });
+          count++;
+        });
+        return batch.commit().then(() => {
+          alert(`¡${count} productos corregidos!`);
+          log(`Corregidos ${count} productos`);
+        });
+      });
+    };
 
     // === MODALES ===
     document.getElementById('addProductBtn').onclick = () => {
@@ -435,6 +486,7 @@
       ['productName', 'productPrice', 'productDesc', 'productImageUrl'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('productType').value = 'normal';
       document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
       document.getElementById('productModal').classList.add('active');
     };
     document.getElementById('closeProductModal').onclick = () => document.getElementById('productModal').classList.remove('active');
