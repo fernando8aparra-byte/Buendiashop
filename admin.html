@@ -20,10 +20,6 @@
     .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
     .hero-banner .tag { font-size: 1rem; color: #666; }
 
-    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
-    .search-bar-header.active { display: flex; }
-    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
-
     .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
     .menu-sidebar.open { transform: translateX(0); }
     .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
@@ -49,29 +45,10 @@
     .social-links img { width: 40px; height: 40px; }
     .edit-social { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-    .cart-sidebar { position: fixed; top: 60px; right: 0; width: 350px; height: calc(100vh - 60px); background: #fff; z-index: 1000; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-    .cart-sidebar.open { transform: translateX(0); }
-    .cart-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .cart-overlay.show { opacity: 1; visibility: visible; }
-    .cart-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
-    .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
-    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
-
-    #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index 30; }
-
-    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; }
-    .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-
     .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
     .header-overlay.show { display: block; }
 
     .main-container { margin-top: 20px; }
-
-    .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .search-results h3 { margin-top: 0; }
-    .no-results { color: #666; font-style: italic; }
-
-    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
@@ -107,7 +84,6 @@
 
   <!-- OVERLAYS -->
   <div class="header-overlay" id="headerOverlay"></div>
-  <div class="cart-overlay" id="cartOverlay"></div>
 
   <!-- HEADER -->
   <header class="header">
@@ -139,35 +115,9 @@
       <div class="header-right">
         <!-- BOTÓN + -->
         <div class="add-post-btn" id="addPostBtn">+</div>
-
-        <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
-          <svg viewBox="0 0 24 24" width="26" height="26">
-            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
-            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-
-        <button id="cartBtn" class="icon-btn" aria-label="Carrito">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="cartBadge"></span>
-        </button>
-      </div>
-
-      <div class="search-bar-header" id="searchBarHeader">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
-        <button id="closeSearchHeader" class="close-search-btn">x</button>
       </div>
     </div>
   </header>
-
-  <!-- RESULTADOS DE BÚSQUEDA -->
-  <div id="searchResultsContainer" class="search-results" style="display:none;">
-    <h3>Resultados de búsqueda</h3>
-    <div id="searchResults"></div>
-  </div>
 
   <!-- CONTENIDO -->
   <main class="main-container">
@@ -225,21 +175,6 @@
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     
     <div class="menu-item login-btn logout-btn" id="authBtn">Cerrar sesión</div>
-  </aside>
-
-  <!-- CARRITO (opcional) -->
-  <aside class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button class="menu-close-x" id="closeCart">x</button>
-    </div>
-    <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Tu carrito está vacío</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
-    </div>
   </aside>
 
   <!-- TOAST -->
