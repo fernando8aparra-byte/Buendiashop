@@ -1,4 +1,4 @@
-// js/index.js - 100% DINÁMICO + MENÚ + CARRITO + BÚSQUEDA
+// js/index.js - 100% DINÁMICO DESDE FIRESTORE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { 
   getFirestore, 
@@ -6,7 +6,7 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs
+  or
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -21,9 +21,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// === DOM ===
-const newCarousel = document.getElementById('newCarousel');
-const starCarousel = document.getElementById('starCarousel');
+// === ELEMENTOS ===
+const carouselTrack = document.getElementById('carouselTrack');
+const anunciosTrack = document.getElementById('anunciosTrack');
 const productsGrid = document.getElementById('productsGrid');
 const cartBadge = document.getElementById('cartBadge');
 const cartItems = document.getElementById('cartItems');
@@ -31,22 +31,8 @@ const cartTotal = document.getElementById('cartTotal');
 const goToPay = document.getElementById('goToPay');
 const toast = document.getElementById('toast');
 const searchInput = document.getElementById('searchInput');
-const searchResultsContainer = document.getElementById('searchResultsContainer');
 const searchResults = document.getElementById('searchResults');
-const menuBtn = document.getElementById('menuBtn');
-const menuOverlay = document.getElementById('menuOverlay');
-const menuSidebar = document.getElementById('menuSidebar');
-const cartBtn = document.getElementById('cartBtn');
-const cartSidebar = document.getElementById('cartSidebar');
-const closeCart = document.getElementById('closeCart');
-const cartOverlay = document.getElementById('cartOverlay');
-const searchBtn = document.getElementById('searchBtn');
-const searchBarHeader = document.getElementById('searchBarHeader');
-const closeSearchHeader = document.getElementById('closeSearchHeader');
-const headerOverlay = document.getElementById('headerOverlay');
-const welcomeMsg = document.getElementById('welcomeMsg');
-const authBtn = document.getElementById('authBtn');
-const helpBtn = document.getElementById('helpBtn');
+const searchResultsContainer = document.getElementById('searchResultsContainer');
 
 // === CARRITO ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -112,10 +98,6 @@ goToPay.onclick = () => {
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
   const filtered = window.allProducts.filter(filterFn);
-  if (filtered.length === 0) {
-    container.innerHTML = '<p style="color:#999; padding:20px;">No hay productos</p>';
-    return;
-  }
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -147,8 +129,9 @@ function renderGrid() {
   });
 }
 
-// === FIRESTORE EN TIEMPO REAL ===
+// === ESCUCHAR FIRESTORE ===
 let allProducts = [];
+
 const productosRef = collection(db, "productos");
 onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
@@ -161,15 +144,15 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
-      nuevo: data.nuevo === true,
-      estrella: data.estrella === true
+      carrusel: data.carrusel || false,
+      anuncios: data.anuncios || false
     });
   });
 
-  window.allProducts = allProducts;
-  renderCarousel(newCarousel, p => p.nuevo);
-  renderCarousel(starCarousel, p => p.estrella);
+  renderCarousel(carouselTrack, p => p.carrusel);
+  renderCarousel(anunciosTrack, p => p.anuncios);
   renderGrid();
+  window.allProducts = allProducts;
 });
 
 // === BÚSQUEDA ===
@@ -182,25 +165,23 @@ searchInput.addEventListener('input', () => {
     return;
   }
 
-  searchTimeout = setTimeout(async () => {
-    const q = query(
-      collection(db, "productos"),
-      where("nombre", ">=", term),
-      where("nombre", "<=", term + '\uf8ff')
+  searchTimeout = setTimeout(() => {
+    const results = allProducts.filter(p =>
+      p.nombre.toLowerCase().includes(term) ||
+      (p.descripcion && p.descripcion.toLowerCase().includes(term))
     );
-    const snapshot = await getDocs(q);
+
     searchResults.innerHTML = '';
-    if (snapshot.empty) {
+    if (results.length === 0) {
       searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
     } else {
-      snapshot.forEach(doc => {
-        const p = doc.data();
+      results.forEach(p => {
         const div = document.createElement('div');
         div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
         div.style.padding = '10px 0';
         div.style.borderBottom = '1px solid #eee';
         div.style.cursor = 'pointer';
-        div.onclick = () => window.location.href = `product.html?id=${doc.id}`;
+        div.onclick = () => window.location.href = `product.html?id=${p.id}`;
         searchResults.appendChild(div);
       });
     }
@@ -208,89 +189,13 @@ searchInput.addEventListener('input', () => {
   }, 300);
 });
 
+// Cerrar búsqueda al hacer clic fuera
 document.addEventListener('click', (e) => {
-  if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+  if (!document.getElementById('searchBarHeader').contains(e.target) && 
+      !searchResultsContainer.contains(e.target)) {
     searchResultsContainer.style.display = 'none';
   }
 });
-
-// === MENÚ HAMBURGUESA ===
-menuBtn.onclick = () => {
-  menuOverlay.classList.add('show');
-  menuSidebar.classList.add('open');
-  updateAuthUI();
-};
-
-menuOverlay.onclick = () => {
-  menuOverlay.classList.remove('show');
-  menuSidebar.classList.remove('open');
-};
-
-// === CARRITO LATERAL ===
-cartBtn.onclick = () => {
-  cartSidebar.classList.add('open');
-  cartOverlay.classList.add('show');
-  updateCart();
-};
-
-closeCart.onclick = () => {
-  cartSidebar.classList.remove('open');
-  cartOverlay.classList.remove('show');
-};
-
-cartOverlay.onclick = () => {
-  cartSidebar.classList.remove('open');
-  cartOverlay.classList.remove('show');
-};
-
-// === BÚSQUEDA HEADER ===
-searchBtn.onclick = () => {
-  searchBarHeader.classList.add('active');
-  headerOverlay.classList.add('show');
-  searchInput.focus();
-};
-
-const closeSearch = () => {
-  searchBarHeader.classList.remove('active');
-  headerOverlay.classList.remove('show');
-  searchResultsContainer.style.display = 'none';
-};
-closeSearchHeader.onclick = closeSearch;
-headerOverlay.onclick = closeSearch;
-
-// === AUTH ===
-let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-let userName = localStorage.getItem('userName') || '';
-
-function updateAuthUI() {
-  if (isLoggedIn && userName) {
-    welcomeMsg.textContent = `¡Hola, ${userName}!`;
-    authBtn.textContent = 'Cerrar sesión';
-    authBtn.classList.add('logout-btn');
-  } else {
-    welcomeMsg.textContent = '';
-    authBtn.textContent = 'Inicia sesión o regístrate';
-    authBtn.classList.remove('logout-btn');
-  }
-}
-
-authBtn.onclick = () => {
-  if (isLoggedIn) {
-    localStorage.removeItem('loggedIn');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('isAdmin');
-    isLoggedIn = false;
-    userName = '';
-    showToast('Sesión cerrada');
-    updateAuthUI();
-  } else {
-    window.location.href = 'login.html';
-  }
-};
-
-helpBtn.onclick = () => {
-  alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
-};
 
 // === TOAST ===
 function showToast(msg) {
@@ -301,4 +206,5 @@ function showToast(msg) {
 
 // === INICIO ===
 updateCart();
-updateAuthUI();
+
+// === LÓGICA DE MENÚS (ya tienes en tu HTML) ===
