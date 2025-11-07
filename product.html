@@ -1,35 +1,138 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Boutique Buendía: Detalle de producto - Moda premium." />
-  <title>Boutique Buendía | Detalle Producto</title>
-  <link rel="stylesheet" href="css/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="icon" href="https://i.ibb.co/9yY7Y7K/logo-buendia.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Producto - Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; }
+    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .header-right { display: flex; align-items: center; gap: 15px; }
+    .icon-btn { color: #000; background: none; cursor: pointer; position: relative; }
+    .icon-btn svg { stroke: #000; fill: none; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+
+    /* BARRA DE BÚSQUEDA */
+    .search-bar {
+      flex: 1; max-width: 300px; position: relative;
+    }
+    .search-bar input {
+      width: 100%; padding: 10px 35px 10px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;
+    }
+    .search-bar svg { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: #666; }
+
+    /* CARRITO BADGE */
+    .cart-badge {
+      position: absolute; top: -8px; right: -8px; background: #ff0000; color: #fff;
+      font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-weight: bold;
+    }
+
+    /* PRODUCTO PRINCIPAL */
+    .product-main {
+      text-align: center; padding: 20px 15px;
+    }
+    .product-image {
+      width: 100%; max-width: 400px; height: auto; border-radius: 12px; margin: 0 auto 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .product-name { font-size: 1.8rem; font-weight: bold; margin: 15px 0 10px; }
+    .product-price { font-size: 1.6rem; color: #000; font-weight: bold; margin: 10px 0; }
+    .product-desc { font-size: 1rem; color: #555; line-height: 1.5; margin: 15px 0; }
+    .product-sizes {
+      display: flex; justify-content: center; gap: 10px; margin: 20px 0;
+    }
+    .size-btn {
+      padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;
+      font-size: 0.9rem; transition: all 0.2s;
+    }
+    .size-btn.selected { background: #000; color: #fff; border-color: #000; }
+
+    /* BOTONES */
+    .btn {
+      display: block; width: 100%; padding: 14px; margin: 10px 0; border: none;
+      border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
+    }
+    .btn-add { background: #000; color: #fff; }
+    .btn-pay { background: #ff4444; color: #fff; }
+
+    /* MENÚ LATERAL */
+    .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
+    .menu-sidebar.open { transform: translateX(0); }
+    .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+    .menu-overlay.show { opacity: 1; visibility: visible; }
+
+    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .menu-item.login-btn { background: #000; color: #fff; text-align: center; margin: 20px 15px; border-radius: 8px; font-weight: bold; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
+    .toast.show { display: block; animation: fadeInOut 3s; }
+    @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+  </style>
 </head>
 <body>
-
-  <!-- BARRA DE BIENVENIDA -->
-  <div id="welcomeBar" class="welcome-bar hidden" role="status" aria-live="polite"></div>
 
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
-      <button id="menuBtn" class="menu-btn" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
-      </button>
-
-      <div class="logo-container">
-        <div class="logo" id="logoCenter">
-          <span>Boutique Buendía</span>
-        </div>
-        <button id="searchBtn" class="icon search-btn" title="Buscar" aria-label="Buscar productos">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <div class="header-left">
+        <button id="menuBtn" class="icon-btn" aria-label="Menú">
+          <svg viewBox="0 0 24 24" width="28" height="28"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <input id="searchInput" class="search-input" type="text" placeholder="Buscar productos..." aria-label="Buscar" style="display:none;">
+        <div class="logo">EFRAÍN</div>
       </div>
 
-      <button id="cartBtn" class="icon cart-icon" title="Carrito" aria-label="Abrir carrito">
-        <svg width="20" height="20
+      <div class="search-bar">
+        <input type="text" placeholder="Buscar producto..." id="searchInput">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.47 6.47 0 0 0 1.57-4.23 6.5 6.5 0 1 0-6.5 6.5c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+      </div>
+
+      <div class="header-right">
+        <a href="checkout.html" class="icon-btn" id="cartBtn">
+          <svg viewBox="0 0 24 24" width="26" height="26"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1 +.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>
+          <div class="cart-badge" id="cartBadge">0</div>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- PRODUCTO PRINCIPAL -->
+  <main class="product-main">
+    <img id="productImage" class="product-image" src="" alt="Producto">
+    <h1 id="productName" class="product-name">Cargando...</h1>
+    <p id="productPrice" class="product-price">$0</p>
+    <p id="productDesc" class="product-desc"></p>
+
+    <div class="product-sizes" id="sizesContainer">
+      <!-- Tallas se inyectan aquí -->
+    </div>
+
+    <button class="btn btn-add" id="addToCartBtn">Agregar al carrito</button>
+    <a href="checkout.html" class="btn btn-pay">Ir a pagar</a>
+  </main>
+
+  <!-- MENÚ LATERAL -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <aside class="menu-sidebar" id="menuSidebar">
+    <div class="menu-item">Inicio</div>
+    <div class="menu-item">Gorras</div>
+    <div class="menu-item">Camisetas</div>
+    <div class="menu-item">Pantalones</div>
+    <div class="menu-item">Cintos</div>
+    <div class="menu-item">Tenis</div>
+    <div class="menu-item">Perfumes</div>
+    <div class="menu-item">Sudaderas</div>
+    <div class="menu-item login-btn">Iniciar sesión</div>
+  </aside>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- SCRIPTS -->
+  <script type="module" src="js/product.js"></script>
+</body>
+</html>
