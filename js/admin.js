@@ -9,14 +9,9 @@ import {
   deleteDoc, 
   onSnapshot,
   query,
-  where
+  where,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { 
-  getStorage, 
-  ref, 
-  uploadBytes, 
-  getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
@@ -29,7 +24,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // === VERIFICAR ADMIN ===
 if (!localStorage.getItem('isAdmin')) {
@@ -52,12 +46,10 @@ function loadProductsByType(type, containerId) {
       container.appendChild(card);
     });
 
-    // Control de carrusel
     if (containerId === 'newCarousel' || containerId === 'starCarousel') {
       handleAutoCarousel(container, products.length, containerId);
     }
 
-    // Duplicar para loop infinito
     duplicateForInfiniteScroll(containerId);
   });
 
@@ -68,24 +60,18 @@ loadProductsByType('carrusel', 'newCarousel');
 loadProductsByType('publicidad', 'starCarousel');
 loadProductsByType('normal', 'productsGrid');
 
-// === CONTROL DE CARRUSEL ===
+// === CARRUSEL ===
 function handleAutoCarousel(container, count, containerId) {
   const section = container.parentElement.parentElement;
   section.classList.remove('auto-scroll', 'static-display');
-  if (count >= 4) {
-    section.classList.add('auto-scroll');
-  } else {
-    section.classList.add('static-display');
-  }
+  if (count >= 4) section.classList.add('auto-scroll');
+  else section.classList.add('static-display');
 }
 
-// === DUPLICAR PARA LOOP INFINITO ===
 function duplicateForInfiniteScroll(containerId) {
   const track = document.getElementById(containerId);
   const parent = track.parentElement.parentElement;
-  if (!parent.classList.contains('auto-scroll')) return;
-  if (track.dataset.duplicated) return;
-
+  if (!parent.classList.contains('auto-scroll') || track.dataset.duplicated) return;
   const clone = track.cloneNode(true);
   clone.id = containerId + '-clone';
   track.appendChild(clone);
@@ -125,13 +111,15 @@ function createProductCard(p, sectionType) {
 
 // === EDITAR ===
 window.editProduct = (id) => {
-  const p = [...document.querySelectorAll('.product-card')].find(c => c.dataset.id === id)?.__data || {};
-  document.getElementById('editName').value = p.nombre || '';
-  document.getElementById('editPrice').value = p.precio || '';
-  document.getElementById('editSizes').value = p.talla?.join(', ') || '';
-  document.getElementById('editDesc').value = p.descripcion || '';
-  document.getElementById('editType').value = p.tipo || 'gorra';
-  document.getElementById('editImage').value = p.imagen || '';
+  const card = document.querySelector(`.product-card[data-id="${id}"]`);
+  const p = {
+    nombre: card.querySelector('h3').textContent,
+    precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || card.querySelector('p')?.textSIGContent?.replace('$', '')),
+    descripcion: card.querySelector('.product-desc-small')?.textContent || '',
+    imagen: card.querySelector('img').src
+  };
+  document.getElementById('editName').value = p.nombre;
+  document.getElementById('addImage').value = p.imagen;
   document.getElementById('editProductModal').classList.add('active');
   window.currentEditId = id;
 };
@@ -140,11 +128,7 @@ document.getElementById('saveProduct').onclick = async () => {
   const id = window.currentEditId;
   const updated = {
     nombre: document.getElementById('editName').value,
-    precio: parseFloat(document.getElementById('editPrice').value),
-    talla: document.getElementById('editSizes').value.split(',').map(s => s.trim()).filter(Boolean),
-    descripcion: document.getElementById('editDesc').value,
-    tipo: document.getElementById('editType').value,
-    imagen: document.getElementById('editImage').value
+    imagen: document.getElementById('addImage').value
   };
   await updateDoc(doc(db, "productos", id), updated);
   showToast("Actualizado");
@@ -163,7 +147,56 @@ document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
 };
 
+// === PREVISUALIZAR IMAGEN ===
+document.getElementById('addImageFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  const urlInput = document.getElementById('addImage');
+  const preview = document.getElementById('imagePreview');
+  const img = document.getElementById('previewImg');
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      img.src = ev.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    urlInput.disabled = true;
+    urlInput.value = '';
+  } else {
+    preview.style.display = 'none';
+    urlInput.disabled = false;
+  }
+});
+
+document.getElementById('addImage').addEventListener('input', (e) => {
+  const fileInput = document.getElementById('addImageFile');
+  const preview = document.getElementById('imagePreview');
+  if (e.target.value.trim()) {
+    fileInput.disabled = true;
+    fileInput.value = '';
+    preview.style.display = 'none';
+  } else {
+    fileInput.disabled = false;
+  }
+});
+
+// === GUARDAR NUEVO ===
 document.getElementById('saveNewProduct').onclick = async () => {
+  const url = document.getElementById('addImage').value;
+  const fileInput = document.getElementById('addImageFile');
+  const hasFile = fileInput.files.length > 0;
+
+  if (hasFile && !url) {
+    showToast("La subida de imágenes aún no está habilitada. Usa una URL.");
+    return;
+  }
+
+  if (!url && !hasFile) {
+    showToast("Agrega una imagen (URL o archivo)");
+    return;
+  }
+
   const producto = {
     nombre: document.getElementById('addName').value,
     precio: parseFloat(document.getElementById('addPrice').value),
@@ -171,15 +204,17 @@ document.getElementById('saveNewProduct').onclick = async () => {
     descripcion: document.getElementById('addDesc').value,
     tipo: document.getElementById('addCategory').value,
     type: document.getElementById('addType').value,
-    imagen: document.getElementById('addImage').value,
+    imagen: url,
     creado: new Date()
   };
+
   if (!producto.nombre || !producto.precio || !producto.type) {
     showToast("Faltan datos");
     return;
   }
+
   await addDoc(collection(db, "productos"), producto);
-  showToast("Agregado");
+  showToast("Producto agregado (imagen por URL)");
   closeModal('addProductModal');
 };
 
@@ -200,7 +235,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// === REDES, ENGRANAJE, LOGOUT ===
+// === REDES ===
 document.querySelectorAll('.edit-social').forEach(el => {
   el.onclick = e => {
     e.preventDefault();
@@ -213,12 +248,14 @@ document.querySelectorAll('.edit-social').forEach(el => {
   };
 });
 
+// === ENGRANAJE ===
 document.getElementById('adminGear').onclick = e => {
   e.stopPropagation();
   document.getElementById('adminDropdown').classList.toggle('show');
 };
 document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
+// === LOGOUT ===
 document.getElementById('authBtn').onclick = () => {
   localStorage.clear();
   window.location.href = 'index.html';
