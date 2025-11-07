@@ -86,6 +86,10 @@
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
     .toast.show { display: block; animation: fadeInOut 3s; }
     @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+    /* CHECKBOX GROUP */
+    .checkbox-group { display: flex; gap: 20px; margin: 15px 0; flex-wrap: wrap; }
+    .checkbox-group label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem; color: #333; }
   </style>
 </head>
 <body>
@@ -153,6 +157,13 @@
       <input type="text" id="editPrice" placeholder="Precio">
       <input type="text" id="editSizes" placeholder="Tallas (S,M,L)">
       <textarea id="editDesc" placeholder="Descripción"></textarea>
+
+      <!-- CHECKBOXES AGREGADOS PARA EDITAR -->
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="editNuevo"> Nuevo lanzamiento</label>
+        <label><input type="checkbox" id="editEstrella"> Producto estrella</label>
+      </div>
+
       <select id="editType">
         <option value="gorra">Gorra</option>
         <option value="camiseta">Camiseta</option>
@@ -176,6 +187,12 @@
       <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
       <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
       <textarea id="addDesc" placeholder="Descripción"></textarea>
+
+      <!-- CHECKBOXES AGREGADOS PARA AGREGAR -->
+      <div class="checkbox-group">
+        <label><input type="checkbox" id="addNuevo"> Nuevo lanzamiento</label>
+        <label><input type="checkbox" id="addEstrella"> Producto estrella</label>
+      </div>
 
       <select id="addCategory">
         <option value="gorra">Gorra</option>
