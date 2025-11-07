@@ -29,7 +29,7 @@ if (!localStorage.getItem('isAdmin')) {
 let orders = [];
 let sortAsc = false;
 
-// === CARGAR COMPRAS EN TIEMPO REAL ===
+// === CARGAR COMPRAS ===
 const ordersRef = collection(db, "orders");
 let unsubscribe = null;
 
@@ -48,13 +48,13 @@ function loadOrders(order = 'desc') {
 
 loadOrders('desc');
 
-// === RENDERIZAR COMPRAS ===
+// === RENDERIZAR COMPRAS (VERTICAL) ===
 function renderOrders() {
   const container = document.getElementById('ordersContainer');
   container.innerHTML = '';
 
   if (orders.length === 0) {
-    container.innerHTML = '<p style="text-align:center; color:#666;">No hay compras aún.</p>';
+    container.innerHTML = '<p style="text-align:center; color:#666; padding:40px 0;">No hay compras aún.</p>';
     return;
   }
 
@@ -64,40 +64,42 @@ function renderOrders() {
 
     const date = order.date?.toDate?.() || new Date(order.date);
     const formattedDate = date.toLocaleString('es-MX', {
-      day: '2-digit', month: 'long', year: 'numeric',
+      weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
 
     const productsHtml = order.products.map(p => `
       <div class="order-product">
-        • ${p.name} (x${p.qty}) - $${p.price * p.qty}
+        <span>${p.name} (x${p.qty})</span>
+        <span>$${(p.price * p.qty).toLocaleString()}</span>
       </div>
     `).join('');
 
-    const address = `${order.address.street}, ${order.address.colonia}, ${order.address.cp}, ${order.address.state}`;
+    const address = order.address;
+    const fullAddress = `${address.street}, ${address.colonia}, ${address.cp}, ${address.state}`;
 
     card.innerHTML = `
-      <div class="order-header">Compra #${order.id.slice(0, 8)}</div>
-      <div class="order-id">ID: ${order.paymentId}</div>
-      <div class="order-total">Total: $${order.total}</div>
+      <div class="order-header">Compra #${order.id.slice(0, 8).toUpperCase()}</div>
+      <div class="order-id">ID de pago: ${order.paymentId}</div>
+      <div class="order-total">Total: $${order.total.toLocaleString()}</div>
       <div class="order-products">${productsHtml}</div>
       <div class="order-address">
-        <strong>${order.address.name}</strong><br>
-        ${address}<br>
-        Tel: ${order.address.phone}
+        <strong>${address.name}</strong><br>
+        ${fullAddress}<br>
+        Tel: ${address.phone}<br>
+        Cliente: ${order.userId}
       </div>
-      <div style="font-size:0.8rem; color:#666; margin-top:8px;">
-        ${formattedDate}
-      </div>
+      <div class="order-date">${formattedDate}</div>
     `;
 
     container.appendChild(card);
   });
 }
 
-// === TOTAL DE COMPRAS ===
+// === TOTAL REAL (SUMA DE TODOS LOS TOTALES) ===
 function updateTotal() {
-  document.getElementById('totalCompras').textContent = `Total: ${orders.length} compra${orders.length !== 1 ? 's' : ''}`;
+  const total = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+  document.getElementById('totalCompras').textContent = `Total: $${total.toLocaleString()}`;
 }
 
 // === NOTIFICACIONES (ÚLTIMAS 5) ===
@@ -119,14 +121,14 @@ function updateNotifications() {
     item.className = 'notification-item';
     item.innerHTML = `
       <strong>Nueva compra</strong><br>
-      ${order.address.name} - $${order.total}<br>
+      ${order.address.name} - $${order.total.toLocaleString()}<br>
       <span class="notification-time">${time}</span>
     `;
     notif.appendChild(item);
   });
 
   notif.classList.add('show');
-  setTimeout(() => notif.classList.remove('show'), 5000);
+  setTimeout(() => notif.classList.remove('show'), 6000);
 }
 
 // === ORDENAR ===
