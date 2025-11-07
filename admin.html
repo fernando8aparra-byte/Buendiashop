@@ -175,7 +175,7 @@
           <p>Haz clic para subir imagen</p>
           <img id="imagePreview" class="image-preview" src="" alt="Vista previa">
         </div>
-        <input type="text" id="productImageUrl" readonly placeholder="URL de imagen">
+        <input type="text" id="productImageUrl" readonly placeholder="URL de imagen (Cloudinary)">
       </div>
       <button class="btn-save" id="saveProductBtn">Guardar Producto</button>
     </div>
@@ -197,7 +197,6 @@
   <!-- FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
   <script>
     // === FIREBASE CONFIG ===
@@ -212,7 +211,10 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
+
+    // === CLOUDINARY CONFIG ===
+    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dgajzxlx6/image/upload';
+    const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // Asegúrate de crear este preset en Cloudinary
 
     // === VERIFICAR ADMIN ===
     if (localStorage.getItem('isAdmin') !== 'true') {
@@ -225,7 +227,7 @@
     let currentTextElement = null;
     let currentTextPath = null;
 
-    // === CLONAR INDEX ===
+    // === CLONAR INDEX Y CREAR CONTENEDORES ===
     fetch('index.html')
       .then(r => r.text())
       .then(html => {
@@ -233,25 +235,44 @@
         const doc = parser.parseFromString(html, 'text/html');
         const main = doc.querySelector('.main-container') || doc.body;
         document.getElementById('indexClone').innerHTML = main.innerHTML;
-        initAdmin();
+
+        // CREAR CONTENEDORES SI NO EXISTEN
+        const containers = {
+          principal: ensureContainer('.hero'),
+          carrusel: ensureContainer('.carrusel'),
+          publicidad: ensureContainer('.publicidad'),
+          normal: ensureContainer('.products-grid')
+        };
+
+        function ensureContainer(selector) {
+          let el = document.querySelector(`#indexClone ${selector}`);
+          if (!el) {
+            el = document.createElement('div');
+            el.className = selector.replace('.', '');
+            document.getElementById('indexClone').appendChild(el);
+          }
+          return el;
+        }
+
+        initAdmin(containers);
       });
 
-    function initAdmin() {
-      // === CARGAR PRODUCTOS ===
-      const productsGrid = document.querySelector('#indexClone .products-grid') || document.createElement('div');
-      productsGrid.className = 'products-grid';
-      document.getElementById('indexClone').appendChild(productsGrid);
+    function initAdmin(containers) {
+      // === CARGAR PRODUCTOS POR TIPO ===
       db.collection('productos').get().then(snapshot => {
         snapshot.forEach(doc => {
           const p = doc.data();
           const card = createProductCard(p, doc.id);
-          productsGrid.appendChild(card);
+          const tipo = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+          if (containers[tipo]) containers[tipo].appendChild(card);
         });
       });
 
       function createProductCard(p, id) {
         const div = document.createElement('div');
         div.className = 'product-card';
+        const tipoActual = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+        const formattedPrice = p.precioFormateado || `$${Number(p.precio || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
         div.innerHTML = `
           <div class="product-actions">
             <button class="action-btn" onclick="editProduct('${id}')">Edit</button>
@@ -262,7 +283,7 @@
             <h3 class="product-title">${p.nombre}</h3>
             <p class="product-description">${p.descripcion}</p>
             <div class="price-container">
-              <span class="product-price">${p.precioFormateado || `$${Number(p.precio || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}</span>
+              <span class="product-price">${formattedPrice}</span>
             </div>
             <label class="switch switch-small" style="margin-top:8px;">
               <input type="checkbox" ${p.habilitado ? 'checked' : ''} onchange="toggleProduct('${id}', this.checked)">
@@ -274,7 +295,7 @@
       }
 
       // === TEXTOS EDITABLES ===
-      const editableEls = document.querySelectorAll('#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag');
+      const editableEls = document.querySelectorAll('#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag, #indexClone .hero-title, #indexClone .hero-subtitle');
       editableEls.forEach(el => {
         el.classList.add('editable');
         const editBtn = document.createElement('div');
@@ -284,17 +305,24 @@
           e.stopPropagation();
           currentTextElement = el;
           currentTextPath = getTextPath(el);
-          document.getElementById('editTextInput').value = el.innerText.trim();
-          document.getElementById('editTextModal').classList.add('active');
+          if (currentTextPath) {
+            document.getElementById('editTextInput').value = el.innerText.trim();
+            document.getElementById('editTextModal').classList.add('active');
+          }
         };
         el.appendChild(editBtn);
       });
 
       function getTextPath(el) {
-        // Personaliza según tu HTML
-        if (el.tagName === 'H1') return 'noticias/principal/titulo';
-        if (el.tagName === 'P') return 'noticias/principal/texto';
-        if (el.tagName === 'H2') return 'lanzamientos/texto/subtitulo';
+        if (el.closest('.hero') && el.tagName === 'H1') return 'noticias/principal/titulo';
+        if (el.closest('.hero') && el.tagName === 'P') return 'noticias/principal/texto';
+        if (el.closest('.lanzamientos') && el.tagName === 'H2') return 'lanzamientos/texto/subtitulo';
+        if (el.closest('.nosotros') && el.tagName === 'P') return 'config/general/descripcion';
+        if (el.classList.contains('instagram-link')) return 'links/social/instagram';
+        if (el.classList.contains('facebook-link')) return 'links/social/facebook';
+        if (el.classList.contains('x-link')) return 'links/social/x';
+        if (el.classList.contains('youtube-link')) return 'links/social/youtube';
+        if (el.classList.contains('whatsapp-link')) return 'config/general/whatsapp';
         return null;
       }
 
@@ -303,7 +331,7 @@
         if (currentTextElement && currentTextPath) {
           const [col, doc, field] = currentTextPath.split('/');
           try {
-            await db.collection(col).doc(doc).update({ [field]: document.getElementById('editTextInput').value });
+            await db.collection(col).doc(doc).set({ [field]: document.getElementById('editTextInput').value }, { merge: true });
             currentTextElement.innerText = document.getElementById('editTextInput').value;
             document.getElementById('editTextModal').classList.remove('active');
           } catch (e) { alert('Error al guardar texto'); }
@@ -328,7 +356,7 @@
         document.getElementById('imagePreview').style.display = 'none';
       }
 
-      // === SUBIDA DE IMAGEN ===
+      // === SUBIDA A CLOUDINARY ===
       document.getElementById('imageUpload').onclick = () => document.getElementById('imageInput').click();
       document.getElementById('imageInput').onchange = async (e) => {
         const file = e.target.files[0];
@@ -336,13 +364,26 @@
         const preview = document.getElementById('imagePreview');
         preview.src = URL.createObjectURL(file);
         preview.style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
         try {
-          const ref = storage.ref(`productos/${Date.now()}_${file.name}`);
-          await ref.put(file);
-          const url = await ref.getDownloadURL();
-          document.getElementById('productImageUrl').value = url;
-          preview.src = url; // Actualiza vista previa con URL final
-        } catch (err) { alert('Error al subir imagen'); }
+          const res = await fetch(CLOUDINARY_URL, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (data.secure_url) {
+            document.getElementById('productImageUrl').value = data.secure_url;
+            preview.src = data.secure_url;
+          } else {
+            alert('Error al subir a Cloudinary');
+          }
+        } catch (err) {
+          alert('Error de red');
+        }
       };
 
       // === EDITAR PRODUCTO ===
@@ -355,7 +396,8 @@
           document.getElementById('productName').value = p.nombre;
           document.getElementById('productPrice').value = p.precio;
           document.getElementById('productDesc').value = p.descripcion;
-          document.getElementById('productType').value = p.tipo;
+          const tipo = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+          document.getElementById('productType').value = tipo;
           document.getElementById('productImageUrl').value = p.imagen;
           const preview = document.getElementById('imagePreview');
           if (p.imagen) {
@@ -370,12 +412,16 @@
       document.getElementById('saveProductBtn').onclick = async () => {
         const precio = parseFloat(document.getElementById('productPrice').value);
         const precioFormateado = `$${precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+        const tipoSeleccionado = document.getElementById('productType').value;
+        const tipoObj = { normal: false, carrusel: false, principal: false, publicidad: false };
+        tipoObj[tipoSeleccionado] = true;
+
         const data = {
           nombre: document.getElementById('productName').value.trim(),
           precio: precio,
           precioFormateado: precioFormateado,
           descripcion: document.getElementById('productDesc').value.trim(),
-          tipo: document.getElementById('productType').value,
+          tipo: tipoObj,
           imagen: document.getElementById('productImageUrl').value,
           habilitado: true,
           fecha: firebase.firestore.FieldValue.serverTimestamp()
@@ -389,7 +435,7 @@
           }
           modal.classList.remove('active');
           location.reload();
-        } catch (e) { alert('Error'); }
+        } catch (e) { alert('Error al guardar producto'); }
       };
 
       // === TOGGLE HABILITADO ===
@@ -397,30 +443,40 @@
         await db.collection('productos').doc(id).update({ habilitado: enabled });
       };
 
-      // === ELIMINAR ===
+      // === ELIMINAR PRODUCTO ===
       window.deleteProduct = async (id) => {
-        if (confirm('¿Eliminar?')) {
+        if (confirm('¿Eliminar este producto?')) {
           await db.collection('productos').doc(id).delete();
           location.reload();
         }
       };
 
-      // === MENÚ ===
+      // === MENÚ DESPLEGABLE ===
       const settingsBtn = document.getElementById('settingsBtn');
       const settingsMenu = document.getElementById('settingsMenu');
-      settingsBtn.onclick = (e) => { e.stopPropagation(); settingsMenu.classList.toggle('active'); };
+      settingsBtn.onclick = (e) => {
+        e.stopPropagation();
+        settingsMenu.classList.toggle('active');
+      };
       document.addEventListener('click', () => settingsMenu.classList.remove('active'));
 
       // === MANTENIMIENTO ===
       const maintenanceToggle = document.getElementById('maintenanceToggle');
       const banner = document.getElementById('maintenanceBanner');
-      maintenanceToggle.checked = localStorage.getItem('mantenimiento') !== 'true';
+      db.collection('config').doc('general').get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          const enMantenimiento = data.mantenimiento || false;
+          maintenanceToggle.checked = !enMantenimiento;
+          banner.classList.toggle('show', enMantenimiento);
+        }
+      });
+
       maintenanceToggle.onchange = () => {
-        const isOn = maintenanceToggle.checked;
-        localStorage.setItem('mantenimiento', !isOn);
-        banner.classList.toggle('show', !isOn);
+        const enMantenimiento = !maintenanceToggle.checked;
+        db.collection('config').doc('general').set({ mantenimiento: enMantenimiento }, { merge: true });
+        banner.classList.toggle('show', enMantenimiento);
       };
-      if (localStorage.getItem('mantenimiento') === 'true') banner.classList.add('show');
 
       // === CERRAR SESIÓN ===
       document.getElementById('logoutBtn').onclick = () => {
