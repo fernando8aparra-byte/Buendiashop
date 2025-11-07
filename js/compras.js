@@ -96,10 +96,10 @@ function renderOrders() {
   });
 }
 
-// === TOTAL REAL (SUMA DE TODOS LOS TOTALES) ===
+// === ACTUALIZAR TOTAL (solo número de órdenes) ===
 function updateTotal() {
-  const total = orders.reduce((sum, order) => sum + (order.total || 0), 0);
-  document.getElementById('totalCompras').textContent = `Total: $${total.toLocaleString()}`;
+  const count = orders.length;
+  document.getElementById('totalCompras').textContent = `Total: ${count}`;
 }
 
 // === NOTIFICACIONES (ÚLTIMAS 5) ===
