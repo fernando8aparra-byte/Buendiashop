@@ -6,7 +6,7 @@
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* === TUS ESTILOS ORIGINALES (SIN CAMBIOS) === */
+    /* === TODOS TUS ESTILOS ORIGINALES (SIN CAMBIOS) === */
     body { margin: 0; padding: 0; padding-top: 60px; }
     .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
@@ -31,7 +31,7 @@
 
     .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
     .menu-item::after { display: none; }
-    .dropdown-toggle::after, .contact-toggle::after { content: '▼'; font-size: 0.8rem; transition: transform 0.3s ease; }
+    .dropdown-toggle::after, .contact-toggle::after { content: 'down arrow'; font-size: 0.8rem; transition: transform 0.3s ease; }
     .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
 
     .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
@@ -210,7 +210,7 @@
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
-  <!-- SCRIPT DINÁMICO -->
+  <!-- SCRIPT -->
   <script type="module" src="js/index.js"></script>
 </body>
 </html>
