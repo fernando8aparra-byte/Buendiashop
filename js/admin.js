@@ -25,10 +25,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// === VERIFICAR ADMIN ===
+// === PROTEGER ADMIN: SIN SESIÓN → LOGIN ===
 if (!localStorage.getItem('isAdmin')) {
-  alert('Acceso denegado');
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
 }
 
 // === CARGAR PRODUCTOS POR TIPO ===
@@ -109,17 +108,19 @@ function createProductCard(p, sectionType) {
   return div;
 }
 
-// === EDITAR ===
+// === EDITAR PRODUCTO ===
 window.editProduct = (id) => {
   const card = document.querySelector(`.product-card[data-id="${id}"]`);
+  if (!card) return;
   const p = {
     nombre: card.querySelector('h3').textContent,
-    precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || card.querySelector('p')?.textSIGContent?.replace('$', '')),
+    precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0),
     descripcion: card.querySelector('.product-desc-small')?.textContent || '',
     imagen: card.querySelector('img').src
   };
   document.getElementById('editName').value = p.nombre;
-  document.getElementById('addImage').value = p.imagen;
+  document.getElementById('editPrice').value = p.precio;
+  document.getElementById('editImage').value = p.imagen;
   document.getElementById('editProductModal').classList.add('active');
   window.currentEditId = id;
 };
@@ -128,26 +129,26 @@ document.getElementById('saveProduct').onclick = async () => {
   const id = window.currentEditId;
   const updated = {
     nombre: document.getElementById('editName').value,
-    imagen: document.getElementById('addImage').value
+    precio: parseFloat(document.getElementById('editPrice').value),
+    imagen: document.getElementById('editImage').value
   };
   await updateDoc(doc(db, "productos", id), updated);
-  showToast("Actualizado");
+  showToast("Producto actualizado");
   closeModal('editProductModal');
 };
 
 // === ELIMINAR ===
 window.deleteProduct = async (id) => {
-  if (!confirm("¿Eliminar?")) return;
+  if (!confirm("¿Eliminar este producto?")) return;
   await deleteDoc(doc(db, "productos", id));
-  showToast("Eliminado");
+  showToast("Producto eliminado");
 };
 
-// === AGREGAR ===
+// === AGREGAR PRODUCTO ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
 };
 
-// === PREVISUALIZAR IMAGEN ===
 document.getElementById('addImageFile').addEventListener('change', (e) => {
   const file = e.target.files[0];
   const urlInput = document.getElementById('addImage');
@@ -181,7 +182,6 @@ document.getElementById('addImage').addEventListener('input', (e) => {
   }
 });
 
-// === GUARDAR NUEVO ===
 document.getElementById('saveNewProduct').onclick = async () => {
   const url = document.getElementById('addImage').value;
   const fileInput = document.getElementById('addImageFile');
@@ -214,9 +214,67 @@ document.getElementById('saveNewProduct').onclick = async () => {
   }
 
   await addDoc(collection(db, "productos"), producto);
-  showToast("Producto agregado (imagen por URL)");
+  showToast("Producto agregado");
   closeModal('addProductModal');
 };
+
+// === CERRAR SESIÓN CON CONFIRMACIÓN ===
+document.getElementById('logoutBtn').onclick = () => {
+  if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+    localStorage.removeItem('isAdmin');
+    window.location.href = 'login.html';
+  }
+};
+
+// === MODAL REDES SOCIALES ===
+document.getElementById('openSocialModal').onclick = () => {
+  document.getElementById('socialLinksModal').classList.add('active');
+  loadSocialLinks(); // Cargar actuales
+};
+
+document.getElementById('cancelSocial').onclick = () => closeModal('socialLinksModal');
+
+document.getElementById('saveSocialLinks').onclick = async () => {
+  const links = {
+    tiktok: document.getElementById('tiktokInput').value.trim(),
+    instagram: document.getElementById('instagramInput').value.trim(),
+    facebook: document.getElementById('facebookInput').value.trim(),
+    x: document.getElementById('xInput').value.trim(),
+    whatsapp: document.getElementById('whatsappInput').value.trim()
+  };
+
+  try {
+    await setDoc(doc(db, "links", "social"), links, { merge: true });
+    showToast("Redes sociales guardadas");
+    closeModal('socialLinksModal');
+    updateSocialLinksInMenu(links);
+  } catch (error) {
+    showToast("Error: " + error.message);
+  }
+};
+
+// === CARGAR REDES DESDE FIRESTORE ===
+function loadSocialLinks() {
+  onSnapshot(doc(db, "links", "social"), (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      document.getElementById('tiktokInput').value = data.tiktok || '';
+      document.getElementById('instagramInput').value = data.instagram || '';
+      document.getElementById('facebookInput').value = data.facebook || '';
+      document.getElementById('xInput').value = data.x || '';
+      document.getElementById('whatsappInput').value = data.whatsapp || '';
+      updateSocialLinksInMenu(data);
+    }
+  });
+}
+
+function updateSocialLinksInMenu(links) {
+  document.getElementById('tiktokLink').href = links.tiktok || '#';
+  document.getElementById('instagramLink').href = links.instagram || '#';
+  document.getElementById('facebookLink').href = links.facebook || '#';
+  document.getElementById('xLink').href = links.x || '#';
+  document.getElementById('whatsappLink').href = links.whatsapp || '#';
+}
 
 // === MODALES ===
 document.querySelectorAll('[id^="cancel"]').forEach(btn => {
@@ -235,19 +293,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// === REDES ===
-document.querySelectorAll('.edit-social').forEach(el => {
-  el.onclick = e => {
-    e.preventDefault();
-    const type = el.dataset.type;
-    const url = prompt(`Editar ${type}`, document.getElementById(type + 'Link').href);
-    if (url) {
-      document.getElementById(type + 'Link').href = url;
-      setDoc(doc(db, "config", "redes"), { [type]: url }, { merge: true });
-    }
-  };
-});
-
 // === ENGRANAJE ===
 document.getElementById('adminGear').onclick = e => {
   e.stopPropagation();
@@ -255,8 +300,13 @@ document.getElementById('adminGear').onclick = e => {
 };
 document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
-// === LOGOUT ===
+// === CERRAR SESIÓN EN MENÚ LATERAL (opcional) ===
 document.getElementById('authBtn').onclick = () => {
-  localStorage.clear();
-  window.location.href = 'index.html';
+  if (confirm("¿Cerrar sesión?")) {
+    localStorage.removeItem('isAdmin');
+    window.location.href = 'login.html';
+  }
 };
+
+// === INICIAR CARGA DE REDES ===
+loadSocialLinks();
