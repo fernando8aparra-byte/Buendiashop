@@ -6,140 +6,145 @@
   <title>Admin - Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* === ESTILOS ORIGINALES DEL INDEX (sin cambios) === */
-    body { margin: 0; padding: 0; padding-top: 60px; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .icon-btn { color: #000 !important; background: none; }
-    .icon-btn svg { stroke: #000; fill: none; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
-    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #666; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { font-family: 'Poppins', sans-serif; background: #ffffff; color: #111111; font-size: 16px; line-height: 1.6; letter-spacing: 0.025em; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 
-    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
-    .search-bar-header.active { display: flex; }
-    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
+    h1, h2, h3, h4, h5, h6 { font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+    h1 { font-size: 3.75rem; line-height: 1.1; letter-spacing: -0.025em; }
+    h2 { font-size: 2.25rem; line-height: 1.2; letter-spacing: 0.05em; }
 
-    .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
-    .menu-sidebar.open { transform: translateX(0); }
-    .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .menu-overlay.show { opacity: 1; visibility: visible; }
+    .hero-banner { padding: 80px 20px; margin-bottom: 60px; text-align: center; }
+    .hero-banner h1 { font-size: 3.75rem; line-height: 1.1; letter-spacing: -0.025em; }
+    .hero-banner .tag { display: inline-block; background: #000; color: #fff; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; margin-top: 16px; }
 
-    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
-    .menu-item::after { display: none; }
-    .dropdown-toggle::after, .contact-toggle::after { content: 'Down Arrow'; font-size: 0.8rem; transition: transform 0.3s ease; }
-    .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
-
-    .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
-    .submenu.open, .contact-dropdown.open { max-height: 500px; padding: 20px; }
-    .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
-
-    .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
-    .social-links { display: flex; gap: 20px; justify-content: center; position: relative; }
-    .social-links img { width: 40px; height: 40px; }
-    .edit-social { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-    .main-container { margin-top: 20px; }
+    /* HEADER */
+    .header { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #eee; z-index: 1000; padding: 16px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .header-inner { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; max-width: 1400px; margin: 0 auto; }
+    .logo { font-weight: 900; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1.5px; color: #111; justify-self: center; }
+    .icon-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .icon-btn:hover { background: #f5f5f5; }
+    .icon-btn svg { width: 24px; height: 24px; stroke: #000; stroke-width: 2.5; fill: none; }
 
     /* ADMIN CONTROLES */
-    .admin-controls { position: fixed; top: 70px; right: 20px; z-index: 1001; display: flex; gap: 10px; }
-    .admin-btn { background: #000; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
-    .demo-toggle { background: #ff4444; }
+    .admin-gear, .add-post-btn { display: none; }
+    .admin-mode .admin-gear, .admin-mode .add-post-btn { display: flex; }
 
-    .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
-    .carousel-item:hover .product-actions, .product-card:hover .product-actions { opacity: 1; }
+    /* CARRUSEL */
+    .infinite-carousel-section { margin-bottom: 80px; }
+    .infinite-carousel { overflow: hidden; padding: 20px 0; }
+    .carousel-track { display: flex; gap: 24px; width: max-content; animation: scroll 40s linear infinite; }
+    .carousel-item { min-width: 220px; position: relative; transition: transform 0.3s; }
+    .carousel-item:hover { transform: translateY(-8px); }
+    .carousel-item img { width: 100%; height: 260px; object-fit: contain; object-position: center; background: transparent !important; padding: 0 !important; border-radius: 0 !important; margin: 0 auto; display: block; image-rendering: -webkit-optimize-contrast; }
+    .carousel-item .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
+    .carousel-item:hover .product-actions { opacity: 1; }
 
+    /* GRID */
+    .main-container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
+    .products-grid { display: grid; gap: 32px; margin-top: 48px; }
+    @media (max-width: 480px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 481px) and (max-width: 900px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 901px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+    .product-card { text-align: center; cursor: pointer; transition: transform 0.3s; position: relative; }
+    .product-card:hover { transform: translateY(-10px); }
+    .product-card img { width: 100%; height: 280px; object-fit: contain; object-position: center; background: transparent !important; border-radius: 0 !important; padding: 0 !important; margin: 0 auto; display: block; image-rendering: -webkit-optimize-contrast; }
+    .product-card .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
+    .product-card:hover .product-actions { opacity: 1; }
+    .product-title { font-weight: 700; font-size: 1.25rem; margin: 12px 0 4px; }
+    .price { font-weight: 800; font-size: 1.875rem; color: #111; }
+
+    .admin-btn { background: #ff4444; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+    .admin-edit { background: #0066ff; }
+    .admin-delete { background: #ff0000; }
+
+    /* MODALES */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
     .modal.active { display: flex; }
     .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
     .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
     .modal button { background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
 
+    /* MENÚ */
+    .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 1090; }
+    .menu-overlay.show { opacity: 1; visibility: visible; }
+    .menu-sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #fff; border-right: 1px solid #eee; padding: 80px 24px 24px; transition: left 0.3s; z-index: 1100; display: flex; flex-direction: column; gap: 4px; }
+    .menu-sidebar.open { left: 0; }
+    .menu-close { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: none; color: #000; font-size: 32px; font-weight: 300; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .menu-item { padding: 16px 0; border-bottom: 1px solid #eee; font-weight: 600; font-size: 1rem; color: #111; text-transform: uppercase; letter-spacing: 0.8px; cursor: pointer; }
+    .dropdown-toggle::after { content: 'Down Arrow'; font-size: 0.8rem; }
+    .dropdown-toggle.active::after { content: 'Up Arrow'; }
+    .submenu { display: none; padding-left: 20px; margin-top: 8px; }
+    .submenu.show { display: block; }
+    .submenu-item { padding: 12px 0; font-size: 0.95rem; color: #666; font-weight: 500; cursor: pointer; }
+    .social-links { display: flex; gap: 20px; justify-content: center; position: relative; margin-top: 10px; }
+    .edit-social { position: absolute; top: -10px; right: -10px; background: #000; color: #fff; width: 20px; height: 20px; border-radius: 50%; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+    /* TOAST */
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #000; color: #fff; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 1rem; box-shadow: 0 8px 25px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transition: all 0.35s; z-index: 1300; text-transform: uppercase; }
     .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
   </style>
 </head>
-<body>
+<body class="admin-mode">
 
-  <!-- ADMIN CONTROLES -->
-  <div class="admin-controls">
-    <button class="admin-btn demo-toggle" id="toggleDemo">Ocultar Demos</button>
-    <button class="admin-btn" id="addPostBtn">+</button>
-  </div>
-
-  <!-- HEADER (IDÉNTICO AL INDEX) -->
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
-      <div class="header-left">
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn" aria-label="Ajustes">
-            <svg viewBox="0 0 24 24" width="26" height="26">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </button>
-          <div class="admin-dropdown" id="adminDropdown">
-            <a href="admin-map.html">Mapa de Compras</a>
-            <a href="#" id="viewPurchases">Compras</a>
-            <a href="#" id="viewStats">Estadísticas</a>
-          </div>
-        </div>
-
-        <button id="menuBtn" class="icon-btn" aria-label="Menú">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+      <div class="admin-gear" id="adminGear">
+        <button class="icon-btn" aria-label="Ajustes">
+          <svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         </button>
-        <div class="logo">EFRAÍN</div>
+        <div class="admin-dropdown" id="adminDropdown">
+          <a href="admin-map.html">Mapa de Compras</a>
+          <a href="#" id="viewPurchases">Compras</a>
+          <a href="#" id="viewStats">Estadísticas</a>
+        </div>
       </div>
 
-      <div class="header-right">
-        <!-- BÚSQUEDA Y CARRITO DESHABILITADOS -->
-      </div>
+      <button id="menuBtn" class="icon-btn" aria-label="Menú">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
 
-      <div class="search-bar-header" id="searchBarHeader">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
-        <button id="closeSearchHeader" class="close-search-btn">x</button>
+      <div class="logo">EFRAÍN</div>
+
+      <div class="search-cart-group">
+        <div class="add-post-btn" id="addPostBtn">+</div>
       </div>
     </div>
   </header>
 
-  <!-- CONTENIDO -->
-  <main class="main-container">
-    <section class="hero-banner">
-      <h1 contenteditable="true" id="heroTitle">Asegura tu Mystery Box</h1>
-      <p class="tag" contenteditable="true" id="heroTag">Envío Gratis en compras +$1,500</p>
-    </section>
+  <!-- HERO -->
+  <section class="hero-banner">
+    <h1 contenteditable="true" id="heroTitle">Asegura tu Mystery Box</h1>
+    <p class="tag" contenteditable="true" id="heroTag">Envío Gratis en compras +$1,500</p>
+  </section>
 
-    <section class="infinite-carousel-section">
-      <h2 contenteditable="true">Nuevos Lanzamientos</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="newCarousel"></div>
-      </div>
-    </section>
+  <!-- CARRUSEL NUEVOS -->
+  <section class="infinite-carousel-section">
+    <h2 contenteditable="true">Nuevos Lanzamientos</h2>
+    <div class="infinite-carousel"><div class="carousel-track" id="newCarousel"></div></div>
+  </section>
 
-    <section class="infinite-carousel-section">
-      <h2 contenteditable="true">Productos Estrella</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="starCarousel"></div>
-      </div>
-    </section>
+  <!-- CARRUSEL ESTRELLA -->
+  <section class="infinite-carousel-section">
+    <h2 contenteditable="true">Productos Estrella</h2>
+    <div class="infinite-carousel"><div class="carousel-track" id="starCarousel"></div></div>
+  </section>
 
-    <section>
-      <h2 contenteditable="true">Todos los Productos</h2>
-      <div class="products-grid" id="productsGrid"></div>
-    </section>
-  </main>
+  <!-- GRID -->
+  <section class="main-container">
+    <h2 contenteditable="true">Todos los Productos</h2>
+    <div class="products-grid normal" id="productsGrid"></div>
+  </section>
 
-  <!-- MENÚ LATERAL (IDÉNTICO AL INDEX) -->
+  <!-- MENÚ -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item welcome" id="welcomeMsg">¡Hola, Admin!</div>
-    
+    <button class="menu-close" id="closeMenu">×</button>
+    <div class="menu-item welcome">¡Hola, Admin!</div>
     <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
     <div class="submenu" id="categoriesSubmenu">
       <div class="submenu-item">Gorras</div>
@@ -150,9 +155,6 @@
       <div class="submenu-item">Perfumes</div>
       <div class="submenu-item">Sudaderas</div>
     </div>
-    
-    <div class="menu-item ofertas-btn">Ofertas</div>
-    
     <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
     <div class="contact-dropdown" id="contactDropdown">
       <p class="contact-text">No te quedes sin tu Mystery Box</p>
@@ -162,35 +164,33 @@
         <a href="#" id="facebookLink"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"><span class="edit-social" data-type="facebook">Edit</span></a>
       </div>
     </div>
-
-    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-    
     <div class="menu-item login-btn logout-btn" id="authBtn">Cerrar sesión</div>
   </aside>
 
-  <!-- MODALES -->
+  <!-- MODAL AGREGAR -->
   <div class="modal" id="addPostModal">
     <div class="modal-content">
       <h3>Nueva Publicación</h3>
       <select id="postSection">
-        <option value="new">Carrusel - Nuevos</option>
-        <option value="star">Carrusel - Estrella</option>
+        <option value="new">Carrusel - Nuevos Lanzamientos</option>
+        <option value="star">Carrusel - Productos Estrella</option>
         <option value="normal">Productos Normales</option>
       </select>
       <input type="text" id="postName" placeholder="Nombre">
       <input type="text" id="postPrice" placeholder="Precio">
-      <input type="text" id="postImage" placeholder="URL imagen">
+      <input type="text" id="postImage" placeholder="URL de imagen">
       <button id="savePost">Publicar</button>
       <button id="cancelPost" style="background:#999;">Cancelar</button>
     </div>
   </div>
 
+  <!-- MODAL EDITAR -->
   <div class="modal" id="editProductModal">
     <div class="modal-content">
       <h3>Editar Producto</h3>
       <input type="text" id="editName" placeholder="Nombre">
       <input type="text" id="editPrice" placeholder="Precio">
-      <input type="text" id="editImage" placeholder="URL imagen">
+      <input type="text" id="editImage" placeholder="URL de imagen">
       <button id="saveEdit">Guardar</button>
       <button id="cancelEdit" style="background:#999;">Cancelar</button>
     </div>
@@ -200,6 +200,5 @@
   <div class="toast" id="toast"></div>
 
   <script type="module" src="js/admin.js"></script>
-  <script src="js/script.js"></script>
 </body>
 </html>
