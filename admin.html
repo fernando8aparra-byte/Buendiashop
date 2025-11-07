@@ -85,6 +85,27 @@
     .product-desc-small { font-size: 0.8rem; color: #666; margin: 5px 0 10px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .product-price { font-weight: bold; color: #000; margin: 5px 0; }
 
+    /* === SUBIDA DE IMAGEN === */
+    .image-upload-section, .image-url-section {
+      margin: 15px 0;
+    }
+    .image-upload-section label, .image-url-section label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    #imagePreview {
+      text-align: center;
+      margin: 10px 0;
+    }
+    #imagePreview img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
     /* TOAST */
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
     .toast.show { display: block; animation: fadeInOut 3s; }
@@ -103,8 +124,8 @@
           </button>
           <div class="admin-dropdown" id="adminDropdown">
             <a href="admin-map.html">Mapa de Compras</a>
-            <a href="#" id="viewPurchases">Compras</a>
-            <a href="#" id="viewStats">Estadísticas</a>
+            <a href="admin-compras.html">Compras</a>
+            <a href="admin-estadisticas.html">Estadísticas</a>
           </div>
         </div>
         <button id="menuBtn" class="icon-btn" aria-label="Menú">
@@ -199,7 +220,7 @@
     </div>
   </div>
 
-  <!-- MODAL AGREGAR -->
+  <!-- MODAL AGREGAR PRODUCTO -->
   <div class="modal" id="addProductModal">
     <div class="modal-content">
       <h3>Agregar Nuevo Producto</h3>
@@ -207,6 +228,7 @@
       <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
       <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
       <textarea id="addDesc" placeholder="Descripción"></textarea>
+
       <select id="addCategory">
         <option value="gorra">Gorra</option>
         <option value="camiseta">Camiseta</option>
@@ -216,12 +238,32 @@
         <option value="perfume">Perfume</option>
         <option value="sudadera">Sudadera</option>
       </select>
+
       <select id="addType">
         <option value="normal">Normal (Todos los Productos)</option>
         <option value="carrusel">Carrusel (Nuevos Lanzamientos)</option>
         <option value="publicidad">Estrella (Productos Estrella)</option>
       </select>
-      <input type="text" id="addImage" placeholder="URL de imagen">
+
+      <!-- SUBIR IMAGEN -->
+      <div class="image-upload-section">
+        <label>Subir imagen desde tu dispositivo:</label>
+        <input type="file" id="addImageFile" accept="image/*">
+        <div id="imagePreview" class="image-preview" style="display:none;">
+          <img id="previewImg" src="" alt="Vista previa">
+        </div>
+      </div>
+
+      <!-- O URL -->
+      <div class="image-url-section">
+        <label>O pegar URL de imagen:</label>
+        <input type="text" id="addImage" placeholder="https://ejemplo.com/imagen.jpg">
+      </div>
+
+      <p style="font-size:0.8rem; color:#d00; margin:10px 0 0;">
+        La subida de imágenes aún no está habilitada. Usa una URL por ahora.
+      </p>
+
       <button id="saveNewProduct">Guardar Producto</button>
       <button id="cancelAdd" style="background:#999;">Cancelar</button>
     </div>
