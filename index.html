@@ -1,218 +1,319 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    /* === TODOS TUS ESTILOS ORIGINALES (SIN CAMBIOS) === */
-    body { margin: 0; padding: 0; padding-top: 60px; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .icon-btn { color: #000 !important; background: none; }
-    .icon-btn svg { stroke: #000; fill: none; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+// js/index.js - 100% DINÁMICO + MENÚ + CARRITO + BÚSQUEDA
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  onSnapshot,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #666; }
+const firebaseConfig = {
+  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+  authDomain: "boutique-buendia.firebaseapp.com",
+  projectId: "boutique-buendia",
+  storageBucket: "boutique-buendia.firebasestorage.app",
+  messagingSenderId: "430651152709",
+  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+};
 
-    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
-    .search-bar-header.active { display: flex; }
-    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
-    .menu-sidebar.open { transform: translateX(0); }
-    .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .menu-overlay.show { opacity: 1; visibility: visible; }
+// === DOM ===
+const newCarousel = document.getElementById('newCarousel');
+const starCarousel = document.getElementById('starCarousel');
+const productsGrid = document.getElementById('productsGrid');
+const cartBadge = document.getElementById('cartBadge');
+const cartItems = document.getElementById('cartItems');
+const cartTotal = document.getElementById('cartTotal');
+const goToPay = document.getElementById('goToPay');
+const toast = document.getElementById('toast');
+const searchInput = document.getElementById('searchInput');
+const searchResultsContainer = document.getElementById('searchResultsContainer');
+const searchResults = document.getElementById('searchResults');
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuSidebar = document.getElementById('menuSidebar');
+const cartBtn = document.getElementById('cartBtn');
+const cartSidebar = document.getElementById('cartSidebar');
+const closeCart = document.getElementById('closeCart');
+const cartOverlay = document.getElementById('cartOverlay');
+const searchBtn = document.getElementById('searchBtn');
+const searchBarHeader = document.getElementById('searchBarHeader');
+const closeSearchHeader = document.getElementById('closeSearchHeader');
+const headerOverlay = document.getElementById('headerOverlay');
+const welcomeMsg = document.getElementById('welcomeMsg');
+const authBtn = document.getElementById('authBtn');
+const helpBtn = document.getElementById('helpBtn');
 
-    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
-    .menu-item::after { display: none; }
-    .dropdown-toggle::after, .contact-toggle::after { content: '▼'; font-size: 0.8rem; transition: transform 0.3s ease; }
-    .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
+// === CARRITO ===
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
-    .submenu.open, .contact-dropdown.open { max-height: 500px; padding: 20px; }
-    .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
+function updateCart() {
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
 
-    .menu-item.ofertas-btn { background: none; color: #000; text-align: left; padding: 18px 20px; margin: 0; border-radius: 0; font-weight: normal; }
+  cartBadge.textContent = totalQty;
+  cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
+  cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
 
-    .menu-item.login-btn { background: #000; color: #fff; text-align: center; padding: 15px 20px; margin: 20px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .menu-item.login-btn::after { display: none; }
-    .menu-item.logout-btn { background: #ff0000; color: #fff; }
+  cartItems.innerHTML = '';
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+    goToPay.style.display = 'none';
+    return;
+  }
 
-    .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
-    .social-links { display: flex; gap: 20px; justify-content: center; }
-    .social-links img { width: 40px; height: 40px; }
-
-    .cart-sidebar { position: fixed; top: 60px; right: 0; width: 350px; height: calc(100vh - 60px); background: #fff; z-index: 1000; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-    .cart-sidebar.open { transform: translateX(0); }
-    .cart-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .cart-overlay.show { opacity: 1; visibility: visible; }
-    .cart-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
-    .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
-    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
-
-    #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
-
-    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; }
-    .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-
-    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
-    .header-overlay.show { display: block; }
-
-    .main-container { margin-top: 20px; }
-
-    /* RESULTADOS DE BÚSQUEDA */
-    .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .search-results h3 { margin-top: 0; }
-    .no-results { color: #666; font-style: italic; }
-
-    /* BOTÓN IR A PAGO */
-    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-    /* PIE DE PÁGINA */
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
-    .footer a { color: #fff; text-decoration: underline; }
-  </style>
-</head>
-<body>
-
-  <!-- OVERLAYS -->
-  <div class="header-overlay" id="headerOverlay"></div>
-  <div class="cart-overlay" id="cartOverlay"></div>
-
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <button id="menuBtn" class="icon-btn" aria-label="Menú">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="logo">EFRAÍN</div>
+  goToPay.style.display = 'block';
+  cart.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
+      <div>
+        <div>${item.nombre}</div>
+        <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
       </div>
+      <button onclick="removeFromCart(${i})">X</button>
+    `;
+    cartItems.appendChild(div);
+  });
+}
 
-      <div class="header-right">
-        <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
-          <svg viewBox="0 0 24 24" width="26" height="26">
-            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
-            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
+window.removeFromCart = (i) => {
+  cart.splice(i, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('Producto eliminado');
+};
 
-        <button id="cartBtn" class="icon-btn" aria-label="Carrito">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="cartBadge"></span>
-        </button>
+window.addToCart = (id) => {
+  const product = window.allProducts.find(p => p.id === id);
+  if (!product) return;
+
+  const existing = cart.find(i => i.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ ...product, qty: 1 });
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('¡Agregado al carrito!');
+};
+
+goToPay.onclick = () => {
+  if (cart.length === 0) return;
+  localStorage.setItem('pendingPayment', JSON.stringify(cart));
+  window.location.href = 'pago.html';
+};
+
+// === RENDER ===
+function renderCarousel(container, filterFn) {
+  container.innerHTML = '';
+  const filtered = window.allProducts.filter(filterFn);
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
+    return;
+  }
+  // Duplicar para efecto infinito
+  [...filtered, ...filtered].forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy">`;
+    item.onclick = () => window.location.href = `product.html?id=${p.id}`;
+    container.appendChild(item);
+  });
+}
+
+function renderGrid() {
+  productsGrid.innerHTML = '';
+  const normales = window.allProducts.filter(p => p.tipo?.normal === true);
+
+  if (normales.length === 0) {
+    productsGrid.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos disponibles</p>';
+    return;
+  }
+
+  normales.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      <div class="card-info">
+        <h3>${p.nombre}</h3>
+        <p class="desc">${p.descripcion || ''}</p>
+        <div class="price-container">
+          ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+          <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
+        </div>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
       </div>
+    `;
+    card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+    productsGrid.appendChild(card);
+  });
+}
 
-      <div class="search-bar-header" id="searchBarHeader">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
-        <button id="closeSearchHeader" class="close-search-btn">x</button>
-      </div>
-    </div>
-  </header>
+// === FIRESTORE EN TIEMPO REAL ===
+let allProducts = [];
+const productosRef = collection(db, "productos");
+onSnapshot(productosRef, (snapshot) => {
+  allProducts = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const tipo = data.tipo || { normal: true }; // por defecto normal
 
-  <!-- RESULTADOS DE BÚSQUEDA -->
-  <div id="searchResultsContainer" class="search-results" style="display:none;">
-    <h3>Resultados de búsqueda</h3>
-    <div id="searchResults"></div>
-  </div>
+    allProducts.push({
+      id: doc.id,
+      nombre: data.nombre || '',
+      precio: data.precio || 0,
+      precioAntiguo: data.precioAntiguo || null,
+      descripcion: data.descripcion || '',
+      imagen: data.imagen || '',
+      tipo: tipo, // { normal: true, carrusel: false, ... }
+      nuevo: data.nuevo === true,
+      estrella: data.estrella === true
+    });
+  });
 
-  <!-- CONTENIDO -->
-  <main class="main-container">
-    <section class="hero-banner">
-      <h1>Asegura tu Mystery Box</h1>
-      <p class="tag">Envío Gratis en compras +$1,500</p>
-    </section>
+  window.allProducts = allProducts;
 
-    <section class="infinite-carousel-section">
-      <h2>Nuevos Lanzamientos</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="newCarousel"></div>
-      </div>
-    </section>
+  // CARRUSELES: solo productos con tipo.carrusel === true
+  renderCarousel(newCarousel, p => p.tipo?.carrusel === true && p.nuevo);
+  renderCarousel(starCarousel, p => p.tipo?.carrusel === true && p.estrella);
 
-    <section class="infinite-carousel-section">
-      <h2>Productos Estrella</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="starCarousel"></div>
-      </div>
-    </section>
+  // GRILLA: solo productos con tipo.normal === true
+  renderGrid();
+});
 
-    <section>
-      <h2>Todos los Productos</h2>
-      <div class="products-grid" id="productsGrid"></div>
-    </section>
-  </main>
+// === BÚSQUEDA ===
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const term = searchInput.value.trim().toLowerCase();
+  if (term.length < 2) {
+    searchResultsContainer.style.display = 'none';
+    return;
+  }
 
-  <!-- MENÚ LATERAL -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item welcome" id="welcomeMsg"></div>
-    
-    <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
-    <div class="submenu" id="categoriesSubmenu">
-      <div class="submenu-item">Gorras</div>
-      <div class="submenu-item">Camisetas</div>
-      <div class="submenu-item">Pantalones</div>
-      <div class="submenu-item">Cintos</div>
-      <div class="submenu-item">Tenis</div>
-      <div class="submenu-item">Perfumes</div>
-      <div class="submenu-item">Sudaderas</div>
-    </div>
-    
-    <div class="menu-item ofertas-btn">Ofertas</div>
-    
-    <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
-    <div class="contact-dropdown" id="contactDropdown">
-      <p class="contact-text">No te quedes sin tu Mystery Box</p>
-      <div class="social-links">
-        <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
-        <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
-        <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
-      </div>
-    </div>
+  searchTimeout = setTimeout(async () => {
+    const q = query(
+      collection(db, "productos"),
+      where("nombre", ">=", term),
+      where("nombre", "<=", term + '\uf8ff')
+    );
+    const snapshot = await getDocs(q);
+    searchResults.innerHTML = '';
+    if (snapshot.empty) {
+      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+    } else {
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
+        div.style.padding = '10px 0';
+        div.style.borderBottom = '1px solid #eee';
+        div.style.cursor = 'pointer';
+        div.onclick = () => window.location.href = `product.html?id=${doc.id}`;
+        searchResults.appendChild(div);
+      });
+    }
+    searchResultsContainer.style.display = 'block';
+  }, 300);
+});
 
-    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-    
-    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
-  </aside>
+document.addEventListener('click', (e) => {
+  if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+    searchResultsContainer.style.display = 'none';
+  }
+});
 
-  <!-- CARRITO -->
-  <aside class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button class="menu-close-x" id="closeCart">x</button>
-    </div>
-    <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Tu carrito está vacío</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
-      <div id="message"></div>
-    </div>
-  </aside>
+// === MENÚ HAMBURGUESA ===
+menuBtn.onclick = () => {
+  menuOverlay.classList.add('show');
+  menuSidebar.classList.add('open');
+  updateAuthUI();
+};
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+menuOverlay.onclick = () => {
+  menuOverlay.classList.remove('show');
+  menuSidebar.classList.remove('open');
+};
 
-  <!-- PIE DE PÁGINA -->
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
-    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
-  </footer>
+// === CARRITO LATERAL ===
+cartBtn.onclick = () => {
+  cartSidebar.classList.add('open');
+  cartOverlay.classList.add('show');
+  updateCart();
+};
 
-  <!-- NUEVO SCRIPT DINÁMICO -->
-  <script type="module" src="js/index.js"></script>
-</body>
-</html>
+closeCart.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+cartOverlay.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+// === BÚSQUEDA HEADER ===
+searchBtn.onclick = () => {
+  searchBarHeader.classList.add('active');
+  headerOverlay.classList.add('show');
+  searchInput.focus();
+};
+
+const closeSearch = () => {
+  searchBarHeader.classList.remove('active');
+  headerOverlay.classList.remove('show');
+  searchResultsContainer.style.display = 'none';
+};
+closeSearchHeader.onclick = closeSearch;
+headerOverlay.onclick = closeSearch;
+
+// === AUTH ===
+let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+let userName = localStorage.getItem('userName') || '';
+
+function updateAuthUI() {
+  if (isLoggedIn && userName) {
+    welcomeMsg.textContent = `¡Hola, ${userName}!`;
+    authBtn.textContent = 'Cerrar sesión';
+    authBtn.classList.add('logout-btn');
+  } else {
+    welcomeMsg.textContent = '';
+    authBtn.textContent = 'Inicia sesión o regístrate';
+    authBtn.classList.remove('logout-btn');
+  }
+}
+
+authBtn.onclick = () => {
+  if (isLoggedIn) {
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('isAdmin');
+    isLoggedIn = false;
+    userName = '';
+    showToast('Sesión cerrada');
+    updateAuthUI();
+  } else {
+    window.location.href = 'login.html';
+  }
+};
+
+helpBtn.onclick = () => {
+  alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
+};
+
+// === TOAST ===
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// === INICIO ===
+updateCart();
+updateAuthUI();
