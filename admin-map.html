@@ -3,113 +3,205 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mapa de Compras - Admin</title>
+  <title>Admin - Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body { margin: 0; padding: 0; padding-top: 70px; }
+    /* === ESTILOS ADMIN === */
+    body { padding-top: 70px; font-family: 'Arial', sans-serif; background: #f9f9f9; }
     .admin-bar {
       position: fixed; top: 0; left: 0; width: 100%; background: #000; color: #fff;
       padding: 15px 20px; z-index: 2000; display: flex; justify-content: space-between;
       align-items: center; font-weight: 700; text-transform: uppercase; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
-    .admin-bar .left { display: flex; gap: 20px; align-items: center; }
+    .admin-bar .left { display: flex; gap: 15px; align-items: center; }
     .admin-bar .right { display: flex; gap: 15px; align-items: center; }
-    .admin-btn { background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
-    .admin-btn:hover { background: #f0f0f0; }
 
-    .map-container {
-      position: relative; height: calc(100vh - 70px); background: #f8f8f8;
+    /* ENGRANAJE + MENÚ */
+    .settings-btn {
+      background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; padding: 0;
     }
-    #map { width: 100%; height: 100%; }
-    .legend {
-      position: absolute; bottom: 20px; left: 20px; background: #fff; padding: 15px; border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; font-size: 0.9rem;
+    .settings-menu {
+      position: absolute; top: 60px; left: 20px; background: #000; border-radius: 8px; overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none; min-width: 200px; z-index: 3000;
     }
-    .legend h4 { margin: 0 0 10px; font-size: 1rem; text-transform: uppercase; }
-    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .legend-color { width: 16px; height: 16px; border-radius: 50%; }
+    .settings-menu.active { display: block; }
+    .settings-menu a {
+      display: block; padding: 14px 18px; color: #fff; text-decoration: none; font-weight: 600;
+      font-size: 1rem; border-bottom: 1px solid #333;
+    }
+    .settings-menu a:last-child { border-bottom: none; }
+    .settings-menu a:hover { background: #333; }
 
-    .stats-panel {
-      position: absolute; top: 90px; right: 20px; width: 300px; background: #fff; padding: 20px;
-      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
+    .add-btn {
+      background: none; border: none; color: #fff; font-size: 1.8rem; font-weight: 800;
+      cursor: pointer; padding: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
     }
-    .stats-panel h3 { margin-top: 0; font-size: 1.3rem; }
-    .stat { margin-bottom: 12px; }
-    .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; }
-    .stat-value { font-size: 1.8rem; font-weight: 800; }
 
-    .back-btn {
-      position: absolute; top: 90px; left: 20px; background: #000; color: #fff; padding: 10px 16px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; z-index: 1000;
+    /* VISTA PREVIA */
+    .main-container { padding: 20px; position: relative; }
+    .product-card, .editable {
+      position: relative; transition: all 0.3s;
     }
+    .product-card:hover, .editable:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+    /* ACCIONES EN PRODUCTOS */
+    .product-actions {
+      position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.3s;
+    }
+    .product-card:hover .product-actions { opacity: 1; }
+    .action-btn {
+      background: #000; color: #fff; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+    }
+
+    /* ICONO LÁPIZ PARA TEXTOS */
+    .text-edit {
+      position: absolute; top: 4px; right: 4px; background: #000; color: #fff; width: 28px; height: 28px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.3s; cursor: pointer;
+    }
+    .editable:hover .text-edit { opacity: 1; }
+
+    /* SWITCH HABILITADO */
+    .switch-small { width: 40px; height: 20px; }
+    .switch-small .slider:before { height: 16px; width: 16px; left: 2px; bottom: 2px; }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    /* MODAL */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000;
+      align-items: center; justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #000;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 1rem;
+    }
+    .btn-save { background: #000; color: #fff; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+    /* SUBIDA DE IMAGEN */
+    .image-upload {
+      border: 2px dashed #ccc; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px;
+      transition: border 0.3s;
+    }
+    .image-upload:hover { border-color: #000; }
+    .image-upload input { display: none; }
+    .image-preview {
+      margin-top: 10px; max-width: 100%; max-height: 150px; border-radius: 8px; display: none;
+    }
+    .upload-status { margin-top: 10px; font-size: 0.9rem; color: #28a745; }
+
+    /* MANTENIMIENTO */
+    .maintenance-banner {
+      position: fixed; top: 0; left: 0; width: 100%; background: #ff0000; color: #fff; text-align: center; padding: 10px; font-weight: bold; z-index: 9999; display: none;
+    }
+    .maintenance-banner.show { display: block; }
+
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: #fff; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background: #28a745; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    .loading { text-align: center; padding: 40px; color: #666; }
   </style>
 </head>
 <body>
 
+  <!-- BANNER MANTENIMIENTO -->
+  <div class="maintenance-banner" id="maintenanceBanner">PÁGINA EN MANTENIMIENTO</div>
+
   <!-- BARRA ADMIN -->
   <div class="admin-bar">
     <div class="left">
-      <span>MAPA DE COMPRAS</span>
+      <button class="settings-btn" id="settingsBtn">Gear</button>
+      <div class="settings-menu" id="settingsMenu">
+        <a href="admin-map.html">Mapa de Compras</a>
+        <a href="admin-compras.html">Compras</a>
+        <a href="admin-stats.html">Estadísticas</a>
+        <a href="admin-nosotros.html">Nosotros</a>
+      </div>
+      <button class="add-btn" id="addProductBtn">+</button>
     </div>
     <div class="right">
+      <label>Página en Servicio</label>
+      <label class="switch">
+        <input type="checkbox" id="maintenanceToggle" checked>
+        <span class="slider"></span>
+      </label>
       <button class="admin-btn" id="logoutBtn">Cerrar Sesión</button>
     </div>
   </div>
 
-  <!-- BOTÓN VOLVER -->
-  <button class="back-btn" id="backBtn">Volver al Panel</button>
+  <!-- VISTA PREVIA -->
+  <div class="main-container" id="indexClone"></div>
 
-  <!-- MAPA -->
-  <div class="map-container">
-    <div id="map"></div>
-
-    <!-- LEYENDA -->
-    <div class="legend">
-      <h4>Leyenda</h4>
-      <div class="legend-item">
-        <div class="legend-color" style="background:#e63946;"></div>
-        <span>1 Compra</span>
+  <!-- MODAL PRODUCTO -->
+  <div class="modal" id="productModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeProductModal">X</button>
+      <h3 id="modalTitle">Agregar Producto</h3>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="productName">
       </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background:#e63946; opacity:0.8;"></div>
-        <span>2-5 Compras</span>
+      <div class="form-group">
+        <label>Precio</label>
+        <input type="number" id="productPrice" step="0.01" placeholder="3000.00">
       </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background:#e63946; opacity:0.6;"></div>
-        <span>6-10 Compras</span>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea id="productDesc" rows="3"></textarea>
       </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background:#e63946; opacity:0.4;"></div>
-        <span>11+ Compras</span>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="productType">
+          <option value="normal">Normal</option>
+          <option value="carrusel">Carrusel</option>
+          <option value="principal">Principal</option>
+          <option value="publicidad">Publicidad</option>
+        </select>
       </div>
-    </div>
-
-    <!-- PANEL DE ESTADÍSTICAS -->
-    <div class="stats-panel">
-      <h3>Resumen</h3>
-      <div class="stat">
-        <div class="stat-label">Total de Órdenes</div>
-        <div class="stat-value" id="totalOrders">0</div>
+      <div class="form-group">
+        <label>Imagen</label>
+        <div class="image-upload" id="imageUpload">
+          <input type="file" id="imageInput" accept="image/*">
+          <p>Haz clic para subir imagen</p>
+          <img id="imagePreview" class="image-preview" src="" alt="Vista previa">
+          <div id="uploadStatus" class="upload-status"></div>
+        </div>
+        <input type="text" id="productImageUrl" readonly placeholder="URL de imagen (Cloudinary)">
       </div>
-      <div class="stat">
-        <div class="stat-label">Ingresos Totales</div>
-        <div class="stat-value" id="totalRevenue">$0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Estado Líder</div>
-        <div class="stat-value" id="topState">-</div>
-      </div>
+      <button class="btn-save" id="saveProductBtn">Guardar Producto</button>
     </div>
   </div>
 
-  <!-- FIREBASE & LEAFLET -->
+  <!-- MODAL EDITAR TEXTO -->
+  <div class="modal" id="editTextModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeTextModal">X</button>
+      <h3>Editar Texto</h3>
+      <div class="form-group">
+        <label>Nuevo texto</label>
+        <textarea id="editTextInput" rows="4"></textarea>
+      </div>
+      <button class="btn-save" id="saveTextBtn">Guardar</button>
+    </div>
+  </div>
+
+  <!-- FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // === FIREBASE ===
+    // === FIREBASE CONFIG ===
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -122,86 +214,317 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // === CLOUDINARY CONFIG (CLAVE FUNCIONAL) ===
+    const CLOUDINARY_CLOUD_NAME = 'dgajzxlx6';
+    const CLOUDINARY_UPLOAD_PRESET = 'ml_default'; // ¡DEBE EXISTIR EN CLOUDINARY!
+    const CLOUDINARY_API_KEY = '678249769396292'; // TU API KEY
+    const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
     // === VERIFICAR ADMIN ===
     if (localStorage.getItem('isAdmin') !== 'true') {
       alert('Acceso denegado');
       window.location.href = 'index.html';
     }
 
-    // === MAPA ===
-    const map = L.map('map').setView([23.5, -102], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+    // === VARIABLES GLOBALES ===
+    let currentProductId = null;
+    let currentTextElement = null;
+    let currentTextPath = null;
+    let containers = {};
+    let unsubscribeProducts = null;
 
-    // === COORDENADAS POR ESTADO ===
-    const stateCoords = {
-      AGS: [21.88, -102.29], BC: [30.0, -115.0], BCS: [26.0, -111.5], CAM: [18.6, -90.7],
-      CHIS: [16.5, -92.5], CHIH: [28.6, -106.0], CDMX: [19.43, -99.13], COAH: [27.0, -102.0],
-      COL: [19.2, -103.7], DGO: [24.0, -104.6], GTO: [21.0, -101.0], GRO: [17.5, -99.5],
-      HGO: [20.5, -98.5], JAL: [20.6, -103.3], MEX: [19.3, -99.6], MICH: [19.0, -101.5],
-      MOR: [18.9, -99.0], NAY: [21.5, -104.8], NL: [25.6, -100.3], OAX: [17.0, -96.7],
-      PUE: [19.0, -98.0], QRO: [20.6, -100.3], QROO: [19.2, -88.5], SLP: [22.1, -100.9],
-      SIN: [24.5, -107.5], SON: [29.0, -110.9], TAB: [17.9, -92.9], TAM: [24.0, -98.5],
-      TLAX: [19.4, -98.2], VER: [19.2, -96.1], YUC: [20.7, -89.1], ZAC: [22.7, -102.5]
-    };
+    // === CLONAR INDEX Y CREAR CONTENEDORES ===
+    fetch('index.html')
+      .then(r => r.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const main = doc.querySelector('.main-container') || doc.body;
+        document.getElementById('indexClone').innerHTML = main.innerHTML;
 
-    // === CONTADORES ===
-    let totalOrders = 0;
-    let totalRevenue = 0;
-    const stateCount = {};
+        containers = {
+          principal: ensureContainer('.hero'),
+          carrusel: ensureContainer('.carrusel'),
+          publicidad: ensureContainer('.publicidad'),
+          normal: ensureContainer('.products-grid')
+        };
 
-    // === CARGAR ÓRDENES ===
-    db.collection('orders').get().then(snapshot => {
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.address && data.address.stateCode) {
-          totalOrders++;
-          totalRevenue += data.total || 0;
-
-          const code = data.address.stateCode;
-          stateCount[code] = (stateCount[code] || 0) + 1;
-
-          const coords = stateCoords[code];
-          if (coords) {
-            const count = stateCount[code];
-            const radius = Math.min(8 + count * 2, 30);
-            const opacity = count > 10 ? 0.4 : count > 5 ? 0.6 : count > 1 ? 0.8 : 1;
-
-            L.circleMarker(coords, {
-              radius: radius,
-              color: '#e63946',
-              fillOpacity: opacity,
-              weight: 2
-            }).addTo(map)
-              .bindPopup(`
-                <b>${data.address.name}</b><br>
-                ${data.address.state}<br>
-                Orden: <b>${doc.id}</b><br>
-                Total: <b>$${data.total}</b><br>
-                Fecha: ${new Date(data.date?.toDate()).toLocaleDateString('es-MX')}
-              `);
+        function ensureContainer(selector) {
+          let el = document.querySelector(`#indexClone ${selector}`);
+          if (!el) {
+            el = document.createElement('div');
+            el.className = selector.replace('.', '');
+            document.getElementById('indexClone').appendChild(el);
           }
+          return el;
         }
+
+        startRealtimeProducts();
+        setupTextEditing();
       });
 
-      // Actualizar estadísticas
-      document.getElementById('totalOrders').textContent = totalOrders;
-      document.getElementById('totalRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+    // === PRODUCTOS EN TIEMPO REAL ===
+    function startRealtimeProducts() {
+      if (unsubscribeProducts) unsubscribeProducts();
 
-      const top = Object.entries(stateCount).sort((a,b) => b[1] - a[1])[0];
-      if (top) {
-        document.getElementById('topState').textContent = `${top[0]} (${top[1]})`;
+      unsubscribeProducts = db.collection('productos').onSnapshot(snapshot => {
+        Object.values(containers).forEach(c => c.innerHTML = '');
+        snapshot.forEach(doc => {
+          const p = doc.data();
+          const tipoKey = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+          const card = createProductCard(p, doc.id);
+          if (containers[tipoKey]) {
+            containers[tipoKey].appendChild(card);
+          }
+        });
+      }, err => {
+        console.error("Error en onSnapshot:", err);
+        alert("Error al cargar productos");
+      });
+    }
+
+    function createProductCard(p, id) {
+      const div = document.createElement('div');
+      div.className = 'product-card';
+      const tipoKey = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+      const formattedPrice = p.precioFormateado || `$${Number(p.precio || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+      div.innerHTML = `
+        <div class="product-actions">
+          <button class="action-btn" onclick="editProduct('${id}')">Edit</button>
+          <button class="action-btn" onclick="deleteProduct('${id}')">Delete</button>
+        </div>
+        <img src="${p.imagen}" alt="${p.nombre}" style="width:100%; height:auto; border-radius:8px;">
+        <div class="card-info">
+          <h3 class="product-title">${p.nombre}</h3>
+          <p class="product-description">${p.descripcion}</p>
+          <div class="price-container">
+            <span class="product-price">${formattedPrice}</span>
+          </div>
+          <label class="switch switch-small" style="margin-top:8px;">
+            <input type="checkbox" ${p.habilitado ? 'checked' : ''} onchange="toggleProduct('${id}', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      `;
+      return div;
+    }
+
+    // === TEXTOS EDITABLES ===
+    function setupTextEditing() {
+      const editableEls = document.querySelectorAll('#indexClone h1, #indexClone h2, #indexClone h3, #indexClone p, #indexClone .tag, #indexClone .hero-title, #indexClone .hero-subtitle');
+      editableEls.forEach(el => {
+        el.classList.add('editable');
+        const editBtn = document.createElement('div');
+        editBtn.className = 'text-edit';
+        editBtn.innerHTML = 'Edit';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          currentTextElement = el;
+          currentTextPath = getTextPath(el);
+          if (currentTextPath) {
+            document.getElementById('editTextInput').value = el.innerText.trim();
+            document.getElementById('editTextModal').classList.add('active');
+          }
+        };
+        el.appendChild(editBtn);
+      });
+    }
+
+    function getTextPath(el) {
+      if (el.closest('.hero') && el.tagName === 'H1') return 'noticias/principal/titulo';
+      if (el.closest('.hero') && el.tagName === 'P') return 'noticias/principal/texto';
+      if (el.closest('.lanzamientos') && el.tagName === 'H2') return 'lanzamientos/texto/subtitulo';
+      return null;
+    }
+
+    // === GUARDAR TEXTO ===
+    document.getElementById('saveTextBtn').onclick = async () => {
+      if (currentTextElement && currentTextPath) {
+        const [col, doc, field] = currentTextPath.split('/');
+        try {
+          await db.collection(col).doc(doc).set({ [field]: document.getElementById('editTextInput').value }, { merge: true });
+          currentTextElement.innerText = document.getElementById('editTextInput').value;
+          document.getElementById('editTextModal').classList.remove('active');
+        } catch (e) {
+          alert('Error al guardar texto');
+        }
+      }
+    };
+
+    // === MODAL PRODUCTO ===
+    const modal = document.getElementById('productModal');
+    document.getElementById('addProductBtn').onclick = () => {
+      currentProductId = null;
+      document.getElementById('modalTitle').textContent = 'Agregar Producto';
+      clearProductForm();
+      modal.classList.add('active');
+    };
+
+    document.getElementById('closeProductModal').onclick = () => modal.classList.remove('active');
+    document.getElementById('closeTextModal').onclick = () => document.getElementById('editTextModal').classList.remove('active');
+
+    function clearProductForm() {
+      ['productName', 'productPrice', 'productDesc', 'productImageUrl'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('productType').value = 'normal';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
+    }
+
+    // === SUBIDA A CLOUDINARY (100% FUNCIONAL) ===
+    document.getElementById('imageUpload').onclick = () => document.getElementById('imageInput').click();
+    document.getElementById('imageInput').onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('imagePreview');
+      const status = document.getElementById('uploadStatus');
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+      status.textContent = 'Subiendo...';
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('api_key', CLOUDINARY_API_KEY);
+
+      try {
+        const response = await fetch(CLOUDINARY_URL, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.secure_url) {
+          document.getElementById('productImageUrl').value = data.secure_url;
+          preview.src = data.secure_url;
+          status.textContent = 'Subida exitosa';
+          status.style.color = '#28a745';
+        } else {
+          throw new Error(data.error?.message || 'Error desconocido');
+        }
+      } catch (err) {
+        console.error("Error en Cloudinary:", err);
+        status.textContent = `Error: ${err.message}`;
+        status.style.color = '#dc3545';
+        alert('No se pudo subir la imagen. Verifica tu preset en Cloudinary.');
+      }
+    };
+
+    // === EDITAR PRODUCTO ===
+    window.editProduct = async (id) => {
+      currentProductId = id;
+      document.getElementById('modalTitle').textContent = 'Editar Producto';
+      try {
+        const doc = await db.collection('productos').doc(id).get();
+        if (doc.exists) {
+          const p = doc.data();
+          document.getElementById('productName').value = p.nombre;
+          document.getElementById('productPrice').value = p.precio;
+          document.getElementById('productDesc').value = p.descripcion;
+          const tipoKey = Object.keys(p.tipo || {}).find(k => p.tipo[k]) || 'normal';
+          document.getElementById('productType').value = tipoKey;
+          document.getElementById('productImageUrl').value = p.imagen;
+          const preview = document.getElementById('imagePreview');
+          if (p.imagen) {
+            preview.src = p.imagen;
+            preview.style.display = 'block';
+          }
+          modal.classList.add('active');
+        }
+      } catch (e) {
+        alert('Error al cargar producto');
+      }
+    };
+
+    // === GUARDAR PRODUCTO ===
+    document.getElementById('saveProductBtn').onclick = async () => {
+      const precio = parseFloat(document.getElementById('productPrice').value);
+      if (isNaN(precio) || precio <= 0) {
+        alert('Ingresa un precio válido');
+        return;
+      }
+
+      const precioFormateado = `$${precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+      const tipoSeleccionado = document.getElementById('productType').value;
+      const tipoObj = { normal: false, carrusel: false, principal: false, publicidad: false };
+      tipoObj[tipoSeleccionado] = true;
+
+      const data = {
+        nombre: document.getElementById('productName').value.trim(),
+        precio: precio,
+        precioFormateado: precioFormateado,
+        descripcion: document.getElementById('productDesc').value.trim(),
+        tipo: tipoObj,
+        imagen: document.getElementById('productImageUrl').value,
+        habilitado: true,
+        fecha: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        if (currentProductId) {
+          await db.collection('productos').doc(currentProductId).update(data);
+        } else {
+          await db.collection('productos').add(data);
+        }
+        modal.classList.remove('active');
+      } catch (e) {
+        console.error(e);
+        alert('Error al guardar producto');
+      }
+    };
+
+    // === TOGGLE HABILITADO ===
+    window.toggleProduct = async (id, enabled) => {
+      try {
+        await db.collection('productos').doc(id).update({ habilitado: enabled });
+      } catch (e) {
+        alert('Error al actualizar estado');
+      }
+    };
+
+    // === ELIMINAR PRODUCTO ===
+    window.deleteProduct = async (id) => {
+      if (confirm('¿Eliminar este producto?')) {
+        try {
+          await db.collection('productos').doc(id).delete();
+        } catch (e) {
+          alert('Error al eliminar');
+        }
+      }
+    };
+
+    // === MENÚ ===
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsMenu = document.getElementById('settingsMenu');
+    settingsBtn.onclick = (e) => {
+      e.stopPropagation();
+      settingsMenu.classList.toggle('active');
+    };
+    document.addEventListener('click', () => settingsMenu.classList.remove('active'));
+
+    // === MANTENIMIENTO ===
+    const maintenanceToggle = document.getElementById('maintenanceToggle');
+    const banner = document.getElementById('maintenanceBanner');
+
+    db.collection('config').doc('general').get().then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        const enMantenimiento = data.mantenimiento || false;
+        maintenanceToggle.checked = !enMantenimiento;
+        banner.classList.toggle('show', enMantenimiento);
       }
     });
 
-    // === VOLVER ===
-    document.getElementById('backBtn').onclick = () => window.location.href = 'admin.html';
+    maintenanceToggle.onchange = () => {
+      const enMantenimiento = !maintenanceToggle.checked;
+      db.collection('config').doc('general').set({ mantenimiento: enMantenimiento }, { merge: true });
+      banner.classList.toggle('show', enMantenimiento);
+    };
 
     // === CERRAR SESIÓN ===
     document.getElementById('logoutBtn').onclick = () => {
       localStorage.removeItem('isAdmin');
-      localStorage.removeItem('loggedIn');
       window.location.href = 'index.html';
     };
   </script>
