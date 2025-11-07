@@ -1,11 +1,12 @@
-// js/index.js - 100% DINÁMICO DESDE ADMIN
+// js/index.js - 100% DINÁMICO + MENÚ + CARRITO + BÚSQUEDA
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { 
   getFirestore, 
   collection, 
   onSnapshot,
   query,
-  where
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -20,7 +21,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// === ELEMENTOS ===
+// === DOM ===
 const newCarousel = document.getElementById('newCarousel');
 const starCarousel = document.getElementById('starCarousel');
 const productsGrid = document.getElementById('productsGrid');
@@ -29,8 +30,25 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const goToPay = document.getElementById('goToPay');
 const toast = document.getElementById('toast');
+const searchInput = document.getElementById('searchInput');
+const searchResultsContainer = document.getElementById('searchResultsContainer');
+const searchResults = document.getElementById('searchResults');
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuSidebar = document.getElementById('menuSidebar');
+const cartBtn = document.getElementById('cartBtn');
+const cartSidebar = document.getElementById('cartSidebar');
+const closeCart = document.getElementById('closeCart');
+const cartOverlay = document.getElementById('cartOverlay');
+const searchBtn = document.getElementById('searchBtn');
+const searchBarHeader = document.getElementById('searchBarHeader');
+const closeSearchHeader = document.getElementById('closeSearchHeader');
+const headerOverlay = document.getElementById('headerOverlay');
+const welcomeMsg = document.getElementById('welcomeMsg');
+const authBtn = document.getElementById('authBtn');
+const helpBtn = document.getElementById('helpBtn');
 
-// === CARRITO LOCAL ===
+// === CARRITO ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
 function updateCart() {
@@ -39,7 +57,6 @@ function updateCart() {
 
   cartBadge.textContent = totalQty;
   cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
-
   cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
 
   cartItems.innerHTML = '';
@@ -91,12 +108,14 @@ goToPay.onclick = () => {
   window.location.href = 'pago.html';
 };
 
-// === CARGA EN TIEMPO REAL ===
-let allProducts = [];
-
+// === RENDER ===
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
-  const filtered = allProducts.filter(filterFn);
+  const filtered = window.allProducts.filter(filterFn);
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="color:#999; padding:20px;">No hay productos</p>';
+    return;
+  }
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -108,7 +127,7 @@ function renderCarousel(container, filterFn) {
 
 function renderGrid() {
   productsGrid.innerHTML = '';
-  allProducts.forEach(p => {
+  window.allProducts.forEach(p => {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
@@ -128,7 +147,8 @@ function renderGrid() {
   });
 }
 
-// === ESCUCHAR CAMBIOS EN FIRESTORE ===
+// === FIRESTORE EN TIEMPO REAL ===
+let allProducts = [];
 const productosRef = collection(db, "productos");
 onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
@@ -136,21 +156,141 @@ onSnapshot(productosRef, (snapshot) => {
     const data = doc.data();
     allProducts.push({
       id: doc.id,
-      nombre: data.nombre,
-      precio: data.precio,
+      nombre: data.nombre || '',
+      precio: data.precio || 0,
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
-      imagen: data.imagen,
-      nuevo: data.nuevo || false,
-      estrella: data.estrella || false
+      imagen: data.imagen || '',
+      nuevo: data.nuevo === true,
+      estrella: data.estrella === true
     });
   });
 
+  window.allProducts = allProducts;
   renderCarousel(newCarousel, p => p.nuevo);
   renderCarousel(starCarousel, p => p.estrella);
   renderGrid();
-  window.allProducts = allProducts;
 });
+
+// === BÚSQUEDA ===
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const term = searchInput.value.trim().toLowerCase();
+  if (term.length < 2) {
+    searchResultsContainer.style.display = 'none';
+    return;
+  }
+
+  searchTimeout = setTimeout(async () => {
+    const q = query(
+      collection(db, "productos"),
+      where("nombre", ">=", term),
+      where("nombre", "<=", term + '\uf8ff')
+    );
+    const snapshot = await getDocs(q);
+    searchResults.innerHTML = '';
+    if (snapshot.empty) {
+      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+    } else {
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
+        div.style.padding = '10px 0';
+        div.style.borderBottom = '1px solid #eee';
+        div.style.cursor = 'pointer';
+        div.onclick = () => window.location.href = `product.html?id=${doc.id}`;
+        searchResults.appendChild(div);
+      });
+    }
+    searchResultsContainer.style.display = 'block';
+  }, 300);
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+    searchResultsContainer.style.display = 'none';
+  }
+});
+
+// === MENÚ HAMBURGUESA ===
+menuBtn.onclick = () => {
+  menuOverlay.classList.add('show');
+  menuSidebar.classList.add('open');
+  updateAuthUI();
+};
+
+menuOverlay.onclick = () => {
+  menuOverlay.classList.remove('show');
+  menuSidebar.classList.remove('open');
+};
+
+// === CARRITO LATERAL ===
+cartBtn.onclick = () => {
+  cartSidebar.classList.add('open');
+  cartOverlay.classList.add('show');
+  updateCart();
+};
+
+closeCart.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+cartOverlay.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+// === BÚSQUEDA HEADER ===
+searchBtn.onclick = () => {
+  searchBarHeader.classList.add('active');
+  headerOverlay.classList.add('show');
+  searchInput.focus();
+};
+
+const closeSearch = () => {
+  searchBarHeader.classList.remove('active');
+  headerOverlay.classList.remove('show');
+  searchResultsContainer.style.display = 'none';
+};
+closeSearchHeader.onclick = closeSearch;
+headerOverlay.onclick = closeSearch;
+
+// === AUTH ===
+let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+let userName = localStorage.getItem('userName') || '';
+
+function updateAuthUI() {
+  if (isLoggedIn && userName) {
+    welcomeMsg.textContent = `¡Hola, ${userName}!`;
+    authBtn.textContent = 'Cerrar sesión';
+    authBtn.classList.add('logout-btn');
+  } else {
+    welcomeMsg.textContent = '';
+    authBtn.textContent = 'Inicia sesión o regístrate';
+    authBtn.classList.remove('logout-btn');
+  }
+}
+
+authBtn.onclick = () => {
+  if (isLoggedIn) {
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('isAdmin');
+    isLoggedIn = false;
+    userName = '';
+    showToast('Sesión cerrada');
+    updateAuthUI();
+  } else {
+    window.location.href = 'login.html';
+  }
+};
+
+helpBtn.onclick = () => {
+  alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
+};
 
 // === TOAST ===
 function showToast(msg) {
@@ -161,5 +301,4 @@ function showToast(msg) {
 
 // === INICIO ===
 updateCart();
-
-// === BÚSQUEDA (ya tienes en index.html, no tocar) ===
+updateAuthUI();
