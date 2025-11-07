@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -35,9 +36,10 @@
     }
     .fix-btn { background: #ffc107; font-size: 1.2rem; }
 
-    .main-container { padding: 20px; position: relative; }
+    .main-container { padding: 20px; }
     .product-card, .editable {
       position: relative; transition: all 0.3s; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .product-card:hover, .editable:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
 
@@ -102,8 +104,15 @@
     input:checked + .slider { background: #28a745; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    .debug { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-family: monospace; font-size: 0.9rem; max-height: 200px; overflow-y: auto; }
     .demo-badge { background: #ffc107; color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+
+    /* CARRUSEL INICIAL */
+    .initial-carousel {
+      display: flex; overflow: hidden; margin: 20px 0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .initial-carousel img {
+      width: 100%; height: auto; object-fit: cover;
+    }
   </style>
 </head>
 <body>
@@ -130,8 +139,13 @@
         <input type="checkbox" id="maintenanceToggle" checked>
         <span class="slider"></span>
       </label>
-      <button class="admin-btn" id="logoutBtn">Cerrar Sesión</button>
+      <button id="logoutBtn" style="background:#dc3545;color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;">Cerrar Sesión</button>
     </div>
+  </div>
+
+  <!-- CARRUSEL INICIAL -->
+  <div class="initial-carousel">
+    <img src="https://via.placeholder.com/1200x400/000000/ffffff?text=CARRUSEL+INICIAL+DE+ADMIN" alt="Carrusel inicial">
   </div>
 
   <!-- VISTA PREVIA -->
@@ -164,14 +178,14 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Imagen</label>
+        <label>Imagen (subir o pegar URL)</label>
         <div class="image-upload" id="imageUpload">
           <input type="file" id="imageInput" accept="image/*">
-          <p>Haz clic para subir imagen</p>
+          <p>Haz clic para subir desde tu PC</p>
           <img id="imagePreview" class="image-preview" src="" alt="Vista previa">
           <div id="uploadStatus" class="upload-status"></div>
         </div>
-        <input type="text" id="productImageUrl" readonly placeholder="URL de imagen (Firebase)">
+        <input type="text" id="productImageUrl" placeholder="O pega URL directa aquí" style="margin-top:10px;">
       </div>
       <button class="btn-save" id="saveProductBtn">Guardar Producto</button>
     </div>
@@ -190,16 +204,12 @@
     </div>
   </div>
 
-  <!-- DEBUG -->
-  <div class="debug" id="debugLog"></div>
-
   <!-- FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 
   <script>
-    // === CONFIG ===
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -213,22 +223,12 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // === LOG ===
-    const debugLog = document.getElementById('debugLog');
-    function log(msg) {
-      const time = new Date().toLocaleTimeString();
-      debugLog.innerHTML += `<div>${time}: ${msg}</div>`;
-      console.log(msg);
-      debugLog.scrollTop = debugLog.scrollHeight;
-    }
-
     // === VERIFICAR ADMIN ===
     if (localStorage.getItem('isAdmin') !== 'true') {
       alert('Acceso denegado');
       window.location.href = 'index.html';
     }
 
-    // === VARIABLES ===
     let currentProductId = null;
     let currentTextElement = null;
     let containers = {};
@@ -260,14 +260,12 @@
           return el;
         }
 
-        log('Contenedores creados');
         startRealtimeProducts();
         setupTextEditing();
         loadAnuncioTexto();
       })
-      .catch(err => log('Error cargando index.html: ' + err));
+      .catch(() => {});
 
-    // === OBTENER TIPO SEGURO ===
     function getTipoKey(p) {
       if (p.tipo && typeof p.tipo === 'object' && !Array.isArray(p.tipo)) {
         return Object.keys(p.tipo).find(k => p.tipo[k]) || 'normal';
@@ -283,11 +281,9 @@
       return 'normal';
     }
 
-    // === PRODUCTOS EN TIEMPO REAL ===
     function startRealtimeProducts() {
       if (unsubscribeProducts) unsubscribeProducts();
       unsubscribeProducts = db.collection('productos').onSnapshot(snapshot => {
-        log(`Recibidos ${snapshot.size} productos`);
         Object.values(containers).forEach(c => c.innerHTML = '');
         snapshot.forEach(doc => {
           const p = doc.data();
@@ -295,8 +291,6 @@
           const card = createProductCard(p, doc.id);
           if (containers[tipoKey]) {
             containers[tipoKey].appendChild(card);
-          } else {
-            log(`Contenedor no encontrado: ${tipoKey}`);
           }
         });
       });
@@ -313,12 +307,10 @@
           <button class="action-btn" onclick="deleteProduct('${id}')">Delete</button>
         </div>
         <img src="${p.imagen}" alt="${p.nombre}" style="width:100%; height:auto; border-radius:8px;">
-        <div class="card-info" style="padding:10px;">
-          <h3 class="product-title">${p.nombre} ${isDemo ? '<span class="demo-badge">DEMO</span>' : ''}</h3>
-          <p class="product-description">${p.descripcion}</p>
-          <div class="price-container">
-            <span class="product-price">${formattedPrice}</span>
-          </div>
+        <div style="padding:10px;">
+          <h3>${p.nombre} ${isDemo ? '<span class="demo-badge">DEMO</span>' : ''}</h3>
+          <p>${p.descripcion}</p>
+          <div><strong>${formattedPrice}</strong></div>
           <label class="switch switch-small" style="margin-top:8px;">
             <input type="checkbox" ${p.habilitado ? 'checked' : ''} onchange="toggleProduct('${id}', this.checked)">
             <span class="slider"></span>
@@ -328,7 +320,6 @@
       return div;
     }
 
-    // === EDITAR ANUNCIO ===
     function setupTextEditing() {
       const anuncio = document.querySelector('#indexClone .contact-text');
       if (anuncio) {
@@ -352,7 +343,7 @@
         const texto = doc.exists ? doc.data().texto : 'No te quedes sin tu Mystery Box';
         const el = document.querySelector('#indexClone .contact-text');
         if (el) el.innerText = texto;
-      } catch (e) { log('Error anuncio: ' + e.message); }
+      } catch (e) {}
     }
 
     document.getElementById('saveTextBtn').onclick = async () => {
@@ -362,11 +353,10 @@
         await db.collection('config').doc('anuncio').set({ texto }, { merge: true });
         if (currentTextElement) currentTextElement.innerText = texto;
         document.getElementById('editTextModal').classList.remove('active');
-        log('Anuncio actualizado');
-      } catch (e) { log('Error: ' + e.message); }
+      } catch (e) {}
     };
 
-    // === SUBIDA IMAGEN ===
+    // === SUBIDA O URL MANUAL ===
     document.getElementById('imageUpload').onclick = () => document.getElementById('imageInput').click();
     document.getElementById('imageInput').onchange = async (e) => {
       const file = e.target.files[0];
@@ -385,21 +375,19 @@
         const url = await snapshot.ref.getDownloadURL();
         document.getElementById('productImageUrl').value = url;
         preview.src = url;
-        status.textContent = '¡Subida exitosa!';
+        status.textContent = 'Subida exitosa';
         status.style.color = '#28a745';
-        log('Imagen subida: ' + url);
       } catch (err) {
         status.textContent = 'Error: ' + err.message;
         status.style.color = '#dc3545';
       }
     };
 
-    // === GUARDAR PRODUCTO ===
     document.getElementById('saveProductBtn').onclick = async () => {
       const precio = parseFloat(document.getElementById('productPrice').value);
       if (isNaN(precio) || precio <= 0) return alert('Precio inválido');
-      const imagen = document.getElementById('productImageUrl').value.trim();
-      if (!imagen) return alert('Sube una imagen');
+      let imagen = document.getElementById('productImageUrl').value.trim();
+      if (!imagen) return alert('Sube una imagen o pega una URL');
 
       const data = {
         nombre: document.getElementById('productName').value.trim(),
@@ -416,10 +404,8 @@
       try {
         if (currentProductId) {
           await db.collection('productos').doc(currentProductId).update(data);
-          log(`Actualizado: ${currentProductId}`);
         } else {
-          const docRef = await db.collection('productos').add(data);
-          log(`Creado: ${docRef.id}`);
+          await db.collection('productos').add(data);
         }
         document.getElementById('productModal').classList.remove('active');
       } catch (e) {
@@ -427,7 +413,6 @@
       }
     };
 
-    // === EDITAR / ELIMINAR / TOGGLE ===
     window.editProduct = async (id) => {
       currentProductId = id;
       const doc = await db.collection('productos').doc(id).get();
@@ -448,9 +433,7 @@
 
     window.deleteProduct = (id) => {
       if (confirm('¿Eliminar este producto?')) {
-        db.collection('productos').doc(id).delete().then(() => {
-          log(`Eliminado: ${id}`);
-        });
+        db.collection('productos').doc(id).delete();
       }
     };
 
@@ -458,28 +441,21 @@
       db.collection('productos').doc(id).update({ habilitado: enabled });
     };
 
-    // === BOTÓN CORREGIR TIPOS ===
     document.getElementById('fixTypesBtn').onclick = () => {
-      if (!confirm('¿Corregir todos los tipos de productos?')) return;
+      if (!confirm('¿Corregir tipos de todos los productos?')) return;
       db.collection('productos').get().then(snapshot => {
         const batch = db.batch();
-        let count = 0;
         snapshot.forEach(doc => {
           const data = doc.data();
           let nuevoTipo = { normal: false, carrusel: false, principal: false, publicidad: false };
           const tipoKey = getTipoKey(data);
           nuevoTipo[tipoKey] = true;
           batch.update(doc.ref, { tipo: nuevoTipo });
-          count++;
         });
-        return batch.commit().then(() => {
-          alert(`¡${count} productos corregidos!`);
-          log(`Corregidos ${count} productos`);
-        });
+        batch.commit().then(() => alert('¡Tipos corregidos!'));
       });
     };
 
-    // === MODALES ===
     document.getElementById('addProductBtn').onclick = () => {
       currentProductId = null;
       document.getElementById('modalTitle').textContent = 'Agregar Producto';
@@ -489,10 +465,10 @@
       document.getElementById('uploadStatus').textContent = '';
       document.getElementById('productModal').classList.add('active');
     };
+
     document.getElementById('closeProductModal').onclick = () => document.getElementById('productModal').classList.remove('active');
     document.getElementById('closeTextModal').onclick = () => document.getElementById('editTextModal').classList.remove('active');
 
-    // === MANTENIMIENTO ===
     const maintenanceToggle = document.getElementById('maintenanceToggle');
     const banner = document.getElementById('maintenanceBanner');
     db.collection('config').doc('general').get().then(doc => {
@@ -507,7 +483,6 @@
       banner.classList.toggle('show', !maintenanceToggle.checked);
     };
 
-    // === CERRAR SESIÓN ===
     document.getElementById('logoutBtn').onclick = () => {
       localStorage.removeItem('isAdmin');
       window.location.href = 'index.html';
