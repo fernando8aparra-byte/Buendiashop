@@ -100,6 +100,9 @@
     <!-- Contraseña -->
     <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
 
+    <!-- Confirmar contraseña (solo en registro) -->
+    <input type="password" id="confirmPassword" class="login-input hidden" placeholder="Confirmar contraseña" required>
+
     <button class="login-btn" id="mainBtn">Entrar</button>
 
     <p class="toggle-text">
@@ -115,7 +118,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -137,13 +140,10 @@
     const nameInput = document.getElementById('name');
     const identifierInput = document.getElementById('identifier');
     const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
     const toast = document.getElementById('toast');
 
     let isLogin = true;
-
-    // === TUS CREDENCIALES DE ADMIN (SIN CAMBIAR) ===
-    const ADMIN_IDENTIFIER = "Buendia*]?~£u837jwhwi";
-    const ADMIN_PASSWORD = "&2)3)8:&?3828&/82$:!";
 
     // === TOAST ===
     function showToast(msg, isError = false) {
@@ -163,8 +163,10 @@
         mainBtn.textContent = 'Entrar';
         toggleLink.textContent = 'Regístrate aquí';
         identifierInput.placeholder = 'Nombre o identificador';
-        nameInput.classList.add('hidden');
+        nameInputश्व.classList.add('hidden');
         nameInput.removeAttribute('required');
+        confirmPasswordInput.classList.add('hidden');
+        confirmPasswordInput.removeAttribute('required');
       } else {
         formTitle.textContent = 'Crear Cuenta';
         mainBtn.textContent = 'Registrarme';
@@ -172,6 +174,8 @@
         identifierInput.placeholder = 'Correo electrónico';
         nameInput.classList.remove('hidden');
         nameInput.setAttribute('required', '');
+        confirmPasswordInput.classList.remove('hidden');
+        confirmPasswordInput.setAttribute('required', '');
       }
     };
 
@@ -180,9 +184,15 @@
       const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
       const nombre = nameInput.value.trim();
+      const confirmPassword = confirmPasswordInput.value;
 
-      if (!identifier || !password || (!isLogin && !nombre)) {
+      if (!identifier || !password) {
         showToast('Completa todos los campos', true);
+        return;
+      }
+
+      if (!isLogin && (!nombre || password !== confirmPassword)) {
+        showToast('Las contraseñas no coinciden', true);
         return;
       }
 
@@ -190,40 +200,44 @@
         if (isLogin) {
           // === INICIAR SESIÓN ===
 
-          // === ADMIN ESPECIAL (TUS CREDENCIALES ORIGINALES) ===
-          if (identifier === ADMIN_IDENTIFIER && password === ADMIN_PASSWORD) {
-            localStorage.setItem('loggedIn', 'true');
-            localStorage.setItem('userName', 'Administrador');
-            localStorage.setItem('admin', 'true'); // ← SE GUARDA COMO ADMIN
-            showToast('Acceso de administrador');
-            setTimeout(() => window.location.href = 'admin.html', 1500);
-            return;
+          // BUSCAR ADMIN EN FIREBASE
+          const adminQuery = query(
+            collection(db, "admins"),
+            where("usuario", "==", identifier)
+          );
+          const adminSnapshot = await getDocs(adminQuery);
+
+          if (!adminSnapshot.empty) {
+            const adminData = adminSnapshot.docs[0].data();
+            if (adminData.contraseña === password) {
+              localStorage.setItem('loggedIn', 'true');
+              localStorage.setItem('userName', 'Administrador');
+              localStorage.setItem('admin', 'true');
+              showToast('Acceso de administrador');
+              setTimeout(() => window.location.href = 'admin.html', 1500);
+              return;
+            } else {
+              showToast('Contraseña incorrecta', true);
+              return;
+            }
           }
 
+          // USUARIO NORMAL
           let email = identifier;
-
-          // Si no es correo, buscar por nombre
           if (!identifier.includes('@')) {
             const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
             const snapshot = await getDocs(q);
             if (snapshot.empty) {
-              showToast('Nombre o identificador no encontrado', true);
+              showToast('Usuario no encontrado', true);
               return;
             }
             email = snapshot.docs[0].data().correo;
           }
 
-          // Iniciar sesión con Firebase Auth
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          const user = userCredential.user;
-
-          const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-          if (!userDoc.exists()) {
-            showToast('Error de datos', true);
-            return;
-          }
-
+          const userDoc = await getDoc(doc(db, "usuarios", userCredential.user.uid));
           const data = userDoc.data();
+
           localStorage.setItem('loggedIn', 'true');
           localStorage.setItem('userName', data.nombre);
           showToast(`¡Bienvenido, ${data.nombre.split(' ')[0]}!`);
@@ -237,9 +251,7 @@
           }
 
           const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
-          const user = userCredential.user;
-
-          await setDoc(doc(db, "usuarios", user.uid), {
+          await setDoc(doc(db, "usuarios", userCredential.user.uid), {
             nombre: nombre,
             correo: identifier
           });
