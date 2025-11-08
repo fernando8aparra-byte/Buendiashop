@@ -1,4 +1,4 @@
-// js/index.js - 100% DINÁMICO + MENÚ + CARRITO + BÚSQUEDA
+// index.js - COMPLETO Y CORREGIDO
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { 
   getFirestore, 
@@ -89,13 +89,23 @@ window.removeFromCart = (i) => {
   showToast('Producto eliminado');
 };
 
+// CORREGIDO: GUARDA IMAGEN EN CARRITO
 window.addToCart = (id) => {
   const product = window.allProducts.find(p => p.id === id);
   if (!product) return;
 
   const existing = cart.find(i => i.id === id);
-  if (existing) existing.qty++;
-  else cart.push({ ...product, qty: 1 });
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({
+      id: product.id,
+      nombre: product.nombre,
+      precio: product.precio,
+      imagen: product.imagen,  // AÑADIDO
+      qty: 1
+    });
+  }
 
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCart();
@@ -104,7 +114,6 @@ window.addToCart = (id) => {
 
 goToPay.onclick = () => {
   if (cart.length === 0) return;
-  localStorage.setItem('pendingPayment', JSON.stringify(cart));
   window.location.href = 'pago.html';
 };
 
@@ -116,7 +125,6 @@ function renderCarousel(container, filterFn) {
     container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
     return;
   }
-  // Duplicar para efecto infinito
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -126,7 +134,7 @@ function renderCarousel(container, filterFn) {
   });
 }
 
-// === RENDER GRILLA (solo productos normales) ===
+// === RENDER GRILLA ===
 function renderGrid() {
   productsGrid.innerHTML = '';
   const normales = window.allProducts.filter(p => p.type === 'normal');
@@ -163,8 +171,6 @@ onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
     const data = doc.data();
-    const type = data.type || 'normal';
-
     allProducts.push({
       id: doc.id,
       nombre: data.nombre || '',
@@ -172,7 +178,7 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
-      type: type,
+      type: data.type || 'normal',
       nuevo: data.nuevo === true,
       estrella: data.estrella === true
     });
@@ -180,9 +186,9 @@ onSnapshot(productosRef, (snapshot) => {
 
   window.allProducts = allProducts;
 
-  // CORREGIDO: "Anuncios" = type: "anuncio"
+  // CORREGIDO: Anuncios = type: "anuncio"
   renderCarousel(newCarousel, p => p.type === 'carrusel' && p.nuevo);
-  renderCarousel(starCarousel, p => p.type === 'anuncio'); // ← CAMBIO CLAVE
+  renderCarousel(starCarousel, p => p.type === 'anuncio'); // CAMBIO CLAVE
 
   renderGrid();
 });
