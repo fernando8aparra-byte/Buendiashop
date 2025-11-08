@@ -4,14 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Boutique Buendía</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; padding: 0; padding-top: 60px; background: #f8f8f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; box-sizing: border-box; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+    * { box-sizing: border-box; }
+    body { 
+      margin: 0; padding: 0; padding-top: 60px; 
+      background: #f8f8f8; font-family: 'Poppins', sans-serif; 
+    }
+    .header { 
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; 
+      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+    }
+    .header-inner { 
+      display: flex; align-items: center; justify-content: space-between; 
+      height: 60px; padding: 0 15px; 
+    }
+    .logo { font-size: 1.5rem; font-weight: 800; color: #000; text-transform: uppercase; }
     .icon-btn { background: none; border: none; cursor: pointer; }
-    .icon-btn svg { stroke: #000; fill: none; }
+    .icon-btn svg { stroke: #000; fill: none; width: 28px; height: 28px; }
 
     .login-container {
       max-width: 400px;
@@ -22,16 +32,17 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       text-align: center;
     }
-    .login-container h1 { margin-bottom: 30px; font-size: 2rem; color: #000; }
+    .login-container h1 { margin-bottom: 30px; font-size: 1.8rem; color: #000; font-weight: 800; }
     .login-input {
       width: 100%;
       padding: 15px;
       margin: 15px 0;
-      border: 1px solid #ddd;
+      border: 1.5px solid #ddd;
       border-radius: 8px;
       font-size: 1rem;
-      box-sizing: border-box;
+      transition: border 0.3s;
     }
+    .login-input:focus { border-color: #000; outline: none; }
     .login-btn {
       width: 100%;
       padding: 15px;
@@ -47,9 +58,16 @@
     }
     .login-btn:hover { background: #333; }
     .back-link { display: block; margin-top: 30px; color: #000; text-decoration: none; font-weight: bold; }
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 15px 30px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .toggle-text { margin-top: 20px; font-size: 0.95rem; }
+    .toggle-text a { color: #000; font-weight: 600; text-decoration: underline; }
+    .toast { 
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+      background: #000; color: #fff; padding: 15px 30px; border-radius: 8px; 
+      opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: 600; 
+    }
     .toast.show { opacity: 1; }
-    .error { color: #ff4444; }
+    .toast.error { background: #d00; }
     .hidden { display: none; }
   </style>
 </head>
@@ -60,11 +78,11 @@
     <div class="header-inner">
       <div style="display:flex; align-items:center; gap:20px;">
         <button onclick="window.location.href='index.html'" class="icon-btn">
-          <svg viewBox="0 0 24 24" width="28" height="28">
+          <svg viewBox="0 0 24 24">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
           </svg>
         </button>
-        <div class="logo">BOUTIQUE BUENDÍA</div>
+        <div class="logo">EFRAÍN SHOP</div>
       </div>
     </div>
   </header>
@@ -73,41 +91,41 @@
   <div class="login-container">
     <h1 id="formTitle">Iniciar Sesión</h1>
 
-    <!-- Campo nombre (solo en registro, aparece primero) -->
-    <input type="text" id="name" class="login-input hidden" placeholder="Nombre" required>
+    <!-- Nombre (solo en registro) -->
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" required>
 
-    <!-- Campo identificador: nombre o correo -->
+    <!-- Identificador -->
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" required>
 
     <!-- Contraseña -->
     <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
 
     <button class="login-btn" id="mainBtn">Entrar</button>
-    <p style="margin-top:20px;">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
+
+    <p class="toggle-text">
+      ¿No tienes cuenta? <a href="#" id="toggleLink">Regístrate aquí</a>
+    </p>
     <a href="index.html" class="back-link">← Volver a la tienda</a>
   </div>
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- FIREBASE SDK v9+ MODULAR -->
+  <!-- FIREBASE + LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    // TUS CREDENCIALES
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
       projectId: "boutique-buendia",
       storageBucket: "boutique-buendia.firebasestorage.app",
       messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-      measurementId: "G-9KJ2330RN7"
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
 
-    // INICIALIZAR
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -123,19 +141,19 @@
 
     let isLogin = true;
 
-    // USUARIO ADMIN ESPECIAL
-    const ADMIN_NAME = "Buendia*]?~?£u837jwhwi";
-    const ADMIN_PASS = "&2)3)8:&?3828&/82$:!";
+    // === ADMIN ESPECIAL (CAMBIA ESTO SI QUIERES) ===
+    const ADMIN_IDENTIFIER = "admin@efrainshop.com";
+    const ADMIN_PASSWORD = "Efrain2025$";
 
-    // TOAST
+    // === TOAST ===
     function showToast(msg, isError = false) {
       toast.textContent = msg;
-      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.classList.toggle('error', isError);
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // TOGGLE LOGIN / REGISTRO
+    // === TOGGLE LOGIN / REGISTRO ===
     toggleLink.onclick = (e) => {
       e.preventDefault();
       isLogin = !isLogin;
@@ -157,7 +175,7 @@
       }
     };
 
-    // ACCIÓN PRINCIPAL
+    // === ACCIÓN PRINCIPAL ===
     mainBtn.onclick = async () => {
       const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
@@ -172,11 +190,11 @@
         if (isLogin) {
           // === INICIAR SESIÓN ===
 
-          // Verificar si es el ADMIN ESPECIAL
-          if (identifier === ADMIN_NAME && password === ADMIN_PASS) {
+          // === ADMIN ESPECIAL ===
+          if (identifier === ADMIN_IDENTIFIER && password === ADMIN_PASSWORD) {
             localStorage.setItem('loggedIn', 'true');
-            localStorage.setItem('userName', 'Admin');
-            localStorage.setItem('isAdmin', 'true');
+            localStorage.setItem('userName', 'Administrador');
+            localStorage.setItem('admin', 'true'); // ← ¡AQUÍ SE GUARDA!
             showToast('Acceso de administrador');
             setTimeout(() => window.location.href = 'admin.html', 1500);
             return;
@@ -184,18 +202,18 @@
 
           let email = identifier;
 
-          // Si no parece correo, buscar por nombre
+          // Si no es correo, buscar por nombre
           if (!identifier.includes('@')) {
             const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.empty) {
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) {
               showToast('Nombre o correo no encontrado', true);
               return;
             }
-            email = querySnapshot.docs[0].data().correo;
+            email = snapshot.docs[0].data().correo;
           }
 
-          // Iniciar sesión con correo
+          // Iniciar sesión con Firebase Auth
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
 
@@ -221,7 +239,6 @@
           const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
           const user = userCredential.user;
 
-          // Guardar en Firestore
           await setDoc(doc(db, "usuarios", user.uid), {
             nombre: nombre,
             correo: identifier
@@ -229,24 +246,24 @@
 
           localStorage.setItem('loggedIn', 'true');
           localStorage.setItem('userName', nombre);
-          showToast('¡Cuenta creada con éxito!');
+          showToast('¡Cuenta creada!');
           setTimeout(() => window.location.href = 'index.html', 1500);
         }
       } catch (error) {
-        let msg = 'Error desconocido';
+        let msg = 'Error';
         switch (error.code) {
           case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
           case 'auth/invalid-email': msg = 'Correo inválido'; break;
-          case 'auth/weak-password': msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
+          case 'auth/weak-password': msg = 'Contraseña muy débil'; break;
           case 'auth/user-not-found':
-          case 'auth/wrong-password': msg = 'Correo, nombre o contraseña incorrectos'; break;
+          case 'auth/wrong-password': msg = 'Credenciales incorrectas'; break;
           default: msg = error.message;
         }
         showToast('Error: ' + msg, true);
       }
     };
 
-    // ENTER = CLICK
+    // === ENTER = ENVIAR ===
     document.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') mainBtn.click();
     });
