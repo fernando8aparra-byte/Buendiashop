@@ -1,8 +1,8 @@
-// index.js - CARRITO GUARDADO EN LOCALSTORAGE + IMAGEN + type.anuncio
+// index.js - CARRITO CON ID + IMAGEN + type.anuncio + type.carrusel + type.normal
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
+import {
+  getFirestore,
+  collection,
   onSnapshot,
   query,
   where,
@@ -54,12 +54,13 @@ let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
-
+  
   cartBadge.textContent = totalQty;
   cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
+  
   cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
-
   cartItems.innerHTML = '';
+
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
     goToPay.style.display = 'none';
@@ -82,10 +83,13 @@ function updateCart() {
   });
 }
 
-// GUARDA IMAGEN + CANTIDAD EN LOCALSTORAGE
+// === AGREGAR AL CARRITO (CON ID + IMAGEN + PRECIO) ===
 window.addToCart = (id) => {
   const product = window.allProducts.find(p => p.id === id);
-  if (!product) return;
+  if (!product) {
+    showToast("Producto no encontrado");
+    return;
+  }
 
   const existing = cart.find(i => i.id === id);
   if (existing) {
@@ -121,10 +125,13 @@ goToPay.onclick = () => {
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
   const filtered = window.allProducts.filter(filterFn);
+  
   if (filtered.length === 0) {
     container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
     return;
   }
+
+  // Duplicar para efecto infinito
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -167,6 +174,7 @@ function renderGrid() {
 // === FIRESTORE EN TIEMPO REAL ===
 let allProducts = [];
 const productosRef = collection(db, "productos");
+
 onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
@@ -178,7 +186,7 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
-      type: data.type || { normal: true },
+      type: data.type || { normal: true }, // ← type.anuncio, type.carrusel, type.normal
       talla: data.talla || [],
       tipo: data.tipo || ''
     });
@@ -186,17 +194,18 @@ onSnapshot(productosRef, (snapshot) => {
 
   window.allProducts = allProducts;
 
-  // FILTROS CORRECTOS
-  renderCarousel(newCarousel, p => p.type && p.type.carrusel);
-  renderCarousel(starCarousel, p => p.type && p.type.anuncio);
+  // === CARRUSELES ===
+  renderCarousel(newCarousel, p => p.type?.carrusel === true);  // Nuevos Lanzamientos
+  renderCarousel(starCarousel, p => p.type?.anuncio === true);   // Productos Estrella
   renderGrid();
 });
 
-// === BÚSQUEDA ===
+// === BÚSQUEDA EN TIEMPO REAL ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const term = searchInput.value.trim().toLowerCase();
+  
   if (term.length < 2) {
     searchResultsContainer.style.display = 'none';
     return;
@@ -210,13 +219,18 @@ searchInput.addEventListener('input', () => {
     );
     const snapshot = await getDocs(q);
     searchResults.innerHTML = '';
+
     if (snapshot.empty) {
       searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
     } else {
       snapshot.forEach(doc => {
         const p = doc.data();
         const div = document.createElement('div');
-        div.innerHTML = `<strong>${p.nombre}</strong><br><small>${p.descripcion}</small><br><strong>$${p.precio}</strong>`;
+        div.innerHTML = `
+          <strong>${p.nombre}</strong><br>
+          <small>${p.descripcion || 'Sin descripción'}</small><br>
+          <strong>$${p.precio.toLocaleString()}</strong>
+        `;
         div.style.padding = '10px 0';
         div.style.borderBottom = '1px solid #eee';
         div.style.cursor = 'pointer';
@@ -228,6 +242,7 @@ searchInput.addEventListener('input', () => {
   }, 300);
 });
 
+// Cerrar búsqueda al hacer clic fuera
 document.addEventListener('click', (e) => {
   if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
     searchResultsContainer.style.display = 'none';
@@ -268,8 +283,10 @@ const closeSearch = () => {
   headerOverlay.classList.remove('show');
   searchResultsContainer.style.display = 'none';
 };
+
 closeSearchHeader.onclick = headerOverlay.onclick = closeSearch;
 
+// === AUTENTICACIÓN ===
 let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
 let userName = localStorage.getItem('userName') || '';
 
@@ -303,12 +320,13 @@ helpBtn.onclick = () => {
   alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
 };
 
+// === TOAST ===
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === INICIO ===
+// === INICIAR ===
 updateCart();
 updateAuthUI();
