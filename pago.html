@@ -47,129 +47,122 @@
     }
     .toast.show { opacity: 1; }
 
-    /* NUEVO: Mensaje carrito vacío con enlace */
+    /* MENSAJE CARRITO VACÍO (solo visible si estás logueado) */
     .empty-cart-message {
-      text-align: center;
-      padding: 40px 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      font-size: 1.1rem;
-      color: #333;
+      text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 1.1rem; color: #333;
     }
-    .empty-cart-message a {
-      color: #000;
-      font-weight: 600;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    .empty-cart-message a:hover {
-      color: #555;
-    }
+    .empty-cart-message a { color: #000; font-weight: 600; text-decoration: underline; cursor: pointer; }
+    .empty-cart-message a:hover { color: #555; }
   </style>
 </head>
 <body>
   <div class="header">EFRAÍN SHOP - PAGO SEGURO</div>
   <div class="container">
-    <!-- LOGIN OBLIGATORIO -->
-    <div id="loginRequired" class="login-required" style="display:none;">
+
+    <!-- MENSAJE DE INICIAR SESIÓN (PRIMERO Y ÚNICO SI NO ESTÁ LOGUEADO) -->
+    <div id="loginRequired" class="login-required">
       <h2>Debes iniciar sesión</h2>
       <p>Para continuar con tu compra, necesitas estar registrado.</p>
       <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
 
-    <!-- SECCIÓN DE PAGO -->
-    <div id="paymentSection" style="display:none;">
-      <!-- DIRECCIÓN -->
-      <div class="form-section">
-        <h3>Dirección de Envío</h3>
-        <button class="btn-edit" id="editAddressBtn">Editar</button>
-        <div id="addressDisplay">
-          <p><strong>Nombre:</strong> <span id="dispName">-</span></p>
-          <p><strong>Teléfono:</strong> <span id="dispPhone">-</span></p>
-          <p><strong>Dirección:</strong> <span id="dispAddress">-</span></p>
-          <p><strong>Estado:</strong> <span id="dispState">-</span></p>
+    <!-- TODO EL CONTENIDO DE PAGO (SOLO SE MUESTRA SI ESTÁ LOGUEADO) -->
+    <div id="paymentContent" style="display:none;">
+
+      <!-- MENSAJE CARRITO VACÍO (solo si estás logueado) -->
+      <div id="emptyCartMessage" class="empty-cart-message" style="display:none;">
+        No tienes productos. <a href="index.html">Ir a comprar</a>
+      </div>
+
+      <!-- SECCIÓN DE PAGO COMPLETA -->
+      <div id="paymentSection">
+        <!-- DIRECCIÓN -->
+        <div class="form-section">
+          <h3>Dirección de Envío</h3>
+          <button class="btn-edit" id="editAddressBtn">Editar</button>
+          <div id="addressDisplay">
+            <p><strong>Nombre:</strong> <span id="dispName">-</span></p>
+            <p><strong>Teléfono:</strong> <span id="dispPhone">-</span></p>
+            <p><strong>Dirección:</strong> <span id="dispAddress">-</span></p>
+            <p><strong>Estado:</strong> <span id="dispState">-</span></p>
+          </div>
+          <form id="addressForm" style="display:none;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Estado</label>
+                <select id="state" required>
+                  <option value="">Seleccionar estado</option>
+                  <option>Aguascalientes</option><option>Baja California</option><option>Baja California Sur</option>
+                  <option>Campeche</option><option>Chiapas</option><option>Chihuahua</option><option>CDMX</option>
+                  <option>Coahuila</option><option>Colima</option><option>Durango</option><option>Guanajuato</option>
+                  <option>Guerrero</option><option>Hidalgo</option><option>Jalisco</option><option>México</option>
+                  <option>Michoacán</option><option>Morelos</option><option>Nayarit</option><option>Nuevo León</option>
+                  <option>Oaxaca</option><option>Puebla</option><option>Querétaro</option><option>Quintana Roo</option>
+                  <option>San Luis Potosí</option><option>Sinaloa</option><option>Sonora</option><option>Tabasco</option>
+                  <option>Tamaulipas</option><option>Tlaxcala</option><option>Veracruz</option><option>Yucatán</option>
+                  <option>Zacatecas</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Calle y Número</label>
+                <input type="text" id="street" placeholder="Ej. Av. Principal 123" required>
+              </div>
+              <div class="form-group">
+                <label>Colonia</label>
+                <input type="text" id="colonia" placeholder="Ej. Centro" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Código Postal</label>
+                <input type="text" id="cp" placeholder="5 dígitos" maxlength="5" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre Completo (quien recibe)</label>
+                <input type="text" id="receiverName" placeholder="Ej. Juan Pérez" required>
+              </div>
+              <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="phone" placeholder="10 dígitos" maxlength="10" required>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Guardar y Continuar</button>
+          </form>
         </div>
-        <form id="addressForm" style="display:none;">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Estado</label>
-              <select id="state" required>
-                <option value="">Seleccionar estado</option>
-                <option>Aguascalientes</option><option>Baja California</option><option>Baja California Sur</option>
-                <option>Campeche</option><option>Chiapas</option><option>Chihuahua</option><option>CDMX</option>
-                <option>Coahuila</option><option>Colima</option><option>Durango</option><option>Guanajuato</option>
-                <option>Guerrero</option><option>Hidalgo</option><option>Jalisco</option><option>México</option>
-                <option>Michoacán</option><option>Morelos</option><option>Nayarit</option><option>Nuevo León</option>
-                <option>Oaxaca</option><option>Puebla</option><option>Querétaro</option><option>Quintana Roo</option>
-                <option>San Luis Potosí</option><option>Sinaloa</option><option>Sonora</option><option>Tabasco</option>
-                <option>Tamaulipas</option><option>Tlaxcala</option><option>Veracruz</option><option>Yucatán</option>
-                <option>Zacatecas</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Calle y Número</label>
-              <input type="text" id="street" placeholder="Ej. Av. Principal 123" required>
-            </div>
-            <div class="form-group">
-              <label>Colonia</label>
-              <input type="text" id="colonia" placeholder="Ej. Centro" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Código Postal</label>
-              <input type="text" id="cp" placeholder="5 dígitos" maxlength="5" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Nombre Completo (quien recibe)</label>
-              <input type="text" id="receiverName" placeholder="Ej. Juan Pérez" required>
-            </div>
-            <div class="form-group">
-              <label>Teléfono</label>
-              <input type="text" id="phone" placeholder="10 dígitos" maxlength="10" required>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Guardar y Continuar</button>
-        </form>
-      </div>
 
-      <!-- RESUMEN DEL PEDIDO -->
-      <div class="form-section order-summary">
-        <h3>Resumen del Pedido</h3>
-        <div id="orderItems">Cargando productos...</div>
-        <div class="order-total" id="orderTotal">Total: $0</div>
-      </div>
-
-      <!-- PAGO -->
-      <div class="form-section">
-        <h3>Método de Pago</h3>
-        <div class="paypal-container">
-          <p>Paga de forma segura con PayPal</p>
-          <div id="paypal-button-container"></div>
+        <!-- RESUMEN DEL PEDIDO -->
+        <div class="form-section order-summary">
+          <h3>Resumen del Pedido</h3>
+          <div id="orderItems">Cargando productos...</div>
+          <div class="order-total" id="orderTotal">Total: $0</div>
         </div>
-        <p style="text-align:center; margin-top:20px; color:#666; font-size:0.9rem;">
-          También aceptamos: <strong>Tarjeta de Crédito / Débito</strong> (a través de PayPal)
-        </p>
+
+        <!-- PAGO -->
+        <div class="form-section">
+          <h3>Método de Pago</h3>
+          <div class="paypal-container">
+            <p>Paga de forma segura con PayPal</p>
+            <div id="paypal-button-container"></div>
+          </div>
+          <p style="text-align:center; margin-top:20px; color:#666; font-size:0.9rem;">
+            También aceptamos: <strong>Tarjeta de Crédito / Débito</strong> (a través de PayPal)
+          </p>
+        </div>
       </div>
-    </div>
 
-    <!-- MENSAJE CARRITO VACÍO -->
-    <div id="emptyCartMessage" class="empty-cart-message" style="display:none;">
-      No tienes productos. <a href="index.html">Ir a comprar</a>
-    </div>
-
-    <!-- ÉXITO -->
-    <div id="successScreen" class="success-screen">
-      <h2>Pago realizado con éxito</h2>
-      <p class="order-id">Tu orden: <strong id="successOrderId"></strong></p>
-      <div class="success-items" id="successItems"></div>
-      <div class="success-total" id="successTotal"></div>
-      <button class="btn-primary" id="goHomeBtn">Ir al Inicio</button>
+      <!-- ÉXITO -->
+      <div id="successScreen" class="success-screen">
+        <h2>Pago realizado con éxito</h2>
+        <p class="order-id">Tu orden: <strong id="successOrderId"></strong></p>
+        <div class="success-items" id="successItems"></div>
+        <div class="success-total" id="successTotal"></div>
+        <button class="btn-primary" id="goHomeBtn">Ir al Inicio</button>
+      </div>
     </div>
   </div>
 
@@ -187,7 +180,7 @@
   <!-- Firebase + Lógica -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -202,14 +195,15 @@
     const db = getFirestore(app);
 
     // === ELEMENTOS ===
-    const toast = document.getElementById('toast');
     const loginRequired = document.getElementById('loginRequired');
+    const paymentContent = document.getElementById('paymentContent');
+    const emptyCartMessage = document.getElementById('emptyCartMessage');
     const paymentSection = document.getElementById('paymentSection');
     const successScreen = document.getElementById('successScreen');
     const orderItems = document.getElementById('orderItems');
     const orderTotal = document.getElementById('orderTotal');
     const paypalContainer = document.getElementById('paypal-button-container');
-    const emptyCartMessage = document.getElementById('emptyCartMessage');
+    const toast = document.getElementById('toast');
 
     // === TOAST ===
     function showToast(msg) {
@@ -218,30 +212,32 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // === LOGIN ===
+    // === VERIFICAR SESIÓN ===
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+
     if (!isLoggedIn) {
+      // Solo mostrar login, NADA MÁS
       loginRequired.style.display = 'block';
-      paymentSection.style.display = 'none';
-      emptyCartMessage.style.display = 'none';
+      paymentContent.style.display = 'none';
       localStorage.setItem('redirectAfterLogin', 'pago.html');
       document.getElementById('goToLogin').onclick = () => window.location.href = 'login.html';
+      return; // ¡DETENER TODO!
     } else {
+      // Usuario logueado → mostrar contenido
       loginRequired.style.display = 'none';
+      paymentContent.style.display = 'block';
     }
 
     // === CARRITO ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // === SI EL CARRITO ESTÁ VACÍO ===
+    // === SI CARRITO VACÍO (pero logueado) ===
     if (cart.length === 0) {
       paymentSection.style.display = 'none';
       emptyCartMessage.style.display = 'block';
       orderTotal.textContent = 'Total: $0';
       paypalContainer.innerHTML = '';
-    } else {
-      paymentSection.style.display = 'block';
-      emptyCartMessage.style.display = 'none';
+      return;
     }
 
     // === DIRECCIÓN ===
@@ -258,7 +254,7 @@
       addressForm.style.display = 'none';
       addressDisplay.style.display = 'block';
       editAddressBtn.style.display = 'block';
-    } else if (cart.length > 0) {
+    } else {
       addressForm.style.display = 'block';
       addressDisplay.style.display = 'none';
       editAddressBtn.style.display = 'none';
@@ -287,8 +283,6 @@
     // === CARGAR PRODUCTOS DESDE FIREBASE ===
     let total = 0;
     async function loadCartItems() {
-      if (cart.length === 0) return;
-
       orderItems.innerHTML = '<p>Cargando productos...</p>';
       const itemsHTML = [];
 
@@ -330,7 +324,7 @@
 
     // === PAYPAL ===
     function renderPayPalButton(totalAmount) {
-      if (!savedAddress || totalAmount <= 0 || cart.length === 0) return;
+      if (!savedAddress || totalAmount <= 0) return;
 
       paypal.Buttons({
         style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
@@ -396,10 +390,8 @@
       }).render('#paypal-button-container');
     }
 
-    // === INICIAR ===
-    if (cart.length > 0) {
-      loadCartItems();
-    }
+    // === INICIAR CARGA (solo si hay productos) ===
+    loadCartItems();
   </script>
 </body>
 </html>
