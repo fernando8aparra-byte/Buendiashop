@@ -1,4 +1,4 @@
-// index.js - COMPLETO Y CORREGIDO PARA type: { anuncio: true }
+// index.js - CARRITO GUARDADO EN LOCALSTORAGE + IMAGEN + type.anuncio
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { 
   getFirestore, 
@@ -48,7 +48,7 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
-// === CARRITO ===
+// === CARRITO (GUARDADO EN LOCALSTORAGE) ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
 function updateCart() {
@@ -82,14 +82,7 @@ function updateCart() {
   });
 }
 
-window.removeFromCart = (i) => {
-  cart.splice(i, 1);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCart();
-  showToast('Producto eliminado');
-};
-
-// GUARDA IMAGEN EN CARRITO
+// GUARDA IMAGEN + CANTIDAD EN LOCALSTORAGE
 window.addToCart = (id) => {
   const product = window.allProducts.find(p => p.id === id);
   if (!product) return;
@@ -110,6 +103,13 @@ window.addToCart = (id) => {
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCart();
   showToast('¡Agregado al carrito!');
+};
+
+window.removeFromCart = (i) => {
+  cart.splice(i, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('Producto eliminado');
 };
 
 goToPay.onclick = () => {
@@ -186,10 +186,9 @@ onSnapshot(productosRef, (snapshot) => {
 
   window.allProducts = allProducts;
 
-  // CORREGIDO: Usa type.anuncio, type.carrusel, type.normal
+  // FILTROS CORRECTOS
   renderCarousel(newCarousel, p => p.type && p.type.carrusel);
   renderCarousel(starCarousel, p => p.type && p.type.anuncio);
-
   renderGrid();
 });
 
@@ -310,5 +309,6 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// === INICIO ===
 updateCart();
 updateAuthUI();
