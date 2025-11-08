@@ -3,136 +3,464 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Producto - Efraín Shop</title>
+  <title>Producto | Boutique-buenday</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; }
+    /* === ESTILOS IGUALES A INDEX.HTML === */
+    body { margin: 0; padding: 0; padding-top: 60px; }
     .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
-    .header-left { display: flex; align-items: center; gap: 15px; }
-    .header-right { display: flex; align-items: center; gap: 15px; }
-    .icon-btn { color: #000; background: none; cursor: pointer; position: relative; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .icon-btn { color: #000 !important; background: none; }
     .icon-btn svg { stroke: #000; fill: none; }
     .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-
-    /* BARRA DE BÚSQUEDA */
-    .search-bar {
-      flex: 1; max-width: 300px; position: relative;
-    }
-    .search-bar input {
-      width: 100%; padding: 10px 35px 10px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem;
-    }
-    .search-bar svg { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: #666; }
-
-    /* CARRITO BADGE */
-    .cart-badge {
-      position: absolute; top: -8px; right: -8px; background: #ff0000; color: #fff;
-      font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex;
-      align-items: center; justify-content: center; font-weight: bold;
-    }
-
-    /* PRODUCTO PRINCIPAL */
-    .product-main {
-      text-align: center; padding: 20px 15px;
-    }
-    .product-image {
-      width: 100%; max-width: 400px; height: auto; border-radius: 12px; margin: 0 auto 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .product-name { font-size: 1.8rem; font-weight: bold; margin: 15px 0 10px; }
-    .product-price { font-size: 1.6rem; color: #000; font-weight: bold; margin: 10px 0; }
-    .product-desc { font-size: 1rem; color: #555; line-height: 1.5; margin: 15px 0; }
-    .product-sizes {
-      display: flex; justify-content: center; gap: 10px; margin: 20px 0;
-    }
-    .size-btn {
-      padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer;
-      font-size: 0.9rem; transition: all 0.2s;
-    }
-    .size-btn.selected { background: #000; color: #fff; border-color: #000; }
-
-    /* BOTONES */
-    .btn {
-      display: block; width: 100%; padding: 14px; margin: 10px 0; border: none;
-      border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
-    }
-    .btn-add { background: #000; color: #fff; }
-    .btn-pay { background: #ff4444; color: #fff; }
-
-    /* MENÚ LATERAL */
+    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
+    .search-bar-header.active { display: flex; }
+    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
     .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
     .menu-sidebar.open { transform: translateX(0); }
     .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
     .menu-overlay.show { opacity: 1; visibility: visible; }
+    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
+    .menu-item::after { display: none; }
+    .dropdown-toggle::after, .contact-toggle::after { content: 'down arrow'; font-size: 0.8rem; transition: transform 0.3s ease; }
+    .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
+    .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
+    .submenu.open, .contact-dropdown.open { max-height: 500px; padding: 20px; }
+    .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
+    .menu-item.ofertas-btn { background: none; color: #000; text-align: left; padding: 18px 20px; margin: 0; border-radius: 0; font-weight: normal; }
+    .menu-item.login-btn { background: #000; color: #fff; text-align: center; padding: 15px 20px; margin: 20px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .menu-item.login-btn::after { display: none; }
+    .menu-item.logout-btn { background: #ff0000; color: #fff; }
+    .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
+    .social-links { display: flex; gap: 20px; justify-content: center; }
+    .social-links img { width: 40px; height: 40px; }
+    .cart-sidebar { position: fixed; top: 60px; right: 0; width: 350px; height: calc(100vh - 60px); background: #fff; z-index: 1000; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+    .cart-sidebar.open { transform: translateX(0); }
+    .cart-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+    .cart-overlay.show { opacity: 1; visibility: visible; }
+    .cart-items { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; }
+    .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
+    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
+    #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
+    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
+    .header-overlay.show { display: block; }
+    .main-container { margin-top: 20px; padding: 0 20px; }
+    .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .search-results h3 { margin-top: 0; }
+    .no-results { color: #666; font-style: italic; }
+    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
+    .footer a { color: #fff; text-decoration: underline; }
 
-    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .menu-item.login-btn { background: #000; color: #fff; text-align: center; margin: 20px 15px; border-radius: 8px; font-weight: bold; }
+    /* === ESTILOS ESPECÍFICOS DE PRODUCTO === */
+    .product-main { text-align: center; padding: 40px 20px; background: #f8f8f8; }
+    .product-main img { max-width: 100%; max-height: 450px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; }
+    .product-info { max-width: 600px; margin: 0 auto; }
+    .product-info h1 { font-size: 2rem; margin: 10px 0; }
+    .product-info .desc { color: #555; font-size: 1rem; margin: 15px 0; line-height: 1.5; }
+    .product-info .price { font-size: 1.8rem; font-weight: bold; color: #000; margin: 20px 0; }
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
-    .toast.show { display: block; animation: fadeInOut 3s; }
-    @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+    .related-section { margin-top: 60px; }
+    .related-section h2 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+    .related-card { cursor: pointer; text-align: center; }
+    .related-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; }
+    .related-card h4 { font-size: 0.9rem; margin: 10px 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .related-card .price { font-weight: bold; color: #000; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; z-index: 10000; opacity: 0; transition: opacity 0.3s ease; }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- OVERLAYS -->
+  <div class="header-overlay" id="headerOverlay"></div>
+  <div class="cart-overlay" id="cartOverlay"></div>
+
+  <!-- HEADER (IGUAL QUE INDEX) -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
         <button id="menuBtn" class="icon-btn" aria-label="Menú">
-          <svg viewBox="0 0 24 24" width="28" height="28"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
-        <div class="logo">EFRAÍN</div>
+        <div class="logo">Boutique-buenday</div>
       </div>
-
-      <div class="search-bar">
-        <input type="text" placeholder="Buscar producto..." id="searchInput">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.47 6.47 0 0 0 1.57-4.23 6.5 6.5 0 1 0-6.5 6.5c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
-      </div>
-
       <div class="header-right">
-        <a href="checkout.html" class="icon-btn" id="cartBtn">
-          <svg viewBox="0 0 24 24" width="26" height="26"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1 +.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>
-          <div class="cart-badge" id="cartBadge">0</div>
-        </a>
+        <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" width="26" height="26">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="cartBtn" class="icon-btn" aria-label="Carrito">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="cartBadge"></span>
+        </button>
+      </div>
+      <div class="search-bar-header" id="searchBarHeader">
+        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
+        <button id="closeSearchHeader" class="close-search-btn">x</button>
       </div>
     </div>
   </header>
 
-  <!-- PRODUCTO PRINCIPAL -->
-  <main class="product-main">
-    <img id="productImage" class="product-image" src="" alt="Producto">
-    <h1 id="productName" class="product-name">Cargando...</h1>
-    <p id="productPrice" class="product-price">$0</p>
-    <p id="productDesc" class="product-desc"></p>
+  <!-- RESULTADOS DE BÚSQUEDA -->
+  <div id="searchResultsContainer" class="search-results" style="display:none;">
+    <h3>Resultados de búsqueda</h3>
+    <div id="searchResults"></div>
+  </div>
 
-    <div class="product-sizes" id="sizesContainer">
-      <!-- Tallas se inyectan aquí -->
-    </div>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-container">
+    <section class="product-main" id="productMain">
+      <p>Cargando producto...</p>
+    </section>
 
-    <button class="btn btn-add" id="addToCartBtn">Agregar al carrito</button>
-    <a href="checkout.html" class="btn btn-pay">Ir a pagar</a>
+    <section class="related-section">
+      <h2>Productos Relacionados</h2>
+      <div class="related-grid" id="relatedGrid">
+        <p>Cargando...</p>
+      </div>
+    </section>
   </main>
 
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item">Inicio</div>
-    <div class="menu-item">Gorras</div>
-    <div class="menu-item">Camisetas</div>
-    <div class="menu-item">Pantalones</div>
-    <div class="menu-item">Cintos</div>
-    <div class="menu-item">Tenis</div>
-    <div class="menu-item">Perfumes</div>
-    <div class="menu-item">Sudaderas</div>
-    <div class="menu-item login-btn">Iniciar sesión</div>
+    <div class="menu-item welcome" id="welcomeMsg"></div>
+    <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
+    <div class="submenu" id="categoriesSubmenu">
+      <div class="submenu-item">Gorras</div>
+      <div class="submenu-item">Camisetas</div>
+      <div class="submenu-item">Pantalones</div>
+      <div class="submenu-item">Cintos</div>
+      <div class="submenu-item">Tenis</div>
+      <div class="submenu-item">Perfumes</div>
+      <div class="submenu-item">Sudaderas</div>
+    </div>
+    <div class="menu-item ofertas-btn">Ofertas</div>
+    <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
+    <div class="contact-dropdown" id="contactDropdown">
+      <p class="contact-text">No te quedes sin tu Mystery Box</p>
+      <div class="social-links">
+        <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
+        <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
+        <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
+      </div>
+    </div>
+    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
+    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
+  </aside>
+
+  <!-- CARRITO -->
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3>Tu Carrito</h3>
+      <button class="menu-close-x" id="closeCart">x</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="empty-cart">Tu carrito está vacío</p>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total" id="cartTotal">Total: $0</div>
+      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
+      <div id="message"></div>
+    </div>
   </aside>
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- SCRIPTS -->
-  <script type="module" src="js/product.js"></script>
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+    <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
+    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
+  </footer>
+
+  <!-- SCRIPT FIREBASE (EL QUE PASASTE) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      query,
+      where,
+      limit
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // === DOM ===
+    const productMain = document.getElementById('productMain');
+    const relatedGrid = document.getElementById('relatedGrid');
+    const cartBadge = document.getElementById('cartBadge');
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const goToPay = document.getElementById('goToPay');
+    const toast = document.getElementById('toast');
+    const searchInput = document.getElementById('searchInput');
+    const searchResultsContainer = document.getElementById('searchResultsContainer');
+    const searchResults = document.getElementById('searchResults');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuSidebar = document.getElementById('menuSidebar');
+    const cartBtn = document.getElementById('cartBtn');
+    const cartSidebar = document.getElementById('cartSidebar');
+    const closeCart = document.getElementById('closeCart');
+    const cartOverlay = document.getElementById('cartOverlay');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchBarHeader = document.getElementById('searchBarHeader');
+    const closeSearchHeader = document.getElementById('closeSearchHeader');
+    const headerOverlay = document.getElementById('headerOverlay');
+    const welcomeMsg = document.getElementById('welcomeMsg');
+    const authBtn = document.getElementById('authBtn');
+    const helpBtn = document.getElementById('helpBtn');
+
+    // === CARRITO ===
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    function updateCart() {
+      const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+      const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+      cartBadge.textContent = totalQty;
+      cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
+      cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
+      cartItems.innerHTML = '';
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+        goToPay.style.display = 'none';
+        return;
+      }
+      goToPay.style.display = 'block';
+      cart.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
+          <div>
+            <div>${item.nombre}</div>
+            <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
+          </div>
+          <button onclick="removeFromCart(${i})">X</button>
+        `;
+        cartItems.appendChild(div);
+      });
+    }
+
+    window.addToCart = (id) => {
+      const product = window.currentProduct || window.allProducts?.find(p => p.id === id);
+      if (!product) return showToast("Producto no disponible");
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.qty++;
+      else cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      showToast('¡Agregado al carrito!');
+    };
+
+    window.removeFromCart = (i) => {
+      cart.splice(i, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      showToast('Producto eliminado');
+    };
+
+    goToPay.onclick = () => {
+      if (cart.length === 0) return;
+      if (window.currentProduct && !cart.some(i => i.id === window.currentProduct.id)) {
+        addToCart(window.currentProduct.id);
+      }
+      window.location.href = 'pago.html';
+    };
+
+    // === CARGAR PRODUCTO POR ID ===
+    async function loadProduct() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      if (!productId) {
+        productMain.innerHTML = '<p>Producto no encontrado.</p>';
+        return;
+      }
+      try {
+        const docRef = doc(db, "productos", productId);
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) {
+          productMain.innerHTML = '<p>Producto no encontrado.</p>';
+          return;
+        }
+        const p = { id: docSnap.id, ...docSnap.data() };
+        window.currentProduct = p;
+        productMain.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+          <div class="product-info">
+            <h1>${p.nombre}</h1>
+            <p class="desc">${p.descripcion || 'Sin descripción'}</p>
+            <div class="price">$${p.precio.toLocaleString()}</div>
+            <div class="go-to-pay" onclick="addToCart('${p.id}')">Ir a Pagar</div>
+          </div>
+        `;
+        loadRelatedProducts(p);
+      } catch (err) {
+        console.error(err);
+        productMain.innerHTML = '<p>Error al cargar el producto.</p>';
+      }
+    }
+
+    // === PRODUCTOS RELACIONADOS ===
+    async function loadRelatedProducts(mainProduct) {
+      relatedGrid.innerHTML = '<p>Cargando relacionados...</p>';
+      const keywords = mainProduct.nombre.toLowerCase().split(' ');
+      const tipo = mainProduct.tipo;
+      const q = query(
+        collection(db, "productos"),
+        where("id", "!=", mainProduct.id),
+        limit(8)
+      );
+      try {
+        const snapshot = await getDocs(q);
+        let related = [];
+        snapshot.forEach(doc => {
+          const p = { id: doc.id, ...doc.data() };
+          const nameMatch = keywords.some(k => p.nombre.toLowerCase().includes(k));
+          const typeMatch = tipo && p.tipo === tipo;
+          if (nameMatch || typeMatch) related.push(p);
+        });
+        if (related.length < 4) {
+          const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          const extras = all.filter(p => p.id !== mainProduct.id && !related.some(r => r.id === p.id));
+          related = [...related, ...extras.slice(0, 4 - related.length)];
+        }
+        if (related.length === 0) {
+          relatedGrid.innerHTML = '<p>No hay productos relacionados.</p>';
+          return;
+        }
+        relatedGrid.innerHTML = '';
+        related.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'related-card';
+          card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+          card.innerHTML = `
+            <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+            <h4>${p.nombre}</h4>
+            <div class="price">$${p.precio.toLocaleString()}</div>
+          `;
+          relatedGrid.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        relatedGrid.innerHTML = '<p>Error al cargar relacionados.</p>';
+      }
+    }
+
+    // === BÚSQUEDA ===
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      const term = searchInput.value.trim().toLowerCase();
+      if (term.length < 2) {
+        searchResultsContainer.style.display = 'none';
+        return;
+      }
+      searchTimeout = setTimeout(async () => {
+        const q = query(
+          collection(db, "productos"),
+          where("nombre", ">=", term),
+          where("nombre", "<=", term + '\uf8ff')
+        );
+        const snapshot = await getDocs(q);
+        searchResults.innerHTML = '';
+        if (snapshot.empty) {
+          searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+        } else {
+          snapshot.forEach(doc => {
+            const p = doc.data();
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${p.nombre}</strong><br><small>$${p.precio.toLocaleString()}</small>`;
+            div.style.padding = '10px 0';
+            div.style.borderBottom = '1px solid #eee';
+            div.style.cursor = 'pointer';
+            div.onclick = () => window.location.href = `product.html?id=${doc.id}`;
+            searchResults.appendChild(div);
+          });
+        }
+        searchResultsContainer.style.display = 'block';
+      }, 300);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+        searchResultsContainer.style.display = 'none';
+      }
+    });
+
+    // === MENÚ, CARRITO, AUTH ===
+    menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); updateAuthUI(); };
+    menuOverlay.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
+    cartBtn.onclick = () => { cartSidebar.classList.add('open'); cartOverlay.classList.add('show'); updateCart(); };
+    closeCart.onclick = cartOverlay.onclick = () => { cartSidebar.classList.remove('open'); cartOverlay.classList.remove('show'); };
+    searchBtn.onclick = () => { searchBarHeader.classList.add('active'); headerOverlay.classList.add('show'); searchInput.focus(); };
+    const closeSearch = () => { searchBarHeader.classList.remove('active'); headerOverlay.classList.remove('show'); searchResultsContainer.style.display = 'none'; };
+    closeSearchHeader.onclick = headerOverlay.onclick = closeSearch;
+
+    // === AUTENTICACIÓN ===
+    let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+    let userName = localStorage.getItem('userName') || '';
+    function updateAuthUI() {
+      if (isLoggedIn && userName) {
+        welcomeMsg.textContent = `¡Hola, ${userName}!`;
+        authBtn.textContent = 'Cerrar sesión';
+        authBtn.classList.add('logout-btn');
+      } else {
+        welcomeMsg.textContent = '';
+        authBtn.textContent = 'Inicia sesión o regístrate';
+        authBtn.classList.remove('logout-btn');
+      }
+    }
+    authBtn.onclick = () => {
+      if (isLoggedIn) {
+        localStorage.removeItem('loggedIn'); localStorage.removeItem('userName'); isLoggedIn = false; userName = '';
+        showToast('Sesión cerrada'); updateAuthUI();
+      } else {
+        window.location.href = 'login.html';
+      }
+    };
+    helpBtn.onclick = () => alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
+
+    // === TOAST ===
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // === INICIAR ===
+    updateCart();
+    updateAuthUI();
+    loadProduct();
+  </script>
 </body>
 </html>
