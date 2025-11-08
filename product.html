@@ -52,34 +52,43 @@
     .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .search-results h3 { margin-top: 0; }
     .no-results { color: #666; font-style: italic; }
-    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
 
-    /* === ESTILOS DE PRODUCTO === */
-    .product-main { text-align: center; padding: 40px 20px; background: #f8f8f8; position: relative; }
+    /* === PRODUCTO PRINCIPAL === */
+    .product-main { text-align: center; padding: 40px 20px; background: #f8f8f8; }
     .product-image-container { position: relative; display: inline-block; max-width: 100%; }
     .product-image-container img { max-width: 100%; max-height: 450px; object-fit: contain; border-radius: 12px; }
     .zoom-btn {
       position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
     }
-    .product-info { max-width: 600px; margin: 25px auto 0; }
+    .product-info { max-width: 600px; margin: 30px auto 0; }
     .product-info h1 { font-size: 2rem; margin: 10px 0; }
     .product-info .desc { color: #555; font-size: 1rem; margin: 15px 0; line-height: 1.6; }
     .product-info .price { font-size: 1.8rem; font-weight: bold; color: #000; margin: 20px 0; }
-    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .add-to-cart-btn {
-      background: #000; color: #fff; padding: 14px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem;
-    }
-    .add-to-cart-btn svg { width: 20px; height: 20px; }
 
-    .related-section { margin-top: 60px; }
-    .related-section h2 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
-    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-    .related-card { cursor: pointer; text-align: center; }
-    .related-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; }
-    .related-card h4 { font-size: 0.9rem; margin: 10px 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .related-card .price { font-weight: bold; color: #000; }
+    /* === BOTONES EN FILA (HORIZONTAL) === */
+    .action-buttons {
+      display: flex; gap: 12px; justify-content: center; margin-top: 25px; flex-wrap: wrap;
+    }
+    .btn-outline {
+      flex: 1; min-width: 160px; padding: 14px 20px; background: #fff; color: #000; border: 2px solid #000; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; transition: all 0.2s ease;
+    }
+    .btn-outline:hover { background: #000; color: #fff; }
+    .btn-outline svg { width: 20px; height: 20px; }
+
+    /* === PRODUCTOS RELACIONADOS EN LISTA VERTICAL === */
+    .related-section { margin-top: 60px; padding: 0 20px; }
+    .related-section h2 { text-align: center; margin-bottom: 25px; font-size: 1.8rem; }
+    .related-list { display: flex; flex-direction: column; gap: 16px; }
+    .related-item {
+      display: flex; gap: 16px; background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s ease;
+    }
+    .related-item:hover { transform: translateY(-2px); }
+    .related-item img { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+    .related-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .related-info h4 { margin: 0; font-size: 1rem; font-weight: 600; }
+    .related-info .price { font-weight: bold; color: #000; margin-top: 4px; }
 
     /* Lightbox */
     .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
@@ -145,7 +154,7 @@
 
     <section class="related-section">
       <h2>Productos Relacionados</h2>
-      <div class="related-grid" id="relatedGrid">
+      <div class="related-list" id="relatedList">
         <p>Cargando...</p>
       </div>
     </section>
@@ -218,10 +227,7 @@
       collection,
       doc,
       getDoc,
-      getDocs,
-      query,
-      where,
-      limit
+      getDocs
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -238,7 +244,7 @@
 
     // === DOM ===
     const productMain = document.getElementById('productMain');
-    const relatedGrid = document.getElementById('relatedGrid');
+    const relatedList = document.getElementById('relatedList');
     const cartBadge = document.getElementById('cartBadge');
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
@@ -303,7 +309,7 @@
         existing.qty++;
         showToast('¡Cantidad aumentada!');
       } else {
-        cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
+        cartooky.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
         showToast('¡Agregado al carrito!');
       }
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -345,21 +351,26 @@
 
         productMain.innerHTML = `
           <div class="product-image-container">
-            <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" id="mainImage">
+            <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
             <button class="zoom-btn" onclick="openLightbox('${p.imagen}')">Zoom</button>
           </div>
           <div class="product-info">
             <h1>${p.nombre}</h1>
             <p class="desc">${p.descripcion || 'Sin descripción'}</p>
             <div class="price">$${p.precio.toLocaleString()}</div>
-            <div class="btn-group">
-              <button class="add-to-cart-btn" onclick="addToCart('${p.id}')">
+            <div class="action-buttons">
+              <button class="btn-outline" onclick="addToCart('${p.id}')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
                 Añadir al carrito
               </button>
-              <div class="go-to-pay" onclick="goToPay.click()">Ir a Pagar</div>
+              <button class="btn-outline" onclick="goToPay.click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 3h18l-2 12H5L3 3zM16 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM8 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                </svg>
+                Ir a Pagar
+              </button>
             </div>
           </div>
         `;
@@ -371,9 +382,9 @@
       }
     }
 
-    // === PRODUCTOS RELACIONADOS (por nombre y descripción) ===
+    // === PRODUCTOS RELACIONADOS (lista vertical) ===
     async function loadRelatedProducts(mainProduct) {
-      relatedGrid.innerHTML = '<p>Cargando relacionados...</p>';
+      relatedList.innerHTML = '<p>Cargando relacionados...</p>';
       const nameWords = (mainProduct.nombre || '').toLowerCase().split(' ').filter(w => w.length > 2);
       const descWords = (mainProduct.descripcion || '').toLowerCase().split(' ').filter(w => w.length > 2);
       const allWords = [...new Set([...nameWords, ...descWords])];
@@ -389,38 +400,37 @@
           const pName = (p.nombre || '').toLowerCase();
           const pDesc = (p.descripcion || '').toLowerCase();
 
-          const matches = allWords.some(word => 
-            pName.includes(word) || pDesc.includes(word)
-          );
-
+          const matches = allWords.some(word => pName.includes(word) || pDesc.includes(word));
           if (matches) related.push(p);
         });
 
-        related = related.slice(0, 8);
+        related = related.slice(0, 6);
         if (related.length === 0) {
-          relatedGrid.innerHTML = '<p>No hay productos relacionados.</p>';
+          relatedList.innerHTML = '<p>No hay productos relacionados.</p>';
           return;
         }
 
-        relatedGrid.innerHTML = '';
+        relatedList.innerHTML = '';
         related.forEach(p => {
-          const card = document.createElement('div');
-          card.className = 'related-card';
-          card.onclick = () => window.location.href = `product.html?id=${p.id}`;
-          card.innerHTML = `
+          const item = document.createElement('div');
+          item.className = 'related-item';
+          item.onclick = () => window.location.href = `product.html?id=${p.id}`;
+          item.innerHTML = `
             <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-            <h4>${p.nombre}</h4>
-            <div class="price">$${p.precio.toLocaleString()}</div>
+            <div class="related-info">
+              <h4>${p.nombre}</h4>
+              <div class="price">$${p.precio.toLocaleString()}</div>
+            </div>
           `;
-          relatedGrid.appendChild(card);
+          relatedList.appendChild(item);
         });
       } catch (err) {
         console.error(err);
-        relatedGrid.innerHTML = '<p>Error al cargar relacionados.</p>';
+        relatedList.innerHTML = '<p>Error al cargar relacionados.</p>';
       }
     }
 
-    // === LIGHTBOX ZOOM ===
+    // === LIGHTBOX ===
     window.openLightbox = (src) => {
       lightboxImage.src = src;
       lightbox.classList.add('active');
@@ -428,7 +438,7 @@
     lightboxClose.onclick = () => lightbox.classList.remove('active');
     lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); };
 
-    // === BÚSQUEDA ===
+    // === BÚSQUEDA, MENÚ, AUTH, TOAST ===
     let searchTimeout;
     searchInput.addEventListener('input', () => {
       clearTimeout(searchTimeout);
@@ -438,11 +448,7 @@
         return;
       }
       searchTimeout = setTimeout(async () => {
-        const q = query(
-          collection(db, "productos"),
-          where("nombre", ">=", term),
-          where("nombre", "<=", term + '\uf8ff')
-        );
+        const q = query(collection(db, "productos"), where("nombre", ">=", term), where("nombre", "<=", term + '\uf8ff'));
         const snapshot = await getDocs(q);
         searchResults.innerHTML = '';
         if (snapshot.empty) {
@@ -469,7 +475,6 @@
       }
     });
 
-    // === MENÚ, CARRITO, AUTH ===
     menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); updateAuthUI(); };
     menuOverlay.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
     cartBtn.onclick = () => { cartSidebar.classList.add('open'); cartOverlay.classList.add('show'); updateCart(); };
