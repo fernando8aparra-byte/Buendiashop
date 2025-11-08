@@ -281,7 +281,22 @@ function showToast(msg) {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
+// === BOTÓN "INICIO" O "ADMIN" EN MENÚ ===
+const homeBtn = document.getElementById('homeBtn');
+function updateHomeButton() {
+  const isProductPage = window.location.pathname.includes('product.html');
+  const isAdminPage = window.location.pathname.includes('admin.html');
 
+  if (isProductPage) {
+    homeBtn.textContent = 'Inicio';
+    homeBtn.onclick = () => window.location.href = 'index.html';
+  } else if (isAdminPage) {
+    homeBtn.textContent = 'Admin';
+    homeBtn.onclick = () => window.location.href = 'admin.html';
+  } else {
+    homeBtn.style.display = 'none';
+  }
+}
 // === INICIAR ===
 updateCart();
 updateAuthUI();
