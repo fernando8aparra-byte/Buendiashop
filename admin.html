@@ -1,247 +1,259 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .icon-btn { color: #000; background: none; cursor: pointer; }
-    .icon-btn svg { stroke: #000; fill: none; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+// admin.js - 100% COMPATIBLE CON TU admin.html ACTUAL
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  onSnapshot,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #666; }
+const firebaseConfig = {
+  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+  authDomain: "boutique-buendia.firebaseapp.com",
+  projectId: "boutique-buendia",
+  storageBucket: "boutique-buendia.firebasestorage.app",
+  messagingSenderId: "430651152709",
+  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+};
 
-    .main-container { margin-top: 20px; padding: 0 15px; }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
-    .footer a { color: #fff; text-decoration: underline; }
+// === DOM ===
+const addPostBtn = document.getElementById('addPostBtn');
+const addProductModal = document.getElementById('addProductModal');
+const editProductModal = document.getElementById('editProductModal');
+const saveNewProduct = document.getElementById('saveNewProduct');
+const cancelAdd = document.getElementById('cancelAdd');
+const saveProduct = document.getElementById('saveProduct');
+const cancelEdit = document.getElementById('cancelEdit');
+const newCarousel = document.getElementById('newCarousel');
+const starCarousel = document.getElementById('starCarousel');
+const productsGrid = document.getElementById('productsGrid');
+const toast = document.getElementById('toast');
+const adminGear = document.getElementById('adminGear');
+const adminDropdown = document.getElementById('adminDropdown');
+const logoutBtn = document.getElementById('logoutBtn');
 
-    /* ADMIN BUTTONS */
-    .admin-btn { background: #ff4444; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; margin-left: 10px; cursor: pointer; }
-    .admin-edit { background: #0066ff; }
-    .admin-delete { background: #ff0000; }
+// === TOAST ===
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
-    .product-card { position: relative; text-align: center; padding: 15px; }
-    .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
-    .product-card:hover .product-actions { opacity: 1; }
+// === ABRIR MODAL AGREGAR ===
+addPostBtn.onclick = () => {
+  addProductModal.classList.add('active');
+  document.getElementById('imagePreview').style.display = 'none';
+};
 
-    /* MODALES */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-    .modal.active { display: flex; }
-    .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-    .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
-    .modal button { background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+// === CERRAR MODALES ===
+[cancelAdd, cancelEdit].forEach(btn => {
+  btn.onclick = () => {
+    addProductModal.classList.remove('active');
+    editProductModal.classList.remove('active');
+  };
+});
 
-    /* ENGRANAJE - ESTILO UNIFORME */
-    .admin-gear { position: relative; }
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
-      border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; z-index: 1001; width: 220px;
-    }
-    .admin-dropdown.show { display: block; }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 14px 20px; color: #000; text-decoration: none;
-      border-bottom: 1px solid #eee; background: none; border: none; text-align: left;
-      cursor: pointer; font-size: 0.95rem; font-weight: 500;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-    .admin-dropdown a:last-child, .admin-dropdown button:last-child { border-bottom: none; }
+// === ENGRANAJE ADMIN ===
+adminGear.onclick = (e) => {
+  e.stopPropagation();
+  adminDropdown.classList.toggle('show');
+};
+document.addEventListener('click', () => {
+  adminDropdown.classList.remove('show');
+});
 
-    /* BOTÓN + */
-    .add-post-btn { background: #000; color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; }
+// === CERRAR SESIÓN ===
+logoutBtn.onclick = () => {
+  localStorage.removeItem('isAdmin');
+  localStorage.removeItem('loggedIn');
+  localStorage.removeItem('userName');
+  window.location.href = 'index.html';
+};
 
-    /* CARRUSEL */
-    .infinite-carousel-section { overflow: hidden; position: relative; margin-bottom: 40px; }
-    .infinite-carousel { display: flex; transition: transform 0.5s ease; }
-    .auto-scroll .infinite-carousel { animation: scrollInfinite 20s linear infinite; }
-    .static-display .infinite-carousel { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-    @keyframes scrollInfinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .auto-scroll .carousel-track { display: flex; width: max-content; }
-    .auto-scroll .carousel-track::after { content: ''; display: block; flex-shrink: 0; width: 100%; }
+// === AGREGAR PRODUCTO (ENVÍA type COMO OBJETO) ===
+saveNewProduct.onclick = async () => {
+  const nombre = document.getElementById('addName').value.trim();
+  const precio = parseFloat(document.getElementById('addPrice').value);
+  const tallasInput = document.getElementById('addSizes').value.trim();
+  const descripcion = document.getElementById('addDesc').value.trim();
+  const categoria = document.getElementById('addCategory').value;
+  const typeSelect = document.getElementById('addType').value;
+  const imagen = document.getElementById('addImage').value.trim();
 
-    /* DESCRIPCIÓN PEQUEÑA */
-    .product-desc-small { font-size: 0.8rem; color: #666; margin: 5px 0 10px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price { font-weight: bold; color: #000; margin: 5px 0; }
+  if (!nombre || isNaN(precio) || !imagen) {
+    showToast('Completa nombre, precio e imagen');
+    return;
+  }
 
-    /* SUBIDA DE IMAGEN */
-    .image-upload-section, .image-url-section { margin: 15px 0; }
-    .image-upload-section label, .image-url-section label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-    #imagePreview { text-align: center; margin: 10px 0; }
-    #imagePreview img { max-width: 100%; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  const talla = tallasInput ? tallasInput.split(',').map(t => t.trim()) : [];
 
-    /* REDES SOCIALES EN MODAL */
-    .social-links-inputs { display: flex; flex-direction: column; gap: 12px; margin: 15px 0; }
-    .social-links-inputs label { font-size: 0.9rem; font-weight: bold; }
-    .social-links-inputs input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+  try {
+    await addDoc(collection(db, 'productos'), {
+      nombre,
+      precio,
+      imagen,
+      descripcion,
+      talla,
+      tipo: categoria,
+      type: {
+        anuncio: typeSelect === 'publicidad',
+        carrusel: typeSelect === 'carrusel',
+        normal: typeSelect === 'normal'
+      }
+    });
+    showToast('Producto agregado');
+    addProductModal.classList.remove('active');
+    // Limpiar formulario
+    document.getElementById('addName').value = '';
+    document.getElementById('addPrice').value = '';
+    document.getElementById('addSizes').value = '';
+    document.getElementById('addDesc').value = '';
+    document.getElementById('addImage').value = '';
+  } catch (err) {
+    console.error(err);
+    showToast('Error al agregar');
+  }
+};
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
-    .toast.show { display: block; animation: fadeInOut 3s; }
-    @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
-  </style>
-</head>
-<body>
+// === RENDER CARRUSEL ===
+function renderCarousel(container, filterFn) {
+  container.innerHTML = '';
+  const filtered = window.allProducts.filter(filterFn);
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="color:#999;padding:15px;text-align:center;">No hay productos</p>';
+    return;
+  }
+  [...filtered, ...filtered].forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.style.minWidth = '200px';
+    item.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+    container.appendChild(item);
+  });
+}
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn" aria-label="Ajustes">
-            <svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-          </button>
-          <div class="admin-dropdown" id="adminDropdown">
-            <a href="admin-map.html">Mapa de Compras</a>
-            <a href="admin-compras.html">Compras</a>
-            <a href="admin-estadisticas.html">Estadísticas</a>
-            <button id="openSocialModal">Agregar Redes Sociales</button>
-            <button id="logoutBtn">Cerrar Sesión</button>
-          </div>
-        </div>
-        <div class="logo">EFRAÍN</div>
+// === RENDER GRILLA ===
+function renderGrid() {
+  productsGrid.innerHTML = '';
+  const normales = window.allProducts.filter(p => p.type && p.type.normal);
+
+  normales.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      <h3>${p.nombre}</h3>
+      <p class="product-desc-small">${p.descripcion || ''}</p>
+      <p class="product-price">$${p.precio.toLocaleString()}</p>
+      <div class="product-actions">
+        <button class="admin-btn admin-edit" data-id="${p.id}">Editar</button>
+        <button class="admin-btn admin-delete" data-id="${p.id}">Eliminar</button>
       </div>
-      <div class="header-right">
-        <div class="add-post-btn" id="addPostBtn">+</div>
-      </div>
-    </div>
-  </header>
+    `;
+    productsGrid.appendChild(card);
+  });
 
-  <!-- CONTENIDO -->
-  <main class="main-container">
-    <section class="hero-banner" contenteditable="true" id="heroTitle">Asegura tu Mystery Box</section>
-    <p class="tag" contenteditable="true" id="heroTag">Envío Gratis en compras +$1,500</p>
+  // EDITAR
+  document.querySelectorAll('.admin-edit').forEach(btn => {
+    btn.onclick = (e) => {
+      const id = e.target.dataset.id;
+      const product = window.allProducts.find(p => p.id === id);
+      if (!product) return;
 
-    <!-- NUEVOS LANZAMIENTOS -->
-    <section class="infinite-carousel-section" id="newCarouselSection">
-      <h2 contenteditable="true">Nuevos Lanzamientos</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="newCarousel"></div>
-      </div>
-    </section>
+      document.getElementById('editName').value = product.nombre;
+      document.getElementById('editPrice').value = product.precio;
+      document.getElementById('editSizes').value = product.talla.join(', ');
+      document.getElementById('editDesc').value = product.descripcion;
+      document.getElementById('editType').value = product.tipo;
+      document.getElementById('editImage').value = product.imagen;
 
-    <!-- PRODUCTOS ESTRELLA -->
-    <section class="infinite-carousel-section" id="starCarouselSection">
-      <h2 contenteditable="true">Productos Estrella</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="starCarousel"></div>
-      </div>
-    </section>
+      editProductModal.classList.add('active');
+      window.currentEditId = id;
+    };
+  });
 
-    <!-- TODOS LOS PRODUCTOS -->
-    <section>
-      <h2 contenteditable="true">Todos los Productos</h2>
-      <div class="products-grid" id="productsGrid"></div>
-    </section>
-  </main>
+  // ELIMINAR
+  document.querySelectorAll('.admin-delete').forEach(btn => {
+    btn.onclick = async (e) => {
+      if (!confirm('¿Eliminar este producto?')) return;
+      const id = e.target.dataset.id;
+      try {
+        await deleteDoc(doc(db, 'productos', id));
+        showToast('Producto eliminado');
+      } catch (err) {
+        showToast('Error al eliminar');
+      }
+    };
+  });
+}
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+// === GUARDAR EDICIÓN ===
+saveProduct.onclick = async () => {
+  const id = window.currentEditId;
+  if (!id) return;
 
-  <!-- MODAL EDITAR PRODUCTO -->
-  <div class="modal" id="editProductModal">
-    <div class="modal-content">
-      <h3>Editar Producto</h3>
-      <input type="text" id="editName" placeholder="Nombre">
-      <input type="text" id="editPrice" placeholder="Precio">
-      <input type="text" id="editSizes" placeholder="Tallas (S,M,L)">
-      <textarea id="editDesc" placeholder="Descripción"></textarea>
-      <select id="editType">
-        <option value="gorra">Gorra</option>
-        <option value="camiseta">Camiseta</option>
-        <option value="pantalon">Pantalón</option>
-        <option value="cinto">Cinto</option>
-        <option value="tenis">Tenis</option>
-        <option value="perfume">Perfume</option>
-        <option value="sudadera">Sudadera</option>
-      </select>
-      <input type="text" id="editImage" placeholder="URL de imagen">
-      <button id="saveProduct">Guardar</button>
-      <button id="cancelEdit" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
+  const nombre = document.getElementById('editName').value.trim();
+  const precio = parseFloat(document.getElementById('editPrice').value);
+  const tallasInput = document.getElementById('editSizes').value.trim();
+  const descripcion = document.getElementById('editDesc').value.trim();
+  const tipo = document.getElementById('editType').value;
+  const imagen = document.getElementById('editImage').value.trim();
 
-  <!-- MODAL AGREGAR PRODUCTO -->
-  <div class="modal" id="addProductModal">
-    <div class="modal-content">
-      <h3>Agregar Nuevo Producto</h3>
-      <input type="text" id="addName" placeholder="Nombre del producto">
-      <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
-      <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
-      <textarea id="addDesc" placeholder="Descripción"></textarea>
+  if (!nombre || isNaN(precio) || !imagen) {
+    showToast('Completa todos los campos');
+    return;
+  }
 
-      <select id="addCategory">
-        <option value="gorra">Gorra</option>
-        <option value="camiseta">Camiseta</option>
-        <option value="pantalon">Pantalón</option>
-        <option value="cinto">Cinto</option>
-        <option value="tenis">Tenis</option>
-        <option value="perfume">Perfume</option>
-        <option value="sudadera">Sudadera</option>
-      </select>
+  const talla = tallasInput ? tallasInput.split(',').map(t => t.trim()) : [];
 
-      <select id="addType">
-        <option value="normal">Normal (Todos los Productos)</option>
-        <option value="carrusel">Carrusel (Nuevos Lanzamientos)</option>
-        <option value="publicidad">Estrella (Productos Estrella)</option>
-      </select>
+  try {
+    await updateDoc(doc(db, 'productos', id), {
+      nombre,
+      precio,
+      imagen,
+      descripcion,
+      talla,
+      tipo
+    });
+    showToast('Producto actualizado');
+    editProductModal.classList.remove('active');
+  } catch (err) {
+    showToast('Error al actualizar');
+  }
+};
 
-      <div class="image-upload-section">
-        <label>Subir imagen desde tu dispositivo:</label>
-        <input type="file" id="addImageFile" accept="image/*">
-        <div id="imagePreview" class="image-preview" style="display:none;">
-          <img id="previewImg" src="" alt="Vista previa">
-        </div>
-      </div>
+// === ESCUCHAR PRODUCTOS EN TIEMPO REAL ===
+let allProducts = [];
+onSnapshot(collection(db, 'productos'), (snapshot) => {
+  allProducts = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    allProducts.push({
+      id: doc.id,
+      nombre: data.nombre || '',
+      precio: data.precio || 0,
+      imagen: data.imagen || '',
+      descripcion: data.descripcion || '',
+      talla: data.talla || [],
+      tipo: data.tipo || '',
+      type: data.type || { normal: true }
+    });
+  });
+  window.allProducts = allProducts;
 
-      <div class="image-url-section">
-        <label>O pegar URL de imagen:</label>
-        <input type="text" id="addImage" placeholder="https://ejemplo.com/imagen.jpg">
-      </div>
+  renderCarousel(newCarousel, p => p.type && p.type.carrusel);
+  renderCarousel(starCarousel, p => p.type && p.type.anuncio);
+  renderGrid();
+});
 
-      <p style="font-size:0.8rem; color:#d00; margin:10px 0 0;">
-        La subida de imágenes aún no está habilitada. Usa una URL por ahora.
-      </p>
-
-      <button id="saveNewProduct">Guardar Producto</button>
-      <button id="cancelAdd" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
-
-  <!-- MODAL REDES SOCIALES -->
-  <div class="modal" id="socialLinksModal">
-    <div class="modal-content">
-      <h3>Agregar Redes Sociales</h3>
-      <div class="social-links-inputs">
-        <label>TikTok</label>
-        <input type="text" id="tiktokInput" placeholder="https://tiktok.com/@usuario">
-        <label>Instagram</label>
-        <input type="text" id="instagramInput" placeholder="https://instagram.com/usuario">
-        <label>Facebook</label>
-        <input type="text" id="facebookInput" placeholder="https://facebook.com/usuario">
-        <label>X (Twitter)</label>
-        <input type="text" id="xInput" placeholder="https://x.com/usuario">
-        <label>WhatsApp</label>
-        <input type="text" id="whatsappInput" placeholder="https://wa.me/521234567890">
-      </div>
-      <button id="saveSocialLinks">Guardar</button>
-      <button id="cancelSocial" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
-
-  <!-- PIE DE PÁGINA -->
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Admin Mode.</p>
-  </footer>
-
-  <!-- SCRIPTS -->
-  <script type="module" src="js/admin.js"></script>
-</body>
-</html>
+// === INICIO ===
+if (localStorage.getItem('isAdmin') !== 'true') {
+  alert('Acceso denegado');
+  window.location.href = 'index.html';
+}
