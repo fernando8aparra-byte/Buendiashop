@@ -144,7 +144,7 @@
 
     let isLogin = true;
 
-    // ADMIN LOCAL (TUS CREDENCIALES ORIGINALES)
+    // ADMIN LOCAL (TUS CREDENCIALES)
     const ADMIN_USER = "Buendia*]?~?£u837jwhwi";
     const ADMIN_PASS = "&2)3)8:&?3828&/82$:!"
 
@@ -198,13 +198,13 @@
 
       try {
         if (isLogin) {
-          // ADMIN LOCAL → REDIRIGE A admin-compras.html
+          // ADMIN → VA A admin.html
           if (identifier === ADMIN_USER && password === ADMIN_PASS) {
             localStorage.setItem('loggedIn', 'true');
             localStorage.setItem('userName', 'Administrador');
             localStorage.setItem('admin', 'true');
             showToast('Acceso de administrador');
-            setTimeout(() => window.location.href = 'admin-compras.html', 1500);
+            setTimeout(() => window.location.href = 'admin.html', 1500); // ← AQUÍ
             return;
           }
 
