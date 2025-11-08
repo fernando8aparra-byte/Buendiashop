@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | Boutique Buendía</title>
+  <title>Login | Efraín Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
@@ -95,7 +95,7 @@
     <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" required>
 
     <!-- Identificador -->
-    <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" required>
+    <input type="text" id="identifier" class="login-input" placeholder="Nombre o identificador" required>
 
     <!-- Contraseña -->
     <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
@@ -105,7 +105,7 @@
     <p class="toggle-text">
       ¿No tienes cuenta? <a href="#" id="toggleLink">Regístrate aquí</a>
     </p>
-    <a href="index.html" class="back-link">← Volver a la tienda</a>
+    <a href="index.html" class="back-link">Volver a la tienda</a>
   </div>
 
   <!-- TOAST -->
@@ -141,9 +141,9 @@
 
     let isLogin = true;
 
-    // === ADMIN ESPECIAL (CAMBIA ESTO SI QUIERES) ===
-    const ADMIN_IDENTIFIER = "admin@efrainshop.com";
-    const ADMIN_PASSWORD = "Efrain2025$";
+    // === TUS CREDENCIALES DE ADMIN (SIN CAMBIAR) ===
+    const ADMIN_IDENTIFIER = "Buendia*]?~£u837jwhwi";
+    const ADMIN_PASSWORD = "&2)3)8:&?3828&/82$:!";
 
     // === TOAST ===
     function showToast(msg, isError = false) {
@@ -162,7 +162,7 @@
         formTitle.textContent = 'Iniciar Sesión';
         mainBtn.textContent = 'Entrar';
         toggleLink.textContent = 'Regístrate aquí';
-        identifierInput.placeholder = 'Nombre o correo electrónico';
+        identifierInput.placeholder = 'Nombre o identificador';
         nameInput.classList.add('hidden');
         nameInput.removeAttribute('required');
       } else {
@@ -190,11 +190,11 @@
         if (isLogin) {
           // === INICIAR SESIÓN ===
 
-          // === ADMIN ESPECIAL ===
+          // === ADMIN ESPECIAL (TUS CREDENCIALES ORIGINALES) ===
           if (identifier === ADMIN_IDENTIFIER && password === ADMIN_PASSWORD) {
             localStorage.setItem('loggedIn', 'true');
             localStorage.setItem('userName', 'Administrador');
-            localStorage.setItem('admin', 'true'); // ← ¡AQUÍ SE GUARDA!
+            localStorage.setItem('admin', 'true'); // ← SE GUARDA COMO ADMIN
             showToast('Acceso de administrador');
             setTimeout(() => window.location.href = 'admin.html', 1500);
             return;
@@ -207,7 +207,7 @@
             const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
             const snapshot = await getDocs(q);
             if (snapshot.empty) {
-              showToast('Nombre o correo no encontrado', true);
+              showToast('Nombre o identificador no encontrado', true);
               return;
             }
             email = snapshot.docs[0].data().correo;
