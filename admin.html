@@ -224,6 +224,64 @@
   </footer>
 
   <!-- SCRIPTS -->
-  <script type="module" src="js/admin.js"></script>
+  <script type="module">
+    // === VERIFICAR ADMIN ===
+    if (localStorage.getItem('admin') !== 'true') {
+      alert('Acceso denegado. Solo administradores.');
+      window.location.href = 'login.html';
+      throw new Error("No admin");
+    }
+
+    // === CERRAR SESIÓN ===
+    document.getElementById('logoutBtn').onclick = () => {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    };
+
+    // === CÓDIGO DE admin.js (INCLUYE AQUÍ SI NO TIENES EL ARCHIVO EXTERNO) ===
+    // (Si tienes js/admin.js, quita esto y usa <script type="module" src="js/admin.js"></script>)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const toast = document.getElementById('toast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // === CARGAR PRODUCTOS ===
+    async function loadProducts() {
+      // Implementa tu lógica para cargar productos aquí
+      console.log("Cargando productos...");
+    }
+
+    // === INICIAR ===
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+
+      // Menú engranaje
+      document.getElementById('adminGear').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('adminDropdown').classList.toggle('show');
+      });
+      document.addEventListener('click', () => {
+        document.getElementById('adminDropdown').classList.remove('show');
+      });
+    });
+  </script>
 </body>
 </html>
