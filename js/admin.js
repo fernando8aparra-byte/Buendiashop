@@ -1,4 +1,4 @@
-// js/admin.js - SUBIDA DE IMAGEN + PRECIO + PRODUCTOS INDIVIDUALES
+// js/admin.js - CON COMAS EN PRECIOS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -29,6 +29,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+// === FORMATEAR PRECIO CON COMAS ===
+function formatPrice(price) {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 // === PROTEGER ADMIN ===
 if (!localStorage.getItem('isAdmin')) {
@@ -82,18 +87,20 @@ function duplicateForInfiniteScroll(containerId) {
   track.dataset.duplicated = 'true';
 }
 
-// === CREAR TARJETA ===
+// === CREAR TARJETA CON PRECIO FORMATEADO ===
 function createProductCard(p, containerId) {
   const div = document.createElement('div');
   div.className = 'product-card';
   div.dataset.id = p.id;
 
   const isNormal = containerId === 'productsGrid';
+  const precioFormateado = formatPrice(p.precio);
+
   div.innerHTML = `
     <img src="${p.imagen}" alt="${p.nombre}">
     <h3>${p.nombre}</h3>
     ${isNormal ? `<p class="product-desc-small">${p.descripcion || ''}</p>` : ''}
-    <p class="product-price">$${p.precio.toLocaleString()}</p>
+    <p class="product-price">$${precioFormateado}</p>
     <div class="product-actions">
       <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
       <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
@@ -102,13 +109,13 @@ function createProductCard(p, containerId) {
   return div;
 }
 
-// === EDITAR PRODUCTO (AHORA SÍ GUARDA PRECIO) ===
+// === EDITAR PRODUCTO (MUESTRA COMAS EN INPUT) ===
 window.editProduct = (id) => {
   const product = allProducts.find(p => p.id === id);
   if (!product) return;
 
   document.getElementById('editName').value = product.nombre;
-  document.getElementById('editPrice').value = product.precio;
+  document.getElementById('editPrice').value = formatPrice(product.precio); // ← COMAS
   document.getElementById('editImage').value = product.imagen;
 
   document.getElementById('editProductModal').classList.add('active');
@@ -117,9 +124,10 @@ window.editProduct = (id) => {
 
 document.getElementById('saveProduct').onclick = async () => {
   const id = window.currentEditId;
+  const precioInput = document.getElementById('editPrice').value.replace(/,/g, ''); // Quitar comas
   const updated = {
     nombre: document.getElementById('editName').value.trim(),
-    precio: parseFloat(document.getElementById('editPrice').value),
+    precio: parseFloat(precioInput),
     imagen: document.getElementById('editImage').value.trim()
   };
 
@@ -140,11 +148,35 @@ window.deleteProduct = async (id) => {
   showToast("Producto eliminado");
 };
 
-// === AGREGAR PRODUCTO (IMAGEN + PRECIO + ID ÚNICO) ===
+// === AGREGAR PRODUCTO (INPUT CON COMAS) ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
   document.getElementById('imagePreview').style.display = 'none';
 };
+
+// === FORMATEAR PRECIO EN TIEMPO REAL ===
+function formatInputPrice(input) {
+  input.addEventListener('input', (e) => {
+    let value = e.target.value.replace(/[^\d]/g, '');
+    if (value) {
+      e.target.value = formatPrice(parseInt(value));
+    }
+  });
+}
+
+document.getElementById('addPrice').addEventListener('input', function(e) {
+  let value = e.target.value.replace(/[^\d]/g, '');
+  if (value) {
+    e.target.value = formatPrice(parseInt(value));
+  }
+});
+
+document.getElementById('editPrice').addEventListener('input', function(e) {
+  let value = e.target.value.replace(/[^\d]/g, '');
+  if (value) {
+    e.target.value = formatPrice(parseInt(value));
+  }
+});
 
 document.getElementById('addImageFile').addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -178,7 +210,6 @@ document.getElementById('addImage').addEventListener('input', (e) => {
   }
 });
 
-// === SUBIR IMAGEN A FIREBASE STORAGE ===
 async function uploadImage(file) {
   const storageRef = ref(storage, 'productos/' + Date.now() + '_' + file.name);
   const snapshot = await uploadBytes(storageRef, file);
@@ -190,7 +221,6 @@ document.getElementById('saveNewProduct').onclick = async () => {
   const urlInput = document.getElementById('addImage').value.trim();
   let imagen = urlInput;
 
-  // SUBIR IMAGEN SI HAY ARCHIVO
   if (fileInput.files.length > 0) {
     showToast("Subiendo imagen...");
     try {
@@ -208,10 +238,11 @@ document.getElementById('saveNewProduct').onclick = async () => {
   }
 
   const typeSelect = document.getElementById('addType').value;
+  const precioInput = document.getElementById('addPrice').value.replace(/,/g, '');
 
   const producto = {
     nombre: document.getElementById('addName').value.trim(),
-    precio: parseFloat(document.getElementById('addPrice').value),
+    precio: parseFloat(precioInput),
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
     descripcion: document.getElementById('addDesc').value.trim(),
     tipo: document.getElementById('addCategory').value,
@@ -230,10 +261,9 @@ document.getElementById('saveNewProduct').onclick = async () => {
   }
 
   try {
-    await addDoc(collection(db, "productos"), producto); // ID ÚNICO
+    await addDoc(collection(db, "productos"), producto);
     showToast("Producto agregado");
     closeModal('addProductModal');
-    // Limpiar
     ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
       document.getElementById(id).value = '';
     });
@@ -244,7 +274,7 @@ document.getElementById('saveNewProduct').onclick = async () => {
   }
 };
 
-// === REDES, MODALES, TOAST, ENGRANAJE (IGUAL) ===
+// === REDES, MODALES, TOAST, ENGRANAJE ===
 document.getElementById('logoutBtn').onclick = () => {
   if (confirm("¿Cerrar sesión?")) {
     localStorage.removeItem('isAdmin');
@@ -313,7 +343,7 @@ document.addEventListener('click', () => {
   document.getElementById('adminDropdown').classList.remove('show');
 });
 
-// === GUARDAR TODOS LOS PRODUCTOS EN MEMORIA ===
+// === GUARDAR PRODUCTOS EN MEMORIA ===
 onSnapshot(collection(db, "productos"), (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
