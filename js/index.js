@@ -163,7 +163,7 @@ onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
     const data = doc.data();
-    const type = data.type || 'normal'; // ← Usa 'type' como string
+    const type = data.type || 'normal';
 
     allProducts.push({
       id: doc.id,
@@ -172,7 +172,7 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
-      type: type, // ← "normal", "carrusel", "publicidad"
+      type: type,
       nuevo: data.nuevo === true,
       estrella: data.estrella === true
     });
@@ -180,11 +180,10 @@ onSnapshot(productosRef, (snapshot) => {
 
   window.allProducts = allProducts;
 
-  // CARRUSELES: solo productos con type === "carrusel"
+  // CORREGIDO: "Anuncios" = type: "anuncio"
   renderCarousel(newCarousel, p => p.type === 'carrusel' && p.nuevo);
-  renderCarousel(starCarousel, p => p.type === 'carrusel' && p.estrella);
+  renderCarousel(starCarousel, p => p.type === 'anuncio'); // ← CAMBIO CLAVE
 
-  // GRILLA: solo productos con type === "normal"
   renderGrid();
 });
 
