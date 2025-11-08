@@ -6,10 +6,10 @@
   <title>Compras - Efraín Shop Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { 
-      margin: 0; padding: 0; padding-top: 60px; 
       font-family: 'Poppins', sans-serif; background: #f8f8f8; 
+      padding-top: 60px;
     }
     .header { 
       position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; 
@@ -29,14 +29,12 @@
 
     .main-container { padding: 20px 15px; max-width: 800px; margin: 0 auto; }
 
-    /* BOTÓN REGRESAR */
     .back-btn {
       display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 500;
       color: #fff; text-decoration: none; cursor: pointer;
     }
     .back-btn svg { width: 20px; height: 20px; fill: #fff; }
 
-    /* ORDENAR */
     .sort-btn {
       position: absolute; top: 10px; right: 15px; background: #fff; color: #000;
       padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
@@ -44,7 +42,6 @@
     }
     .sort-btn svg { width: 16px; height: 16px; fill: #000; }
 
-    /* CONTENEDOR DE COMPRAS */
     .orders-container {
       margin-top: 50px; max-height: calc(100vh - 180px); overflow-y: auto; padding-right: 5px;
     }
@@ -52,7 +49,6 @@
     .orders-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
     .orders-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 
-    /* TARJETA DE COMPRA */
     .order-card {
       background: #fff; border: 1.5px solid #eee; border-radius: 12px;
       padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -65,7 +61,6 @@
     .order-address { font-size: 0.9rem; color: #444; margin-top: 12px; line-height: 1.6; }
     .order-date { font-size: 0.8rem; color: #888; margin-top: 10px; text-align: right; }
 
-    /* BOTÓN IMPRIMIR */
     .print-btn {
       background: #f0f0f0; border: 1px solid #ddd; cursor: pointer; padding: 8px 12px;
       margin-top: 12px; border-radius: 6px; font-size: 0.9rem; color: #000;
@@ -74,7 +69,6 @@
     .print-btn:hover { background: #e0e0e0; border-color: #aaa; }
     .print-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
 
-    /* TOAST */
     .toast { 
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
       background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; 
@@ -82,7 +76,6 @@
     }
     .toast.show { opacity: 1; }
 
-    /* ENGRANAJE */
     .admin-gear { position: relative; }
     .admin-dropdown {
       position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
@@ -97,7 +90,6 @@
     .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
     .admin-dropdown a:last-child, .admin-dropdown button:last-child { border-bottom: none; }
 
-    /* IMPRESIÓN */
     @media print {
       body * { visibility: hidden; }
       .printable-order, .printable-order * { visibility: visible; }
@@ -127,6 +119,7 @@
             <button id="logoutBtn">Cerrar Sesión</button>
           </div>
         </div>
+        <!-- FLECHA → LLEVA A admin.html -->
         <a href="admin.html" class="back-btn">
           <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg>
           Regresar
@@ -178,21 +171,19 @@
     const totalVentasEl = document.getElementById('totalVentas');
     const toast = document.getElementById('toast');
 
-    // === VERIFICAR ADMIN ===
+    // === PROTECCIÓN ADMIN ===
     if (localStorage.getItem('admin') !== 'true') {
       alert('Acceso denegado. Solo administradores.');
       window.location.href = 'login.html';
-      throw new Error("No admin");
     }
 
     // === CERRAR SESIÓN ===
     document.getElementById('logoutBtn').onclick = () => {
-      localStorage.removeItem('admin');
-      localStorage.removeItem('loggedIn');
+      localStorage.clear();
       window.location.href = 'login.html';
     };
 
-    // === CARGAR ÓRDENES ===
+    // === CARGAR PEDIDOS ===
     async function loadOrders() {
       try {
         const q = query(collection(db, "orders"), orderBy("date", "desc"));
@@ -209,22 +200,25 @@
             const id = doc.id;
             const monto = parseFloat(data.total) || 0;
             totalVentas += monto;
+
             html += createOrderCard({ id, ...data });
           });
         }
 
+        // ACTUALIZAR TOTALES
         totalComprasEl.textContent = `Total: ${snapshot.size}`;
         totalVentasEl.textContent = `Total Ventas: $${totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
-        ordersContainer.innerHTML = html;
 
+        ordersContainer.innerHTML = html;
         setupPrintButtons();
+
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error al cargar pedidos:", error);
         showToast("Error al cargar compras");
       }
     }
 
-    // === CREAR TARJETA ===
+    // === CREAR TARJETA DE PEDIDO ===
     function createOrderCard(order) {
       const productos = order.products || [];
       const productosHTML = productos.map(p => 
@@ -250,7 +244,7 @@
         <div class="order-card printable-order" id="order-${order.id}">
           <div class="order-header">Detalles de la Compra</div>
           <div class="order-id">Orden: ${order.id}</div>
-          <div class="order-total">Total: $${(order.total || 0).toLocaleString()}</div>
+          <div class="order-total">Total: $${(order.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
           
           <div class="order-products">${productosHTML}</div>
           
@@ -266,7 +260,7 @@
       `;
     }
 
-    // === IMPRIMIR ===
+    // === IMPRIMIR PEDIDO ===
     function setupPrintButtons() {
       document.querySelectorAll('.print-btn').forEach(btn => {
         btn.onclick = () => {
@@ -326,10 +320,9 @@
         document.getElementById('adminDropdown').classList.remove('show');
       });
 
-      // Ordenar
+      // Ordenar (ya está ordenado por defecto)
       document.getElementById('sortBtn').addEventListener('click', () => {
         showToast("Ordenado por fecha ↓");
-        loadOrders();
       });
     });
   </script>
