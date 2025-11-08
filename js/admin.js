@@ -1,4 +1,4 @@
-// js/admin.js - ACTUALIZADO PARA type: { anuncio: true, ... }
+// js/admin.js - SUBIDA DE IMAGEN + PRECIO + PRODUCTOS INDIVIDUALES
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -8,13 +8,17 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
-  query,
-  where,
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE", // ← TU API KEY REAL
+  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
   authDomain: "boutique-buendia.firebaseapp.com",
   projectId: "boutique-buendia",
   storageBucket: "boutique-buendia.firebasestorage.app",
@@ -24,13 +28,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // === PROTEGER ADMIN ===
 if (!localStorage.getItem('isAdmin')) {
   window.location.href = 'login.html';
 }
 
-// === CARGAR PRODUCTOS POR type.anuncio, type.carrusel, type.normal ===
+// === CARGAR PRODUCTOS ===
+let allProducts = [];
 function loadProductsByType(filterFn, containerId) {
   const unsubscribe = onSnapshot(collection(db, "productos"), (snapshot) => {
     const container = document.getElementById(containerId);
@@ -54,10 +60,9 @@ function loadProductsByType(filterFn, containerId) {
   window[`unsubscribe_${containerId}`] = unsubscribe;
 }
 
-// FILTROS CORREGIDOS: usa type.anuncio, type.carrusel, type.normal
-loadProductsByType(p => p.type && p.type.carrusel, 'newCarousel');
-loadProductsByType(p => p.type && p.type.anuncio, 'starCarousel');
-loadProductsByType(p => p.type && p.type.normal, 'productsGrid');
+loadProductsByType(p => p.type?.carrusel, 'newCarousel');
+loadProductsByType(p => p.type?.anuncio, 'starCarousel');
+loadProductsByType(p => p.type?.normal, 'productsGrid');
 
 // === CARRUSEL ===
 function handleAutoCarousel(container, count, containerId) {
@@ -97,9 +102,9 @@ function createProductCard(p, containerId) {
   return div;
 }
 
-// === EDITAR ===
+// === EDITAR PRODUCTO (AHORA SÍ GUARDA PRECIO) ===
 window.editProduct = (id) => {
-  const product = window.allProducts.find(p => p.id === id);
+  const product = allProducts.find(p => p.id === id);
   if (!product) return;
 
   document.getElementById('editName').value = product.nombre;
@@ -135,7 +140,7 @@ window.deleteProduct = async (id) => {
   showToast("Producto eliminado");
 };
 
-// === AGREGAR PRODUCTO (type COMO OBJETO) ===
+// === AGREGAR PRODUCTO (IMAGEN + PRECIO + ID ÚNICO) ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
   document.getElementById('imagePreview').style.display = 'none';
@@ -173,17 +178,32 @@ document.getElementById('addImage').addEventListener('input', (e) => {
   }
 });
 
-document.getElementById('saveNewProduct').onclick = async () => {
-  const url = document.getElementById('addImage').value.trim();
-  const fileInput = document.getElementById('addImageFile');
-  const hasFile = fileInput.files.length > 0;
+// === SUBIR IMAGEN A FIREBASE STORAGE ===
+async function uploadImage(file) {
+  const storageRef = ref(storage, 'productos/' + Date.now() + '_' + file.name);
+  const snapshot = await uploadBytes(storageRef, file);
+  return await getDownloadURL(snapshot.ref);
+}
 
-  if (hasFile && !url) {
-    showToast("La subida de imágenes aún no está habilitada. Usa una URL.");
-    return;
+document.getElementById('saveNewProduct').onclick = async () => {
+  const fileInput = document.getElementById('addImageFile');
+  const urlInput = document.getElementById('addImage').value.trim();
+  let imagen = urlInput;
+
+  // SUBIR IMAGEN SI HAY ARCHIVO
+  if (fileInput.files.length > 0) {
+    showToast("Subiendo imagen...");
+    try {
+      imagen = await uploadImage(fileInput.files[0]);
+      showToast("Imagen subida");
+    } catch (err) {
+      showToast("Error al subir imagen");
+      return;
+    }
   }
-  if (!url && !hasFile) {
-    showToast("Agrega una imagen (URL o archivo)");
+
+  if (!imagen) {
+    showToast("Agrega una imagen");
     return;
   }
 
@@ -195,7 +215,7 @@ document.getElementById('saveNewProduct').onclick = async () => {
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
     descripcion: document.getElementById('addDesc').value.trim(),
     tipo: document.getElementById('addCategory').value,
-    imagen: url,
+    imagen,
     creado: new Date(),
     type: {
       anuncio: typeSelect === 'publicidad',
@@ -204,16 +224,16 @@ document.getElementById('saveNewProduct').onclick = async () => {
     }
   };
 
-  if (!producto.nombre || isNaN(producto.precio) || !producto.imagen) {
+  if (!producto.nombre || isNaN(producto.precio)) {
     showToast("Faltan datos obligatorios");
     return;
   }
 
   try {
-    await addDoc(collection(db, "productos"), producto);
+    await addDoc(collection(db, "productos"), producto); // ID ÚNICO
     showToast("Producto agregado");
     closeModal('addProductModal');
-    // Limpiar formulario
+    // Limpiar
     ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
       document.getElementById(id).value = '';
     });
@@ -224,9 +244,9 @@ document.getElementById('saveNewProduct').onclick = async () => {
   }
 };
 
-// === CERRAR SESIÓN ===
+// === REDES, MODALES, TOAST, ENGRANAJE (IGUAL) ===
 document.getElementById('logoutBtn').onclick = () => {
-  if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+  if (confirm("¿Cerrar sesión?")) {
     localStorage.removeItem('isAdmin');
     localStorage.removeItem('loggedIn');
     localStorage.removeItem('userName');
@@ -234,7 +254,6 @@ document.getElementById('logoutBtn').onclick = () => {
   }
 };
 
-// === REDES SOCIALES ===
 document.getElementById('openSocialModal').onclick = () => {
   document.getElementById('socialLinksModal').classList.add('active');
   loadSocialLinks();
@@ -250,30 +269,22 @@ document.getElementById('saveSocialLinks').onclick = async () => {
     x: document.getElementById('xInput').value.trim(),
     whatsapp: document.getElementById('whatsappInput').value.trim()
   };
-
-  try {
-    await setDoc(doc(db, "links", "social"), links, { merge: true });
-    showToast("Redes sociales guardadas");
-    closeModal('socialLinksModal');
-  } catch (error) {
-    showToast("Error: " + error.message);
-  }
+  await setDoc(doc(db, "links", "social"), links, { merge: true });
+  showToast("Redes guardadas");
+  closeModal('socialLinksModal');
 };
 
 function loadSocialLinks() {
   onSnapshot(doc(db, "links", "social"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
-      document.getElementById('tiktokInput').value = data.tiktok || '';
-      document.getElementById('instagramInput').value = data.instagram || '';
-      document.getElementById('facebookInput').value = data.facebook || '';
-      document.getElementById('xInput').value = data.x || '';
-      document.getElementById('whatsappInput').value = data.whatsapp || '';
+      ['tiktok', 'instagram', 'facebook', 'x', 'whatsapp'].forEach(s => {
+        document.getElementById(s + 'Input').value = data[s] || '';
+      });
     }
   });
 }
 
-// === MODALES ===
 document.querySelectorAll('[id^="cancel"]').forEach(btn => {
   btn.onclick = () => closeModal(btn.closest('.modal').id);
 });
@@ -286,7 +297,6 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('active');
 }
 
-// === TOAST ===
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -294,7 +304,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// === ENGRANAJE ===
 document.getElementById('adminGear').onclick = e => {
   e.stopPropagation();
   document.getElementById('adminDropdown').classList.toggle('show');
@@ -305,7 +314,6 @@ document.addEventListener('click', () => {
 });
 
 // === GUARDAR TODOS LOS PRODUCTOS EN MEMORIA ===
-let allProducts = [];
 onSnapshot(collection(db, "productos"), (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
@@ -321,8 +329,6 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
       type: data.type || { normal: true }
     });
   });
-  window.allProducts = allProducts;
 });
 
-// === INICIAR REDES ===
 loadSocialLinks();
