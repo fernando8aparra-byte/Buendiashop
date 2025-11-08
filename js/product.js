@@ -300,4 +300,5 @@ function updateHomeButton() {
 // === INICIAR ===
 updateCart();
 updateAuthUI();
+updateHomeButton();  // AÑADIDO
 loadProduct();
