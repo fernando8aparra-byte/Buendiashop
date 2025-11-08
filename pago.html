@@ -60,14 +60,17 @@
 
   <div class="container">
 
+    <!-- LOGIN OBLIGATORIO -->
     <div id="loginRequired" class="login-required" style="display:none;">
       <h2>Debes iniciar sesión</h2>
       <p>Para continuar con tu compra, necesitas estar registrado.</p>
       <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
 
+    <!-- SECCIÓN DE PAGO -->
     <div id="paymentSection" style="display:none;">
 
+      <!-- DIRECCIÓN -->
       <div class="form-section">
         <h3>Dirección de Envío</h3>
         <button class="btn-edit" id="editAddressBtn">Editar</button>
@@ -79,44 +82,13 @@
           <p><strong>Estado:</strong> <span id="dispState">-</span></p>
         </div>
 
-        <form id="addressForm">
+        <form id="addressForm" style="display:none;">
           <div class="form-row">
             <div class="form-group">
               <label>Estado</label>
               <select id="state" required>
                 <option value="">Seleccionar estado</option>
-                <option>Aguascalientes</option>
-                <option>Baja California</option>
-                <option>Baja California Sur</option>
-                <option>Campeche</option>
-                <option>Chiapas</option>
-                <option>Chihuahua</option>
-                <option>CDMX</option>
-                <option>Coahuila</option>
-                <option>Colima</option>
-                <option>Durango</option>
-                <option>Guanajuato</option>
-                <option>Guerrero</option>
-                <option>Hidalgo</option>
-                <option>Jalisco</option>
-                <option>México</option>
-                <option>Michoacán</option>
-                <option>Morelos</option>
-                <option>Nayarit</option>
-                <option>Nuevo León</option>
-                <option>Oaxaca</option>
-                <option>Puebla</option>
-                <option>Querétaro</option>
-                <option>Quintana Roo</option>
-                <option>San Luis Potosí</option>
-                <option>Sinaloa</option>
-                <option>Sonora</option>
-                <option>Tabasco</option>
-                <option>Tamaulipas</option>
-                <option>Tlaxcala</option>
-                <option>Veracruz</option>
-                <option>Yucatán</option>
-                <option>Zacatecas</option>
+                <option>Aguascalientes</option><option>Baja California</option><option>Baja California Sur</option><option>Campeche</option><option>Chiapas</option><option>Chihuahua</option><option>CDMX</option><option>Coahuila</option><option>Colima</option><option>Durango</option><option>Guanajuato</option><option>Guerrero</option><option>Hidalgo</option><option>Jalisco</option><option>México</option><option>Michoacán</option><option>Morelos</option><option>Nayarit</option><option>Nuevo León</option><option>Oaxaca</option><option>Puebla</option><option>Querétaro</option><option>Quintana Roo</option><option>San Luis Potosí</option><option>Sinaloa</option><option>Sonora</option><option>Tabasco</option><option>Tamaulipas</option><option>Tlaxcala</option><option>Veracruz</option><option>Yucatán</option><option>Zacatecas</option>
               </select>
             </div>
           </div>
@@ -150,12 +122,14 @@
         </form>
       </div>
 
+      <!-- RESUMEN DEL PEDIDO -->
       <div class="form-section order-summary">
         <h3>Resumen del Pedido</h3>
         <div id="orderItems"></div>
         <div class="order-total" id="orderTotal">Total: $0</div>
       </div>
 
+      <!-- PAGO -->
       <div class="form-section">
         <h3>Método de Pago</h3>
         <div class="paypal-container">
@@ -168,6 +142,7 @@
       </div>
     </div>
 
+    <!-- ÉXITO -->
     <div id="successScreen" class="success-screen">
       <h2>Pago realizado con éxito</h2>
       <p class="order-id">Tu orden: <strong id="successOrderId"></strong></p>
@@ -182,33 +157,38 @@
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
+  <!-- PayPal SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=AdB6bEc3xx0Ned5sYc6Wy6prEgKeZQrfMKtfrCU-tIcvrJNgf8og5nlRkbQKfBRxcIHPmfjY8JsWE6zo&currency=MXN&intent=capture"></script>
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+  <!-- SCRIPT PRINCIPAL -->
   <script>
+    // Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
       projectId: "boutique-buendia",
       storageBucket: "boutique-buendia.firebasestorage.app",
       messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-      measurementId: "G-9KJ2330RN7"
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // Toast
     const toast = document.createElement('div');
     toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;z-index:9999;opacity:0;transition:all 0.3s;';
     document.body.appendChild(toast);
-
     function showToast(msg) {
       toast.textContent = msg;
       toast.style.opacity = '1';
       setTimeout(() => toast.style.opacity = '0', 3000);
     }
 
+    // Login
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     const loginRequired = document.getElementById('loginRequired');
     const paymentSection = document.getElementById('paymentSection');
@@ -225,6 +205,7 @@
       paymentSection.style.display = 'block';
     }
 
+    // Dirección
     const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
     const addressForm = document.getElementById('addressForm');
     const addressDisplay = document.getElementById('addressDisplay');
@@ -264,7 +245,7 @@
       location.reload();
     };
 
-    // === CARGAR CARRITO DESDE LOCALSTORAGE (CORREGIDO) ===
+    // === CARRITO DESDE LOCALSTORAGE (CON IMÁGENES) ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
     if (cart.length === 0) {
@@ -283,7 +264,7 @@
       div.className = 'order-item';
       div.innerHTML = `
         <span>
-          <img src="${item.imagen}" alt="${item.nombre}">
+          <img src="${item.imagen}" alt="${item.nombre}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:8px;">
           ${item.nombre} x${item.qty}
         </span>
         <span>$${(item.precio * item.qty).toLocaleString()}</span>
@@ -293,6 +274,7 @@
     });
     orderTotal.textContent = `Total: $${total.toLocaleString()}`;
 
+    // === PAYPAL ===
     if (total > 0 && savedAddress) {
       paypal.Buttons({
         style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
@@ -300,16 +282,14 @@
           return actions.order.create({
             purchase_units: [{
               amount: { value: total.toFixed(2), currency_code: 'MXN' },
-              description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
-              custom_id: `efrain-${Date.now()}-${total.toFixed(0)}`
+              description: 'Compra en Efraín Shop',
+              custom_id: `efrain-${Date.now()}`
             }]
           });
         },
         onApprove: (data, actions) => {
           return actions.order.capture().then(details => {
-            const stateCodes = {
-              "Aguascalientes": "AGS","Baja California": "BC","Baja California Sur": "BCS","Campeche": "CAM","Chiapas": "CHIS","Chihuahua": "CHIH","CDMX": "CDMX","Coahuila": "COAH","Colima": "COL","Durango": "DGO","Guanajuato": "GTO","Guerrero": "GRO","Hidalgo": "HGO","Jalisco": "JAL","México": "MEX","Michoacán": "MICH","Morelos": "MOR","Nayarit": "NAY","Nuevo León": "NL","Oaxaca": "OAX","Puebla": "PUE","Querétaro": "QRO","Quintana Roo": "QROO","San Luis Potosí": "SLP","Sinaloa": "SIN","Sonora": "SON","Tabasco": "TAB","Tamaulipas": "TAM","Tlaxcala": "TLAX","Veracruz": "VER","Yucatán": "YUC","Zacatecas": "ZAC"
-            };
+            const stateCodes = { "Aguascalientes": "AGS","Baja California": "BC","Baja California Sur": "BCS","Campeche": "CAM","Chiapas": "CHIS","Chihuahua": "CHIH","CDMX": "CDMX","Coahuila": "COAH","Colima": "COL","Durango": "DGO","Guanajuato": "GTO","Guerrero": "GRO","Hidalgo": "HGO","Jalisco": "JAL","México": "MEX","Michoacán": "MICH","Morelos": "MOR","Nayarit": "NAY","Nuevo León": "NL","Oaxaca": "OAX","Puebla": "PUE","Querétaro": "QRO","Quintana Roo": "QROO","San Luis Potosí": "SLP","Sinaloa": "SIN","Sonora": "SON","Tabasco": "TAB","Tamaulipas": "TAM","Tlaxcala": "TLAX","Veracruz": "VER","Yucatán": "YUC","Zacatecas": "ZAC" };
 
             const orderData = {
               userId: localStorage.getItem('userName') || 'anonimo',
@@ -365,9 +345,9 @@
                   window.location.href = 'index.html';
                 };
               })
-              .catch(error => {
-                console.error('Error al guardar orden:', error);
-                showToast('Error al procesar la orden');
+              .catch(err => {
+                console.error(err);
+                showToast('Error al guardar orden');
               });
           });
         },
