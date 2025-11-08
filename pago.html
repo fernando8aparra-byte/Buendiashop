@@ -47,7 +47,7 @@
     }
     .toast.show { opacity: 1; }
 
-    /* MENSAJE CARRITO VACÍO (solo visible si estás logueado) */
+    /* MENSAJE CARRITO VACÍO */
     .empty-cart-message {
       text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 1.1rem; color: #333;
@@ -60,22 +60,22 @@
   <div class="header">EFRAÍN SHOP - PAGO SEGURO</div>
   <div class="container">
 
-    <!-- MENSAJE DE INICIAR SESIÓN (PRIMERO Y ÚNICO SI NO ESTÁ LOGUEADO) -->
+    <!-- MENSAJE DE INICIAR SESIÓN (SI NO ESTÁ LOGUEADO) -->
     <div id="loginRequired" class="login-required">
       <h2>Debes iniciar sesión</h2>
       <p>Para continuar con tu compra, necesitas estar registrado.</p>
       <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
 
-    <!-- TODO EL CONTENIDO DE PAGO (SOLO SE MUESTRA SI ESTÁ LOGUEADO) -->
+    <!-- TODO EL CONTENIDO DE PAGO (SOLO SI ESTÁ LOGUEADO) -->
     <div id="paymentContent" style="display:none;">
 
-      <!-- MENSAJE CARRITO VACÍO (solo si estás logueado) -->
+      <!-- MENSAJE CARRITO VACÍO (SI ESTÁ LOGUEADO PERO SIN PRODUCTOS) -->
       <div id="emptyCartMessage" class="empty-cart-message" style="display:none;">
         No tienes productos. <a href="index.html">Ir a comprar</a>
       </div>
 
-      <!-- SECCIÓN DE PAGO COMPLETA -->
+      <!-- SECCIÓN DE PAGO -->
       <div id="paymentSection">
         <!-- DIRECCIÓN -->
         <div class="form-section">
@@ -177,230 +177,229 @@
   <!-- PayPal SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=AdB6bEc3xx0Ned5sYc6Wy6prEgKeZQrfMKtfrCU-tIcvrJNgf8og5nlRkbQKfBRxcIHPmfjY8JsWE6zo&currency=MXN&intent=capture"></script>
 
-<!-- Firebase + Lógica -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  <!-- Firebase + Lógica -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-    authDomain: "boutique-buendia.firebaseapp.com",
-    projectId: "boutique-buendia",
-    storageBucket: "boutique-buendia.firebasestorage.app",
-    messagingSenderId: "430651152709",
-    appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // === ELEMENTOS ===
-  const loginRequired = document.getElementById('loginRequired');
-  const paymentContent = document.getElementById('paymentContent');
-  const emptyCartMessage = document.getElementById('emptyCartMessage');
-  const paymentSection = document.getElementById('paymentSection');
-  const successScreen = document.getElementById('successScreen');
-  const orderItems = document.getElementById('orderItems');
-  const orderTotal = document.getElementById('orderTotal');
-  const paypalContainer = document.getElementById('paypal-button-container');
-  const toast = document.getElementById('toast');
-
-  // === TOAST ===
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
-
-  // === VERIFICAR SESIÓN ===
-  const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-
-  if (!isLoggedIn) {
-    // MOSTRAR SOLO EL MENSAJE DE LOGIN
-    loginRequired.style.display = 'block';
-    paymentContent.style.display = 'none';
-
-    // GUARDAR REDIRECCIÓN PARA DESPUÉS DEL LOGIN
-    localStorage.setItem('redirectAfterLogin', 'pago.html');
-
-    // BOTÓN FUNCIONA 100% → REDIRIGE A login.html
-    const goToLoginBtn = document.getElementById('goToLogin');
-    if (goToLoginBtn) {
-      goToLoginBtn.onclick = () => {
-        window.location.href = 'login.html';
-      };
-    }
-
-    // DETENER TODO EL RESTO DEL CÓDIGO
-    return;
-  } else {
-    // USUARIO LOGUEADO
-    loginRequired.style.display = 'none';
-    paymentContent.style.display = 'block';
-  }
-
-  // === CARRITO ===
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-  // === SI CARRITO VACÍO (logueado) ===
-  if (cart.length === 0) {
-    paymentSection.style.display = 'none';
-    emptyCartMessage.style.display = 'block';
-    orderTotal.textContent = 'Total: $0';
-    paypalContainer.innerHTML = '';
-    return;
-  }
-
-  // === DIRECCIÓN ===
-  const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
-  const addressForm = document.getElementById('addressForm');
-  const addressDisplay = document.getElementById('addressDisplay');
-  const editAddressBtn = document.getElementById('editAddressBtn');
-
-  if (savedAddress) {
-    document.getElementById('dispName').textContent = savedAddress.name;
-    document.getElementById('dispPhone').textContent = savedAddress.phone;
-    document.getElementById('dispAddress').textContent = `${savedAddress.street}, ${savedAddress.colonia}, C.P. ${savedAddress.cp}`;
-    document.getElementById('dispState').textContent = savedAddress.state;
-    addressForm.style.display = 'none';
-    addressDisplay.style.display = 'block';
-    editAddressBtn.style.display = 'block';
-  } else {
-    addressForm.style.display = 'block';
-    addressDisplay.style.display = 'none';
-    editAddressBtn.style.display = 'none';
-  }
-
-  editAddressBtn.onclick = () => {
-    addressForm.style.display = 'block';
-    addressDisplay.style.display = 'none';
-    editAddressBtn.style.display = 'none';
-  };
-
-  addressForm.onsubmit = (e) => {
-    e.preventDefault();
-    const address = {
-      state: document.getElementById('state').value,
-      street: document.getElementById('street').value,
-      colonia: document.getElementById('colonia').value,
-      cp: document.getElementById('cp').value,
-      name: document.getElementById('receiverName').value,
-      phone: document.getElementById('phone').value
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
-    localStorage.setItem('shippingAddress', JSON.stringify(address));
-    location.reload();
-  };
 
-  // === CARGAR PRODUCTOS DESDE FIREBASE ===
-  let total = 0;
-  async function loadCartItems() {
-    orderItems.innerHTML = '<p>Cargando productos...</p>';
-    const itemsHTML = [];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    for (const item of cart) {
-      try {
-        const docRef = doc(db, "productos", item.id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const subtotal = data.precio * item.qty;
-          total += subtotal;
-          itemsHTML.push(`
-            <div class="order-item">
-              <span>
-                <img src="${data.imagen}" alt="${data.nombre}">
-                ${data.nombre} x${item.qty}
-                ${data.descripcion ? `<br><small style="color:#666;">${data.descripcion}</small>` : ''}
-              </span>
-              <span>$${(subtotal).toLocaleString()}</span>
-            </div>
-          `);
-        } else {
-          itemsHTML.push(`
-            <div class="order-item" style="opacity:0.6;">
-              <span>Producto eliminado</span>
-            </div>
-          `);
-        }
-      } catch (err) {
-        console.error("Error cargando producto:", err);
-        itemsHTML.push(`<div class="order-item" style="color:#d00;">Error</div>`);
-      }
+    // === ELEMENTOS ===
+    const loginRequired = document.getElementById('loginRequired');
+    const paymentContent = document.getElementById('paymentContent');
+    const emptyCartMessage = document.getElementById('emptyCartMessage');
+    const paymentSection = document.getElementById('paymentSection');
+    const successScreen = document.getElementById('successScreen');
+    const orderItems = document.getElementById('orderItems');
+    const orderTotal = document.getElementById('orderTotal');
+    const paypalContainer = document.getElementById('paypal-button-container');
+    const toast = document.getElementById('toast');
+
+    // === TOAST ===
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    orderItems.innerHTML = itemsHTML.join('');
-    orderTotal.textContent = `Total: $${total.toLocaleString()}`;
-    renderPayPalButton(total);
-  }
+    // === VERIFICAR SESIÓN ===
+    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
 
-  // === PAYPAL ===
-  function renderPayPalButton(totalAmount) {
-    if (!savedAddress || totalAmount <= 0) return;
+    if (!isLoggedIn) {
+      // SOLO MOSTRAR LOGIN
+      loginRequired.style.display = 'block';
+      paymentContent.style.display = 'none';
 
-    paypal.Buttons({
-      style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
-      createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [{
-            amount: { value: totalAmount.toFixed(2), currency_code: 'MXN' },
-            description: 'Compra en Efraín Shop',
-            custom_id: `efrain-${Date.now()}`
-          }]
-        });
-      },
-      onApprove: async (data, actions) => {
-        return actions.order.capture().then(async (details) => {
-          const orderData = {
-            userId: localStorage.getItem('userName') || 'anonimo',
-            date: new Date(),
-            total: totalAmount,
-            paymentId: details.id,
-            status: "paid",
-            address: savedAddress,
-            products: cart.map(item => ({
-              id: item.id,
-              name: item.nombre,
-              qty: item.qty,
-              price: item.precio
-            }))
-          };
+      // GUARDAR REDIRECCIÓN
+      localStorage.setItem('redirectAfterLogin', 'pago.html');
 
-          try {
-            await setDoc(doc(db, 'orders', details.id), orderData);
-            localStorage.removeItem('cart');
-            localStorage.removeItem('shippingAddress');
-            paymentSection.style.display = 'none';
-            successScreen.style.display = 'block';
-            document.getElementById('successOrderId').textContent = details.id;
-
-            const successItems = document.getElementById('successItems');
-            cart.forEach(item => {
-              const div = document.createElement('div');
-              div.className = 'item';
-              div.innerHTML = `
-                <span>
-                  <img src="${item.imagen}" alt="${item.nombre}">
-                  ${item.nombre} x${item.qty}
-                </span>
-                <span>$${(item.precio * item.qty).toLocaleString()}</span>
-              `;
-              successItems.appendChild(div);
-            });
-            document.getElementById('successTotal').textContent = `Total: $${totalAmount.toLocaleString()}`;
-            document.getElementById('goHomeBtn').onclick = () => window.location.href = 'index.html';
-          } catch (err) {
-            console.error(err);
-            showToast('Error al guardar orden');
-          }
-        });
-      },
-      onError: (err) => {
-        console.error(err);
-        showToast('Error en el pago. Intenta de nuevo.');
+      // BOTÓN FUNCIONA 100%
+      const goToLoginBtn = document.getElementById('goToLogin');
+      if (goToLoginBtn) {
+        goToLoginBtn.onclick = () => {
+          window.location.href = 'login.html';
+        };
       }
-    }).render('#paypal-button-container');
-  }
+      return; // DETENER TODO
+    } else {
+      loginRequired.style.display = 'none';
+      paymentContent.style.display = 'block';
+    }
 
-  // === INICIAR ===
-  loadCartItems();
-</script>
+    // === CARRITO ===
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    // === CARRITO VACÍO (logueado) ===
+    if (cart.length === 0) {
+      paymentSection.style.display = 'none';
+      emptyCartMessage.style.display = 'block';
+      orderTotal.textContent = 'Total: $0';
+      paypalContainer.innerHTML = '';
+      return;
+    }
+
+    // === DIRECCIÓN ===
+    const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
+    const addressForm = document.getElementById('addressForm');
+    const addressDisplay = document.getElementById('addressDisplay');
+    const editAddressBtn = document.getElementById('editAddressBtn');
+
+    if (savedAddress) {
+      document.getElementById('dispName').textContent = savedAddress.name;
+      document.getElementById('dispPhone').textContent = savedAddress.phone;
+      document.getElementById('dispAddress').textContent = `${savedAddress.street}, ${savedAddress.colonia}, C.P. ${savedAddress.cp}`;
+      document.getElementById('dispState').textContent = savedAddress.state;
+      addressForm.style.display = 'none';
+      addressDisplay.style.display = 'block';
+      editAddressBtn.style.display = 'block';
+    } else {
+      addressForm.style.display = 'block';
+      addressDisplay.style.display = 'none';
+      editAddressBtn.style.display = 'none';
+    }
+
+    editAddressBtn.onclick = () => {
+      addressForm.style.display = 'block';
+      addressDisplay.style.display = 'none';
+      editAddressBtn.style.display = 'none';
+    };
+
+    addressForm.onsubmit = (e) => {
+      e.preventDefault();
+      const address = {
+        state: document.getElementById('state').value,
+        street: document.getElementById('street').value,
+        colonia: document.getElementById('colonia').value,
+        cp: document.getElementById('cp').value,
+        name: document.getElementById('receiverName').value,
+        phone: document.getElementById('phone').value
+      };
+      localStorage.setItem('shippingAddress', JSON.stringify(address));
+      location.reload();
+    };
+
+    // === CARGAR PRODUCTOS DESDE FIREBASE ===
+    let total = 0;
+    async function loadCartItems() {
+      orderItems.innerHTML = '<p>Cargando productos...</p>';
+      const itemsHTML = [];
+
+      for (const item of cart) {
+        try {
+          const docRef = doc(db, "productos", item.id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const subtotal = data.precio * item.qty;
+            total += subtotal;
+            itemsHTML.push(`
+              <div class="order-item">
+                <span>
+                  <img src="${data.imagen}" alt="${data.nombre}">
+                  ${data.nombre} x${item.qty}
+                  ${data.descripcion ? `<br><small style="color:#666;">${data.descripcion}</small>` : ''}
+                </span>
+                <span>$${(subtotal).toLocaleString()}</span>
+              </div>
+            `);
+          } else {
+            itemsHTML.push(`
+              <div class="order-item" style="opacity:0.6;">
+                <span>Producto eliminado</span>
+              </div>
+            `);
+          }
+        } catch (err) {
+          console.error("Error cargando producto:", err);
+          itemsHTML.push(`<div class="order-item" style="color:#d00;">Error</div>`);
+        }
+      }
+
+      orderItems.innerHTML = itemsHTML.join('');
+      orderTotal.textContent = `Total: $${total.toLocaleString()}`;
+      renderPayPalButton(total);
+    }
+
+    // === PAYPAL ===
+    function renderPayPalButton(totalAmount) {
+      if (!savedAddress || totalAmount <= 0) return;
+
+      paypal.Buttons({
+        style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: { value: totalAmount.toFixed(2), currency_code: 'MXN' },
+              description: 'Compra en Efraín Shop',
+              custom_id: `efrain-${Date.now()}`
+            }]
+          });
+        },
+        onApprove: async (data, actions) => {
+          return actions.order.capture().then(async (details) => {
+            const orderData = {
+              userId: localStorage.getItem('userName') || 'anonimo',
+              date: new Date(),
+              total: totalAmount,
+              paymentId: details.id,
+              status: "paid",
+              address: savedAddress,
+              products: cart.map(item => ({
+                id: item.id,
+                name: item.nombre,
+                qty: item.qty,
+                price: item.precio
+              }))
+            };
+
+            try {
+              await setDoc(doc(db, 'orders', details.id), orderData);
+              localStorage.removeItem('cart');
+              localStorage.removeItem('shippingAddress');
+              paymentSection.style.display = 'none';
+              successScreen.style.display = 'block';
+              document.getElementById('successOrderId').textContent = details.id;
+
+              const successItems = document.getElementById('successItems');
+              cart.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `
+                  <span>
+                    <img src="${item.imagen}" alt="${item.nombre}">
+                    ${item.nombre} x${item.qty}
+                  </span>
+                  <span>$${(item.precio * item.qty).toLocaleString()}</span>
+                `;
+                successItems.appendChild(div);
+              });
+              document.getElementById('successTotal').textContent = `Total: $${totalAmount.toLocaleString()}`;
+              document.getElementById('goHomeBtn').onclick = () => window.location.href = 'index.html';
+            } catch (err) {
+              console.error(err);
+              showToast('Error al guardar orden');
+            }
+          });
+        },
+        onError: (err) => {
+          console.error(err);
+          showToast('Error en el pago. Intenta de nuevo.');
+        }
+      }).render('#paypal-button-container');
+    }
+
+    // === INICIAR ===
+    loadCartItems();
+  </script>
+</body>
+</html>
