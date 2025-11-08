@@ -22,7 +22,7 @@
     .menu-sidebar.open { transform: translateX(0); }
     .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
     .menu-overlay.show { opacity: 1; visibility: visible; }
-    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
+    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; }
     .menu-item::after { display: none; }
     .dropdown-toggle::after, .contact-toggle::after { content: 'down arrow'; font-size: 0.8rem; transition: transform 0.3s ease; }
     .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
@@ -44,7 +44,7 @@
     .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
     .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
     #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
-    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; }
     .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
     .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
     .header-overlay.show { display: block; }
@@ -77,7 +77,7 @@
     .btn-outline:hover { background: #000; color: #fff; }
     .btn-outline svg { width: 20px; height: 20px; }
 
-    /* === PRODUCTOS RELACIONADOS: TARJETAS VERTICALES (RECTÁNGULOS) === */
+    /* === PRODUCTOS RELACIONADOS: TARJETAS VERTICALES === */
     .related-section { margin-top: 60px; padding: 0 20px; }
     .related-section h2 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
     .related-grid {
@@ -140,6 +140,17 @@
     /* Toast */
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; z-index: 10000; opacity: 0; transition: opacity 0.3s ease; }
     .toast.show { opacity: 1; }
+
+    /* === BOTÓN "INICIO" EN MENÚ === */
+    .menu-item.home-btn {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 15px;
+      border-radius: 8px;
+      padding: 15px 20px;
+    }
   </style>
 </head>
 <body>
@@ -207,37 +218,37 @@
     <img id="lightboxImage" src="" alt="">
   </div>
 
- <!-- MENÚ LATERAL -->
-<div class="menu-overlay" id="menuOverlay"></div>
-<aside class="menu-sidebar" id="menuSidebar">
-  <div class="menu-item welcome" id="welcomeMsg"></div>
+  <!-- MENÚ LATERAL -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <aside class="menu-sidebar" id="menuSidebar">
+    <div class="menu-item welcome" id="welcomeMsg"></div>
 
-  <!-- BOTÓN DINÁMICO: INICIO O ADMIN -->
-  <div class="menu-item home-btn" id="homeBtn"></div>
+    <!-- BOTÓN DINÁMICO: INICIO O ADMIN -->
+    <div class="menu-item home-btn" id="homeBtn"></div>
 
-  <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
-  <div class="submenu" id="categoriesSubmenu">
-    <div class="submenu-item">Gorras</div>
-    <div class="submenu-item">Camisetas</div>
-    <div class="submenu-item">Pantalones</div>
-    <div class="submenu-item">Cintos</div>
-    <div class="submenu-item">Tenis</div>
-    <div class="submenu-item">Perfumes</div>
-    <div class="submenu-item">Sudaderas</div>
-  </div>
-  <div class="menu-item ofertas-btn">Ofertas</div>
-  <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
-  <div class="contact-dropdown" id="contactDropdown">
-    <p class="contact-text">No te quedes sin tu Mystery Box</p>
-    <div class="social-links">
-      <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
-      <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
-      <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
+    <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
+    <div class="submenu" id="categoriesSubmenu">
+      <div class="submenu-item">Gorras</div>
+      <div class="submenu-item">Camisetas</div>
+      <div class="submenu-item">Pantalones</div>
+      <div class="submenu-item">Cintos</div>
+      <div class="submenu-item">Tenis</div>
+      <div class="submenu-item">Perfumes</div>
+      <div class="submenu-item">Sudaderas</div>
     </div>
-  </div>
-  <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-  <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
-</aside>
+    <div class="menu-item ofertas-btn">Ofertas</div>
+    <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
+    <div class="contact-dropdown" id="contactDropdown">
+      <p class="contact-text">No te quedes sin tu Mystery Box</p>
+      <div class="social-links">
+        <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
+        <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
+        <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
+      </div>
+    </div>
+    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
+    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
+  </aside>
 
   <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
@@ -319,6 +330,7 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxClose = document.getElementById('lightboxClose');
+    const homeBtn = document.getElementById('homeBtn');
 
     // === CARRITO ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -339,7 +351,7 @@
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
-          <img src="${item.imagen}" alt="${item.nombre}" class="thumb" style="width:50px;height:50px;object-fit:cover;border-radius:6px;">
+          <img src="${item.imagen}" alt="${item.nombre}" style="width:50px;height:50px;object-fit:cover;border-radius:6px;">
           <div style="flex:1;">
             <div style="font-weight:600;">${item.nombre}</div>
             <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
@@ -372,10 +384,8 @@
       showToast('Producto eliminado');
     };
 
-    // === PAGAR DESDE CARRITO O PRODUCTO ===
     goToPay.onclick = () => {
       if (cart.length === 0) return showToast("Carrito vacío");
-      // Asegurar que el producto actual esté en el carrito
       if (window.currentProduct && !cart.some(i => i.id === window.currentProduct.id)) {
         addToCart(window.currentProduct.id);
       }
@@ -433,7 +443,7 @@
       }
     }
 
-    // === PRODUCTOS RELACIONADOS (tarjetas verticales centradas) ===
+    // === PRODUCTOS RELACIONADOS (tarjetas verticales) ===
     async function loadRelatedProducts(mainProduct) {
       relatedGrid.innerHTML = '<p>Cargando relacionados...</p>';
       const nameWords = (mainProduct.nombre || '').toLowerCase().split(' ').filter(w => w.length > 2);
@@ -524,7 +534,12 @@
       }
     });
 
-    menuBtn.onclick = () => { menuOverlay.classList.add('show'); menuSidebar.classList.add('open'); updateAuthUI(); };
+    menuBtn.onclick = () => { 
+      menuOverlay.classList.add('show'); 
+      menuSidebar.classList.add('open'); 
+      updateAuthUI(); 
+      updateHomeButton(); 
+    };
     menuOverlay.onclick = () => { menuOverlay.classList.remove('show'); menuSidebar.classList.remove('open'); };
     cartBtn.onclick = () => { cartSidebar.classList.add('open'); cartOverlay.classList.add('show'); updateCart(); };
     closeCart.onclick = cartOverlay.onclick = () => { cartSidebar.classList.remove('open'); cartOverlay.classList.remove('show'); };
@@ -561,9 +576,28 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
+    // === BOTÓN "INICIO" O "ADMIN" ===
+    function updateHomeButton() {
+      const isProductPage = window.location.pathname.includes('product.html');
+      const isAdminPage = window.location.pathname.includes('admin.html');
+
+      if (isProductPage) {
+        homeBtn.textContent = 'Inicio';
+        homeBtn.onclick = () => window.location.href = 'index.html';
+        homeBtn.style.display = 'block';
+      } else if (isAdminPage) {
+        homeBtn.textContent = 'Admin';
+        homeBtn.onclick = () => window.location.href = 'admin.html';
+        homeBtn.style.display = 'block';
+      } else {
+        homeBtn.style.display = 'none';
+      }
+    }
+
     // === INICIAR ===
     updateCart();
     updateAuthUI();
+    updateHomeButton();
     loadProduct();
   </script>
 </body>
