@@ -1,12 +1,12 @@
-// js/admin.js
+// js/admin.js - ACTUALIZADO PARA type: { anuncio: true, ... }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  doc, 
+import {
+  getFirestore,
+  collection,
+  doc,
   addDoc,
-  updateDoc, 
-  deleteDoc, 
+  updateDoc,
+  deleteDoc,
   onSnapshot,
   query,
   where,
@@ -14,7 +14,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
+  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE", // ← TU API KEY REAL
   authDomain: "boutique-buendia.firebaseapp.com",
   projectId: "boutique-buendia",
   storageBucket: "boutique-buendia.firebasestorage.app",
@@ -30,34 +30,34 @@ if (!localStorage.getItem('isAdmin')) {
   window.location.href = 'login.html';
 }
 
-// === CARGAR PRODUCTOS ===
-function loadProductsByType(type, containerId) {
-  const q = query(collection(db, "productos"), where("type", "==", type));
-  const unsubscribe = onSnapshot(q, (snapshot) => {
+// === CARGAR PRODUCTOS POR type.anuncio, type.carrusel, type.normal ===
+function loadProductsByType(filterFn, containerId) {
+  const unsubscribe = onSnapshot(collection(db, "productos"), (snapshot) => {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     const products = [];
-    
+
     snapshot.forEach((docSnap) => {
       const data = { id: docSnap.id, ...docSnap.data() };
-      products.push(data);
-      const card = createProductCard(data, type);
-      container.appendChild(card);
+      if (filterFn(data)) {
+        products.push(data);
+        const card = createProductCard(data, containerId);
+        container.appendChild(card);
+      }
     });
 
     if (containerId === 'newCarousel' || containerId === 'starCarousel') {
       handleAutoCarousel(container, products.length, containerId);
     }
-
     duplicateForInfiniteScroll(containerId);
   });
-
   window[`unsubscribe_${containerId}`] = unsubscribe;
 }
 
-loadProductsByType('carrusel', 'newCarousel');
-loadProductsByType('publicidad', 'starCarousel');
-loadProductsByType('normal', 'productsGrid');
+// FILTROS CORREGIDOS: usa type.anuncio, type.carrusel, type.normal
+loadProductsByType(p => p.type && p.type.carrusel, 'newCarousel');
+loadProductsByType(p => p.type && p.type.anuncio, 'starCarousel');
+loadProductsByType(p => p.type && p.type.normal, 'productsGrid');
 
 // === CARRUSEL ===
 function handleAutoCarousel(container, count, containerId) {
@@ -78,49 +78,34 @@ function duplicateForInfiniteScroll(containerId) {
 }
 
 // === CREAR TARJETA ===
-function createProductCard(p, sectionType) {
+function createProductCard(p, containerId) {
   const div = document.createElement('div');
   div.className = 'product-card';
   div.dataset.id = p.id;
 
-  if (sectionType === 'normal') {
-    div.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <h3>${p.nombre}</h3>
-      <p class="product-price">$${p.precio}</p>
-      <p class="product-desc-small">${p.descripcion || ''}</p>
-      <div class="product-actions">
-        <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
-        <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
-      </div>
-    `;
-  } else {
-    div.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <h3>${p.nombre}</h3>
-      <p>$${p.precio}</p>
-      <div class="product-actions">
-        <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
-        <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
-      </div>
-    `;
-  }
+  const isNormal = containerId === 'productsGrid';
+  div.innerHTML = `
+    <img src="${p.imagen}" alt="${p.nombre}">
+    <h3>${p.nombre}</h3>
+    ${isNormal ? `<p class="product-desc-small">${p.descripcion || ''}</p>` : ''}
+    <p class="product-price">$${p.precio.toLocaleString()}</p>
+    <div class="product-actions">
+      <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+      <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
+    </div>
+  `;
   return div;
 }
 
 // === EDITAR ===
 window.editProduct = (id) => {
-  const card = document.querySelector(`.product-card[data-id="${id}"]`);
-  if (!card) return;
-  const p = {
-    nombre: card.querySelector('h3').textContent,
-    precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0),
-    descripcion: card.querySelector('.product-desc-small')?.textContent || '',
-    imagen: card.querySelector('img').src
-  };
-  document.getElementById('editName').value = p.nombre;
-  document.getElementById('editPrice').value = p.precio;
-  document.getElementById('editImage').value = p.imagen;
+  const product = window.allProducts.find(p => p.id === id);
+  if (!product) return;
+
+  document.getElementById('editName').value = product.nombre;
+  document.getElementById('editPrice').value = product.precio;
+  document.getElementById('editImage').value = product.imagen;
+
   document.getElementById('editProductModal').classList.add('active');
   window.currentEditId = id;
 };
@@ -128,10 +113,16 @@ window.editProduct = (id) => {
 document.getElementById('saveProduct').onclick = async () => {
   const id = window.currentEditId;
   const updated = {
-    nombre: document.getElementById('editName').value,
+    nombre: document.getElementById('editName').value.trim(),
     precio: parseFloat(document.getElementById('editPrice').value),
-    imagen: document.getElementById('editImage').value
+    imagen: document.getElementById('editImage').value.trim()
   };
+
+  if (!updated.nombre || isNaN(updated.precio) || !updated.imagen) {
+    showToast("Completa todos los campos");
+    return;
+  }
+
   await updateDoc(doc(db, "productos", id), updated);
   showToast("Producto actualizado");
   closeModal('editProductModal');
@@ -144,9 +135,10 @@ window.deleteProduct = async (id) => {
   showToast("Producto eliminado");
 };
 
-// === AGREGAR PRODUCTO ===
+// === AGREGAR PRODUCTO (type COMO OBJETO) ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
+  document.getElementById('imagePreview').style.display = 'none';
 };
 
 document.getElementById('addImageFile').addEventListener('change', (e) => {
@@ -154,7 +146,6 @@ document.getElementById('addImageFile').addEventListener('change', (e) => {
   const urlInput = document.getElementById('addImage');
   const preview = document.getElementById('imagePreview');
   const img = document.getElementById('previewImg');
-
   if (file) {
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -183,7 +174,7 @@ document.getElementById('addImage').addEventListener('input', (e) => {
 });
 
 document.getElementById('saveNewProduct').onclick = async () => {
-  const url = document.getElementById('addImage').value;
+  const url = document.getElementById('addImage').value.trim();
   const fileInput = document.getElementById('addImageFile');
   const hasFile = fileInput.files.length > 0;
 
@@ -191,37 +182,54 @@ document.getElementById('saveNewProduct').onclick = async () => {
     showToast("La subida de imágenes aún no está habilitada. Usa una URL.");
     return;
   }
-
   if (!url && !hasFile) {
     showToast("Agrega una imagen (URL o archivo)");
     return;
   }
 
+  const typeSelect = document.getElementById('addType').value;
+
   const producto = {
-    nombre: document.getElementById('addName').value,
+    nombre: document.getElementById('addName').value.trim(),
     precio: parseFloat(document.getElementById('addPrice').value),
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
-    descripcion: document.getElementById('addDesc').value,
+    descripcion: document.getElementById('addDesc').value.trim(),
     tipo: document.getElementById('addCategory').value,
-    type: document.getElementById('addType').value,
     imagen: url,
-    creado: new Date()
+    creado: new Date(),
+    type: {
+      anuncio: typeSelect === 'publicidad',
+      carrusel: typeSelect === 'carrusel',
+      normal: typeSelect === 'normal'
+    }
   };
 
-  if (!producto.nombre || !producto.precio || !producto.type) {
-    showToast("Faltan datos");
+  if (!producto.nombre || isNaN(producto.precio) || !producto.imagen) {
+    showToast("Faltan datos obligatorios");
     return;
   }
 
-  await addDoc(collection(db, "productos"), producto);
-  showToast("Producto agregado");
-  closeModal('addProductModal');
+  try {
+    await addDoc(collection(db, "productos"), producto);
+    showToast("Producto agregado");
+    closeModal('addProductModal');
+    // Limpiar formulario
+    ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    fileInput.value = '';
+  } catch (err) {
+    console.error(err);
+    showToast("Error al agregar");
+  }
 };
 
 // === CERRAR SESIÓN ===
 document.getElementById('logoutBtn').onclick = () => {
   if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
     localStorage.removeItem('isAdmin');
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userName');
     window.location.href = 'login.html';
   }
 };
@@ -269,10 +277,14 @@ function loadSocialLinks() {
 document.querySelectorAll('[id^="cancel"]').forEach(btn => {
   btn.onclick = () => closeModal(btn.closest('.modal').id);
 });
+
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => e.target === m && closeModal(m.id));
 });
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
 
 // === TOAST ===
 function showToast(msg) {
@@ -287,7 +299,30 @@ document.getElementById('adminGear').onclick = e => {
   e.stopPropagation();
   document.getElementById('adminDropdown').classList.toggle('show');
 };
-document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
+
+document.addEventListener('click', () => {
+  document.getElementById('adminDropdown').classList.remove('show');
+});
+
+// === GUARDAR TODOS LOS PRODUCTOS EN MEMORIA ===
+let allProducts = [];
+onSnapshot(collection(db, "productos"), (snapshot) => {
+  allProducts = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    allProducts.push({
+      id: doc.id,
+      nombre: data.nombre || '',
+      precio: data.precio || 0,
+      imagen: data.imagen || '',
+      descripcion: data.descripcion || '',
+      talla: data.talla || [],
+      tipo: data.tipo || '',
+      type: data.type || { normal: true }
+    });
+  });
+  window.allProducts = allProducts;
+});
 
 // === INICIAR REDES ===
 loadSocialLinks();
