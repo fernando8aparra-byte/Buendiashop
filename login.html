@@ -114,7 +114,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- FIREBASE + LÓGICA (admin LOCAL) -->
+  <!-- FIREBASE + LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -144,7 +144,7 @@
 
     let isLogin = true;
 
-    // ADMIN LOCAL (SIN FIREBASE)
+    // ADMIN LOCAL (TUS CREDENCIALES ORIGINALES)
     const ADMIN_USER = "Buendia*]?~?£u837jwhwi";
     const ADMIN_PASS = "&2)3)8:&?3828&/82$:!"
 
@@ -198,13 +198,13 @@
 
       try {
         if (isLogin) {
-          // ADMIN LOCAL
+          // ADMIN LOCAL → REDIRIGE A admin-compras.html
           if (identifier === ADMIN_USER && password === ADMIN_PASS) {
             localStorage.setItem('loggedIn', 'true');
             localStorage.setItem('userName', 'Administrador');
             localStorage.setItem('admin', 'true');
             showToast('Acceso de administrador');
-            setTimeout(() => window.location.href = 'admin.html', 1500);
+            setTimeout(() => window.location.href = 'admin-compras.html', 1500);
             return;
           }
 
