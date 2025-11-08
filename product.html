@@ -6,8 +6,8 @@
   <title>Producto | Boutique-buenday</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* === ESTILOS IGUALES A INDEX.HTML === */
-    body { margin: 0; padding: 0; padding-top: 60px; }
+    /* === ESTILOS IGUALES A INDEX === */
+    body { margin: 0; padding: 0; padding-top: 60px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
     .header-left { display: flex; align-items: center; gap: 20px; }
@@ -52,17 +52,26 @@
     .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .search-results h3 { margin-top: 0; }
     .no-results { color: #666; font-style: italic; }
-    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
 
-    /* === ESTILOS ESPECÍFICOS DE PRODUCTO === */
-    .product-main { text-align: center; padding: 40px 20px; background: #f8f8f8; }
-    .product-main img { max-width: 100%; max-height: 450px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; }
-    .product-info { max-width: 600px; margin: 0 auto; }
+    /* === ESTILOS DE PRODUCTO === */
+    .product-main { text-align: center; padding: 40px 20px; background: #f8f8f8; position: relative; }
+    .product-image-container { position: relative; display: inline-block; max-width: 100%; }
+    .product-image-container img { max-width: 100%; max-height: 450px; object-fit: contain; border-radius: 12px; }
+    .zoom-btn {
+      position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+    .product-info { max-width: 600px; margin: 25px auto 0; }
     .product-info h1 { font-size: 2rem; margin: 10px 0; }
-    .product-info .desc { color: #555; font-size: 1rem; margin: 15px 0; line-height: 1.5; }
+    .product-info .desc { color: #555; font-size: 1rem; margin: 15px 0; line-height: 1.6; }
     .product-info .price { font-size: 1.8rem; font-weight: bold; color: #000; margin: 20px 0; }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .add-to-cart-btn {
+      background: #000; color: #fff; padding: 14px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1rem;
+    }
+    .add-to-cart-btn svg { width: 20px; height: 20px; }
 
     .related-section { margin-top: 60px; }
     .related-section h2 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
@@ -71,6 +80,12 @@
     .related-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; }
     .related-card h4 { font-size: 0.9rem; margin: 10px 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .related-card .price { font-weight: bold; color: #000; }
+
+    /* Lightbox */
+    .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 12px; }
+    .lightbox-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 2.5rem; cursor: pointer; }
 
     /* Toast */
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; z-index: 10000; opacity: 0; transition: opacity 0.3s ease; }
@@ -83,7 +98,7 @@
   <div class="header-overlay" id="headerOverlay"></div>
   <div class="cart-overlay" id="cartOverlay"></div>
 
-  <!-- HEADER (IGUAL QUE INDEX) -->
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
@@ -122,7 +137,7 @@
     <div id="searchResults"></div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO -->
   <main class="main-container">
     <section class="product-main" id="productMain">
       <p>Cargando producto...</p>
@@ -135,6 +150,12 @@
       </div>
     </section>
   </main>
+
+  <!-- LIGHTBOX ZOOM -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">x</button>
+    <img id="lightboxImage" src="" alt="">
+  </div>
 
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
@@ -189,7 +210,7 @@
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
-  <!-- SCRIPT FIREBASE (EL QUE PASASTE) -->
+  <!-- SCRIPT FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -240,6 +261,9 @@
     const welcomeMsg = document.getElementById('welcomeMsg');
     const authBtn = document.getElementById('authBtn');
     const helpBtn = document.getElementById('helpBtn');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxClose = document.getElementById('lightboxClose');
 
     // === CARRITO ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -272,14 +296,18 @@
     }
 
     window.addToCart = (id) => {
-      const product = window.currentProduct || window.allProducts?.find(p => p.id === id);
+      const product = window.currentProduct;
       if (!product) return showToast("Producto no disponible");
       const existing = cart.find(i => i.id === id);
-      if (existing) existing.qty++;
-      else cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
+      if (existing) {
+        existing.qty++;
+        showToast('¡Cantidad aumentada!');
+      } else {
+        cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
+        showToast('¡Agregado al carrito!');
+      }
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-      showToast('¡Agregado al carrito!');
     };
 
     window.removeFromCart = (i) => {
@@ -297,7 +325,7 @@
       window.location.href = 'pago.html';
     };
 
-    // === CARGAR PRODUCTO POR ID ===
+    // === CARGAR PRODUCTO ===
     async function loadProduct() {
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get('id');
@@ -314,15 +342,28 @@
         }
         const p = { id: docSnap.id, ...docSnap.data() };
         window.currentProduct = p;
+
         productMain.innerHTML = `
-          <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+          <div class="product-image-container">
+            <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" id="mainImage">
+            <button class="zoom-btn" onclick="openLightbox('${p.imagen}')">Zoom</button>
+          </div>
           <div class="product-info">
             <h1>${p.nombre}</h1>
             <p class="desc">${p.descripcion || 'Sin descripción'}</p>
             <div class="price">$${p.precio.toLocaleString()}</div>
-            <div class="go-to-pay" onclick="addToCart('${p.id}')">Ir a Pagar</div>
+            <div class="btn-group">
+              <button class="add-to-cart-btn" onclick="addToCart('${p.id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                Añadir al carrito
+              </button>
+              <div class="go-to-pay" onclick="goToPay.click()">Ir a Pagar</div>
+            </div>
           </div>
         `;
+
         loadRelatedProducts(p);
       } catch (err) {
         console.error(err);
@@ -330,34 +371,37 @@
       }
     }
 
-    // === PRODUCTOS RELACIONADOS ===
+    // === PRODUCTOS RELACIONADOS (por nombre y descripción) ===
     async function loadRelatedProducts(mainProduct) {
       relatedGrid.innerHTML = '<p>Cargando relacionados...</p>';
-      const keywords = mainProduct.nombre.toLowerCase().split(' ');
-      const tipo = mainProduct.tipo;
-      const q = query(
-        collection(db, "productos"),
-        where("id", "!=", mainProduct.id),
-        limit(8)
-      );
+      const nameWords = (mainProduct.nombre || '').toLowerCase().split(' ').filter(w => w.length > 2);
+      const descWords = (mainProduct.descripcion || '').toLowerCase().split(' ').filter(w => w.length > 2);
+      const allWords = [...new Set([...nameWords, ...descWords])];
+
       try {
-        const snapshot = await getDocs(q);
+        const snapshot = await getDocs(collection(db, "productos"));
         let related = [];
+
         snapshot.forEach(doc => {
           const p = { id: doc.id, ...doc.data() };
-          const nameMatch = keywords.some(k => p.nombre.toLowerCase().includes(k));
-          const typeMatch = tipo && p.tipo === tipo;
-          if (nameMatch || typeMatch) related.push(p);
+          if (p.id === mainProduct.id) return;
+
+          const pName = (p.nombre || '').toLowerCase();
+          const pDesc = (p.descripcion || '').toLowerCase();
+
+          const matches = allWords.some(word => 
+            pName.includes(word) || pDesc.includes(word)
+          );
+
+          if (matches) related.push(p);
         });
-        if (related.length < 4) {
-          const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-          const extras = all.filter(p => p.id !== mainProduct.id && !related.some(r => r.id === p.id));
-          related = [...related, ...extras.slice(0, 4 - related.length)];
-        }
+
+        related = related.slice(0, 8);
         if (related.length === 0) {
           relatedGrid.innerHTML = '<p>No hay productos relacionados.</p>';
           return;
         }
+
         relatedGrid.innerHTML = '';
         related.forEach(p => {
           const card = document.createElement('div');
@@ -375,6 +419,14 @@
         relatedGrid.innerHTML = '<p>Error al cargar relacionados.</p>';
       }
     }
+
+    // === LIGHTBOX ZOOM ===
+    window.openLightbox = (src) => {
+      lightboxImage.src = src;
+      lightbox.classList.add('active');
+    };
+    lightboxClose.onclick = () => lightbox.classList.remove('active');
+    lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); };
 
     // === BÚSQUEDA ===
     let searchTimeout;
@@ -426,7 +478,6 @@
     const closeSearch = () => { searchBarHeader.classList.remove('active'); headerOverlay.classList.remove('show'); searchResultsContainer.style.display = 'none'; };
     closeSearchHeader.onclick = headerOverlay.onclick = closeSearch;
 
-    // === AUTENTICACIÓN ===
     let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     let userName = localStorage.getItem('userName') || '';
     function updateAuthUI() {
@@ -450,7 +501,6 @@
     };
     helpBtn.onclick = () => alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
 
-    // === TOAST ===
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
