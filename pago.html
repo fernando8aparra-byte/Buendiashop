@@ -21,7 +21,8 @@
     .btn-edit { background: #f0f0f0; color: #000; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; float: right; }
 
     .order-summary { background: #f8f8f8; padding: 20px; border-radius: 12px; }
-    .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; align-items: center; }
+    .order-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px; }
     .order-total { font-weight: 800; font-size: 1.4rem; margin-top: 15px; text-align: right; }
 
     .login-required { text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -34,7 +35,6 @@
     .footer { padding: 30px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; margin-top: 40px; }
     .footer a { color: #fff; text-decoration: underline; }
 
-    /* NUEVO: PANTALLA DE ÉXITO */
     .success-screen {
       display: none;
       text-align: center;
@@ -45,53 +45,27 @@
       margin: 20px auto;
       max-width: 600px;
     }
-    .success-screen h2 {
-      color: #28a745;
-      font-size: 1.8rem;
-      margin-bottom: 15px;
-    }
-    .success-screen .order-id {
-      font-size: 1.1rem;
-      color: #333;
-      margin-bottom: 25px;
-    }
-    .success-items {
-      text-align: left;
-      background: #f8f8f8;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 20px 0;
-    }
-    .success-items .item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
+    .success-screen h2 { color: #28a745; font-size: 1.8rem; margin-bottom: 15px; }
+    .success-screen .order-id { font-size: 1.1rem; color: #333; margin-bottom: 25px; }
+    .success-items { text-align: left; background: #f8f8f8; padding: 15px; border-radius: 8px; margin: 20px 0; }
+    .success-items .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; align-items: center; }
+    .success-items .item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px; }
     .success-items .item:last-child { border-bottom: none; }
-    .success-total {
-      font-weight: 800;
-      font-size: 1.3rem;
-      text-align: right;
-      margin-top: 15px;
-    }
+    .success-total { font-weight: 800; font-size: 1.3rem; text-align: right; margin-top: 15px; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER SIMPLE -->
   <div class="header">EFRAÍN SHOP - PAGO SEGURO</div>
 
   <div class="container">
 
-    <!-- SI NO ESTÁ LOGUEADO -->
     <div id="loginRequired" class="login-required" style="display:none;">
       <h2>Debes iniciar sesión</h2>
       <p>Para continuar con tu compra, necesitas estar registrado.</p>
       <button class="btn-primary" id="goToLogin">Iniciar Sesión / Registrarse</button>
     </div>
 
-    <!-- FORMULARIO DE ENVÍO (DESPLEGADO DESDE EL INICIO) -->
     <div id="paymentSection" style="display:none;">
 
       <div class="form-section">
@@ -176,14 +150,12 @@
         </form>
       </div>
 
-      <!-- RESUMEN DE PEDIDO -->
       <div class="form-section order-summary">
         <h3>Resumen del Pedido</h3>
         <div id="orderItems"></div>
         <div class="order-total" id="orderTotal">Total: $0</div>
       </div>
 
-      <!-- MÉTODOS DE PAGO -->
       <div class="form-section">
         <h3>Método de Pago</h3>
         <div class="paypal-container">
@@ -196,7 +168,6 @@
       </div>
     </div>
 
-    <!-- NUEVO: PANTALLA DE ÉXITO -->
     <div id="successScreen" class="success-screen">
       <h2>Pago realizado con éxito</h2>
       <p class="order-id">Tu orden: <strong id="successOrderId"></strong></p>
@@ -206,22 +177,16 @@
     </div>
   </div>
 
-  <!-- PIE DE PÁGINA -->
   <footer class="footer">
     <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
 
-  <!-- PAYPAL SDK (SANDBOX) -->
   <script src="https://www.paypal.com/sdk/js?client-id=AdB6bEc3xx0Ned5sYc6Wy6prEgKeZQrfMKtfrCU-tIcvrJNgf8og5nlRkbQKfBRxcIHPmfjY8JsWE6zo&currency=MXN&intent=capture"></script>
-
-  <!-- FIREBASE SDK (v9 compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- SCRIPT PRINCIPAL -->
   <script>
-    // === INICIALIZAR FIREBASE ===
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -244,7 +209,6 @@
       setTimeout(() => toast.style.opacity = '0', 3000);
     }
 
-    // Verificar login
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
     const loginRequired = document.getElementById('loginRequired');
     const paymentSection = document.getElementById('paymentSection');
@@ -261,7 +225,6 @@
       paymentSection.style.display = 'block';
     }
 
-    // Cargar dirección
     const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
     const addressForm = document.getElementById('addressForm');
     const addressDisplay = document.getElementById('addressDisplay');
@@ -301,131 +264,119 @@
       location.reload();
     };
 
-    // Cargar carrito desde Firebase (colección 'carts', documento por userName, campo 'items')
-    const userId = localStorage.getItem('userName') || 'anonimo';
-    const cartRef = db.collection('carts').doc(userId);
-    cartRef.get().then((doc) => {
-      let cart = [];
-      if (doc.exists) {
-        cart = doc.data().items || [];
-      }
+    // === CARGAR CARRITO DESDE LOCALSTORAGE (CORREGIDO) ===
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-      // Resumen del pedido
-      const orderItems = document.getElementById('orderItems');
-      const orderTotal = document.getElementById('orderTotal');
-      let total = 0;
+    if (cart.length === 0) {
+      document.querySelector('.paypal-container').innerHTML = '<p style="color:#999; text-align:center;">Tu carrito está vacío.</p>';
+      showToast('Carrito vacío');
+      setTimeout(() => window.location.href = 'index.html', 2000);
+      return;
+    }
 
-      cart.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'order-item';
-        div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString()}</span>`;
-        orderItems.appendChild(div);
-        total += item.price * item.qty;
-      });
-      orderTotal.textContent = `Total: $${total.toLocaleString()}`;
+    const orderItems = document.getElementById('orderItems');
+    const orderTotal = document.getElementById('orderTotal');
+    let total = 0;
 
-      // PayPal Button
-      if (total > 0 && savedAddress) {
-        paypal.Buttons({
-          style: {
-            shape: 'rect',
-            color: 'gold',
-            layout: 'vertical',
-            label: 'paypal'
-          },
-          createOrder: (data, actions) => {
-            return actions.order.create({
-              purchase_units: [{
-                amount: { value: total.toFixed(2), currency_code: 'MXN' },
-                description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
-                custom_id: `efrain-${Date.now()}-${total.toFixed(0)}`
-              }]
-            });
-          },
-          onApprove: (data, actions) => {
-            return actions.order.capture().then(details => {
-              console.log('PEDIDO PARA ADMIN:', { cart, address: savedAddress, total, orderId: details.id, user: details.payer });
-
-              // === MAPEO DE CÓDIGOS DE ESTADO ===
-              const stateCodes = {
-                "Aguascalientes": "AGS","Baja California": "BC","Baja California Sur": "BCS","Campeche": "CAM","Chiapas": "CHIS","Chihuahua": "CHIH","CDMX": "CDMX","Coahuila": "COAH","Colima": "COL","Durango": "DGO","Guanajuato": "GTO","Guerrero": "GRO","Hidalgo": "HGO","Jalisco": "JAL","México": "MEX","Michoacán": "MICH","Morelos": "MOR","Nayarit": "NAY","Nuevo León": "NL","Oaxaca": "OAX","Puebla": "PUE","Querétaro": "QRO","Quintana Roo": "QROO","San Luis Potosí": "SLP","Sinaloa": "SIN","Sonora": "SON","Tabasco": "TAB","Tamaulipas": "TAM","Tlaxcala": "TLAX","Veracruz": "VER","Yucatán": "YUC","Zacatecas": "ZAC"
-              };
-
-              // === FORMATEAR Y ENVIAR A FIRESTORE ===
-              const orderData = {
-                userId: localStorage.getItem('userName') || 'anonimo',
-                date: firebase.firestore.FieldValue.serverTimestamp(),
-                total: total,
-                paymentId: details.id,
-                status: "paid",
-                address: {
-                  name: savedAddress.name,
-                  phone: savedAddress.phone,
-                  street: savedAddress.street,
-                  colonia: savedAddress.colonia,
-                  cp: savedAddress.cp,
-                  state: savedAddress.state,
-                  stateCode: stateCodes[savedAddress.state] || savedAddress.state
-                },
-                products: cart.map(item => ({
-                  name: item.name,
-                  qty: item.qty,
-                  price: item.price
-                }))
-              };
-
-              db.collection('orders').doc(details.id).set(orderData)
-                .then(() => {
-                  console.log('Orden guardada en Firebase con ID:', details.id);
-                  // Limpiar carrito en Firebase
-                  cartRef.set({ items: [] })
-                    .then(() => {
-                      console.log('Carrito limpiado en Firebase');
-                    })
-                    .catch((error) => {
-                      console.error('Error al limpiar carrito:', error);
-                    });
-                })
-                .catch((error) => {
-                  console.error('Error al guardar en Firebase:', error);
-                });
-
-              // === MOSTRAR PANTALLA DE ÉXITO ===
-              paymentSection.style.display = 'none';
-              successScreen.style.display = 'block';
-
-              document.getElementById('successOrderId').textContent = details.id;
-
-              const successItems = document.getElementById('successItems');
-              successItems.innerHTML = '';
-              let successTotal = 0;
-              cart.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'item';
-                div.innerHTML = `<span>${item.name} x${item.qty}</span><span>$${(item.price * item.qty).toLocaleString()}</span>`;
-                successItems.appendChild(div);
-                successTotal += item.price * item.qty;
-              });
-              document.getElementById('successTotal').textContent = `Total: $${successTotal.toLocaleString()}`;
-
-              document.getElementById('goHomeBtn').onclick = () => {
-                localStorage.removeItem('shippingAddress');
-                window.location.href = 'index.html';
-              };
-            });
-          },
-          onError: (err) => {
-            console.error(err);
-            showToast('Error en el pago. Intenta de nuevo.');
-          }
-        }).render('#paypal-button-container');
-      } else if (total === 0) {
-        document.querySelector('.paypal-container').innerHTML = '<p style="color:#999;">No hay productos en el carrito.</p>';
-      }
-    }).catch((error) => {
-      console.error('Error al cargar el carrito desde Firebase:', error);
-      showToast('Error al cargar el carrito. Intenta de nuevo.');
+    cart.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'order-item';
+      div.innerHTML = `
+        <span>
+          <img src="${item.imagen}" alt="${item.nombre}">
+          ${item.nombre} x${item.qty}
+        </span>
+        <span>$${(item.precio * item.qty).toLocaleString()}</span>
+      `;
+      orderItems.appendChild(div);
+      total += item.precio * item.qty;
     });
+    orderTotal.textContent = `Total: $${total.toLocaleString()}`;
+
+    if (total > 0 && savedAddress) {
+      paypal.Buttons({
+        style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: { value: total.toFixed(2), currency_code: 'MXN' },
+              description: 'Compra en Efraín Shop - Streetwear & Mystery Box',
+              custom_id: `efrain-${Date.now()}-${total.toFixed(0)}`
+            }]
+          });
+        },
+        onApprove: (data, actions) => {
+          return actions.order.capture().then(details => {
+            const stateCodes = {
+              "Aguascalientes": "AGS","Baja California": "BC","Baja California Sur": "BCS","Campeche": "CAM","Chiapas": "CHIS","Chihuahua": "CHIH","CDMX": "CDMX","Coahuila": "COAH","Colima": "COL","Durango": "DGO","Guanajuato": "GTO","Guerrero": "GRO","Hidalgo": "HGO","Jalisco": "JAL","México": "MEX","Michoacán": "MICH","Morelos": "MOR","Nayarit": "NAY","Nuevo León": "NL","Oaxaca": "OAX","Puebla": "PUE","Querétaro": "QRO","Quintana Roo": "QROO","San Luis Potosí": "SLP","Sinaloa": "SIN","Sonora": "SON","Tabasco": "TAB","Tamaulipas": "TAM","Tlaxcala": "TLAX","Veracruz": "VER","Yucatán": "YUC","Zacatecas": "ZAC"
+            };
+
+            const orderData = {
+              userId: localStorage.getItem('userName') || 'anonimo',
+              date: firebase.firestore.FieldValue.serverTimestamp(),
+              total: total,
+              paymentId: details.id,
+              status: "paid",
+              address: {
+                name: savedAddress.name,
+                phone: savedAddress.phone,
+                street: savedAddress.street,
+                colonia: savedAddress.colonia,
+                cp: savedAddress.cp,
+                state: savedAddress.state,
+                stateCode: stateCodes[savedAddress.state] || savedAddress.state
+              },
+              products: cart.map(item => ({
+                name: item.nombre,
+                qty: item.qty,
+                price: item.precio
+              }))
+            };
+
+            db.collection('orders').doc(details.id).set(orderData)
+              .then(() => {
+                localStorage.removeItem('cart');
+                localStorage.removeItem('shippingAddress');
+
+                paymentSection.style.display = 'none';
+                successScreen.style.display = 'block';
+
+                document.getElementById('successOrderId').textContent = details.id;
+
+                const successItems = document.getElementById('successItems');
+                successItems.innerHTML = '';
+                let successTotal = 0;
+                cart.forEach(item => {
+                  const div = document.createElement('div');
+                  div.className = 'item';
+                  div.innerHTML = `
+                    <span>
+                      <img src="${item.imagen}" alt="${item.nombre}">
+                      ${item.nombre} x${item.qty}
+                    </span>
+                    <span>$${(item.precio * item.qty).toLocaleString()}</span>
+                  `;
+                  successItems.appendChild(div);
+                  successTotal += item.precio * item.qty;
+                });
+                document.getElementById('successTotal').textContent = `Total: $${successTotal.toLocaleString()}`;
+
+                document.getElementById('goHomeBtn').onclick = () => {
+                  window.location.href = 'index.html';
+                };
+              })
+              .catch(error => {
+                console.error('Error al guardar orden:', error);
+                showToast('Error al procesar la orden');
+              });
+          });
+        },
+        onError: (err) => {
+          console.error(err);
+          showToast('Error en el pago. Intenta de nuevo.');
+        }
+      }).render('#paypal-button-container');
+    }
   </script>
 </body>
 </html>
