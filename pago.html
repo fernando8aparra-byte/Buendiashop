@@ -52,6 +52,16 @@
     }
     .empty-cart-message a { color: #000; font-weight: 600; text-decoration: underline; cursor: pointer; }
     .empty-cart-message a:hover { color: #555; }
+
+    /* NUEVO: Mensaje si no hay dirección */
+    .address-required {
+      text-align: center; padding: 30px 20px; background: #fff9e6; border: 1px solid #ffd700; border-radius: 12px;
+      margin-bottom: 20px; color: #b8860b; font-weight: 600;
+    }
+    .address-required::before {
+      content: "Warning: ";
+      font-weight: 800;
+    }
   </style>
 </head>
 <body>
@@ -65,7 +75,7 @@
       <button class="btn-primary" id="goToLogin">Iniciar sesión o registrarse</button>
     </div>
 
-    <!-- CONTENIDO DE PAGO (SOLO SI ESTÁ LOGUEADO) -->
+    <!-- CONTENIDO DE PAGO -->
     <div id="paymentContent" style="display:none;">
 
       <!-- CARRITO VACÍO -->
@@ -75,6 +85,12 @@
 
       <!-- SECCIÓN DE PAGO -->
       <div id="paymentSection">
+
+        <!-- AVISO: DIRECCIÓN REQUERIDA -->
+        <div id="addressRequiredMessage" class="address-required" style="display:none;">
+          Debes guardar tu dirección de envío para continuar con el pago.
+        </div>
+
         <!-- DIRECCIÓN -->
         <div class="form-section">
           <h3>Dirección de Envío</h3>
@@ -97,7 +113,7 @@
                   <option>Guerrero</option><option>Hidalgo</option><option>Jalisco</option><option>México</option>
                   <option>Michoacán</option><option>Morelos</option><option>Nayarit</option><option>Nuevo León</option>
                   <option>Oaxaca</option><option>Puebla</option><option>Querétaro</option><option>Quintana Roo</option>
-                   <option>San Luis Potosí</option><option>Sinaloa</option><option>Sonora</option><option>Tabasco</option>
+                  <option>San Luis Potosí</option><option>Sinaloa</option><option>Sonora</option><option>Tabasco</option>
                   <option>Tamaulipas</option><option>Tlaxcala</option><option>Veracruz</option><option>Yucatán</option>
                   <option>Zacatecas</option>
                 </select>
@@ -140,8 +156,8 @@
           <div class="order-total" id="orderTotal">Total: $0</div>
         </div>
 
-        <!-- PAGO -->
-        <div class="form-section">
+        <!-- PAGO (solo aparece si hay dirección) -->
+        <div class="form-section" id="paymentMethodSection" style="display:none;">
           <h3>Método de Pago</h3>
           <div class="paypal-container">
             <p>Paga de forma segura con PayPal</p>
@@ -201,8 +217,9 @@
     const orderItems = document.getElementById('orderItems');
     const orderTotal = document.getElementById('orderTotal');
     const paypalContainer = document.getElementById('paypal-button-container');
+    const paymentMethodSection = document.getElementById('paymentMethodSection');
+    const addressRequiredMessage = document.getElementById('addressRequiredMessage');
     const toast = document.getElementById('toast');
-    const goToLoginBtn = document.getElementById('goToLogin');
 
     // === TOAST ===
     function showToast(msg) {
@@ -213,20 +230,12 @@
 
     // === VERIFICAR SESIÓN ===
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-
     if (!isLoggedIn) {
       loginRequired.style.display = 'block';
       paymentContent.style.display = 'none';
-
-      // Guardar redirección
       localStorage.setItem('redirectAfterLogin', 'pago.html');
-
-      // Botón de login
-      goToLoginBtn.onclick = () => {
-        window.location.href = 'login.html';
-      };
-      // Detener ejecución
-      throw new Error("Usuario no logueado"); // Evita que siga
+      document.getElementById('goToLogin').onclick = () => window.location.href = 'login.html';
+      throw new Error("No logueado");
     } else {
       loginRequired.style.display = 'none';
       paymentContent.style.display = 'block';
@@ -234,40 +243,43 @@
 
     // === CARRITO ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-    // === CARRITO VACÍO ===
     if (cart.length === 0) {
       paymentSection.style.display = 'none';
       emptyCartMessage.style.display = 'block';
-      orderTotal.textContent = 'Total: $0';
-      paypalContainer.innerHTML = '';
       throw new Error("Carrito vacío");
     }
 
     // === DIRECCIÓN ===
-    const savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
+    let savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
     const addressForm = document.getElementById('addressForm');
     const addressDisplay = document.getElementById('addressDisplay');
     const editAddressBtn = document.getElementById('editAddressBtn');
 
-    if (savedAddress) {
-      document.getElementById('dispName').textContent = savedAddress.name;
-      document.getElementById('dispPhone').textContent = savedAddress.phone;
-      document.getElementById('dispAddress').textContent = `${savedAddress.street}, ${savedAddress.colonia}, C.P. ${savedAddress.cp}`;
-      document.getElementById('dispState').textContent = savedAddress.state;
-      addressForm.style.display = 'none';
-      addressDisplay.style.display = 'block';
-      editAddressBtn.style.display = 'block';
-    } else {
-      addressForm.style.display = 'block';
-      addressDisplay.style.display = 'none';
-      editAddressBtn.style.display = 'none';
+    function updateAddressUI() {
+      if (savedAddress) {
+        document.getElementById('dispName').textContent = savedAddress.name;
+        document.getElementById('dispPhone').textContent = savedAddress.phone;
+        document.getElementById('dispAddress').textContent = `${savedAddress.street}, ${savedAddress.colonia}, C.P. ${savedAddress.cp}`;
+        document.getElementById('dispState').textContent = savedAddress.state;
+        addressForm.style.display = 'none';
+        addressDisplay.style.display = 'block';
+        editAddressBtn.style.display = 'block';
+        addressRequiredMessage.style.display = 'none';
+        paymentMethodSection.style.display = 'block'; // Mostrar PayPal
+        renderPayPalButton(total);
+      } else {
+        addressForm.style.display = 'block';
+        addressDisplay.style.display = 'none';
+        editAddressBtn.style.display = 'none';
+        addressRequiredMessage.style.display = 'block';
+        paymentMethodSection.style.display = 'none'; // Ocultar PayPal
+      }
     }
 
     editAddressBtn.onclick = () => {
-      addressForm.style.display = 'block';
-      addressDisplay.style.display = 'none';
-      editAddressBtn.style.display = 'none';
+      savedAddress = null;
+      localStorage.removeItem('shippingAddress');
+      updateAddressUI();
     };
 
     addressForm.onsubmit = (e) => {
@@ -281,7 +293,9 @@
         phone: document.getElementById('phone').value
       };
       localStorage.setItem('shippingAddress', JSON.stringify(address));
-      location.reload();
+      savedAddress = address;
+      updateAddressUI();
+      showToast('Dirección guardada');
     };
 
     // === CARGAR PRODUCTOS ===
@@ -318,12 +332,15 @@
 
       orderItems.innerHTML = itemsHTML.join('');
       orderTotal.textContent = `Total: $${total.toLocaleString()}`;
-      renderPayPalButton(total);
+      updateAddressUI(); // Mostrar u ocultar PayPal
     }
 
     // === PAYPAL ===
     function renderPayPalButton(totalAmount) {
       if (!savedAddress || totalAmount <= 0) return;
+
+      // Limpiar botón anterior
+      paypalContainer.innerHTML = '';
 
       paypal.Buttons({
         style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
@@ -347,7 +364,7 @@
               address: savedAddress,
               products: cart.map(item => ({
                 id: item.id,
-                name: item.nombre,
+                name: item.nombre || 'Producto',
                 qty: item.qty,
                 price: item.precio
               }))
@@ -381,9 +398,7 @@
             }
           });
         },
-        onError: (err) => {
-          showToast('Error en el pago. Intenta de nuevo.');
-        }
+        onError: () => showToast('Error en el pago. Intenta de nuevo.')
       }).render('#paypal-button-container');
     }
 
