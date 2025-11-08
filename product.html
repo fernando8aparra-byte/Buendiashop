@@ -6,7 +6,7 @@
   <title>Producto | Boutique-buenday</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* === ESTILOS IGUALES A INDEX === */
+    /* === ESTILOS GENERALES === */
     body { margin: 0; padding: 0; padding-top: 60px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .header-inner { display: flex; align-items: center; justify-content: space-between; position: relative; height: 60px; padding: 0 15px; box-sizing: border-box; }
@@ -77,18 +77,59 @@
     .btn-outline:hover { background: #000; color: #fff; }
     .btn-outline svg { width: 20px; height: 20px; }
 
-    /* === PRODUCTOS RELACIONADOS EN LISTA VERTICAL === */
+    /* === PRODUCTOS RELACIONADOS: TARJETAS VERTICALES (RECTÁNGULOS) === */
     .related-section { margin-top: 60px; padding: 0 20px; }
-    .related-section h2 { text-align: center; margin-bottom: 25px; font-size: 1.8rem; }
-    .related-list { display: flex; flex-direction: column; gap: 16px; }
-    .related-item {
-      display: flex; gap: 16px; background: #fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.2s ease;
+    .related-section h2 { text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 20px;
+      justify-items: center;
     }
-    .related-item:hover { transform: translateY(-2px); }
-    .related-item img { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
-    .related-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .related-info h4 { margin: 0; font-size: 1rem; font-weight: 600; }
-    .related-info .price { font-weight: bold; color: #000; margin-top: 4px; }
+    .related-card {
+      width: 100%;
+      max-width: 160px;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+    .related-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+    .related-info {
+      padding: 12px 8px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .related-info h4 {
+      margin: 0 0 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .related-info .price {
+      font-weight: bold;
+      color: #000;
+      font-size: 1rem;
+    }
 
     /* Lightbox */
     .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
@@ -154,7 +195,7 @@
 
     <section class="related-section">
       <h2>Productos Relacionados</h2>
-      <div class="related-list" id="relatedList">
+      <div class="related-grid" id="relatedGrid">
         <p>Cargando...</p>
       </div>
     </section>
@@ -205,8 +246,12 @@
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
-      <div id="message"></div>
+      <button id="goToPay" class="btn-outline" style="display:none; margin-top: 12px; width: 100%;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3h18l-2 12H5L3 3zM16 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM8 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+        </svg>
+        Ir a Pagar
+      </button>
     </div>
   </aside>
 
@@ -244,7 +289,7 @@
 
     // === DOM ===
     const productMain = document.getElementById('productMain');
-    const relatedList = document.getElementById('relatedList');
+    const relatedGrid = document.getElementById('relatedGrid');
     const cartBadge = document.getElementById('cartBadge');
     const cartItems = document.getElementById('cartItems');
     const cartTotal = document.getElementById('cartTotal');
@@ -285,14 +330,14 @@
         goToPay.style.display = 'none';
         return;
       }
-      goToPay.style.display = 'block';
+      goToPay.style.display = 'flex';
       cart.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
-          <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
-          <div>
-            <div>${item.nombre}</div>
+          <img src="${item.imagen}" alt="${item.nombre}" class="thumb" style="width:50px;height:50px;object-fit:cover;border-radius:6px;">
+          <div style="flex:1;">
+            <div style="font-weight:600;">${item.nombre}</div>
             <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
           </div>
           <button onclick="removeFromCart(${i})">X</button>
@@ -309,7 +354,7 @@
         existing.qty++;
         showToast('¡Cantidad aumentada!');
       } else {
-        cartooky.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
+        cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
         showToast('¡Agregado al carrito!');
       }
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -323,8 +368,10 @@
       showToast('Producto eliminado');
     };
 
+    // === PAGAR DESDE CARRITO O PRODUCTO ===
     goToPay.onclick = () => {
-      if (cart.length === 0) return;
+      if (cart.length === 0) return showToast("Carrito vacío");
+      // Asegurar que el producto actual esté en el carrito
       if (window.currentProduct && !cart.some(i => i.id === window.currentProduct.id)) {
         addToCart(window.currentProduct.id);
       }
@@ -382,9 +429,9 @@
       }
     }
 
-    // === PRODUCTOS RELACIONADOS (lista vertical) ===
+    // === PRODUCTOS RELACIONADOS (tarjetas verticales centradas) ===
     async function loadRelatedProducts(mainProduct) {
-      relatedList.innerHTML = '<p>Cargando relacionados...</p>';
+      relatedGrid.innerHTML = '<p>Cargando relacionados...</p>';
       const nameWords = (mainProduct.nombre || '').toLowerCase().split(' ').filter(w => w.length > 2);
       const descWords = (mainProduct.descripcion || '').toLowerCase().split(' ').filter(w => w.length > 2);
       const allWords = [...new Set([...nameWords, ...descWords])];
@@ -396,37 +443,35 @@
         snapshot.forEach(doc => {
           const p = { id: doc.id, ...doc.data() };
           if (p.id === mainProduct.id) return;
-
           const pName = (p.nombre || '').toLowerCase();
           const pDesc = (p.descripcion || '').toLowerCase();
-
           const matches = allWords.some(word => pName.includes(word) || pDesc.includes(word));
           if (matches) related.push(p);
         });
 
-        related = related.slice(0, 6);
+        related = related.slice(0, 8);
         if (related.length === 0) {
-          relatedList.innerHTML = '<p>No hay productos relacionados.</p>';
+          relatedGrid.innerHTML = '<p style="text-align:center;color:#666;">No hay productos relacionados.</p>';
           return;
         }
 
-        relatedList.innerHTML = '';
+        relatedGrid.innerHTML = '';
         related.forEach(p => {
-          const item = document.createElement('div');
-          item.className = 'related-item';
-          item.onclick = () => window.location.href = `product.html?id=${p.id}`;
-          item.innerHTML = `
+          const card = document.createElement('div');
+          card.className = 'related-card';
+          card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+          card.innerHTML = `
             <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
             <div class="related-info">
               <h4>${p.nombre}</h4>
               <div class="price">$${p.precio.toLocaleString()}</div>
             </div>
           `;
-          relatedList.appendChild(item);
+          relatedGrid.appendChild(card);
         });
       } catch (err) {
         console.error(err);
-        relatedList.innerHTML = '<p>Error al cargar relacionados.</p>';
+        relatedGrid.innerHTML = '<p>Error al cargar relacionados.</p>';
       }
     }
 
