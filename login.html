@@ -116,169 +116,160 @@
 
   <!-- FIREBASE + LÓGICA -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+    authDomain: "boutique-buendia.firebaseapp.com",
+    projectId: "boutique-buendia",
+    storageBucket: "boutique-buendia.firebasestorage.app",
+    messagingSenderId: "430651152709",
+    appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    // ELEMENTOS
-    const formTitle = document.getElementById('formTitle');
-    const mainBtn = document.getElementById('mainBtn');
-    const toggleLink = document.getElementById('toggleLink');
-    const nameInput = document.getElementById('name');
-    const identifierInput = document.getElementById('identifier');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const toast = document.getElementById('toast');
+  const formTitle = document.getElementById('formTitle');
+  const mainBtn = document.getElementById('mainBtn');
+  const toggleLink = document.getElementById('toggleLink');
+  const nameInput = document.getElementById('name');
+  const identifierInput = document.getElementById('identifier');
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const toast = document.getElementById('toast');
 
-    let isLogin = true;
+  let isLogin = true;
 
-    // === TOAST ===
-    function showToast(msg, isError = false) {
-      toast.textContent = msg;
-      toast.classList.toggle('error', isError);
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 4000);
+  function showToast(msg, isError = false) {
+    toast.textContent = msg;
+    toast.classList.toggle('error', isError);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  toggleLink.onclick = (e) => {
+    e.preventDefault();
+    isLogin = !isLogin;
+
+    if (isLogin) {
+      formTitle.textContent = 'Iniciar Sesión';
+      mainBtn.textContent = 'Entrar';
+      toggleLink.textContent = 'Regístrate aquí';
+      identifierInput.placeholder = 'Nombre o identificador';
+      nameInput.classList.add('hidden');
+      nameInput.removeAttribute('required');
+      confirmPasswordInput.classList.add('hidden');
+      confirmPasswordInput.removeAttribute('required');
+    } else {
+      formTitle.textContent = 'Crear Cuenta';
+      mainBtn.textContent = 'Registrarme';
+      toggleLink.textContent = 'Iniciar sesión';
+      identifierInput.placeholder = 'Correo electrónico';
+      nameInput.classList.remove('hidden');
+      nameInput.setAttribute('required', '');
+      confirmPasswordInput.classList.remove('hidden');
+      confirmPasswordInput.setAttribute('required', '');
+    }
+  };
+
+  mainBtn.onclick = async () => {
+    const identifier = identifierInput.value.trim();
+    const password = passwordInput.value;
+    const nombre = nameInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value;
+
+    if (!identifier || !password) {
+      showToast('Completa todos los campos', true);
+      return;
     }
 
-    // === TOGGLE LOGIN / REGISTRO ===
-    toggleLink.onclick = (e) => {
-      e.preventDefault();
-      isLogin = !isLogin;
+    if (!isLogin && (!nombre || password !== confirmPassword)) {
+      showToast('Las contraseñas no coinciden', true);
+      return;
+    }
 
+    try {
       if (isLogin) {
-        formTitle.textContent = 'Iniciar Sesión';
-        mainBtn.textContent = 'Entrar';
-        toggleLink.textContent = 'Regístrate aquí';
-        identifierInput.placeholder = 'Nombre o identificador';
-        nameInputश्व.classList.add('hidden');
-        nameInput.removeAttribute('required');
-        confirmPasswordInput.classList.add('hidden');
-        confirmPasswordInput.removeAttribute('required');
-      } else {
-        formTitle.textContent = 'Crear Cuenta';
-        mainBtn.textContent = 'Registrarme';
-        toggleLink.textContent = 'Iniciar sesión';
-        identifierInput.placeholder = 'Correo electrónico';
-        nameInput.classList.remove('hidden');
-        nameInput.setAttribute('required', '');
-        confirmPasswordInput.classList.remove('hidden');
-        confirmPasswordInput.setAttribute('required', '');
-      }
-    };
+        // === BUSCAR ADMIN EN COLECCIÓN "admin" (sin s) ===
+        console.log("Buscando en colección 'admin' (sin s)...");
 
-    // === ACCIÓN PRINCIPAL ===
-    mainBtn.onclick = async () => {
-      const identifier = identifierInput.value.trim();
-      const password = passwordInput.value;
-      const nombre = nameInput.value.trim();
-      const confirmPassword = confirmPasswordInput.value;
+        // Intentar leer el documento "admin" directamente
+        const adminDocRef = doc(db, "admin", "admin"); // colección: admin, documento: admin
+        const adminDocSnap = await getDoc(adminDocRef);
 
-      if (!identifier || !password) {
-        showToast('Completa todos los campos', true);
-        return;
-      }
+        if (adminDocSnap.exists()) {
+          const adminData = adminDocSnap.data();
+          console.log("Admin encontrado:", adminData);
 
-      if (!isLogin && (!nombre || password !== confirmPassword)) {
-        showToast('Las contraseñas no coinciden', true);
-        return;
-      }
-
-      try {
-        if (isLogin) {
-          // === INICIAR SESIÓN ===
-
-          // BUSCAR ADMIN EN FIREBASE
-          const adminQuery = query(
-            collection(db, "admins"),
-            where("usuario", "==", identifier)
-          );
-          const adminSnapshot = await getDocs(adminQuery);
-
-          if (!adminSnapshot.empty) {
-            const adminData = adminSnapshot.docs[0].data();
-            if (adminData.contraseña === password) {
-              localStorage.setItem('loggedIn', 'true');
-              localStorage.setItem('userName', 'Administrador');
-              localStorage.setItem('admin', 'true');
-              showToast('Acceso de administrador');
-              setTimeout(() => window.location.href = 'admin.html', 1500);
-              return;
-            } else {
-              showToast('Contraseña incorrecta', true);
-              return;
-            }
-          }
-
-          // USUARIO NORMAL
-          let email = identifier;
-          if (!identifier.includes('@')) {
-            const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) {
-              showToast('Usuario no encontrado', true);
-              return;
-            }
-            email = snapshot.docs[0].data().correo;
-          }
-
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          const userDoc = await getDoc(doc(db, "usuarios", userCredential.user.uid));
-          const data = userDoc.data();
-
-          localStorage.setItem('loggedIn', 'true');
-          localStorage.setItem('userName', data.nombre);
-          showToast(`¡Bienvenido, ${data.nombre.split(' ')[0]}!`);
-          setTimeout(() => window.location.href = 'index.html', 1500);
-
-        } else {
-          // === REGISTRO ===
-          if (!identifier.includes('@')) {
-            showToast('Ingresa un correo válido', true);
+          if (adminData.usuario === identifier && adminData.contraseña === password) {
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('userName', 'Administrador');
+            localStorage.setItem('admin', 'true');
+            showToast('Acceso de administrador');
+            setTimeout(() => window.location.href = 'admin.html', 1500);
+            return;
+          } else {
+            showToast('Usuario o contraseña incorrectos', true);
             return;
           }
-
-          const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
-          await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-            nombre: nombre,
-            correo: identifier
-          });
-
-          localStorage.setItem('loggedIn', 'true');
-          localStorage.setItem('userName', nombre);
-          showToast('¡Cuenta creada!');
-          setTimeout(() => window.location.href = 'index.html', 1500);
+        } else {
+          console.log("No existe el documento 'admin' en colección 'admin'");
+          showToast('Admin no configurado', true);
+          return;
         }
-      } catch (error) {
-        let msg = 'Error';
-        switch (error.code) {
-          case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
-          case 'auth/invalid-email': msg = 'Correo inválido'; break;
-          case 'auth/weak-password': msg = 'Contraseña muy débil'; break;
-          case 'auth/user-not-found':
-          case 'auth/wrong-password': msg = 'Credenciales incorrectas'; break;
-          default: msg = error.message;
+
+        // === USUARIO NORMAL ===
+        let email = identifier;
+        if (!identifier.includes('@')) {
+          const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
+          const snapshot = await getDocs(q);
+          if (snapshot.empty) {
+            showToast('Usuario no encontrado', true);
+            return;
+          }
+          email = snapshot.docs[0].data().correo;
         }
-        showToast('Error: ' + msg, true);
+
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userDoc = await getDoc(doc(db, "usuarios", userCredential.user.uid));
+        const data = userDoc.data();
+
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userName', data.nombre);
+        showToast(`¡Bienvenido, ${data.nombre.split(' ')[0]}!`);
+        setTimeout(() => window.location.href = 'index.html', 1500);
+
+      } else {
+        // === REGISTRO ===
+        if (!identifier.includes('@')) {
+          showToast('Ingresa un correo válido', true);
+          return;
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
+        await setDoc(doc(db, "usuarios", userCredential.user.uid), {
+          nombre: nombre,
+          correo: identifier
+        });
+
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userName', nombre);
+        showToast('¡Cuenta creada!');
+        setTimeout(() => window.location.href = 'index.html', 1500);
       }
-    };
+    } catch (error) {
+      console.error("Error:", error);
+      showToast('Error: ' + (error.message || 'Intenta de nuevo'), true);
+    }
+  };
 
-    // === ENTER = ENVIAR ===
-    document.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') mainBtn.click();
-    });
-  </script>
+  document.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') mainBtn.click();
+  });
+</script>
 </body>
 </html>
