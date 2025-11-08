@@ -161,7 +161,7 @@
   <!-- PayPal SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=AdB6bEc3xx0Ned5sYc6Wy6prEgKeZQrfMKtfrCU-tIcvrJNgf8og5nlRkbQKfBRxcIHPmfjY8JsWE6zo&currency=MXN&intent=capture"></script>
 
-  <!-- Firebase -->
+  <!-- Firebase + Lógica -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -178,8 +178,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // === TOAST ===
+    // === ELEMENTOS ===
     const toast = document.getElementById('toast');
+    const loginRequired = document.getElementById('loginRequired');
+    const paymentSection = document.getElementById('paymentSection');
+    const successScreen = document.getElementById('successScreen');
+    const orderItems = document.getElementById('orderItems');
+    const orderTotal = document.getElementById('orderTotal');
+    const paypalContainer = document.getElementById('paypal-button-container');
+
+    // === TOAST ===
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
@@ -188,16 +196,11 @@
 
     // === LOGIN ===
     const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-    const loginRequired = document.getElementById('loginRequired');
-    const paymentSection = document.getElementById('paymentSection');
-    const successScreen = document.getElementById('successScreen');
-    const goToLogin = document.getElementById('goToLogin');
-
     if (!isLoggedIn) {
       loginRequired.style.display = 'block';
       paymentSection.style.display = 'none';
       localStorage.setItem('redirectAfterLogin', 'pago.html');
-      goToLogin.onclick = () => window.location.href = 'login.html';
+      document.getElementById('goToLogin').onclick = () => window.location.href = 'login.html';
     } else {
       loginRequired.style.display = 'none';
       paymentSection.style.display = 'block';
@@ -243,20 +246,18 @@
       location.reload();
     };
 
-    // === CARRITO DESDE LOCALSTORAGE ===
+    // === CARRITO ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
     if (cart.length === 0) {
-      document.querySelector('.paypal-container').innerHTML = '<p style="color:#999; text-align:center;">Tu carrito está vacío.</p>';
+      orderItems.innerHTML = '<p style="color:#999; text-align:center;">Tu carrito está vacío.</p>';
+      orderTotal.textContent = 'Total: $0';
+      paypalContainer.innerHTML = '';
       showToast('Carrito vacío');
-      setTimeout(() => window.location.href = 'index.html', 2000);
       return;
     }
 
     // === CARGAR PRODUCTOS DESDE FIREBASE ===
-    const orderItems = document.getElementById('orderItems');
-    const orderTotal = document.getElementById('orderTotal');
     let total = 0;
-
     async function loadCartItems() {
       orderItems.innerHTML = '<p>Cargando productos...</p>';
       const itemsHTML = [];
@@ -284,13 +285,13 @@
           } else {
             itemsHTML.push(`
               <div class="order-item" style="opacity:0.6;">
-                <span>Producto no encontrado (ID: ${item.id})</span>
+                <span>Producto eliminado</span>
               </div>
             `);
           }
         } catch (err) {
-          console.error(err);
-          itemsHTML.push(`<div class="order-item" style="color:#d00;">Error al cargar</div>`);
+          console.error("Error cargando producto:", err);
+          itemsHTML.push(`<div class="order-item" style="color:#d00;">Error</div>`);
         }
       }
 
@@ -324,15 +325,7 @@
               total: totalAmount,
               paymentId: details.id,
               status: "paid",
-              address: {
-                name: savedAddress.name,
-                phone: savedAddress.phone,
-                street: savedAddress.street,
-                colonia: savedAddress.colonia,
-                cp: savedAddress.cp,
-                state: savedAddress.state,
-                stateCode: stateCodes[savedAddress.state] || savedAddress.state
-              },
+              address: savedAddress,
               products: cart.map(item => ({
                 id: item.id,
                 name: item.nombre,
@@ -351,7 +344,6 @@
               document.getElementById('successOrderId').textContent = details.id;
 
               const successItems = document.getElementById('successItems');
-              successItems.innerHTML = '';
               cart.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'item';
