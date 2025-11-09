@@ -31,6 +31,10 @@ if (!localStorage.getItem('isAdmin')) {
   window.location.href = 'login.html';
 }
 
+// === ESTADO DE EDICIÓN DE TEXTOS ===
+let textEditMode = false;
+let textChanges = {};
+
 // === CARGAR PRODUCTOS ===
 function loadProductsByType(type, containerId) {
   const q = query(collection(db, "productos"), where("type", "==", type));
@@ -145,7 +149,7 @@ window.deleteProduct = async (id) => {
   showToast("Producto eliminado");
 };
 
-// === AGREGAR PRODUCTO (LIMPIAR + DISPONIBLES) ===
+// === AGREGAR PRODUCTO ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
   ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
@@ -153,7 +157,7 @@ document.getElementById('addPostBtn').onclick = () => {
   });
   document.getElementById('addImageFile').value = '';
   document.getElementById('imagePreview').style.display = 'none';
-  document.getElementById('addAvailable').checked = false;
+  document.getElementById('addAvailableCount').value = 0;
 };
 
 document.getElementById('saveNewProduct').onclick = async () => {
@@ -177,6 +181,7 @@ document.getElementById('saveNewProduct').onclick = async () => {
     tipo: document.getElementById('addCategory').value,
     type: document.getElementById('addType').value,
     imagen: url,
+    disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
     creado: new Date()
   };
 
@@ -185,18 +190,20 @@ document.getElementById('saveNewProduct').onclick = async () => {
     return;
   }
 
-  const docRef = await addDoc(collection(db, "productos"), producto);
-
-  if (document.getElementById('addAvailable').checked) {
-    await setDoc(doc(db, "productos_disponibles", "disponibles"), {
-      activos: arrayUnion(producto.nombre)
-    }, { merge: true });
-    showToast("Producto agregado y en disponibles");
-  } else {
-    showToast("Producto agregado");
-  }
-
+  await addDoc(collection(db, "productos"), producto);
+  showToast("Producto agregado");
   closeModal('addProductModal');
+};
+
+// === BOTONES + / - PARA CANTIDAD ===
+document.getElementById('increaseAvailable').onclick = () => {
+  const input = document.getElementById('addAvailableCount');
+  input.value = (parseInt(input.value) || 0) + 1;
+};
+document.getElementById('decreaseAvailable').onclick = () => {
+  const input = document.getElementById('addAvailableCount');
+  const val = parseInt(input.value) || 0;
+  input.value = val > 0 ? val - 1 : 0;
 };
 
 // === REDES SOCIALES ===
@@ -260,75 +267,47 @@ document.getElementById('adminGear').onclick = e => {
 };
 document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
-// === EDICIÓN DIRECTA DE TEXTOS ===
+// === EDICIÓN DE TEXTOS CON BORDES Y BOTONES ===
+document.getElementById('toggleTextEdit').onclick = () => {
+  textEditMode = !textEditMode;
+  const controls = document.getElementById('textEditControls');
+  const editables = document.querySelectorAll('[contenteditable="true"]');
+
+  if (textEditMode) {
+    controls.classList.add('active');
+    editables.forEach(el => el.classList.add('editing'));
+  } else {
+    controls.classList.remove('active');
+    editables.forEach(el => el.classList.remove('editing'));
+    textChanges = {};
+  }
+};
+
+// Guardar cambios
+document.getElementById('saveTextChanges').onclick = async () => {
+  for (const [key, value] of Object.entries(textChanges)) {
+    const [coll, docu, field] = key.split('|');
+    await setDoc(doc(db, coll, docu), { [field]: value }, { merge: true });
+  }
+  showToast("Cambios guardados");
+  textEditMode = false;
+  document.getElementById('textEditControls').classList.remove('active');
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.remove('editing'));
+  textChanges = {};
+};
+
+// Cancelar
+document.getElementById('cancelTextChanges').onclick = () => {
+  location.reload(); // Más simple: recargar
+};
+
+// Capturar cambios
 document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-  el.addEventListener('focus', () => el.classList.add('editing'));
-  el.addEventListener('blur', () => {
-    el.classList.remove('editing');
-    setTimeout(() => saveEditable(el), 300);
+  el.addEventListener('input', () => {
+    const key = `${el.dataset.collection}|${el.dataset.doc}|${el.dataset.field}`;
+    textChanges[key] = el.textContent.trim();
   });
 });
-
-async function saveEditable(el) {
-  const coll = el.dataset.collection;
-  const docu = el.dataset.doc;
-  const field = el.dataset.field;
-  const value = el.textContent.trim();
-  await setDoc(doc(db, coll, docu), { [field]: value }, { merge: true });
-}
-
-// === PANEL DE EDICIÓN DE TEXTOS ===
-document.getElementById('openTextEditor').onclick = () => {
-  document.getElementById('textEditorPanel').classList.add('active');
-  loadTextEditorValues();
-};
-
-document.getElementById('closeTextEditor').onclick = () => {
-  document.getElementById('textEditorPanel').classList.remove('active');
-};
-
-function loadTextEditorValues() {
-  onSnapshot(doc(db, "textos", "hero"), snap => {
-    if (snap.exists()) {
-      const d = snap.data();
-      document.getElementById('editHeroTitle').value = d.titulo || '';
-      document.getElementById('editHeroTag').value = d.subtitulo || '';
-      document.getElementById('editHeroBg').value = d.fondo_url || '';
-      if (d.fondo_url) {
-        const img = document.getElementById('heroBgPreview');
-        img.src = d.fondo_url;
-        img.style.display = 'block';
-      }
-    }
-  });
-
-  onSnapshot(doc(db, "textos", "secciones"), snap => {
-    if (snap.exists()) {
-      const d = snap.data();
-      document.getElementById('editNewTitle').value = d.nuevos_lanzamientos || '';
-      document.getElementById('editStarTitle').value = d.productos_estrella || '';
-      document.getElementById('editAllTitle').value = d.todos_productos || '';
-    }
-  });
-}
-
-document.getElementById('saveAllTexts').onclick = async () => {
-  const hero = {
-    titulo: document.getElementById('editHeroTitle').value,
-    subtitulo: document.getElementById('editHeroTag').value,
-    fondo_url: document.getElementById('editHeroBg').value
-  };
-  const secciones = {
-    nuevos_lanzamientos: document.getElementById('editNewTitle').value,
-    productos_estrella: document.getElementById('editStarTitle').value,
-    todos_productos: document.getElementById('editAllTitle').value
-  };
-
-  await setDoc(doc(db, "textos", "hero"), hero, { merge: true });
-  await setDoc(doc(db, "textos", "secciones"), secciones, { merge: true });
-  showToast("Textos guardados");
-  document.getElementById('textEditorPanel').classList.remove('active');
-};
 
 // === CARGAR FONDO HERO ===
 onSnapshot(doc(db, "textos", "hero"), snap => {
