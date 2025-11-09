@@ -190,6 +190,7 @@ document.getElementById('addAvailableCount').addEventListener('blur', () => {
   inputContainer.style.display = 'none';
 });
 
+// === GUARDAR NUEVO PRODUCTO (type COMO OBJETO) ===
 document.getElementById('saveNewProduct').onclick = async () => {
   const url = document.getElementById('addImage').value.trim();
   const hasFile = document.getElementById('addImageFile').files.length > 0;
@@ -203,19 +204,25 @@ document.getElementById('saveNewProduct').onclick = async () => {
     return;
   }
 
+  const typeValue = document.getElementById('addType').value;
+  let typeObj = { normal: false, carrusel: false, anuncio: false };
+  if (typeValue === 'carrusel') typeObj.carrusel = true;
+  else if (typeValue === 'publicidad') typeObj.anuncio = true;
+  else if (typeValue === 'normal') typeObj.normal = true;
+
   const producto = {
     nombre: document.getElementById('addName').value.trim(),
     precio: parseFloat(document.getElementById('addPrice').value),
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
     descripcion: document.getElementById('addDesc').value,
     tipo: document.getElementById('addCategory').value,
-    type: document.getElementById('addType').value,
+    type: typeObj,  // ← OBJETO CORRECTO
     imagen: url,
     disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
     creado: new Date()
   };
 
-  if (!producto.nombre || !producto.precio || !producto.type) {
+  if (!producto.nombre || !producto.precio || !typeValue) {
     showToast("Faltan datos");
     return;
   }
