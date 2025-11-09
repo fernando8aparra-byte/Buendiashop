@@ -245,7 +245,7 @@ document.getElementById('saveSocialLinks').onclick = async () => {
 
   try {
     await setDoc(doc(db, "links", "social"), links, { merge: true });
-    show・マToast("Redes sociales guardadas");
+    showToast("Redes sociales guardadas");
     closeModal('socialLinksModal');
   } catch (error) {
     showToast("Error: " + error.message);
@@ -295,86 +295,61 @@ document.addEventListener('click', () => document.getElementById('adminDropdown'
 loadSocialLinks();
 
 // ========================================
-// === NUEVO: EDITAR TEXTOS E IMAGEN ===
+// === EDICIÓN DIRECTA DE TEXTOS ===
 // ========================================
 
-function loadAdminTexts() {
-  // Hero
-  onSnapshot(doc(db, "textos", "hero"), (docSnap) => {
-    if (docSnap.exists()) {
-      const d = docSnap.data();
-      document.getElementById('heroTitleInput').value = d.titulo || '';
-      document.getElementById('heroTagInput').value = d.subtitulo || '';
-      document.getElementById('heroBgInput').value = d.fondo_url || '';
-      
-      if (d.fondo_url) {
-        const prev = document.getElementById('heroBgPreview');
-        prev.src = d.fondo_url;
-        prev.style.display = 'block';
-      }
+let editingTimeout;
 
-      // Actualizar vista en vivo
-      document.getElementById('heroTitleDisplay').textContent = d.titulo || 'Asegura tu Mystery Box';
-      document.getElementById('heroTagDisplay').textContent = d.subtitulo || 'Envío Gratis en compras +$1,500';
-      if (d.fondo_url) {
-        document.getElementById('heroBanner').style.backgroundImage = `url(${d.fondo_url})`;
-        document.getElementById('heroBanner').style.backgroundSize = 'cover';
-        document.getElementById('heroBanner').style.backgroundPosition = 'center';
-        document.getElementById('heroBanner').style.color = '#fff';
-        document.getElementById('heroBanner').style.textShadow = '0 0 10px rgba(0,0,0,0.6)';
+document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+  el.addEventListener('blur', async function() {
+    clearTimeout(editingTimeout);
+    editingTimeout = setTimeout(async () => {
+      const collectionName = this.dataset.collection;
+      const docName = this.dataset.doc;
+      const field = this.dataset.field;
+      const value = this.textContent.trim();
+
+      try {
+        await setDoc(doc(db, collectionName, docName), { [field]: value }, { merge: true });
+        showToast("Texto guardado");
+      } catch (e) {
+        showToast("Error al guardar");
+        console.error(e);
       }
-    }
+    }, 500);
   });
 
-  // Secciones
-  onSnapshot(doc(db, "textos", "secciones"), (docSnap) => {
-    if (docSnap.exists()) {
-      const d = docSnap.data();
-      document.getElementById('titleNewInput').value = d.nuevos_lanzamientos || '';
-      document.getElementById('titleStarInput').value = d.productos_estrella || '';
-      document.getElementById('titleAllInput').value = d.todos_productos || '';
-
-      document.getElementById('titleNewDisplay').textContent = d.nuevos_lanzamientos || 'Nuevos Lanzamientos';
-      document.getElementById('titleStarDisplay').textContent = d.productos_estrella || 'Productos Estrella';
-      document.getElementById('titleAllDisplay').textContent = d.todos_productos || 'Todos los Productos';
+  el.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      this.blur();
     }
   });
-}
+});
 
-// === GUARDAR TEXTOS ===
-document.getElementById('saveTextsBtn').onclick = async () => {
-  const hero = {
-    titulo: document.getElementById('heroTitleInput').value.trim(),
-    subtitulo: document.getElementById('heroTagInput').value.trim(),
-    fondo_url: document.getElementById('heroBgInput').value.trim()
-  };
-
-  const secciones = {
-    nuevos_lanzamientos: document.getElementById('titleNewInput').value.trim(),
-    productos_estrella: document.getElementById('titleStarInput').value.trim(),
-    todos_productos: document.getElementById('titleAllInput').value.trim()
-  };
-
-  try {
-    await setDoc(doc(db, "textos", "hero"), hero, { merge: true });
-    await setDoc(doc(db, "textos", "secciones"), secciones, { merge: true });
-    showToast("Textos e imagen guardados correctamente");
-  } catch (e) {
-    showToast("Error: " + e.message);
-  }
-};
-
-// === PREVISUALIZAR IMAGEN DE FONDO ===
-document.getElementById('heroBgInput').addEventListener('input', (e) => {
-  const url = e.target.value.trim();
-  const img = document.getElementById('heroBgPreview');
-  if (url) {
-    img.src = url;
-    img.style.display = 'block';
-  } else {
-    img.style.display = 'none';
+// === CAMBIAR IMAGEN DE FONDO DEL HERO ===
+document.getElementById('changeHeroBg').addEventListener('click', () => {
+  const url = prompt("Pega la URL de la nueva imagen de fondo:", "");
+  if (url && url.startsWith('http')) {
+    setDoc(doc(db, "textos", "hero"), { fondo_url: url }, { merge: true })
+      .then(() => {
+        document.getElementById('heroBanner').style.backgroundImage = `url(${url})`;
+        showToast("Fondo actualizado");
+      })
+      .catch(() => showToast("Error al cambiar fondo"));
   }
 });
 
-// === INICIAR CARGA DE TEXTOS ===
-loadAdminTexts();
+// === CARGAR TEXTOS AL INICIAR ===
+onSnapshot(doc(db, "textos", "hero"), (snap) => {
+  if (snap.exists()) {
+    const d = snap.data();
+    if (d.fondo_url) {
+      document.getElementById('heroBanner').style.backgroundImage = `url(${d.fondo_url})`;
+      document.getElementById('heroBanner').style.backgroundSize = 'cover';
+      document.getElementById('heroBanner').style.backgroundPosition = 'center';
+      document.getElementById('heroBanner').style.color = '#fff';
+      document.getElementById('heroBanner').style.textShadow = '0 0 10px rgba(0,0,0,0.6)';
+    }
+  }
+});
