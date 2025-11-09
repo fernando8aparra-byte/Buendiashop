@@ -93,7 +93,7 @@ function createProductCard(p, sectionType) {
       <h3>${p.nombre}</h3>
       <p class="product-price">$${p.precio}</p>
       <p class="product-desc-small">${p.descripcion || ''}</p>
-      ${p.disponibles > 0 ? `<p style="color:#0a0; font-weight:bold;">${p.disponibles} disponibles</p>` : ''}
+      ${p.disponibles > 0 ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>` : ''}
       <div class="product-actions">
         <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
         <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
@@ -168,7 +168,7 @@ document.getElementById('addPostBtn').onclick = () => {
   inputContainer.style.display = 'none';
 };
 
-// === CANTIDAD DISPONIBLE: CUADRADO + (ESTILO ACTUALIZADO) ===
+// === CANTIDAD DISPONIBLE: CUADRADO + (ESTILO SUAVE) ===
 document.getElementById('availableBox').onclick = () => {
   const box = document.getElementById('availableBox');
   const inputContainer = document.getElementById('availableInput');
@@ -190,23 +190,19 @@ document.getElementById('addAvailableCount').addEventListener('blur', () => {
   inputContainer.style.display = 'none';
 });
 
-// Resetear al abrir modal
-document.getElementById('addPostBtn').onclick = () => {
-  document.getElementById('addProductModal').classList.add('active');
-  ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('addImageFile').value = '';
-  document.getElementById('imagePreview').style.display = 'none';
+document.getElementById('saveNewProduct').onclick = async () => {
+  const url = document.getElementById('addImage').value.trim();
+  const hasFile = document.getElementById('addImageFile').files.length > 0;
 
-  const box = document.getElementById('availableBox');
-  const input = document.getElementById('addAvailableCount');
-  const inputContainer = document.getElementById('availableInput');
-  input.value = '0';
-  box.textContent = '+';
-  box.style.display = 'flex';
-  inputContainer.style.display = 'none';
-};
+  if (hasFile && !url) {
+    showToast("Usa URL por ahora");
+    return;
+  }
+  if (!url && !hasFile) {
+    showToast("Agrega imagen");
+    return;
+  }
+
   const producto = {
     nombre: document.getElementById('addName').value.trim(),
     precio: parseFloat(document.getElementById('addPrice').value),
