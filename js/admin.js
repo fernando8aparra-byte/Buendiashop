@@ -34,9 +34,9 @@ if (!localStorage.getItem('isAdmin')) {
 let textEditMode = false;
 let textChanges = {};
 
-// === CARGAR PRODUCTOS ===
-function loadProductsByType(type, containerId) {
-  const q = query(collection(db, "productos"), where("type", "==", type));
+// === CARGAR TODOS LOS PRODUCTOS EN SUS SECCIONES ===
+function loadProductsByType(typeKey, containerId) {
+  const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
@@ -45,7 +45,7 @@ function loadProductsByType(type, containerId) {
     snapshot.forEach((docSnap) => {
       const data = { id: docSnap.id, ...docSnap.data() };
       products.push(data);
-      const card = createProductCard(data, type);
+      const card = createProductCard(data, typeKey);
       container.appendChild(card);
     });
 
@@ -59,11 +59,12 @@ function loadProductsByType(type, containerId) {
   window[`unsubscribe_${containerId}`] = unsubscribe;
 }
 
+// CARGAR CADA SECCIÓN
 loadProductsByType('carrusel', 'newCarousel');
-loadProductsByType('publicidad', 'starCarousel');
+loadProductsByType('anuncio', 'starCarousel');
 loadProductsByType('normal', 'productsGrid');
 
-// === CARRUSEL ===
+// === CARRUSEL AUTOMÁTICO ===
 function handleAutoCarousel(container, count, containerId) {
   const section = container.parentElement.parentElement;
   section.classList.remove('auto-scroll', 'static-display');
@@ -81,11 +82,15 @@ function duplicateForInfiniteScroll(containerId) {
   track.dataset.duplicated = 'true';
 }
 
-// === CREAR TARJETA ===
+// === CREAR TARJETA DE PRODUCTO (CON BOTONES EDITAR/ELIMINAR) ===
 function createProductCard(p, sectionType) {
   const div = document.createElement('div');
   div.className = 'product-card';
   div.dataset.id = p.id;
+
+  const stockInfo = p.disponibles > 0 
+    ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>` 
+    : '';
 
   if (sectionType === 'normal') {
     div.innerHTML = `
@@ -93,7 +98,7 @@ function createProductCard(p, sectionType) {
       <h3>${p.nombre}</h3>
       <p class="product-price">$${p.precio}</p>
       <p class="product-desc-small">${p.descripcion || ''}</p>
-      ${p.disponibles > 0 ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>` : ''}
+      ${stockInfo}
       <div class="product-actions">
         <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
         <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
@@ -104,6 +109,7 @@ function createProductCard(p, sectionType) {
       <img src="${p.imagen}" alt="${p.nombre}">
       <h3>${p.nombre}</h3>
       <p>$${p.precio}</p>
+      ${stockInfo}
       <div class="product-actions">
         <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
         <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
@@ -117,12 +123,13 @@ function createProductCard(p, sectionType) {
 window.editProduct = (id) => {
   const card = document.querySelector(`.product-card[data-id="${id}"]`);
   if (!card) return;
+
   const p = {
     nombre: card.querySelector('h3').textContent,
     precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0),
-    descripcion: card.querySelector('.product-desc-small')?.textContent || '',
     imagen: card.querySelector('img').src
   };
+
   document.getElementById('editName').value = p.nombre;
   document.getElementById('editPrice').value = p.precio;
   document.getElementById('editImage').value = p.imagen;
@@ -133,10 +140,14 @@ window.editProduct = (id) => {
 document.getElementById('saveProduct').onclick = async () => {
   const id = window.currentEditId;
   const updated = {
-    nombre: document.getElementById('editName').value,
+    nombre: document.getElementById('editName').value.trim(),
     precio: parseFloat(document.getElementById('editPrice').value),
-    imagen: document.getElementById('editImage').value
+    imagen: document.getElementById('editImage').value.trim()
   };
+  if (!updated.nombre || !updated.precio) {
+    showToast("Faltan datos");
+    return;
+  }
   await updateDoc(doc(db, "productos", id), updated);
   showToast("Producto actualizado");
   closeModal('editProductModal');
@@ -216,7 +227,7 @@ document.getElementById('saveNewProduct').onclick = async () => {
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
     descripcion: document.getElementById('addDesc').value,
     tipo: document.getElementById('addCategory').value,
-    type: typeObj,  // ← OBJETO CORRECTO
+    type: typeObj,
     imagen: url,
     disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
     creado: new Date()
