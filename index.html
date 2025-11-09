@@ -175,7 +175,6 @@
       transition: opacity 0.3s;
     }
     .toast.show { opacity: 1; }
-
     /* === NUEVO: CANTIDAD DISPONIBLE === */
     .stock-info {
       font-size: 0.85rem;
@@ -183,7 +182,6 @@
       font-weight: 500;
       margin: 4px 0;
     }
-
     /* Responsive */
     @media (max-width: 768px) {
       .carousel-item { min-width: 240px; max-width: 240px; }
@@ -235,34 +233,39 @@
   </div>
   <!-- CONTENIDO -->
   <main class="main-container">
+    <!-- HERO BANNER -->
     <section class="hero-banner">
-      <h1>Asegura tu Mystery Box</h1>
-      <p class="tag">Envío Gratis en compras +$1,500</p>
+      <h1 id="heroTitle">Asegura tu Mystery Box</h1>
+      <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
+
     <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
     <section class="infinite-carousel-section">
-      <h2>Nuevos Lanzamientos</h2>
+      <h2 id="titleNew">Nuevos Lanzamientos</h2>
       <div class="carousel-container">
         <div class="carousel-track" id="newCarousel"></div>
         <button class="carousel-btn prev hidden">Left Arrow</button>
         <button class="carousel-btn next">Right Arrow</button>
       </div>
     </section>
+
     <!-- CARRUSEL: ANUNCIOS -->
     <section class="infinite-carousel-section">
-      <h2>Anuncios</h2>
+      <h2 id="titleStar">Anuncios</h2>
       <div class="carousel-container">
         <div class="carousel-track" id="starCarousel"></div>
         <button class="carousel-btn prev hidden">Left Arrow</button>
         <button class="carousel-btn next">Right Arrow</button>
       </div>
     </section>
+
     <!-- TODOS LOS PRODUCTOS -->
     <section>
-      <h2>Todos los Productos</h2>
+      <h2 id="titleAll">Todos los Productos</h2>
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
+
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
@@ -290,6 +293,7 @@
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
+
   <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
@@ -305,13 +309,16 @@
       <div id="message"></div>
     </div>
   </aside>
+
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
+
   <!-- PIE DE PÁGINA -->
   <footer class="footer">
     <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
+
   <!-- SCRIPT -->
   <script type="module" src="js/index.js"></script>
 </body>
