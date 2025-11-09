@@ -1,4 +1,4 @@
-// index.js - CARRITO CON ID + IMAGEN + type.anuncio + type.carrusel + type.normal + STOCK
+// js/index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -6,7 +6,8 @@ import {
   onSnapshot,
   query,
   where,
-  getDocs
+  getDocs,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -48,15 +49,40 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
-// === CARRITO (GUARDADO EN LOCALSTORAGE) ===
+// === TÍTULOS DINÁMICOS (desde Firebase) ===
+function loadTitles() {
+  // Hero
+  onSnapshot(doc(db, "textos", "hero"), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      const titleEl = document.getElementById("heroTitle");
+      const tagEl = document.getElementById("heroTag");
+      if (titleEl && data.titulo) titleEl.textContent = data.titulo;
+      if (tagEl && data.subtitulo) tagEl.textContent = data.subtitulo;
+    }
+  });
+
+  // Secciones
+  onSnapshot(doc(db, "textos", "secciones"), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      const newEl = document.getElementById("titleNew");
+      const starEl = document.getElementById("titleStar");
+      const allEl = document.getElementById("titleAll");
+      if (newEl && data.nuevos_lanzamientos) newEl.textContent = data.nuevos_lanzamientos;
+      if (starEl && data.productos_estrella) starEl.textContent = data.productos_estrella;
+      if (allEl && data.todos_productos) allEl.textContent = data.todos_productos;
+    }
+  });
+}
+
+// === CARRITO (LOCALSTORAGE) ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
- 
   cartBadge.textContent = totalQty;
   cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
- 
   cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
   cartItems.innerHTML = '';
   if (cart.length === 0) {
@@ -80,7 +106,6 @@ function updateCart() {
   });
 }
 
-// === AGREGAR AL CARRITO (CON ID + IMAGEN + PRECIO) ===
 window.addToCart = (id) => {
   const product = window.allProducts.find(p => p.id === id);
   if (!product) {
@@ -120,12 +145,10 @@ goToPay.onclick = () => {
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
   const filtered = window.allProducts.filter(filterFn);
- 
   if (filtered.length === 0) {
     container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
     return;
   }
-  // Duplicar para efecto infinito
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
@@ -171,7 +194,7 @@ function renderGrid() {
   });
 }
 
-// === FIRESTORE EN TIEMPO REAL ===
+// === PRODUCTOS EN TIEMPO REAL ===
 let allProducts = [];
 const productosRef = collection(db, "productos");
 onSnapshot(productosRef, (snapshot) => {
@@ -188,7 +211,7 @@ onSnapshot(productosRef, (snapshot) => {
       type: data.type || { normal: true },
       talla: data.talla || [],
       tipo: data.tipo || '',
-      disponibles: data.disponibles || 0  // ← NUEVO
+      disponibles: data.disponibles || 0
     });
   });
   window.allProducts = allProducts;
@@ -197,12 +220,11 @@ onSnapshot(productosRef, (snapshot) => {
   renderGrid();
 });
 
-// === BÚSQUEDA EN TIEMPO REAL ===
+// === BÚSQUEDA ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const term = searchInput.value.trim().toLowerCase();
- 
   if (term.length < 2) {
     searchResultsContainer.style.display = 'none';
     return;
@@ -238,14 +260,13 @@ searchInput.addEventListener('input', () => {
   }, 300);
 });
 
-// Cerrar búsqueda al hacer clic fuera
 document.addEventListener('click', (e) => {
   if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
     searchResultsContainer.style.display = 'none';
   }
 });
 
-// === MENÚ, CARRITO, BÚSQUEDA, AUTH ===
+// === UI: MENÚ, CARRITO, BÚSQUEDA, AUTH ===
 menuBtn.onclick = () => {
   menuOverlay.classList.add('show');
   menuSidebar.classList.add('open');
@@ -317,3 +338,4 @@ function showToast(msg) {
 // === INICIAR ===
 updateCart();
 updateAuthUI();
+loadTitles(); // ← CARGA TÍTULOS DESDE FIREBASE
