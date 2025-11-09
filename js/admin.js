@@ -10,7 +10,8 @@ import {
   onSnapshot,
   query,
   where,
-  setDoc
+  setDoc,
+  arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -144,61 +145,32 @@ window.deleteProduct = async (id) => {
   showToast("Producto eliminado");
 };
 
-// === AGREGAR PRODUCTO ===
+// === AGREGAR PRODUCTO (LIMPIAR + DISPONIBLES) ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
+  ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('addImageFile').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('addAvailable').checked = false;
 };
 
-document.getElementById('addImageFile').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  const urlInput = document.getElementById('addImage');
-  const preview = document.getElementById('imagePreview');
-  const img = document.getElementById('previewImg');
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      img.src = ev.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-    urlInput.disabled = true;
-    urlInput.value = '';
-  } else {
-    preview.style.display = 'none';
-    urlInput.disabled = false;
-  }
-});
-
-document.getElementById('addImage').addEventListener('input', (e) => {
-  const fileInput = document.getElementById('addImageFile');
-  const preview = document.getElementById('imagePreview');
-  if (e.target.value.trim()) {
-    fileInput.disabled = true;
-    fileInput.value = '';
-    preview.style.display = 'none';
-  } else {
-    fileInput.disabled = false;
-  }
-});
-
 document.getElementById('saveNewProduct').onclick = async () => {
-  const url = document.getElementById('addImage').value;
-  const fileInput = document.getElementById('addImageFile');
-  const hasFile = fileInput.files.length > 0;
+  const url = document.getElementById('addImage').value.trim();
+  const hasFile = document.getElementById('addImageFile').files.length > 0;
 
   if (hasFile && !url) {
-    showToast("La subida de imágenes aún no está habilitada. Usa una URL.");
+    showToast("Usa URL por ahora");
     return;
   }
-
   if (!url && !hasFile) {
-    showToast("Agrega una imagen (URL o archivo)");
+    showToast("Agrega imagen");
     return;
   }
 
   const producto = {
-    nombre: document.getElementById('addName').value,
+    nombre: document.getElementById('addName').value.trim(),
     precio: parseFloat(document.getElementById('addPrice').value),
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
     descripcion: document.getElementById('addDesc').value,
@@ -213,17 +185,18 @@ document.getElementById('saveNewProduct').onclick = async () => {
     return;
   }
 
-  await addDoc(collection(db, "productos"), producto);
-  showToast("Producto agregado");
-  closeModal('addProductModal');
-};
+  const docRef = await addDoc(collection(db, "productos"), producto);
 
-// === CERRAR SESIÓN ===
-document.getElementById('logoutBtn').onclick = () => {
-  if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
-    localStorage.removeItem('isAdmin');
-    window.location.href = 'login.html';
+  if (document.getElementById('addAvailable').checked) {
+    await setDoc(doc(db, "productos_disponibles", "disponibles"), {
+      activos: arrayUnion(producto.nombre)
+    }, { merge: true });
+    showToast("Producto agregado y en disponibles");
+  } else {
+    showToast("Producto agregado");
   }
+
+  closeModal('addProductModal');
 };
 
 // === REDES SOCIALES ===
@@ -243,13 +216,9 @@ document.getElementById('saveSocialLinks').onclick = async () => {
     whatsapp: document.getElementById('whatsappInput').value.trim()
   };
 
-  try {
-    await setDoc(doc(db, "links", "social"), links, { merge: true });
-    showToast("Redes sociales guardadas");
-    closeModal('socialLinksModal');
-  } catch (error) {
-    showToast("Error: " + error.message);
-  }
+  await setDoc(doc(db, "links", "social"), links, { merge: true });
+  showToast("Redes guardadas");
+  closeModal('socialLinksModal');
 };
 
 function loadSocialLinks() {
@@ -291,65 +260,82 @@ document.getElementById('adminGear').onclick = e => {
 };
 document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
+// === EDICIÓN DIRECTA DE TEXTOS ===
+document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+  el.addEventListener('focus', () => el.classList.add('editing'));
+  el.addEventListener('blur', () => {
+    el.classList.remove('editing');
+    setTimeout(() => saveEditable(el), 300);
+  });
+});
+
+async function saveEditable(el) {
+  const coll = el.dataset.collection;
+  const docu = el.dataset.doc;
+  const field = el.dataset.field;
+  const value = el.textContent.trim();
+  await setDoc(doc(db, coll, docu), { [field]: value }, { merge: true });
+}
+
+// === PANEL DE EDICIÓN DE TEXTOS ===
+document.getElementById('openTextEditor').onclick = () => {
+  document.getElementById('textEditorPanel').classList.add('active');
+  loadTextEditorValues();
+};
+
+document.getElementById('closeTextEditor').onclick = () => {
+  document.getElementById('textEditorPanel').classList.remove('active');
+};
+
+function loadTextEditorValues() {
+  onSnapshot(doc(db, "textos", "hero"), snap => {
+    if (snap.exists()) {
+      const d = snap.data();
+      document.getElementById('editHeroTitle').value = d.titulo || '';
+      document.getElementById('editHeroTag').value = d.subtitulo || '';
+      document.getElementById('editHeroBg').value = d.fondo_url || '';
+      if (d.fondo_url) {
+        const img = document.getElementById('heroBgPreview');
+        img.src = d.fondo_url;
+        img.style.display = 'block';
+      }
+    }
+  });
+
+  onSnapshot(doc(db, "textos", "secciones"), snap => {
+    if (snap.exists()) {
+      const d = snap.data();
+      document.getElementById('editNewTitle').value = d.nuevos_lanzamientos || '';
+      document.getElementById('editStarTitle').value = d.productos_estrella || '';
+      document.getElementById('editAllTitle').value = d.todos_productos || '';
+    }
+  });
+}
+
+document.getElementById('saveAllTexts').onclick = async () => {
+  const hero = {
+    titulo: document.getElementById('editHeroTitle').value,
+    subtitulo: document.getElementById('editHeroTag').value,
+    fondo_url: document.getElementById('editHeroBg').value
+  };
+  const secciones = {
+    nuevos_lanzamientos: document.getElementById('editNewTitle').value,
+    productos_estrella: document.getElementById('editStarTitle').value,
+    todos_productos: document.getElementById('editAllTitle').value
+  };
+
+  await setDoc(doc(db, "textos", "hero"), hero, { merge: true });
+  await setDoc(doc(db, "textos", "secciones"), secciones, { merge: true });
+  showToast("Textos guardados");
+  document.getElementById('textEditorPanel').classList.remove('active');
+};
+
+// === CARGAR FONDO HERO ===
+onSnapshot(doc(db, "textos", "hero"), snap => {
+  if (snap.exists() && snap.data().fondo_url) {
+    document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
+  }
+});
+
 // === INICIAR REDES ===
 loadSocialLinks();
-
-// ========================================
-// === EDICIÓN DIRECTA DE TEXTOS ===
-// ========================================
-
-let editingTimeout;
-
-document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-  el.addEventListener('blur', async function() {
-    clearTimeout(editingTimeout);
-    editingTimeout = setTimeout(async () => {
-      const collectionName = this.dataset.collection;
-      const docName = this.dataset.doc;
-      const field = this.dataset.field;
-      const value = this.textContent.trim();
-
-      try {
-        await setDoc(doc(db, collectionName, docName), { [field]: value }, { merge: true });
-        showToast("Texto guardado");
-      } catch (e) {
-        showToast("Error al guardar");
-        console.error(e);
-      }
-    }, 500);
-  });
-
-  el.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      this.blur();
-    }
-  });
-});
-
-// === CAMBIAR IMAGEN DE FONDO DEL HERO ===
-document.getElementById('changeHeroBg').addEventListener('click', () => {
-  const url = prompt("Pega la URL de la nueva imagen de fondo:", "");
-  if (url && url.startsWith('http')) {
-    setDoc(doc(db, "textos", "hero"), { fondo_url: url }, { merge: true })
-      .then(() => {
-        document.getElementById('heroBanner').style.backgroundImage = `url(${url})`;
-        showToast("Fondo actualizado");
-      })
-      .catch(() => showToast("Error al cambiar fondo"));
-  }
-});
-
-// === CARGAR TEXTOS AL INICIAR ===
-onSnapshot(doc(db, "textos", "hero"), (snap) => {
-  if (snap.exists()) {
-    const d = snap.data();
-    if (d.fondo_url) {
-      document.getElementById('heroBanner').style.backgroundImage = `url(${d.fondo_url})`;
-      document.getElementById('heroBanner').style.backgroundSize = 'cover';
-      document.getElementById('heroBanner').style.backgroundPosition = 'center';
-      document.getElementById('heroBanner').style.color = '#fff';
-      document.getElementById('heroBanner').style.textShadow = '0 0 10px rgba(0,0,0,0.6)';
-    }
-  }
-});
