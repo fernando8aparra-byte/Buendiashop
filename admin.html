@@ -6,72 +6,98 @@
   <title>Admin - Boutique Buendía</title>
   <link rel="stylesheet" href="css/admin.css">
   <style>
-    /* === ESTILOS ADMIN === */
-    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-    .admin-container { max-width: 1200px; margin: 0 auto; }
-    .section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    h2 { margin: 0 0 15px; color: #000; font-size: 1.4rem; }
-    .carousel-track, .products-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+    /* === TU DISEÑO ORIGINAL MANTENIDO === */
+    body { margin: 0; font-family: 'Helvetica', Arial, sans-serif; background: #f8f9fa; }
+    .admin-container { padding: 20px; max-width: 1300px; margin: 0 auto; }
+    .section { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 32px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+    h2 { margin: 0 0 16px; font-size: 1.5rem; color: #1a1a1a; font-weight: 600; }
+    .carousel-track { display: flex; gap: 16px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; }
+    .carousel-track::-webkit-scrollbar { display: none; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
     .product-card { 
-      background: #fff; border: 1px solid #eee; border-radius: 10px; 
-      padding: 12px; text-align: center; width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; 
+      overflow: hidden; text-align: center; transition: transform 0.2s, box-shadow 0.2s;
     }
-    .product-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; }
-    .product-actions { display: flex; gap: 6px; margin-top: 10px; }
-    .admin-btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
+    .product-card img { width: 100%; height: 160px; object-fit: cover; }
+    .product-card h3 { margin: 10px 0 6px; font-size: 1rem; color: #1a1a1a; }
+    .product-price { font-weight: bold; color: #e91e63; font-size: 1.1rem; }
+    .product-desc-small { font-size: 0.8rem; color: #666; margin: 4px 0; }
+    .product-actions { display: flex; gap: 8px; padding: 8px; }
+    .admin-btn { 
+      flex: 1; padding: 8px; border: none; border-radius: 8px; 
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
     .admin-edit { background: #007bff; color: #fff; }
+    .admin-edit:hover { background: #0056b3; }
     .admin-delete { background: #dc3545; color: #fff; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+    .admin-delete:hover { background: #c82333; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
     .modal.active { display: flex; }
-    .modal-content { background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; }
-    .input-group { margin-bottom: 15px; }
-    .input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95rem; }
+    .modal-content { background: #fff; padding: 28px; border-radius: 16px; width: 90%; max-width: 520px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; }
     .input-group input, .input-group select, .input-group textarea { 
-      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; 
+      width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; 
     }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
     .admin-btn.secondary { background: #6c757d; color: #fff; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 1001; opacity: 0; transition: opacity 0.3s; }
+    .admin-btn.secondary:hover { background: #5a6268; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 14px 28px; border-radius: 12px; font-size: 0.95rem; z-index: 1001; opacity: 0; transition: opacity 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .toast.show { opacity: 1; }
-    .available-container { display: flex; align-items: center; gap: 12px; margin: 15px 0; }
+    .available-container { display: flex; align-items: center; gap: 14px; margin: 16px 0; }
     #availableBox { 
-      width: 36px; height: 36px; border: 2px solid #000; border-radius: 8px; 
+      width: 40px; height: 40px; border: 2px solid #ccc; border-radius: 10px; 
       display: flex; align-items: center; justify-content: center; 
-      font-size: 1.2rem; color: #555; font-weight: normal; cursor: pointer; 
-      user-select: none; background: #f9f9f9; 
+      font-size: 1.3rem; color: #777; font-weight: normal; cursor: pointer; 
+      background: #fff; user-select: none; transition: 0.2s;
     }
+    #availableBox:hover { border-color: #999; }
     #availableInput { display: none; }
-    #availableInput input { width: 70px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
-    .available-label { margin: 4px 0 0; font-size: 0.85rem; color: #555; }
-    .admin-gear-container { text-align: right; margin-bottom: 15px; }
-    .auto-scroll { overflow: hidden; }
-    .static-display { display: flex; flex-wrap: wrap; }
+    #availableInput input { width: 80px; padding: 8px; text-align: center; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    .available-label { margin: 0; font-size: 0.85rem; color: #666; }
+    .admin-gear-container { text-align: right; margin-bottom: 16px; }
+    .auto-scroll { overflow: hidden; position: relative; }
+    .auto-scroll .carousel-track { animation: scroll 20s linear infinite; }
+    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .static-display { display: flex; flex-wrap: wrap; gap: 16px; }
   </style>
 </head>
 <body>
   <div class="admin-container">
 
-    <!-- BOTÓN EDITAR TÍTULOS -->
+    <!-- ENGRANAJE + DROPDOWN -->
     <div class="admin-gear-container">
-      <button id="editTitlesBtn" class="admin-btn">Editar Títulos</button>
+      <button id="adminGear" class="admin-btn" style="background:#000; color:#fff; padding:10px 16px; border-radius:50%;">
+        Gear
+      </button>
+      <div id="adminDropdown" class="dropdown" style="display:none; position:absolute; right:20px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,0.15); padding:12px; z-index:100;">
+        <button id="toggleTextEdit" class="admin-btn" style="width:100%; margin-bottom:8px;">Editar Textos</button>
+        <button id="openSocialModal" class="admin-btn" style="width:100%;">Redes Sociales</button>
+      </div>
+    </div>
+
+    <!-- BOTÓN EDITAR TÍTULOS -->
+    <div style="text-align:right; margin-bottom:16px;">
+      <button id="editTitlesBtn" class="admin-btn" style="background:#28a745; color:#fff;">Editar Títulos</button>
     </div>
 
     <!-- SECCIÓN: NUEVOS LANZAMIENTOS -->
     <div class="section">
-      <h2>Nuevos Lanzamientos</h2>
+      <h2 contenteditable="true" data-collection="textos" data-doc="titulos" data-field="nuevos_lanzamientos">Nuevos Lanzamientos</h2>
       <div id="newCarousel" class="carousel-track"></div>
     </div>
 
     <!-- SECCIÓN: ANUNCIOS -->
     <div class="section">
-      <h2>Anuncios</h2>
+      <h2 contenteditable="true" data-collection="textos" data-doc="titulos" data-field="anuncios">Anuncios</h2>
       <div id="starCarousel" class="carousel-track"></div>
     </div>
 
     <!-- SECCIÓN: TODOS LOS PRODUCTOS -->
     <div class="section">
-      <h2>Todos los Productos</h2>
-      <button id="addPostBtn" class="admin-btn" style="margin-bottom:15px; background:#000; color:#fff;">+ Agregar Producto</button>
+      <h2 contenteditable="true" data-collection="textos" data-doc="titulos" data-field="todos_productos">Todos los Productos</h2>
+      <button id="addPostBtn" class="admin-btn" style="margin:16px 0; background:#000; color:#fff; padding:10px 20px; border-radius:10px; font-weight:bold;">+ Agregar Producto</button>
       <div id="productsGrid" class="products-grid"></div>
     </div>
 
@@ -120,8 +146,8 @@
       <div class="input-group">
         <label>Imagen (URL)</label>
         <input type="text" id="addImage" placeholder="https://...">
-        <input type="file" id="addImageFile" accept="image/*" style="margin-top:5px;">
-        <img id="imagePreview" style="width:100%; margin-top:10px; border-radius:8px; display:none;">
+        <input type="file" id="addImageFile" accept="image/*" style="margin-top:6px;">
+        <img id="imagePreview" style="width:100%; margin-top:12px; border-radius:10px; display:none;">
       </div>
       <div class="available-container">
         <div id="availableBox">+</div>
@@ -162,27 +188,64 @@
     </div>
   </div>
 
+  <!-- MODAL: REDES SOCIALES -->
+  <div class="modal" id="socialLinksModal">
+    <div class="modal-content">
+      <h3>Redes Sociales</h3>
+      <div class="input-group">
+        <label>TikTok</label>
+        <input type="text" id="tiktokInput" placeholder="https://tiktok.com/@...">
+      </div>
+      <div class="input-group">
+        <label>Instagram</label>
+        <input type="text" id="instagramInput" placeholder="https://instagram.com/...">
+      </div>
+      <div class="input-group">
+        <label>Facebook</label>
+        <input type="text" id="facebookInput" placeholder="https://facebook.com/...">
+      </div>
+      <div class="input-group">
+        <label>X (Twitter)</label>
+        <input type="text" id="xInput" placeholder="https://x.com/...">
+      </div>
+      <div class="input-group">
+        <label>WhatsApp</label>
+        <input type="text" id="whatsappInput" placeholder="+52...">
+      </div>
+      <div class="modal-actions">
+        <button id="saveSocialLinks" class="admin-btn">Guardar</button>
+        <button id="cancelSocial" class="admin-btn secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: EDITAR TÍTULOS -->
   <div class="modal" id="titlesModal">
     <div class="modal-content">
       <h3>Editar Títulos</h3>
       <div class="input-group">
         <label>Nuevos Lanzamientos</label>
-        <input type="text" id="titleNew" placeholder="Ej: Nuevos Lanzamientos">
+        <input type="text" id="titleNew">
       </div>
       <div class="input-group">
         <label>Anuncios</label>
-        <input type="text" id="titleAds" placeholder="Ej: Anuncios">
+        <input type="text" id="titleAds">
       </div>
       <div class="input-group">
         <label>Todos los Productos</label>
-        <input type="text" id="titleAll" placeholder="Ej: Todos los Productos">
+        <input type="text" id="titleAll">
       </div>
       <div class="modal-actions">
         <button id="saveTitles" class="admin-btn">Guardar</button>
         <button id="cancelTitles" class="admin-btn secondary">Cancelar</button>
       </div>
     </div>
+  </div>
+
+  <!-- CONTROLES EDICIÓN DE TEXTOS -->
+  <div id="textEditControls" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#000; color:#fff; padding:12px 20px; border-radius:12px; display:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+    <button id="saveTextChanges" class="admin-btn" style="background:#28a745; margin-right:8px;">Guardar</button>
+    <button id="cancelTextChanges" class="admin-btn secondary">Cancelar</button>
   </div>
 
   <!-- TOAST -->
