@@ -23,6 +23,19 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // === DOM ===
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuSidebar = document.getElementById('menuSidebar');
+const closeMenu = document.getElementById('closeMenu');
+const cartBtn = document.getElementById('cartBtn');
+const cartSidebar = document.getElementById('cartSidebar');
+const closeCart = document.getElementById('closeCart');
+const searchBtn = document.getElementById('searchBtn');
+const searchContainer = document.getElementById('searchContainer');
+const closeSearch = document.getElementById('closeSearch');
+const searchInput = document.getElementById('searchInput');
+const searchResultsContainer = document.getElementById('searchResultsContainer');
+const searchResults = document.getElementById('searchResults');
 const newCarousel = document.getElementById('newCarousel');
 const starCarousel = document.getElementById('starCarousel');
 const productsGrid = document.getElementById('productsGrid');
@@ -31,52 +44,104 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const goToPay = document.getElementById('goToPay');
 const toast = document.getElementById('toast');
-const searchInput = document.getElementById('searchInput');
-const searchResultsContainer = document.getElementById('searchResultsContainer');
-const searchResults = document.getElementById('searchResults');
-const menuBtn = document.getElementById('menuBtn');
-const menuOverlay = document.getElementById('menuOverlay');
-const menuSidebar = document.getElementById('menuSidebar');
-const cartBtn = document.getElementById('cartBtn');
-const cartSidebar = document.getElementById('cartSidebar');
-const closeCart = document.getElementById('closeCart');
-const cartOverlay = document.getElementById('cartOverlay');
-const searchBtn = document.getElementById('searchBtn');
-const searchBarHeader = document.getElementById('searchBarHeader');
-const closeSearchHeader = document.getElementById('closeSearchHeader');
-const headerOverlay = document.getElementById('headerOverlay');
 const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
-// === TÍTULOS DINÁMICOS (desde Firebase) ===
+// === TÍTULOS DINÁMICOS ===
 function loadTitles() {
-  // Hero
   onSnapshot(doc(db, "textos", "hero"), (snap) => {
     if (snap.exists()) {
-      const data = snap.data();
-      const titleEl = document.getElementById("heroTitle");
-      const tagEl = document.getElementById("heroTag");
-      if (titleEl && data.titulo) titleEl.textContent = data.titulo;
-      if (tagEl && data.subtitulo) tagEl.textContent = data.subtitulo;
+      const { titulo, subtitulo } = snap.data();
+      if (document.getElementById("heroTitle")) document.getElementById("heroTitle").textContent = titulo || "";
+      if (document.getElementById("heroTag")) document.getElementById("heroTag").textContent = subtitulo || "";
     }
   });
 
-  // Secciones
   onSnapshot(doc(db, "textos", "secciones"), (snap) => {
     if (snap.exists()) {
       const data = snap.data();
-      const newEl = document.getElementById("titleNew");
-      const starEl = document.getElementById("titleStar");
-      const allEl = document.getElementById("titleAll");
-      if (newEl && data.nuevos_lanzamientos) newEl.textContent = data.nuevos_lanzamientos;
-      if (starEl && data.productos_estrella) starEl.textContent = data.productos_estrella;
-      if (allEl && data.todos_productos) allEl.textContent = data.todos_productos;
+      if (document.getElementById("titleNew")) document.getElementById("titleNew").textContent = data.nuevos_lanzamientos || "";
+      if (document.getElementById("titleStar")) document.getElementById("titleStar").textContent = data.productos_estrella || "";
+      if (document.getElementById("titleAll")) document.getElementById("titleAll").textContent = data.todos_productos || "";
     }
   });
 }
 
-// === CARRITO (LOCALSTORAGE) ===
+// === CARGAR TIPOS DE PRODUCTOS ===
+async function loadProductTypes() {
+  const submenu = document.getElementById('categoriesSubmenu');
+  submenu.innerHTML = '<div class="submenu-item">Cargando...</div>';
+
+  try {
+    const snapshot = await getDocs(collection(db, "productos"));
+    const tipos = new Set();
+    snapshot.forEach(doc => {
+      const tipo = doc.data().tipo;
+      if (tipo) tipos.add(tipo);
+    });
+
+    submenu.innerHTML = '';
+    if (tipos.size === 0) {
+      submenu.innerHTML = '<div class="submenu-item">No hay categorías</div>';
+      return;
+    }
+
+    [...tipos].sort().forEach(tipo => {
+      const item = document.createElement('div');
+      item.className = 'submenu-item';
+      item.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+      item.onclick = () => {
+        window.location.href = `products_tipo.html?tipo=${encodeURIComponent(tipo)}`;
+      };
+      submenu.appendChild(item);
+    });
+  } catch (e) {
+    submenu.innerHTML = '<div class="submenu-item">Error al cargar</div>';
+  }
+}
+
+// === CARGAR REDES SOCIALES ===
+function loadSocialLinks() {
+  const container = document.getElementById('socialLinksContainer');
+  onSnapshot(doc(db, "links", "social"), (snap) => {
+    container.innerHTML = '';
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const redes = [
+      { key: 'instagram', icon: 'https://imgfz.com/i/instagram-logo.png' },
+      { key: 'x', icon: 'https://imgfz.com/i/x-logo.png' },
+      { key: 'facebook', icon: 'https://imgfz.com/i/facebook-logo.png' },
+      { key: 'youtube', icon: 'https://imgfz.com/i/youtube-logo.png' },
+      { key: 'tiktok', icon: 'https://imgfz.com/i/tiktok-logo.png' },
+      { key: 'whatsapp', icon: 'https://imgfz.com/i/whatsapp-logo.png' }
+    ];
+    redes.forEach(red => {
+      if (data[red.key]) {
+        const a = document.createElement('a');
+        a.href = data[red.key];
+        a.target = '_blank';
+        a.innerHTML = `<img src="${red.icon}" alt="${red.key}" style="width:40px;height:40px;">`;
+        container.appendChild(a);
+      }
+    });
+  });
+}
+
+// === DESPLEGABLES ===
+document.getElementById('categoriesToggle').onclick = () => {
+  const submenu = document.getElementById('categoriesSubmenu');
+  submenu.classList.toggle('show');
+  document.getElementById('categoriesToggle').classList.toggle('active');
+};
+
+document.getElementById('contactToggle').onclick = () => {
+  const submenu = document.getElementById('contactDropdown');
+  submenu.classList.toggle('show');
+  document.getElementById('contactToggle').classList.toggle('active');
+};
+
+// === CARRITO ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
@@ -84,46 +149,27 @@ function updateCart() {
   cartBadge.textContent = totalQty;
   cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
   cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
-  cartItems.innerHTML = '';
-  if (cart.length === 0) {
-    cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
-    goToPay.style.display = 'none';
-    return;
-  }
-  goToPay.style.display = 'block';
-  cart.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
-      <div>
-        <div>${item.nombre}</div>
-        <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
+  cartItems.innerHTML = cart.length === 0
+    ? '<p class="empty-cart">Tu carrito está vacío</p>'
+    : cart.map((item, i) => `
+      <div class="cart-item">
+        <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
+        <div>
+          <div>${item.nombre}</div>
+          <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
+        </div>
+        <button onclick="removeFromCart(${i})">×</button>
       </div>
-      <button onclick="removeFromCart(${i})">X</button>
-    `;
-    cartItems.appendChild(div);
-  });
+    `).join('');
+  goToPay.style.display = cart.length > 0 ? 'block' : 'none';
 }
 
 window.addToCart = (id) => {
   const product = window.allProducts.find(p => p.id === id);
-  if (!product) {
-    showToast("Producto no encontrado");
-    return;
-  }
+  if (!product) return showToast("Producto no encontrado");
   const existing = cart.find(i => i.id === id);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({
-      id: product.id,
-      nombre: product.nombre,
-      precio: product.precio,
-      imagen: product.imagen,
-      qty: 1
-    });
-  }
+  if (existing) existing.qty++;
+  else cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCart();
   showToast('¡Agregado al carrito!');
@@ -136,89 +182,50 @@ window.removeFromCart = (i) => {
   showToast('Producto eliminado');
 };
 
-goToPay.onclick = () => {
-  if (cart.length === 0) return;
-  window.location.href = 'pago.html';
-};
+goToPay.onclick = () => window.location.href = 'pago.html';
 
-// === RENDER CARRUSEL ===
+// === PRODUCTOS ===
+let allProducts = [];
+onSnapshot(collection(db, "productos"), (snapshot) => {
+  allProducts = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    type: doc.data().type || { normal: true }
+  }));
+  window.allProducts = allProducts;
+  renderCarousel(newCarousel, p => p.type?.carrusel);
+  renderCarousel(starCarousel, p => p.type?.anuncio);
+  renderGrid();
+});
+
 function renderCarousel(container, filterFn) {
-  container.innerHTML = '';
-  const filtered = window.allProducts.filter(filterFn);
-  if (filtered.length === 0) {
-    container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
-    return;
-  }
-  [...filtered, ...filtered].forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'carousel-item';
-    const stock = p.disponibles > 0 ? `<p class="stock-info">${p.disponibles} disponibles</p>` : '';
-    item.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-      <h4>${p.nombre}</h4>
-      <p>$${p.precio.toLocaleString()}</p>
-      ${stock}
-    `;
-    item.onclick = () => window.location.href = `product.html?id=${p.id}`;
-    container.appendChild(item);
-  });
+  const filtered = allProducts.filter(filterFn);
+  container.innerHTML = filtered.length === 0
+    ? '<p style="color:#999; text-align:center; padding:40px;">No hay productos</p>'
+    : [...filtered, ...filtered].map(p => `
+      <div class="carousel-item" onclick="window.location.href='product.html?id=${p.id}'">
+        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      </div>
+    `).join('');
 }
 
-// === RENDER GRILLA ===
 function renderGrid() {
-  productsGrid.innerHTML = '';
-  const normales = window.allProducts.filter(p => p.type && p.type.normal);
-  if (normales.length === 0) {
-    productsGrid.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos disponibles</p>';
-    return;
-  }
-  normales.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    const stock = p.disponibles > 0 ? `<p class="stock-info">${p.disponibles} disponibles</p>` : '';
-    card.innerHTML = `
+  const normales = allProducts.filter(p => p.type?.normal);
+  productsGrid.innerHTML = normales.map(p => `
+    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       <div class="card-info">
         <h3>${p.nombre}</h3>
         <p class="desc">${p.descripcion || ''}</p>
-        ${stock}
         <div class="price-container">
           ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
           <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
         </div>
         <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
       </div>
-    `;
-    card.onclick = () => window.location.href = `product.html?id=${p.id}`;
-    productsGrid.appendChild(card);
-  });
+    </div>
+  `).join('');
 }
-
-// === PRODUCTOS EN TIEMPO REAL ===
-let allProducts = [];
-const productosRef = collection(db, "productos");
-onSnapshot(productosRef, (snapshot) => {
-  allProducts = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    allProducts.push({
-      id: doc.id,
-      nombre: data.nombre || '',
-      precio: data.precio || 0,
-      precioAntiguo: data.precioAntiguo || null,
-      descripcion: data.descripcion || '',
-      imagen: data.imagen || '',
-      type: data.type || { normal: true },
-      talla: data.talla || [],
-      tipo: data.tipo || '',
-      disponibles: data.disponibles || 0
-    });
-  });
-  window.allProducts = allProducts;
-  renderCarousel(newCarousel, p => p.type?.carrusel === true);
-  renderCarousel(starCarousel, p => p.type?.anuncio === true);
-  renderGrid();
-});
 
 // === BÚSQUEDA ===
 let searchTimeout;
@@ -230,74 +237,37 @@ searchInput.addEventListener('input', () => {
     return;
   }
   searchTimeout = setTimeout(async () => {
-    const q = query(
-      collection(db, "productos"),
-      where("nombre", ">=", term),
-      where("nombre", "<=", term + '\uf8ff')
-    );
+    const q = query(collection(db, "productos"), where("nombre", ">=", term), where("nombre", "<=", term + '\uf8ff'));
     const snapshot = await getDocs(q);
-    searchResults.innerHTML = '';
-    if (snapshot.empty) {
-      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
-    } else {
-      snapshot.forEach(doc => {
-        const p = doc.data();
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <strong>${p.nombre}</strong><br>
-          <small>${p.descripcion || 'Sin descripción'}</small><br>
-          <strong>$${p.precio.toLocaleString()}</strong>
-          ${p.disponibles > 0 ? `<br><small style="color:#0a0;">${p.disponibles} disponibles</small>` : ''}
-        `;
-        div.style.padding = '10px 0';
-        div.style.borderBottom = '1px solid #eee';
-        div.style.cursor = 'pointer';
-        div.onclick = () => window.location.href = `product.html?id=${doc.id}`;
-        searchResults.appendChild(div);
-      });
-    }
+    searchResults.innerHTML = snapshot.empty
+      ? '<p class="no-results">No se encontraron productos.</p>'
+      : snapshot.docs.map(doc => {
+          const p = doc.data();
+          return `<div style="padding:12px 0; border-bottom:1px solid #eee; cursor:pointer;" onclick="window.location.href='product.html?id=${doc.id}'">
+            <strong>${p.nombre}</strong><br>
+            <small>${p.descripcion || 'Sin descripción'}</small><br>
+            <strong>$${p.precio.toLocaleString()}</strong>
+          </div>`;
+        }).join('');
     searchResultsContainer.style.display = 'block';
   }, 300);
 });
 
-document.addEventListener('click', (e) => {
-  if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+// === UI ===
+menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
+[menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
+cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
+closeCart.onclick = () => cartSidebar.classList.remove('open');
+searchBtn.onclick = () => searchContainer.classList.add('active');
+closeSearch.onclick = () => searchContainer.classList.remove('active');
+document.addEventListener('click', e => {
+  if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
+    searchContainer.classList.remove('active');
     searchResultsContainer.style.display = 'none';
   }
 });
 
-// === UI: MENÚ, CARRITO, BÚSQUEDA, AUTH ===
-menuBtn.onclick = () => {
-  menuOverlay.classList.add('show');
-  menuSidebar.classList.add('open');
-  updateAuthUI();
-};
-menuOverlay.onclick = () => {
-  menuOverlay.classList.remove('show');
-  menuSidebar.classList.remove('open');
-};
-cartBtn.onclick = () => {
-  cartSidebar.classList.add('open');
-  cartOverlay.classList.add('show');
-  updateCart();
-};
-closeCart.onclick = cartOverlay.onclick = () => {
-  cartSidebar.classList.remove('open');
-  cartOverlay.classList.remove('show');
-};
-searchBtn.onclick = () => {
-  searchBarHeader.classList.add('active');
-  headerOverlay.classList.add('show');
-  searchInput.focus();
-};
-const closeSearch = () => {
-  searchBarHeader.classList.remove('active');
-  headerOverlay.classList.remove('show');
-  searchResultsContainer.style.display = 'none';
-};
-closeSearchHeader.onclick = headerOverlay.onclick = closeSearch;
-
-// === AUTENTICACIÓN ===
+// === AUTH ===
 let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
 let userName = localStorage.getItem('userName') || '';
 function updateAuthUI() {
@@ -315,18 +285,14 @@ authBtn.onclick = () => {
   if (isLoggedIn) {
     localStorage.removeItem('loggedIn');
     localStorage.removeItem('userName');
-    localStorage.removeItem('isAdmin');
-    isLoggedIn = false;
-    userName = '';
+    isLoggedIn = false; userName = '';
     showToast('Sesión cerrada');
     updateAuthUI();
   } else {
-    window.location.href = 'login.html';
+    window.location.href utilização = 'login.html';
   }
 };
-helpBtn.onclick = () => {
-  alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
-};
+helpBtn.onclick = () => alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
 
 // === TOAST ===
 function showToast(msg) {
@@ -338,4 +304,6 @@ function showToast(msg) {
 // === INICIAR ===
 updateCart();
 updateAuthUI();
-loadTitles(); // ← CARGA TÍTULOS DESDE FIREBASE
+loadTitles();
+loadProductTypes();
+loadSocialLinks();
