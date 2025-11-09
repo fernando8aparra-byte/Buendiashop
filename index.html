@@ -56,7 +56,6 @@
     .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
-
     /* === CARRUSEL: 1 PRODUCTO POR VEZ === */
     .carousel-container {
       position: relative;
@@ -65,14 +64,12 @@
       padding: 10px 0;
       margin: 20px 0;
     }
-
     .carousel-track {
       display: flex;
       gap: 16px;
       transition: transform 0.4s ease;
       padding: 0 10px;
     }
-
     .carousel-item {
       min-width: 280px;
       max-width: 280px;
@@ -85,29 +82,24 @@
       cursor: pointer;
       transition: transform 0.2s;
     }
-
     .carousel-item:hover { transform: translateY(-4px); }
-
     .carousel-item img {
       width: 100%;
       height: 280px;
       object-fit: cover;
       border-radius: 8px;
     }
-
     .carousel-item h4 {
       margin: 10px 0 5px;
       font-size: 1rem;
       color: #000;
     }
-
     .carousel-item p {
       margin: 0;
       font-size: 0.9rem;
       color: #666;
       font-weight: 500;
     }
-
     .carousel-btn {
       position: absolute;
       top: 50%;
@@ -127,12 +119,10 @@
       opacity: 0.8;
       transition: opacity 0.2s;
     }
-
     .carousel-btn:hover { opacity: 1; }
     .carousel-btn.prev { left: 10px; }
     .carousel-btn.next { right: 10px; }
     .carousel-btn.hidden { display: none; }
-
     /* GRID PRODUCTOS */
     .products-grid {
       display: grid;
@@ -140,7 +130,6 @@
       gap: 16px;
       margin: 20px 0;
     }
-
     .product-card {
       background: #fff;
       border-radius: 12px;
@@ -149,19 +138,16 @@
       text-align: center;
       padding: 12px;
     }
-
     .product-card img {
       width: 100%;
       height: 150px;
       object-fit: cover;
       border-radius: 8px;
     }
-
     .product-card h3 {
       font-size: 0.95rem;
       margin: 8px 0 4px;
     }
-
     .product-card p { margin: 0 0 8px; color: #666; }
     .add-to-cart {
       background: #000;
@@ -173,7 +159,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     /* TOAST */
     .toast {
       position: fixed;
@@ -191,6 +176,14 @@
     }
     .toast.show { opacity: 1; }
 
+    /* === NUEVO: CANTIDAD DISPONIBLE === */
+    .stock-info {
+      font-size: 0.85rem;
+      color: #0a0;
+      font-weight: 500;
+      margin: 4px 0;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .carousel-item { min-width: 240px; max-width: 240px; }
@@ -203,7 +196,6 @@
   <!-- OVERLAYS -->
   <div class="header-overlay" id="headerOverlay"></div>
   <div class="cart-overlay" id="cartOverlay"></div>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
@@ -236,20 +228,17 @@
       </div>
     </div>
   </header>
-
   <!-- RESULTADOS DE BÚSQUEDA -->
   <div id="searchResultsContainer" class="search-results" style="display:none;">
     <h3>Resultados de búsqueda</h3>
     <div id="searchResults"></div>
   </div>
-
   <!-- CONTENIDO -->
   <main class="main-container">
     <section class="hero-banner">
       <h1>Asegura tu Mystery Box</h1>
       <p class="tag">Envío Gratis en compras +$1,500</p>
     </section>
-
     <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
     <section class="infinite-carousel-section">
       <h2>Nuevos Lanzamientos</h2>
@@ -259,7 +248,6 @@
         <button class="carousel-btn next">Right Arrow</button>
       </div>
     </section>
-
     <!-- CARRUSEL: ANUNCIOS -->
     <section class="infinite-carousel-section">
       <h2>Anuncios</h2>
@@ -269,14 +257,12 @@
         <button class="carousel-btn next">Right Arrow</button>
       </div>
     </section>
-
     <!-- TODOS LOS PRODUCTOS -->
     <section>
       <h2>Todos los Productos</h2>
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
-
   <!-- MENÚ LATERAL -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <aside class="menu-sidebar" id="menuSidebar">
@@ -304,7 +290,6 @@
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
   </aside>
-
   <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
@@ -320,16 +305,13 @@
       <div id="message"></div>
     </div>
   </aside>
-
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
-
   <!-- PIE DE PÁGINA -->
   <footer class="footer">
     <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
     <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
   </footer>
-
   <!-- SCRIPT -->
   <script type="module" src="js/index.js"></script>
 </body>
