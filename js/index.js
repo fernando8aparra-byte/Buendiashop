@@ -1,4 +1,4 @@
-// index.js - ACTUALIZADO: CARRUSEL 1x1 + SCROLL INTELIGENTE
+// index.js - CARRITO CON ID + IMAGEN + type.anuncio + type.carrusel + type.normal
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -34,195 +34,299 @@ const searchInput = document.getElementById('searchInput');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 const searchResults = document.getElementById('searchResults');
 const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuSidebar = document.getElementById('menuSidebar');
+const cartBtn = document.getElementById('cartBtn');
+const cartSidebar = document.getElementById('cartSidebar');
+const closeCart = document.getElementById('closeCart');
+const cartOverlay = document.getElementById('cartOverlay');
+const searchBtn = document.getElementById('searchBtn');
+const searchBarHeader = document.getElementById('searchBarHeader');
+const closeSearchHeader = document.getElementById('closeSearchHeader');
+const headerOverlay = document.getElementById('headerOverlay');
+const welcomeMsg = document.getElementById('welcomeMsg');
+const authBtn = document.getElementById('authBtn');
+const helpBtn = document.getElementById('helpBtn');
 
-// === CARRITO ===
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-// === FUNCIÓN: CREAR ITEM CARRUSEL ===
-function createCarouselItem(product) {
-  const item = document.createElement('div');
-  item.className = 'carousel-item';
-  item.innerHTML = `
-    <img src="${product.image}" alt="${product.name}">
-    <h4>${product.name}</h4>
-    <p>$${product.price}</p>
-  `;
-  item.onclick = () => addToCart(product);
-  return item;
-}
-
-// === FUNCIÓN: SETUP CARRUSEL (1 POR VEZ) ===
-function setupCarousel(trackElement, products) {
-  if (!trackElement || !products.length) return;
-
-  trackElement.innerHTML = '';
-  products.forEach(p => trackElement.appendChild(createCarouselItem(p)));
-
-  const container = trackElement.parentElement;
-  const items = trackElement.children;
-  let currentIndex = 0;
-
-  const prevBtn = container.querySelector('.carousel-btn.prev');
-  const nextBtn = container.querySelector('.carousel-btn.next');
-
-  function updateButtons() {
-    const totalWidth = trackElement.scrollWidth;
-    const containerWidth = container.clientWidth;
-
-    if (totalWidth <= containerWidth + 50) {
-      prevBtn.classList.add('hidden');
-      nextBtn.classList.add('hidden');
-    } else {
-      prevBtn.classList.remove('hidden');
-      nextBtn.classList.remove('hidden');
-    }
-
-    prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex >= items.length - 1;
-  }
-
-  function moveTo(index) {
-    const itemWidth = items[0].offsetWidth + 16;
-    trackElement.style.transform = `translateX(-${index * itemWidth}px)`;
-    currentIndex = index;
-    updateButtons();
-  }
-
-  nextBtn.onclick = () => currentIndex < items.length - 1 && moveTo(currentIndex + 1);
-  prevBtn.onclick = () => currentIndex > 0 && moveTo(currentIndex - 1);
-
-  // Inicializar
-  updateButtons();
-  window.addEventListener('resize', updateButtons);
-}
-
-// === CARGAR PRODUCTOS ===
-async function loadProducts() {
-  const q = query(collection(db, "products"));
-  onSnapshot(q, (snapshot) => {
-    const nuevos = [];
-    const anuncios = [];
-    const todos = [];
-
-    snapshot.forEach(doc => {
-      const p = { id: doc.id, ...doc.data() };
-      todos.push(p);
-
-      if (p.type === 'carrusel') nuevos.push(p);
-      if (p.type === 'anuncio') anuncios.push(p);
-    });
-
-    // Carruseles
-    setupCarousel(newCarousel, nuevos);
-    setupCarousel(starCarousel, anuncios);
-
-    // Grid
-    productsGrid.innerHTML = '';
-    todos.filter(p => p.type === 'normal').forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'product-card';
-      div.innerHTML = `
-        <img src="${p.image}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <p>$${p.price}</p>
-        <button class="add-to-cart">Agregar</button>
-      `;
-      div.querySelector('.add-to-cart').onclick = () => addToCart(p);
-      productsGrid.appendChild(div);
-    });
-
-    updateCart();
-  });
-}
-
-// === CARRITO ===
-function addToCart(product) {
-  const existing = cart.find(item => item.id === product.id);
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ ...product, quantity: 1 });
-  }
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCart();
-  showToast('Agregado al carrito');
-}
-
-function removeFromCart(id) {
-  cart = cart.filter(item => item.id !== id);
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCart();
-}
+// === CARRITO (GUARDADO EN LOCALSTORAGE) ===
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
 function updateCart() {
-  cartBadge.textContent = cart.reduce((sum, i) => sum + i.quantity, 0) || '';
-  cartBadge.style.display = cart.length ? 'block' : 'none';
-
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+  
+  cartBadge.textContent = totalQty;
+  cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
+  
+  cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
   cartItems.innerHTML = '';
-  let total = 0;
 
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
+    goToPay.style.display = 'none';
+    return;
+  }
+
+  goToPay.style.display = 'block';
+  cart.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
+      <div>
+        <div>${item.nombre}</div>
+        <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
+      </div>
+      <button onclick="removeFromCart(${i})">X</button>
+    `;
+    cartItems.appendChild(div);
+  });
+}
+
+// === AGREGAR AL CARRITO (CON ID + IMAGEN + PRECIO) ===
+window.addToCart = (id) => {
+  const product = window.allProducts.find(p => p.id === id);
+  if (!product) {
+    showToast("Producto no encontrado");
+    return;
+  }
+
+  const existing = cart.find(i => i.id === id);
+  if (existing) {
+    existing.qty++;
   } else {
-    cart.forEach(item => {
-      total += item.price * item.quantity;
-      const div = document.createElement('div');
-      div.className = 'cart-item';
-      div.innerHTML = `
-        <img src="${item.image}" alt="${item.name}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">
-        <div style="flex:1;margin-left:10px;">
-          <h4 style="margin:0;font-size:0.95rem;">${item.name}</h4>
-          <p style="margin:5px 0;color:#666;">$${item.price} x ${item.quantity}</p>
-        </div>
-        <button>X</button>
-      `;
-      div.querySelector('button').onclick = () => removeFromCart(item.id);
-      cartItems.appendChild(div);
+    cart.push({
+      id: product.id,
+      nombre: product.nombre,
+      precio: product.precio,
+      imagen: product.imagen,
+      qty: 1
     });
   }
 
-  cartTotal.textContent = `Total: $${total}`;
-  goToPay.style.display = cart.length ? 'block' : 'none';
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('¡Agregado al carrito!');
+};
+
+window.removeFromCart = (i) => {
+  cart.splice(i, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('Producto eliminado');
+};
+
+goToPay.onclick = () => {
+  if (cart.length === 0) return;
+  window.location.href = 'pago.html';
+};
+
+// === RENDER CARRUSEL ===
+function renderCarousel(container, filterFn) {
+  container.innerHTML = '';
+  const filtered = window.allProducts.filter(filterFn);
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
+    return;
+  }
+
+  // Duplicar para efecto infinito
+  [...filtered, ...filtered].forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'carousel-item';
+    item.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy">`;
+    item.onclick = () => window.location.href = `product.html?id=${p.id}`;
+    container.appendChild(item);
+  });
 }
+
+// === RENDER GRILLA ===
+function renderGrid() {
+  productsGrid.innerHTML = '';
+  const normales = window.allProducts.filter(p => p.type && p.type.normal);
+
+  if (normales.length === 0) {
+    productsGrid.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos disponibles</p>';
+    return;
+  }
+
+  normales.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      <div class="card-info">
+        <h3>${p.nombre}</h3>
+        <p class="desc">${p.descripcion || ''}</p>
+        <div class="price-container">
+          ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+          <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
+        </div>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
+      </div>
+    `;
+    card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+    productsGrid.appendChild(card);
+  });
+}
+
+// === FIRESTORE EN TIEMPO REAL ===
+let allProducts = [];
+const productosRef = collection(db, "productos");
+
+onSnapshot(productosRef, (snapshot) => {
+  allProducts = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    allProducts.push({
+      id: doc.id,
+      nombre: data.nombre || '',
+      precio: data.precio || 0,
+      precioAntiguo: data.precioAntiguo || null,
+      descripcion: data.descripcion || '',
+      imagen: data.imagen || '',
+      type: data.type || { normal: true }, // ← type.anuncio, type.carrusel, type.normal
+      talla: data.talla || [],
+      tipo: data.tipo || ''
+    });
+  });
+
+  window.allProducts = allProducts;
+
+  // === CARRUSELES ===
+  renderCarousel(newCarousel, p => p.type?.carrusel === true);  // Nuevos Lanzamientos
+  renderCarousel(starCarousel, p => p.type?.anuncio === true);   // Productos Estrella
+  renderGrid();
+});
+
+// === BÚSQUEDA EN TIEMPO REAL ===
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const term = searchInput.value.trim().toLowerCase();
+  
+  if (term.length < 2) {
+    searchResultsContainer.style.display = 'none';
+    return;
+  }
+
+  searchTimeout = setTimeout(async () => {
+    const q = query(
+      collection(db, "productos"),
+      where("nombre", ">=", term),
+      where("nombre", "<=", term + '\uf8ff')
+    );
+    const snapshot = await getDocs(q);
+    searchResults.innerHTML = '';
+
+    if (snapshot.empty) {
+      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+    } else {
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <strong>${p.nombre}</strong><br>
+          <small>${p.descripcion || 'Sin descripción'}</small><br>
+          <strong>$${p.precio.toLocaleString()}</strong>
+        `;
+        div.style.padding = '10px 0';
+        div.style.borderBottom = '1px solid #eee';
+        div.style.cursor = 'pointer';
+        div.onclick = () => window.location.href = `product.html?id=${doc.id}`;
+        searchResults.appendChild(div);
+      });
+    }
+    searchResultsContainer.style.display = 'block';
+  }, 300);
+});
+
+// Cerrar búsqueda al hacer clic fuera
+document.addEventListener('click', (e) => {
+  if (!searchBarHeader.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+    searchResultsContainer.style.display = 'none';
+  }
+});
+
+// === MENÚ, CARRITO, BÚSQUEDA, AUTH ===
+menuBtn.onclick = () => {
+  menuOverlay.classList.add('show');
+  menuSidebar.classList.add('open');
+  updateAuthUI();
+};
+
+menuOverlay.onclick = () => {
+  menuOverlay.classList.remove('show');
+  menuSidebar.classList.remove('open');
+};
+
+cartBtn.onclick = () => {
+  cartSidebar.classList.add('open');
+  cartOverlay.classList.add('show');
+  updateCart();
+};
+
+closeCart.onclick = cartOverlay.onclick = () => {
+  cartSidebar.classList.remove('open');
+  cartOverlay.classList.remove('show');
+};
+
+searchBtn.onclick = () => {
+  searchBarHeader.classList.add('active');
+  headerOverlay.classList.add('show');
+  searchInput.focus();
+};
+
+const closeSearch = () => {
+  searchBarHeader.classList.remove('active');
+  headerOverlay.classList.remove('show');
+  searchResultsContainer.style.display = 'none';
+};
+
+closeSearchHeader.onclick = headerOverlay.onclick = closeSearch;
+
+// === AUTENTICACIÓN ===
+let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+let userName = localStorage.getItem('userName') || '';
+
+function updateAuthUI() {
+  if (isLoggedIn && userName) {
+    welcomeMsg.textContent = `¡Hola, ${userName}!`;
+    authBtn.textContent = 'Cerrar sesión';
+    authBtn.classList.add('logout-btn');
+  } else {
+    welcomeMsg.textContent = '';
+    authBtn.textContent = 'Inicia sesión o regístrate';
+    authBtn.classList.remove('logout-btn');
+  }
+}
+
+authBtn.onclick = () => {
+  if (isLoggedIn) {
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('isAdmin');
+    isLoggedIn = false;
+    userName = '';
+    showToast('Sesión cerrada');
+    updateAuthUI();
+  } else {
+    window.location.href = 'login.html';
+  }
+};
+
+helpBtn.onclick = () => {
+  alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
+};
 
 // === TOAST ===
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === BÚSQUEDA ===
-searchInput.addEventListener('input', async () => {
-  const term = searchInput.value.trim().toLowerCase();
-  if (!term) {
-    searchResultsContainer.style.display = 'none';
-    return;
-  }
-
-  const q = query(collection(db, "products"), where("keywords", "array-contains", term));
-  const snapshot = await getDocs(q);
-  searchResults.innerHTML = '';
-
-  if (snapshot.empty) {
-    searchResults.innerHTML = '<p class="no-results">No se encontraron productos</p>';
-  } else {
-    snapshot.forEach(doc => {
-      const p = doc.data();
-      const div = document.createElement('div');
-      div.style = 'padding:10px;border-bottom:1px solid #eee;cursor:pointer;display:flex;gap:10px;align-items:center;';
-      div.innerHTML = `<img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">
-                       <div><strong>${p.name}</strong><br>$${p.price}</div>`;
-      div.onclick = () => {
-        addToCart({ id: doc.id, ...p });
-        searchInput.value = '';
-        searchResultsContainer.style.display = 'none';
-      };
-      searchResults.appendChild(div);
-    });
-  }
-  searchResultsContainer.style.display = 'block';
-});
-
 // === INICIAR ===
-loadProducts();
+updateCart();
+updateAuthUI();
