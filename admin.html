@@ -3,253 +3,282 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Boutique Buendía</title>
-  <link rel="stylesheet" href="css/admin.css">
+  <title>Admin - Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* === TU DISEÑO ORIGINAL MANTENIDO === */
-    body { margin: 0; font-family: 'Helvetica', Arial, sans-serif; background: #f8f9fa; }
-    .admin-container { padding: 20px; max-width: 1300px; margin: 0 auto; }
-    .section { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 32px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
-    h2 { margin: 0 0 16px; font-size: 1.5rem; color: #1a1a1a; font-weight: 600; }
-    .carousel-track { display: flex; gap: 16px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; }
-    .carousel-track::-webkit-scrollbar { display: none; }
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-    .product-card { 
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; 
-      overflow: hidden; text-align: center; transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.12); }
-    .product-card img { width: 100%; height: 160px; object-fit: cover; }
-    .product-card h3 { margin: 10px 0 6px; font-size: 1rem; color: #1a1a1a; }
-    .product-price { font-weight: bold; color: #e91e63; font-size: 1.1rem; }
-    .product-desc-small { font-size: 0.8rem; color: #666; margin: 4px 0; }
-    .product-actions { display: flex; gap: 8px; padding: 8px; }
-    .admin-btn { 
-      flex: 1; padding: 8px; border: none; border-radius: 8px; 
-      font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s;
-    }
-    .admin-edit { background: #007bff; color: #fff; }
-    .admin-edit:hover { background: #0056b3; }
-    .admin-delete { background: #dc3545; color: #fff; }
-    .admin-delete:hover { background: #c82333; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
+    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; }
+    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .icon-btn { color: #000; background: none; cursor: pointer; }
+    .icon-btn svg { stroke: #000; fill: none; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; position: relative; min-height: 200px; background-size: cover; background-position: center; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.6); }
+    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
+    .hero-banner .tag { font-size: 1rem; color: #fff; }
+    .main-container { margin-top: 20px; padding: 0 15px; }
+    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
+    .footer a { color: #fff; text-decoration: underline; }
+
+    /* ADMIN BUTTONS */
+    .admin-btn { background: #ff4444; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; margin-left: 10px; cursor: pointer; }
+    .admin-edit { background: #0066ff; }
+    .admin-delete { background: #ff0000; }
+    .product-card { position: relative; text-align: center; padding: 15px; }
+    .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
+    .product-card:hover .product-actions { opacity: 1; }
+
+    /* MODALES */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
     .modal.active { display: flex; }
-    .modal-content { background: #fff; padding: 28px; border-radius: 16px; width: 90%; max-width: 520px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #333; }
-    .input-group input, .input-group select, .input-group textarea { 
-      width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; 
+    .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+    .modal button { background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+
+    /* ENGRANAJE */
+    .admin-gear { position: relative; }
+    .admin-dropdown {
+      position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
+      border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; z-index: 1001; width: 220px;
     }
-    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
-    .admin-btn.secondary { background: #6c757d; color: #fff; }
-    .admin-btn.secondary:hover { background: #5a6268; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 14px 28px; border-radius: 12px; font-size: 0.95rem; z-index: 1001; opacity: 0; transition: opacity 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .toast.show { opacity: 1; }
-    .available-container { display: flex; align-items: center; gap: 14px; margin: 16px 0; }
-    #availableBox { 
-      width: 40px; height: 40px; border: 2px solid #ccc; border-radius: 10px; 
-      display: flex; align-items: center; justify-content: center; 
-      font-size: 1.3rem; color: #777; font-weight: normal; cursor: pointer; 
-      background: #fff; user-select: none; transition: 0.2s;
+    .admin-dropdown.show { display: block; }
+    .admin-dropdown a, .admin-dropdown button {
+      display: block; width: 100%; padding: 14px 20px; color: #000; text-decoration: none;
+      border-bottom: 1px solid #eee; background: none; border: none; text-align: left;
+      cursor: pointer; font-size: 0.95rem; font-weight: 500;
     }
-    #availableBox:hover { border-color: #999; }
-    #availableInput { display: none; }
-    #availableInput input { width: 80px; padding: 8px; text-align: center; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-    .available-label { margin: 0; font-size: 0.85rem; color: #666; }
-    .admin-gear-container { text-align: right; margin-bottom: 16px; }
-    .auto-scroll { overflow: hidden; position: relative; }
-    .auto-scroll .carousel-track { animation: scroll 20s linear infinite; }
-    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-    .static-display { display: flex; flex-wrap: wrap; gap: 16px; }
+    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
+
+    /* BOTONES + Y LÁPIZ */
+    .add-post-btn, .edit-text-btn {
+      background: #000; color: #fff; width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer;
+    }
+
+    /* CARRUSEL */
+    .infinite-carousel-section { overflow: hidden; position: relative; margin-bottom: 40px; }
+    .infinite-carousel { display: flex; transition: transform 0.5s ease; }
+    .auto-scroll .infinite-carousel { animation: scrollInfinite 20s linear infinite; }
+    .static-display .infinite-carousel { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    @keyframes scrollInfinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
+    .toast.show { display: block; animation: fadeInOut 3s; }
+    @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+
+    /* EDITABLE TEXT */
+    [contenteditable="true"] {
+      outline: none;
+      cursor: text;
+      padding: 4px;
+      border-radius: 4px;
+      position: relative;
+    }
+    [contenteditable="true"].editing {
+      outline: 2px dashed #0066ff;
+      background: rgba(0, 102, 255, 0.08);
+      border-radius: 6px;
+      padding: 6px;
+    }
+
+    /* BOTONES DE EDICIÓN DE TEXTOS */
+    .text-edit-controls {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #fff; padding: 12px 20px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      display: none; z-index: 2500; gap: 10px; align-items: center;
+    }
+    .text-edit-controls.active { display: flex; }
+    .text-edit-controls button {
+      background: #000; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+    }
+    .text-edit-controls button.cancel { background: #999; }
+
+    /* CANTIDAD DISPONIBLE: CUADRADO + */
+    .available-container {
+      display: flex; align-items: center; gap: 12px; margin: 15px 0;
+    }
+    #availableBox {
+      width: 36px; height: 36px; border: 2px solid #000; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+      cursor: pointer; user-select: none; font-weight: bold; color: #000;
+    }
+    #availableInput {
+      display: none;
+    }
+    #availableInput input {
+      width: 70px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px;
+    }
+    .available-label {
+      margin: 4px 0 0; font-size: 0.85rem; color: #555; line-height: 1.3;
+    }
   </style>
 </head>
 <body>
-  <div class="admin-container">
 
-    <!-- ENGRANAJE + DROPDOWN -->
-    <div class="admin-gear-container">
-      <button id="adminGear" class="admin-btn" style="background:#000; color:#fff; padding:10px 16px; border-radius:50%;">
-        Gear
-      </button>
-      <div id="adminDropdown" class="dropdown" style="display:none; position:absolute; right:20px; background:#fff; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,0.15); padding:12px; z-index:100;">
-        <button id="toggleTextEdit" class="admin-btn" style="width:100%; margin-bottom:8px;">Editar Textos</button>
-        <button id="openSocialModal" class="admin-btn" style="width:100%;">Redes Sociales</button>
-      </div>
-    </div>
-
-    <!-- BOTÓN EDITAR TÍTULOS -->
-    <div style="text-align:right; margin-bottom:16px;">
-      <button id="editTitlesBtn" class="admin-btn" style="background:#28a745; color:#fff;">Editar Títulos</button>
-    </div>
-
-    <!-- SECCIÓN: NUEVOS LANZAMIENTOS -->
-    <div class="section">
-      <h2 contenteditable="true" data-collection="textos" data-doc="titulos" data-field="nuevos_lanzamientos">Nuevos Lanzamientos</h2>
-      <div id="newCarousel" class="carousel-track"></div>
-    </div>
-
-    <!-- SECCIÓN: ANUNCIOS -->
-    <div class="section">
-      <h2 contenteditable="true" data-collection="textos" data-doc="titulos" data-field="anuncios">Anuncios</h2>
-      <div id="starCarousel" class="carousel-track"></div>
-    </div>
-
-    <!-- SECCIÓN: TODOS LOS PRODUCTOS -->
-    <div class="section">
-      <h2 contenteditable="true" data-collection="textos" data-doc="titulos" data-field="todos_productos">Todos los Productos</h2>
-      <button id="addPostBtn" class="admin-btn" style="margin:16px 0; background:#000; color:#fff; padding:10px 20px; border-radius:10px; font-weight:bold;">+ Agregar Producto</button>
-      <div id="productsGrid" class="products-grid"></div>
-    </div>
-
-  </div>
-
-  <!-- MODAL: AGREGAR PRODUCTO -->
-  <div class="modal" id="addProductModal">
-    <div class="modal-content">
-      <h3>Agregar Producto</h3>
-      <div class="input-group">
-        <label>Nombre</label>
-        <input type="text" id="addName">
-      </div>
-      <div class="input-group">
-        <label>Precio</label>
-        <input type="number" id="addPrice" min="0" step="0.01">
-      </div>
-      <div class="input-group">
-        <label>Tallas (separadas por coma)</label>
-        <input type="text" id="addSizes" placeholder="S, M, L">
-      </div>
-      <div class="input-group">
-        <label>Categoría</label>
-        <select id="addCategory">
-          <option value="gorras">Gorras</option>
-          <option value="camisetas">Camisetas</option>
-          <option value="pantalones">Pantalones</option>
-          <option value="cintos">Cintos</option>
-          <option value="tenis">Tenis</option>
-          <option value="perfumes">Perfumes</option>
-          <option value="sudaderas">Sudaderas</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Tipo</label>
-        <select id="addType">
-          <option value="normal">Normal</option>
-          <option value="carrusel">Carrusel</option>
-          <option value="publicidad">Publicidad</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>Descripción</label>
-        <textarea id="addDesc" rows="2"></textarea>
-      </div>
-      <div class="input-group">
-        <label>Imagen (URL)</label>
-        <input type="text" id="addImage" placeholder="https://...">
-        <input type="file" id="addImageFile" accept="image/*" style="margin-top:6px;">
-        <img id="imagePreview" style="width:100%; margin-top:12px; border-radius:10px; display:none;">
-      </div>
-      <div class="available-container">
-        <div id="availableBox">+</div>
-        <div>
-          <div id="availableInput">
-            <input type="number" id="addAvailableCount" min="0" max="999" value="0">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="admin-gear" id="adminGear">
+          <button class="icon-btn" aria-label="Ajustes">
+            <svg viewBox="0 0 24 24" width="26" height="26">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </button>
+          <div class="admin-dropdown" id="adminDropdown">
+            <a href="admin-map.html">Mapa de Compras</a>
+            <a href="admin-compras.html">Compras</a>
+            <a href="admin-estadisticas.html">Estadísticas</a>
+            <button id="openSocialModal">Agregar Redes Sociales</button>
+            <button id="logoutBtn">Cerrar Sesión</button>
           </div>
-          <p class="available-label">Cantidad de producto disponible</p>
         </div>
+        <div class="logo">EFRAÍN</div>
       </div>
-      <div class="modal-actions">
-        <button id="saveNewProduct" class="admin-btn">Guardar</button>
-        <button id="cancelAdd" class="admin-btn secondary">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: EDITAR PRODUCTO -->
-  <div class="modal" id="editProductModal">
-    <div class="modal-content">
-      <h3>Editar Producto</h3>
-      <div class="input-group">
-        <label>Nombre</label>
-        <input type="text" id="editName">
-      </div>
-      <div class="input-group">
-        <label>Precio</label>
-        <input type="number" id="editPrice" min="0" step="0.01">
-      </div>
-      <div class="input-group">
-        <label>Imagen (URL)</label>
-        <input type="text" id="editImage">
-      </div>
-      <div class="modal-actions">
-        <button id="saveProduct" class="admin-btn">Guardar</button>
-        <button id="cancelEdit" class="admin-btn secondary">Cancelar</button>
+      <div class="header-right">
+        <div class="edit-text-btn" id="toggleTextEdit">Edit</div>
+        <div class="add-post-btn" id="addPostBtn">+</div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- MODAL: REDES SOCIALES -->
-  <div class="modal" id="socialLinksModal">
-    <div class="modal-content">
-      <h3>Redes Sociales</h3>
-      <div class="input-group">
-        <label>TikTok</label>
-        <input type="text" id="tiktokInput" placeholder="https://tiktok.com/@...">
-      </div>
-      <div class="input-group">
-        <label>Instagram</label>
-        <input type="text" id="instagramInput" placeholder="https://instagram.com/...">
-      </div>
-      <div class="input-group">
-        <label>Facebook</label>
-        <input type="text" id="facebookInput" placeholder="https://facebook.com/...">
-      </div>
-      <div class="input-group">
-        <label>X (Twitter)</label>
-        <input type="text" id="xInput" placeholder="https://x.com/...">
-      </div>
-      <div class="input-group">
-        <label>WhatsApp</label>
-        <input type="text" id="whatsappInput" placeholder="+52...">
-      </div>
-      <div class="modal-actions">
-        <button id="saveSocialLinks" class="admin-btn">Guardar</button>
-        <button id="cancelSocial" class="admin-btn secondary">Cancelar</button>
-      </div>
+  <!-- HERO BANNER -->
+  <section class="hero-banner" id="heroBanner">
+    <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
+      Asegura tu Mystery Box
+    </h1>
+    <p class="tag" id="heroTagDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="subtitulo">
+      Envío Gratis en compras +$1,500
+    </p>
+  </section>
+
+  <!-- SECCIONES -->
+  <section class="infinite-carousel-section" id="newCarouselSection">
+    <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
+      Nuevos Lanzamientos
+    </h2>
+    <div class="infinite-carousel">
+      <div class="carousel-track" id="newCarousel"></div>
     </div>
-  </div>
+  </section>
 
-  <!-- MODAL: EDITAR TÍTULOS -->
-  <div class="modal" id="titlesModal">
-    <div class="modal-content">
-      <h3>Editar Títulos</h3>
-      <div class="input-group">
-        <label>Nuevos Lanzamientos</label>
-        <input type="text" id="titleNew">
-      </div>
-      <div class="input-group">
-        <label>Anuncios</label>
-        <input type="text" id="titleAds">
-      </div>
-      <div class="input-group">
-        <label>Todos los Productos</label>
-        <input type="text" id="titleAll">
-      </div>
-      <div class="modal-actions">
-        <button id="saveTitles" class="admin-btn">Guardar</button>
-        <button id="cancelTitles" class="admin-btn secondary">Cancelar</button>
-      </div>
+  <section class="infinite-carousel-section" id="starCarouselSection">
+    <h2 id="titleStarDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="productos_estrella">
+      Productos Estrella
+    </h2>
+    <div class="infinite-carousel">
+      <div class="carousel-track" id="starCarousel"></div>
     </div>
-  </div>
+  </section>
 
-  <!-- CONTROLES EDICIÓN DE TEXTOS -->
-  <div id="textEditControls" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#000; color:#fff; padding:12px 20px; border-radius:12px; display:none; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-    <button id="saveTextChanges" class="admin-btn" style="background:#28a745; margin-right:8px;">Guardar</button>
-    <button id="cancelTextChanges" class="admin-btn secondary">Cancelar</button>
-  </div>
+  <section>
+    <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
+      Todos los Productos
+    </h2>
+    <div class="products-grid" id="productsGrid"></div>
+  </section>
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
+
+  <!-- BOTONES DE EDICIÓN DE TEXTOS -->
+  <div class="text-edit-controls" id="textEditControls">
+    <button id="saveTextChanges">Guardar Cambios</button>
+    <button id="cancelTextChanges" class="cancel">No Guardar</button>
+  </div>
+
+  <!-- MODAL EDITAR PRODUCTO -->
+  <div class="modal" id="editProductModal">
+    <div class="modal-content">
+      <h3>Editar Producto</h3>
+      <input type="text" id="editName" placeholder="Nombre">
+      <input type="text" id="editPrice" placeholder="Precio">
+      <input type="text" id="editImage" placeholder="URL de imagen">
+      <button id="saveProduct">Guardar</button>
+      <button id="cancelEdit" style="background:#999;">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL AGREGAR PRODUCTO -->
+  <div class="modal" id="addProductModal">
+    <div class="modal-content">
+      <h3>Agregar Nuevo Producto</h3>
+      <input type="text" id="addName" placeholder="Nombre del producto">
+      <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
+      <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
+      <textarea id="addDesc" placeholder="Descripción"></textarea>
+      <select id="addCategory">
+        <option value="gorra">Gorra</option>
+        <option value="camiseta">Camiseta</option>
+        <option value="pantalon">Pantalón</option>
+        <option value="cinto">Cinto</option>
+        <option value="tenis">Tenis</option>
+        <option value="perfume">Perfume</option>
+        <option value="sudadera">Sudadera</option>
+      </select>
+      <select id="addType">
+        <option value="normal">Normal</option>
+        <option value="carrusel">Carrusel</option>
+        <option value="publicidad">Estrella</option>
+      </select>
+
+     <!-- CANTIDAD DISPONIBLE: CUADRADO + -->
+<div class="available-container">
+  <div id="availableBox">+</div>
+  <div>
+    <div id="availableInput">
+      <input type="number" id="addAvailableCount" min="0" max="999" value="0">
+    </div>
+    <p class="available-label">Cantidad de producto disponible</p>
+  </div>
+</div>
+
+      <div class="image-upload-section">
+        <label>Subir imagen:</label>
+        <input type="file" id="addImageFile" accept="image/*">
+        <div id="imagePreview" style="display:none; text-align:center; margin:10px 0;">
+          <img id="previewImg" style="max-width:100%; max-height:200px; border-radius:8px;">
+        </div>
+      </div>
+      <div class="image-url-section">
+        <label>O URL:</label>
+        <input type="text" id="addImage" placeholder="https://...">
+      </div>
+      <p style="font-size:0.8rem; color:#d00; margin:10px 0 0;">
+        Usa una URL por ahora.
+      </p>
+      <button id="saveNewProduct">Guardar Producto</button>
+      <button id="cancelAdd" style="background:#999;">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL REDES SOCIALES -->
+  <div class="modal" id="socialLinksModal">
+    <div class="modal-content">
+      <h3>Agregar Redes Sociales</h3>
+      <div class="social-links-inputs">
+        <label>TikTok</label>
+        <input type="text" id="tiktokInput" placeholder="https://tiktok.com/@usuario">
+        <label>Instagram</label>
+        <input type="text" id="instagramInput" placeholder="https://instagram.com/usuario">
+        <label>Facebook</label>
+        <input type="text" id="facebookInput" placeholder="https://facebook.com/usuario">
+        <label>X (Twitter)</label>
+        <input type="text" id="xInput" placeholder="https://x.com/usuario">
+        <label>WhatsApp</label>
+        <input type="text" id="whatsappInput" placeholder="https://wa.me/521234567890">
+      </div>
+      <button id="saveSocialLinks">Guardar</button>
+      <button id="cancelSocial" style="background:#999;">Cancelar</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 Efraín Shop. Admin Mode.</p>
+  </footer>
 
   <script type="module" src="js/admin.js"></script>
 </body>
