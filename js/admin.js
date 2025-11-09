@@ -1,24 +1,20 @@
-// js/admin.js - CON COMAS EN PRECIOS
+// js/admin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  doc,
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
   addDoc,
-  updateDoc,
-  deleteDoc,
+  updateDoc, 
+  deleteDoc, 
   onSnapshot,
+  query,
+  where,
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+  apiKey: "TU_API_KEY",
   authDomain: "boutique-buendia.firebaseapp.com",
   projectId: "boutique-buendia",
   storageBucket: "boutique-buendia.firebasestorage.app",
@@ -28,12 +24,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
-
-// === FORMATEAR PRECIO CON COMAS ===
-function formatPrice(price) {
-  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 
 // === PROTEGER ADMIN ===
 if (!localStorage.getItem('isAdmin')) {
@@ -41,33 +31,33 @@ if (!localStorage.getItem('isAdmin')) {
 }
 
 // === CARGAR PRODUCTOS ===
-let allProducts = [];
-function loadProductsByType(filterFn, containerId) {
-  const unsubscribe = onSnapshot(collection(db, "productos"), (snapshot) => {
+function loadProductsByType(type, containerId) {
+  const q = query(collection(db, "productos"), where("type", "==", type));
+  const unsubscribe = onSnapshot(q, (snapshot) => {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     const products = [];
-
+    
     snapshot.forEach((docSnap) => {
       const data = { id: docSnap.id, ...docSnap.data() };
-      if (filterFn(data)) {
-        products.push(data);
-        const card = createProductCard(data, containerId);
-        container.appendChild(card);
-      }
+      products.push(data);
+      const card = createProductCard(data, type);
+      container.appendChild(card);
     });
 
     if (containerId === 'newCarousel' || containerId === 'starCarousel') {
       handleAutoCarousel(container, products.length, containerId);
     }
+
     duplicateForInfiniteScroll(containerId);
   });
+
   window[`unsubscribe_${containerId}`] = unsubscribe;
 }
 
-loadProductsByType(p => p.type?.carrusel, 'newCarousel');
-loadProductsByType(p => p.type?.anuncio, 'starCarousel');
-loadProductsByType(p => p.type?.normal, 'productsGrid');
+loadProductsByType('carrusel', 'newCarousel');
+loadProductsByType('publicidad', 'starCarousel');
+loadProductsByType('normal', 'productsGrid');
 
 // === CARRUSEL ===
 function handleAutoCarousel(container, count, containerId) {
@@ -87,55 +77,61 @@ function duplicateForInfiniteScroll(containerId) {
   track.dataset.duplicated = 'true';
 }
 
-// === CREAR TARJETA CON PRECIO FORMATEADO ===
-function createProductCard(p, containerId) {
+// === CREAR TARJETA ===
+function createProductCard(p, sectionType) {
   const div = document.createElement('div');
   div.className = 'product-card';
   div.dataset.id = p.id;
 
-  const isNormal = containerId === 'productsGrid';
-  const precioFormateado = formatPrice(p.precio);
-
-  div.innerHTML = `
-    <img src="${p.imagen}" alt="${p.nombre}">
-    <h3>${p.nombre}</h3>
-    ${isNormal ? `<p class="product-desc-small">${p.descripcion || ''}</p>` : ''}
-    <p class="product-price">$${precioFormateado}</p>
-    <div class="product-actions">
-      <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
-      <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
-    </div>
-  `;
+  if (sectionType === 'normal') {
+    div.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <h3>${p.nombre}</h3>
+      <p class="product-price">$${p.precio}</p>
+      <p class="product-desc-small">${p.descripcion || ''}</p>
+      <div class="product-actions">
+        <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+        <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
+      </div>
+    `;
+  } else {
+    div.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <h3>${p.nombre}</h3>
+      <p>$${p.precio}</p>
+      <div class="product-actions">
+        <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+        <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
+      </div>
+    `;
+  }
   return div;
 }
 
-// === EDITAR PRODUCTO (MUESTRA COMAS EN INPUT) ===
+// === EDITAR ===
 window.editProduct = (id) => {
-  const product = allProducts.find(p => p.id === id);
-  if (!product) return;
-
-  document.getElementById('editName').value = product.nombre;
-  document.getElementById('editPrice').value = formatPrice(product.precio); // ← COMAS
-  document.getElementById('editImage').value = product.imagen;
-
+  const card = document.querySelector(`.product-card[data-id="${id}"]`);
+  if (!card) return;
+  const p = {
+    nombre: card.querySelector('h3').textContent,
+    precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0),
+    descripcion: card.querySelector('.product-desc-small')?.textContent || '',
+    imagen: card.querySelector('img').src
+  };
+  document.getElementById('editName').value = p.nombre;
+  document.getElementById('editPrice').value = p.precio;
+  document.getElementById('editImage').value = p.imagen;
   document.getElementById('editProductModal').classList.add('active');
   window.currentEditId = id;
 };
 
 document.getElementById('saveProduct').onclick = async () => {
   const id = window.currentEditId;
-  const precioInput = document.getElementById('editPrice').value.replace(/,/g, ''); // Quitar comas
   const updated = {
-    nombre: document.getElementById('editName').value.trim(),
-    precio: parseFloat(precioInput),
-    imagen: document.getElementById('editImage').value.trim()
+    nombre: document.getElementById('editName').value,
+    precio: parseFloat(document.getElementById('editPrice').value),
+    imagen: document.getElementById('editImage').value
   };
-
-  if (!updated.nombre || isNaN(updated.precio) || !updated.imagen) {
-    showToast("Completa todos los campos");
-    return;
-  }
-
   await updateDoc(doc(db, "productos", id), updated);
   showToast("Producto actualizado");
   closeModal('editProductModal');
@@ -148,41 +144,17 @@ window.deleteProduct = async (id) => {
   showToast("Producto eliminado");
 };
 
-// === AGREGAR PRODUCTO (INPUT CON COMAS) ===
+// === AGREGAR PRODUCTO ===
 document.getElementById('addPostBtn').onclick = () => {
   document.getElementById('addProductModal').classList.add('active');
-  document.getElementById('imagePreview').style.display = 'none';
 };
-
-// === FORMATEAR PRECIO EN TIEMPO REAL ===
-function formatInputPrice(input) {
-  input.addEventListener('input', (e) => {
-    let value = e.target.value.replace(/[^\d]/g, '');
-    if (value) {
-      e.target.value = formatPrice(parseInt(value));
-    }
-  });
-}
-
-document.getElementById('addPrice').addEventListener('input', function(e) {
-  let value = e.target.value.replace(/[^\d]/g, '');
-  if (value) {
-    e.target.value = formatPrice(parseInt(value));
-  }
-});
-
-document.getElementById('editPrice').addEventListener('input', function(e) {
-  let value = e.target.value.replace(/[^\d]/g, '');
-  if (value) {
-    e.target.value = formatPrice(parseInt(value));
-  }
-});
 
 document.getElementById('addImageFile').addEventListener('change', (e) => {
   const file = e.target.files[0];
   const urlInput = document.getElementById('addImage');
   const preview = document.getElementById('imagePreview');
   const img = document.getElementById('previewImg');
+
   if (file) {
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -210,80 +182,51 @@ document.getElementById('addImage').addEventListener('input', (e) => {
   }
 });
 
-async function uploadImage(file) {
-  const storageRef = ref(storage, 'productos/' + Date.now() + '_' + file.name);
-  const snapshot = await uploadBytes(storageRef, file);
-  return await getDownloadURL(snapshot.ref);
-}
-
 document.getElementById('saveNewProduct').onclick = async () => {
+  const url = document.getElementById('addImage').value;
   const fileInput = document.getElementById('addImageFile');
-  const urlInput = document.getElementById('addImage').value.trim();
-  let imagen = urlInput;
+  const hasFile = fileInput.files.length > 0;
 
-  if (fileInput.files.length > 0) {
-    showToast("Subiendo imagen...");
-    try {
-      imagen = await uploadImage(fileInput.files[0]);
-      showToast("Imagen subida");
-    } catch (err) {
-      showToast("Error al subir imagen");
-      return;
-    }
-  }
-
-  if (!imagen) {
-    showToast("Agrega una imagen");
+  if (hasFile && !url) {
+    showToast("La subida de imágenes aún no está habilitada. Usa una URL.");
     return;
   }
 
-  const typeSelect = document.getElementById('addType').value;
-  const precioInput = document.getElementById('addPrice').value.replace(/,/g, '');
+  if (!url && !hasFile) {
+    showToast("Agrega una imagen (URL o archivo)");
+    return;
+  }
 
   const producto = {
-    nombre: document.getElementById('addName').value.trim(),
-    precio: parseFloat(precioInput),
+    nombre: document.getElementById('addName').value,
+    precio: parseFloat(document.getElementById('addPrice').value),
     talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
-    descripcion: document.getElementById('addDesc').value.trim(),
+    descripcion: document.getElementById('addDesc').value,
     tipo: document.getElementById('addCategory').value,
-    imagen,
-    creado: new Date(),
-    type: {
-      anuncio: typeSelect === 'publicidad',
-      carrusel: typeSelect === 'carrusel',
-      normal: typeSelect === 'normal'
-    }
+    type: document.getElementById('addType').value,
+    imagen: url,
+    creado: new Date()
   };
 
-  if (!producto.nombre || isNaN(producto.precio)) {
-    showToast("Faltan datos obligatorios");
+  if (!producto.nombre || !producto.precio || !producto.type) {
+    showToast("Faltan datos");
     return;
   }
 
-  try {
-    await addDoc(collection(db, "productos"), producto);
-    showToast("Producto agregado");
-    closeModal('addProductModal');
-    ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-    fileInput.value = '';
-  } catch (err) {
-    console.error(err);
-    showToast("Error al agregar");
-  }
+  await addDoc(collection(db, "productos"), producto);
+  showToast("Producto agregado");
+  closeModal('addProductModal');
 };
 
-// === REDES, MODALES, TOAST, ENGRANAJE ===
+// === CERRAR SESIÓN ===
 document.getElementById('logoutBtn').onclick = () => {
-  if (confirm("¿Cerrar sesión?")) {
+  if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
     localStorage.removeItem('isAdmin');
-    localStorage.removeItem('loggedIn');
-    localStorage.removeItem('userName');
     window.location.href = 'login.html';
   }
 };
 
+// === REDES SOCIALES ===
 document.getElementById('openSocialModal').onclick = () => {
   document.getElementById('socialLinksModal').classList.add('active');
   loadSocialLinks();
@@ -299,34 +242,39 @@ document.getElementById('saveSocialLinks').onclick = async () => {
     x: document.getElementById('xInput').value.trim(),
     whatsapp: document.getElementById('whatsappInput').value.trim()
   };
-  await setDoc(doc(db, "links", "social"), links, { merge: true });
-  showToast("Redes guardadas");
-  closeModal('socialLinksModal');
+
+  try {
+    await setDoc(doc(db, "links", "social"), links, { merge: true });
+    showToast("Redes sociales guardadas");
+    closeModal('socialLinksModal');
+  } catch (error) {
+    showToast("Error: " + error.message);
+  }
 };
 
 function loadSocialLinks() {
   onSnapshot(doc(db, "links", "social"), (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
-      ['tiktok', 'instagram', 'facebook', 'x', 'whatsapp'].forEach(s => {
-        document.getElementById(s + 'Input').value = data[s] || '';
-      });
+      document.getElementById('tiktokInput').value = data.tiktok || '';
+      document.getElementById('instagramInput').value = data.instagram || '';
+      document.getElementById('facebookInput').value = data.facebook || '';
+      document.getElementById('xInput').value = data.x || '';
+      document.getElementById('whatsappInput').value = data.whatsapp || '';
     }
   });
 }
 
+// === MODALES ===
 document.querySelectorAll('[id^="cancel"]').forEach(btn => {
   btn.onclick = () => closeModal(btn.closest('.modal').id);
 });
-
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => e.target === m && closeModal(m.id));
 });
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
+// === TOAST ===
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -334,31 +282,12 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// === ENGRANAJE ===
 document.getElementById('adminGear').onclick = e => {
   e.stopPropagation();
   document.getElementById('adminDropdown').classList.toggle('show');
 };
+document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
-document.addEventListener('click', () => {
-  document.getElementById('adminDropdown').classList.remove('show');
-});
-
-// === GUARDAR PRODUCTOS EN MEMORIA ===
-onSnapshot(collection(db, "productos"), (snapshot) => {
-  allProducts = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    allProducts.push({
-      id: doc.id,
-      nombre: data.nombre || '',
-      precio: data.precio || 0,
-      imagen: data.imagen || '',
-      descripcion: data.descripcion || '',
-      talla: data.talla || [],
-      tipo: data.tipo || '',
-      type: data.type || { normal: true }
-    });
-  });
-});
-
+// === INICIAR REDES ===
 loadSocialLinks();
