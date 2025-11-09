@@ -1,4 +1,4 @@
-// index.js - CARRITO CON ID + IMAGEN + type.anuncio + type.carrusel + type.normal
+// index.js - CARRITO CON ID + IMAGEN + type.anuncio + type.carrusel + type.normal + STOCK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -50,23 +50,20 @@ const helpBtn = document.getElementById('helpBtn');
 
 // === CARRITO (GUARDADO EN LOCALSTORAGE) ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
-  
+ 
   cartBadge.textContent = totalQty;
   cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
-  
+ 
   cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
   cartItems.innerHTML = '';
-
   if (cart.length === 0) {
     cartItems.innerHTML = '<p class="empty-cart">Tu carrito está vacío</p>';
     goToPay.style.display = 'none';
     return;
   }
-
   goToPay.style.display = 'block';
   cart.forEach((item, i) => {
     const div = document.createElement('div');
@@ -90,7 +87,6 @@ window.addToCart = (id) => {
     showToast("Producto no encontrado");
     return;
   }
-
   const existing = cart.find(i => i.id === id);
   if (existing) {
     existing.qty++;
@@ -103,7 +99,6 @@ window.addToCart = (id) => {
       qty: 1
     });
   }
-
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCart();
   showToast('¡Agregado al carrito!');
@@ -125,17 +120,22 @@ goToPay.onclick = () => {
 function renderCarousel(container, filterFn) {
   container.innerHTML = '';
   const filtered = window.allProducts.filter(filterFn);
-  
+ 
   if (filtered.length === 0) {
     container.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos</p>';
     return;
   }
-
   // Duplicar para efecto infinito
   [...filtered, ...filtered].forEach(p => {
     const item = document.createElement('div');
     item.className = 'carousel-item';
-    item.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy">`;
+    const stock = p.disponibles > 0 ? `<p class="stock-info">${p.disponibles} disponibles</p>` : '';
+    item.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      <h4>${p.nombre}</h4>
+      <p>$${p.precio.toLocaleString()}</p>
+      ${stock}
+    `;
     item.onclick = () => window.location.href = `product.html?id=${p.id}`;
     container.appendChild(item);
   });
@@ -145,20 +145,20 @@ function renderCarousel(container, filterFn) {
 function renderGrid() {
   productsGrid.innerHTML = '';
   const normales = window.allProducts.filter(p => p.type && p.type.normal);
-
   if (normales.length === 0) {
     productsGrid.innerHTML = '<p style="color:#999; padding:20px; text-align:center;">No hay productos disponibles</p>';
     return;
   }
-
   normales.forEach(p => {
     const card = document.createElement('div');
     card.className = 'product-card';
+    const stock = p.disponibles > 0 ? `<p class="stock-info">${p.disponibles} disponibles</p>` : '';
     card.innerHTML = `
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       <div class="card-info">
         <h3>${p.nombre}</h3>
         <p class="desc">${p.descripcion || ''}</p>
+        ${stock}
         <div class="price-container">
           ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
           <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
@@ -174,7 +174,6 @@ function renderGrid() {
 // === FIRESTORE EN TIEMPO REAL ===
 let allProducts = [];
 const productosRef = collection(db, "productos");
-
 onSnapshot(productosRef, (snapshot) => {
   allProducts = [];
   snapshot.forEach(doc => {
@@ -186,17 +185,15 @@ onSnapshot(productosRef, (snapshot) => {
       precioAntiguo: data.precioAntiguo || null,
       descripcion: data.descripcion || '',
       imagen: data.imagen || '',
-      type: data.type || { normal: true }, // ← type.anuncio, type.carrusel, type.normal
+      type: data.type || { normal: true },
       talla: data.talla || [],
-      tipo: data.tipo || ''
+      tipo: data.tipo || '',
+      disponibles: data.disponibles || 0  // ← NUEVO
     });
   });
-
   window.allProducts = allProducts;
-
-  // === CARRUSELES ===
-  renderCarousel(newCarousel, p => p.type?.carrusel === true);  // Nuevos Lanzamientos
-  renderCarousel(starCarousel, p => p.type?.anuncio === true);   // Productos Estrella
+  renderCarousel(newCarousel, p => p.type?.carrusel === true);
+  renderCarousel(starCarousel, p => p.type?.anuncio === true);
   renderGrid();
 });
 
@@ -205,12 +202,11 @@ let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const term = searchInput.value.trim().toLowerCase();
-  
+ 
   if (term.length < 2) {
     searchResultsContainer.style.display = 'none';
     return;
   }
-
   searchTimeout = setTimeout(async () => {
     const q = query(
       collection(db, "productos"),
@@ -219,7 +215,6 @@ searchInput.addEventListener('input', () => {
     );
     const snapshot = await getDocs(q);
     searchResults.innerHTML = '';
-
     if (snapshot.empty) {
       searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
     } else {
@@ -230,6 +225,7 @@ searchInput.addEventListener('input', () => {
           <strong>${p.nombre}</strong><br>
           <small>${p.descripcion || 'Sin descripción'}</small><br>
           <strong>$${p.precio.toLocaleString()}</strong>
+          ${p.disponibles > 0 ? `<br><small style="color:#0a0;">${p.disponibles} disponibles</small>` : ''}
         `;
         div.style.padding = '10px 0';
         div.style.borderBottom = '1px solid #eee';
@@ -255,41 +251,34 @@ menuBtn.onclick = () => {
   menuSidebar.classList.add('open');
   updateAuthUI();
 };
-
 menuOverlay.onclick = () => {
   menuOverlay.classList.remove('show');
   menuSidebar.classList.remove('open');
 };
-
 cartBtn.onclick = () => {
   cartSidebar.classList.add('open');
   cartOverlay.classList.add('show');
   updateCart();
 };
-
 closeCart.onclick = cartOverlay.onclick = () => {
   cartSidebar.classList.remove('open');
   cartOverlay.classList.remove('show');
 };
-
 searchBtn.onclick = () => {
   searchBarHeader.classList.add('active');
   headerOverlay.classList.add('show');
   searchInput.focus();
 };
-
 const closeSearch = () => {
   searchBarHeader.classList.remove('active');
   headerOverlay.classList.remove('show');
   searchResultsContainer.style.display = 'none';
 };
-
 closeSearchHeader.onclick = headerOverlay.onclick = closeSearch;
 
 // === AUTENTICACIÓN ===
 let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
 let userName = localStorage.getItem('userName') || '';
-
 function updateAuthUI() {
   if (isLoggedIn && userName) {
     welcomeMsg.textContent = `¡Hola, ${userName}!`;
@@ -301,7 +290,6 @@ function updateAuthUI() {
     authBtn.classList.remove('logout-btn');
   }
 }
-
 authBtn.onclick = () => {
   if (isLoggedIn) {
     localStorage.removeItem('loggedIn');
@@ -315,7 +303,6 @@ authBtn.onclick = () => {
     window.location.href = 'login.html';
   }
 };
-
 helpBtn.onclick = () => {
   alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
 };
