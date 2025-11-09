@@ -503,85 +503,34 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   margin-bottom: 60px;
   text-align: center;
 }
-/* CARRUSEL RESPONSIVE - 1 IMAGEN POR VEZ */
-.carousel-container {
+
+/* =============================================
+   CARRUSEL INFINITO (SOLO IMÁGENES)
+   ============================================= */
+.infinite-carousel-section {
+  margin-bottom: 80px;
+}
+
+.infinite-carousel {
   overflow: hidden;
-  position: relative;
-  width: 100%;
-  padding: 10px 0;
+  padding: 20px 0;
 }
 
 .carousel-track {
   display: flex;
-  gap: 16px;
-  transition: transform 0.4s ease;
-  will-change: transform;
+  gap: 24px;
+  width: max-content;
+  animation: scroll 40s linear infinite;
 }
 
 .carousel-item {
-  min-width: 280px;           /* Ancho fijo por producto */
-  max-width: 280px;
-  flex: 0 0 auto;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  text-align: center;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-.carousel-item img {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-.carousel-item h4 {
-  margin: 8px 0;
-  font-size: 1rem;
-  color: #000;
-}
-
-.carousel-item p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-/* Flechas opcionales (puedes ocultar si no las quieres) */
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 1.5rem;
+  min-width: 220px;
   cursor: pointer;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: transform 0.3s ease;
 }
 
-.carousel-btn.prev { left: 10px; }
-.carousel-btn.next { right: 10px; }
-
-.carousel-btn.hidden { display: none; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .carousel-item {
-    min-width: 240px;
-    max-width: 240px;
-  }
-  .carousel-item img { height: 240px; }
+.carousel-item:hover {
+  transform: translateY(-8px);
 }
 
 /* IMAGEN ADAPTADA SIN DEFORMAR */
