@@ -168,7 +168,7 @@ document.getElementById('addPostBtn').onclick = () => {
   inputContainer.style.display = 'none';
 };
 
-// CANTIDAD DISPONIBLE: CUADRADO +
+// === CANTIDAD DISPONIBLE: CUADRADO + (ESTILO ACTUALIZADO) ===
 document.getElementById('availableBox').onclick = () => {
   const box = document.getElementById('availableBox');
   const inputContainer = document.getElementById('availableInput');
@@ -183,26 +183,30 @@ document.getElementById('availableBox').onclick = () => {
 document.getElementById('addAvailableCount').addEventListener('blur', () => {
   const box = document.getElementById('availableBox');
   const inputContainer = document.getElementById('availableInput');
-  const value = document.getElementById('addAvailableCount').value;
+  const value = document.getElementById('addAvailableCount').value.trim();
 
-  box.textContent = value > 0 ? value : '+';
+  box.textContent = value && value !== '0' ? value : '+';
   box.style.display = 'flex';
   inputContainer.style.display = 'none';
 });
 
-document.getElementById('saveNewProduct').onclick = async () => {
-  const url = document.getElementById('addImage').value.trim();
-  const hasFile = document.getElementById('addImageFile').files.length > 0;
+// Resetear al abrir modal
+document.getElementById('addPostBtn').onclick = () => {
+  document.getElementById('addProductModal').classList.add('active');
+  ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('addImageFile').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
 
-  if (hasFile && !url) {
-    showToast("Usa URL por ahora");
-    return;
-  }
-  if (!url && !hasFile) {
-    showToast("Agrega imagen");
-    return;
-  }
-
+  const box = document.getElementById('availableBox');
+  const input = document.getElementById('addAvailableCount');
+  const inputContainer = document.getElementById('availableInput');
+  input.value = '0';
+  box.textContent = '+';
+  box.style.display = 'flex';
+  inputContainer.style.display = 'none';
+};
   const producto = {
     nombre: document.getElementById('addName').value.trim(),
     precio: parseFloat(document.getElementById('addPrice').value),
