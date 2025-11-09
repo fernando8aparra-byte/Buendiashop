@@ -1,192 +1,255 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Admin</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Boutique Buendía</title>
+  <link rel="stylesheet" href="css/styles.css">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
-    }
+    body { margin: 0; padding: 0; padding-top: 60px; background: #f8f8f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; box-sizing: border-box; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+    .icon-btn { background: none; border: none; cursor: pointer; }
+    .icon-btn svg { stroke: #000; fill: none; }
 
     .login-container {
-      background: white;
-      padding: 40px 30px;
-      border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      width: 100%;
       max-width: 400px;
+      margin: 60px auto;
+      padding: 40px 30px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       text-align: center;
-      animation: fadeIn 0.6s ease-out;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h2 {
-      margin-bottom: 25px;
-      color: #444;
-      font-size: 24px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .input-group input {
+    .login-container h1 { margin-bottom: 30px; font-size: 2rem; color: #000; }
+    .login-input {
       width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e1e5e9;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: all 0.3s;
-      outline: none;
+      padding: 15px;
+      margin: 15px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
-
-    .input-group input:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .input-group label {
-      position: absolute;
-      top: -10px;
-      left: 12px;
-      background: white;
-      padding: 0 6px;
-      font-size: 14px;
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    button {
+    .login-btn {
       width: 100%;
-      padding: 14px;
-      background: #667eea;
-      color: white;
+      padding: 15px;
+      background: #000;
+      color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
-      margin-top: 10px;
+      margin-top: 20px;
+      transition: 0.3s;
     }
-
-    button:hover {
-      background: #5a6fd8;
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    .error {
-      color: #e74c3c;
-      margin-top: 15px;
-      font-size: 14px;
-      min-height: 20px;
-    }
-
-    .footer {
-      margin-top: 25px;
-      font-size: 13px;
-      color: #888;
-    }
-
-    .footer a {
-      color: #667eea;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
+    .login-btn:hover { background: #333; }
+    .back-link { display: block; margin-top: 30px; color: #000; text-decoration: none; font-weight: bold; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 15px 30px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
+    .toast.show { opacity: 1; }
+    .error { color: #ff4444; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div style="display:flex; align-items:center; gap:20px;">
+        <button onclick="window.location.href='index.html'" class="icon-btn">
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
+          </svg>
+        </button>
+        <div class="logo">BOUTIQUE BUENDÍA</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOGIN / REGISTRO -->
   <div class="login-container">
-    <h2>Panel de Administración</h2>
+    <h1 id="formTitle">Iniciar Sesión</h1>
 
-    <div class="input-group">
-      <input type="text" id="username" placeholder=" " />
-      <label>Usuario</label>
-    </div>
+    <!-- Campo nombre (solo en registro, aparece primero) -->
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre" required>
 
-    <div class="input-group">
-      <input type="password" id="password" placeholder=" " />
-      <label>Contraseña</label>
-    </div>
+    <!-- Campo identificador: nombre o correo -->
+    <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" required>
 
-    <button onclick="iniciarSesion()">Iniciar Sesión</button>
-    <p id="error" class="error"></p>
+    <!-- Contraseña -->
+    <input type="password" id="password" class="login-input" placeholder="Contraseña" required>
 
-    <div class="footer">
-      <p>Usuario de prueba: <strong>admin</strong> | Contraseña: <strong>1234</strong></p>
-    </div>
+    <button class="login-btn" id="mainBtn">Entrar</button>
+    <p style="margin-top:20px;">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
+    <a href="index.html" class="back-link">← Volver a la tienda</a>
   </div>
 
-  <script>
-    // Base de datos simulada
-    const USUARIOS = [
-      { username: 'admin', password: '1234', role: 'admin' },
-      { username: 'user', password: 'user123', role: 'user' }
-    ];
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
 
-    function iniciarSesion() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-      const error = document.getElementById('error');
+  <!-- FIREBASE SDK v9+ MODULAR -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-      // Limpiar error
-      error.textContent = '';
+    // TUS CREDENCIALES
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
+    };
 
-      if (!username || !password) {
-        error.textContent = 'Por favor, completa ambos campos.';
+    // INICIALIZAR
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ELEMENTOS
+    const formTitle = document.getElementById('formTitle');
+    const mainBtn = document.getElementById('mainBtn');
+    const toggleLink = document.getElementById('toggleLink');
+    const nameInput = document.getElementById('name');
+    const identifierInput = document.getElementById('identifier');
+    const passwordInput = document.getElementById('password');
+    const toast = document.getElementById('toast');
+
+    let isLogin = true;
+
+    // USUARIO ADMIN ESPECIAL
+    const ADMIN_NAME = "Buendia*]?~?£u837jwhwi";
+    const ADMIN_PASS = "&2)3)8:&?3828&/82$:!";
+
+    // TOAST
+    function showToast(msg, isError = false) {
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    // TOGGLE LOGIN / REGISTRO
+    toggleLink.onclick = (e) => {
+      e.preventDefault();
+      isLogin = !isLogin;
+
+      if (isLogin) {
+        formTitle.textContent = 'Iniciar Sesión';
+        mainBtn.textContent = 'Entrar';
+        toggleLink.textContent = 'Regístrate aquí';
+        identifierInput.placeholder = 'Nombre o correo electrónico';
+        nameInput.classList.add('hidden');
+        nameInput.removeAttribute('required');
+      } else {
+        formTitle.textContent = 'Crear Cuenta';
+        mainBtn.textContent = 'Registrarme';
+        toggleLink.textContent = 'Iniciar sesión';
+        identifierInput.placeholder = 'Correo electrónico';
+        nameInput.classList.remove('hidden');
+        nameInput.setAttribute('required', '');
+      }
+    };
+
+    // ACCIÓN PRINCIPAL
+    mainBtn.onclick = async () => {
+      const identifier = identifierInput.value.trim();
+      const password = passwordInput.value;
+      const nombre = nameInput.value.trim();
+
+      if (!identifier || !password || (!isLogin && !nombre)) {
+        showToast('Completa todos los campos', true);
         return;
       }
 
-      // Buscar usuario
-      const usuario = USUARIOS.find(u => u.username === username && u.password === password);
+      try {
+        if (isLogin) {
+          // === INICIAR SESIÓN ===
 
-      if (usuario) {
-        // Guardar en sessionStorage
-        sessionStorage.setItem('usuarioActual', JSON.stringify(usuario));
+          // Verificar si es el ADMIN ESPECIAL
+          if (identifier === ADMIN_NAME && password === ADMIN_PASS) {
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('userName', 'Admin');
+            localStorage.setItem('isAdmin', 'true');
+            showToast('Acceso de administrador');
+            setTimeout(() => window.location.href = 'admin.html', 1500);
+            return;
+          }
 
-        // Redirigir según rol
-        if (usuario.role === 'admin') {
-          window.location.href = 'admin.html';
+          let email = identifier;
+
+          // Si no parece correo, buscar por nombre
+          if (!identifier.includes('@')) {
+            const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+              showToast('Nombre o correo no encontrado', true);
+              return;
+            }
+            email = querySnapshot.docs[0].data().correo;
+          }
+
+          // Iniciar sesión con correo
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+          if (!userDoc.exists()) {
+            showToast('Error de datos', true);
+            return;
+          }
+
+          const data = userDoc.data();
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userName', data.nombre);
+          showToast(`¡Bienvenido, ${data.nombre.split(' ')[0]}!`);
+          setTimeout(() => window.location.href = 'index.html', 1500);
+
         } else {
-          alert('Bienvenido, ' + usuario.username);
-        }
-      } else {
-        error.textContent = 'Usuario o contraseña incorrectos.';
-      }
-    }
+          // === REGISTRO ===
+          if (!identifier.includes('@')) {
+            showToast('Ingresa un correo válido', true);
+            return;
+          }
 
-    // Permitir Enter para login
-    document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        iniciarSesion();
+          const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
+          const user = userCredential.user;
+
+          // Guardar en Firestore
+          await setDoc(doc(db, "usuarios", user.uid), {
+            nombre: nombre,
+            correo: identifier
+          });
+
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userName', nombre);
+          showToast('¡Cuenta creada con éxito!');
+          setTimeout(() => window.location.href = 'index.html', 1500);
+        }
+      } catch (error) {
+        let msg = 'Error desconocido';
+        switch (error.code) {
+          case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
+          case 'auth/invalid-email': msg = 'Correo inválido'; break;
+          case 'auth/weak-password': msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
+          case 'auth/user-not-found':
+          case 'auth/wrong-password': msg = 'Correo, nombre o contraseña incorrectos'; break;
+          default: msg = error.message;
+        }
+        showToast('Error: ' + msg, true);
       }
+    };
+
+    // ENTER = CLICK
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') mainBtn.click();
     });
   </script>
-
 </body>
 </html>
