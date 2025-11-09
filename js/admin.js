@@ -10,8 +10,7 @@ import {
   onSnapshot,
   query,
   where,
-  setDoc,
-  arrayUnion
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -94,6 +93,7 @@ function createProductCard(p, sectionType) {
       <h3>${p.nombre}</h3>
       <p class="product-price">$${p.precio}</p>
       <p class="product-desc-small">${p.descripcion || ''}</p>
+      ${p.disponibles > 0 ? `<p style="color:#0a0; font-weight:bold;">${p.disponibles} disponibles</p>` : ''}
       <div class="product-actions">
         <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
         <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
@@ -157,8 +157,38 @@ document.getElementById('addPostBtn').onclick = () => {
   });
   document.getElementById('addImageFile').value = '';
   document.getElementById('imagePreview').style.display = 'none';
-  document.getElementById('addAvailableCount').value = 0;
+
+  // Resetear cantidad
+  const box = document.getElementById('availableBox');
+  const input = document.getElementById('addAvailableCount');
+  const inputContainer = document.getElementById('availableInput');
+  input.value = '0';
+  box.textContent = '+';
+  box.style.display = 'flex';
+  inputContainer.style.display = 'none';
 };
+
+// CANTIDAD DISPONIBLE: CUADRADO +
+document.getElementById('availableBox').onclick = () => {
+  const box = document.getElementById('availableBox');
+  const inputContainer = document.getElementById('availableInput');
+  const input = document.getElementById('addAvailableCount');
+
+  box.style.display = 'none';
+  inputContainer.style.display = 'block';
+  input.focus();
+  input.select();
+};
+
+document.getElementById('addAvailableCount').addEventListener('blur', () => {
+  const box = document.getElementById('availableBox');
+  const inputContainer = document.getElementById('availableInput');
+  const value = document.getElementById('addAvailableCount').value;
+
+  box.textContent = value > 0 ? value : '+';
+  box.style.display = 'flex';
+  inputContainer.style.display = 'none';
+});
 
 document.getElementById('saveNewProduct').onclick = async () => {
   const url = document.getElementById('addImage').value.trim();
@@ -193,17 +223,6 @@ document.getElementById('saveNewProduct').onclick = async () => {
   await addDoc(collection(db, "productos"), producto);
   showToast("Producto agregado");
   closeModal('addProductModal');
-};
-
-// === BOTONES + / - PARA CANTIDAD ===
-document.getElementById('increaseAvailable').onclick = () => {
-  const input = document.getElementById('addAvailableCount');
-  input.value = (parseInt(input.value) || 0) + 1;
-};
-document.getElementById('decreaseAvailable').onclick = () => {
-  const input = document.getElementById('addAvailableCount');
-  const val = parseInt(input.value) || 0;
-  input.value = val > 0 ? val - 1 : 0;
 };
 
 // === REDES SOCIALES ===
@@ -267,7 +286,7 @@ document.getElementById('adminGear').onclick = e => {
 };
 document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
-// === EDICIÓN DE TEXTOS CON BORDES Y BOTONES ===
+// === EDICIÓN DE TEXTOS ===
 document.getElementById('toggleTextEdit').onclick = () => {
   textEditMode = !textEditMode;
   const controls = document.getElementById('textEditControls');
@@ -283,7 +302,6 @@ document.getElementById('toggleTextEdit').onclick = () => {
   }
 };
 
-// Guardar cambios
 document.getElementById('saveTextChanges').onclick = async () => {
   for (const [key, value] of Object.entries(textChanges)) {
     const [coll, docu, field] = key.split('|');
@@ -296,12 +314,10 @@ document.getElementById('saveTextChanges').onclick = async () => {
   textChanges = {};
 };
 
-// Cancelar
 document.getElementById('cancelTextChanges').onclick = () => {
-  location.reload(); // Más simple: recargar
+  location.reload();
 };
 
-// Capturar cambios
 document.querySelectorAll('[contenteditable="true"]').forEach(el => {
   el.addEventListener('input', () => {
     const key = `${el.dataset.collection}|${el.dataset.doc}|${el.dataset.field}`;
