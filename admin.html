@@ -1,285 +1,361 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .icon-btn { color: #000; background: none; cursor: pointer; }
-    .icon-btn svg { stroke: #000; fill: none; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; position: relative; min-height: 200px; background-size: cover; background-position: center; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.6); }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #fff; }
-    .main-container { margin-top: 20px; padding: 0 15px; }
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
-    .footer a { color: #fff; text-decoration: underline; }
+// js/admin.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  where,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    /* ADMIN BUTTONS */
-    .admin-btn { background: #ff4444; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; margin-left: 10px; cursor: pointer; }
-    .admin-edit { background: #0066ff; }
-    .admin-delete { background: #ff0000; }
-    .product-card { position: relative; text-align: center; padding: 15px; }
-    .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
-    .product-card:hover .product-actions { opacity: 1; }
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "boutique-buendia.firebaseapp.com",
+  projectId: "boutique-buendia",
+  storageBucket: "boutique-buendia.firebasestorage.app",
+  messagingSenderId: "430651152709",
+  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+};
 
-    /* MODALES */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-    .modal.active { display: flex; }
-    .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-    .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
-    .modal button { background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    /* ENGRANAJE */
-    .admin-gear { position: relative; }
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
-      border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; z-index: 1001; width: 220px;
-    }
-    .admin-dropdown.show { display: block; }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 14px 20px; color: #000; text-decoration: none;
-      border-bottom: 1px solid #eee; background: none; border: none; text-align: left;
-      cursor: pointer; font-size: 0.95rem; font-weight: 500;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
+// === PROTEGER ADMIN ===
+if (!localStorage.getItem('isAdmin')) {
+  window.location.href = 'login.html';
+}
 
-    /* BOTONES + Y LÁPIZ */
-    .add-post-btn, .edit-text-btn {
-      background: #000; color: #fff; width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer;
-    }
+// === ESTADO DE EDICIÓN DE TEXTOS ===
+let textEditMode = false;
+let textChanges = {};
 
-    /* CARRUSEL */
-    .infinite-carousel-section { overflow: hidden; position: relative; margin-bottom: 40px; }
-    .infinite-carousel { display: flex; transition: transform 0.5s ease; }
-    .auto-scroll .infinite-carousel { animation: scrollInfinite 20s linear infinite; }
-    .static-display .infinite-carousel { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-    @keyframes scrollInfinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+// === CARGAR TEXTOS EDITABLES EN TIEMPO REAL ===
+function loadEditableTexts() {
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    const coll = el.dataset.collection;
+    const docu = el.dataset.doc;
+    const field = el.dataset.field;
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
-    .toast.show { display: block; animation: fadeInOut 3s; }
-    @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
+    const path = `${coll}/${docu}`;
+    const unsubscribe = onSnapshot(doc(db, coll, docu), (snap) => {
+      if (snap.exists() && snap.data()[field] !== undefined) {
+        const value = snap.data()[field];
+        if (el.textContent.trim() !== value) {
+          el.textContent = value;
+        }
+      } else {
+        // Si no existe, inicializar con valor por defecto
+        setDoc(doc(db, coll, docu), { [field]: el.textContent.trim() }, { merge: true });
+      }
+    });
 
-    /* EDITABLE TEXT */
-    [contenteditable="true"] {
-      outline: none;
-      cursor: text;
-      padding: 4px;
-      border-radius: 4px;
-      position: relative;
-    }
-    [contenteditable="true"].editing {
-      outline: 2px dashed #0066ff;
-      background: rgba(0, 102, 255, 0.08);
-      border-radius: 6px;
-      padding: 6px;
-    }
+    // Guardar unsubscribe para limpieza futura si es necesario
+    el.dataset.unsubscribe = unsubscribe;
+  });
+}
 
-    /* BOTONES DE EDICIÓN DE TEXTOS */
-    .text-edit-controls {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #fff; padding: 12px 20px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-      display: none; z-index: 2500; gap: 10px; align-items: center;
+// === CARGAR TODOS LOS PRODUCTOS EN SUS SECCIONES ===
+function loadProductsByType(typeKey, containerId) {
+  const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const products = [];
+   
+    snapshot.forEach((docSnap) => {
+      const data = { id: docSnap.id, ...docSnap.data() };
+      products.push(data);
+      const card = createProductCard(data, typeKey);
+      container.appendChild(card);
+    });
+    if (containerId === 'newCarousel' || containerId === 'starCarousel') {
+      handleAutoCarousel(container, products.length, containerId);
     }
-    .text-edit-controls.active { display: flex; }
-    .text-edit-controls button {
-      background: #000; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
-    }
-    .text-edit-controls button.cancel { background: #999; }
+    duplicateForInfiniteScroll(containerId);
+  });
+  window[`unsubscribe_${containerId}`] = unsubscribe;
+}
 
-    /* CANTIDAD DISPONIBLE: CUADRADO + */
-    .available-container {
-      display: flex; align-items: center; gap: 12px; margin: 15px 0;
-    }
-    #availableBox {
-      width: 36px; height: 36px; border: 2px solid #000; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-      cursor: pointer; user-select: none; font-weight: bold; color: #000;
-    }
-    #availableInput {
-      display: none;
-    }
-    #availableInput input {
-      width: 70px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px;
-    }
-    .available-label {
-      margin: 4px 0 0; font-size: 0.85rem; color: #555; line-height: 1.3;
-    }
-  </style>
-</head>
-<body>
+// CARGAR CADA SECCIÓN
+loadProductsByType('carrusel', 'newCarousel');
+loadProductsByType('anuncio', 'starCarousel');
+loadProductsByType('normal', 'productsGrid');
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn" aria-label="Ajustes">
-            <svg viewBox="0 0 24 24" width="26" height="26">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </button>
-          <div class="admin-dropdown" id="adminDropdown">
-            <a href="admin-map.html">Mapa de Compras</a>
-            <a href="admin-compras.html">Compras</a>
-            <a href="admin-estadisticas.html">Estadísticas</a>
-            <button id="openSocialModal">Agregar Redes Sociales</button>
-            <button id="logoutBtn">Cerrar Sesión</button>
-          </div>
-        </div>
-        <div class="logo">EFRAÍN</div>
+// === CARRUSEL AUTOMÁTICO ===
+function handleAutoCarousel(container, count, containerId) {
+  const section = container.parentElement.parentElement;
+  section.classList.remove('auto-scroll', 'static-display');
+  if (count >= 4) section.classList.add('auto-scroll');
+  else section.classList.add('static-display');
+}
+
+function duplicateForInfiniteScroll(containerId) {
+  const track = document.getElementById(containerId);
+  const parent = track.parentElement.parentElement;
+  if (!parent.classList.contains('auto-scroll') || track.dataset.duplicated) return;
+  const clone = track.cloneNode(true);
+  clone.id = containerId + '-clone';
+  track.appendChild(clone);
+  track.dataset.duplicated = 'true';
+}
+
+// === CREAR TARJETA DE PRODUCTO (CON BOTONES EDITAR/ELIMINAR) ===
+function createProductCard(p, sectionType) {
+  const div = document.createElement('div');
+  div.className = 'product-card';
+  div.dataset.id = p.id;
+  const stockInfo = p.disponibles > 0
+    ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>`
+    : '';
+  if (sectionType === 'normal') {
+    div.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <h3>${p.nombre}</h3>
+      <p class="product-price">$${p.precio}</p>
+      <p class="product-desc-small">${p.descripcion || ''}</p>
+      ${stockInfo}
+      <div class="product-actions">
+        <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+        <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
       </div>
-      <div class="header-right">
-        <div class="edit-text-btn" id="toggleTextEdit">Edit</div>
-        <div class="add-post-btn" id="addPostBtn">+</div>
+    `;
+  } else {
+    div.innerHTML = `
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <h3>${p.nombre}</h3>
+      <p>$${p.precio}</p>
+      ${stockInfo}
+      <div class="product-actions">
+        <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+        <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
       </div>
-    </div>
-  </header>
+    `;
+  }
+  return div;
+}
 
-  <!-- HERO BANNER -->
-  <section class="hero-banner" id="heroBanner">
-    <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
-      Asegura tu Mystery Box
-    </h1>
-    <p class="tag" id="heroTagDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="subtitulo">
-      Envío Gratis en compras +$1,500
-    </p>
-  </section>
+// === EDITAR PRODUCTO ===
+window.editProduct = (id) => {
+  const card = document.querySelector(`.product-card[data-id="${id}"]`);
+  if (!card) return;
+  const p = {
+    nombre: card.querySelector('h3').textContent,
+    precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0),
+    imagen: card.querySelector('img').src
+  };
+  document.getElementById('editName').value = p.nombre;
+  document.getElementById('editPrice').value = p.precio;
+  document.getElementById('editImage').value = p.imagen;
+  document.getElementById('editProductModal').classList.add('active');
+  window.currentEditId = id;
+};
 
-  <!-- SECCIONES -->
-  <section class="infinite-carousel-section" id="newCarouselSection">
-    <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
-      Nuevos Lanzamientos
-    </h2>
-    <div class="infinite-carousel">
-      <div class="carousel-track" id="newCarousel"></div>
-    </div>
-  </section>
+document.getElementById('saveProduct').onclick = async () => {
+  const id = window.currentEditId;
+  const updated = {
+    nombre: document.getElementById('editName').value.trim(),
+    precio: parseFloat(document.getElementById('editPrice').value),
+    imagen: document.getElementById('editImage').value.trim()
+  };
+  if (!updated.nombre || !updated.precio) {
+    showToast("Faltan datos");
+    return;
+  }
+  await updateDoc(doc(db, "productos", id), updated);
+  showToast("Producto actualizado");
+  closeModal('editProductModal');
+};
 
-  <section class="infinite-carousel-section" id="starCarouselSection">
-    <h2 id="titleStarDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="productos_estrella">
-      Productos Estrella
-    </h2>
-    <div class="infinite-carousel">
-      <div class="carousel-track" id="starCarousel"></div>
-    </div>
-  </section>
+// === ELIMINAR PRODUCTO ===
+window.deleteProduct = async (id) => {
+  if (!confirm("¿Eliminar este producto?")) return;
+  await deleteDoc(doc(db, "productos", id));
+  showToast("Producto eliminado");
+};
 
-  <section>
-    <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
-      Todos los Productos
-    </h2>
-    <div class="products-grid" id="productsGrid"></div>
-  </section>
+// === AGREGAR PRODUCTO ===
+document.getElementById('addPostBtn').onclick = () => {
+  document.getElementById('addProductModal').classList.add('active');
+  ['addName', 'addPrice', 'addSizes', 'addDesc', 'addImage'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('addImageFile').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  // Resetear cantidad
+  const box = document.getElementById('availableBox');
+  const input = document.getElementById('addAvailableCount');
+  const inputContainer = document.getElementById('availableInput');
+  input.value = '0';
+  box.textContent = '+';
+  box.style.display = 'flex';
+  inputContainer.style.display = 'none';
+};
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+// === CANTIDAD DISPONIBLE: CUADRADO + (ESTILO SUAVE) ===
+document.getElementById('availableBox').onclick = () => {
+  const box = document.getElementById('availableBox');
+  const inputContainer = document.getElementById('availableInput');
+  const input = document.getElementById('addAvailableCount');
+  box.style.display = 'none';
+  inputContainer.style.display = 'block';
+  input.focus();
+  input.select();
+};
 
-  <!-- BOTONES DE EDICIÓN DE TEXTOS -->
-  <div class="text-edit-controls" id="textEditControls">
-    <button id="saveTextChanges">Guardar Cambios</button>
-    <button id="cancelTextChanges" class="cancel">No Guardar</button>
-  </div>
+document.getElementById('addAvailableCount').addEventListener('blur', () => {
+  const box = document.getElementById('availableBox');
+  const inputContainer = document.getElementById('availableInput');
+  const value = document.getElementById('addAvailableCount').value.trim();
+  box.textContent = value && value !== '0' ? value : '+';
+  box.style.display = 'flex';
+  inputContainer.style.display = 'none';
+});
 
-  <!-- MODAL EDITAR PRODUCTO -->
-  <div class="modal" id="editProductModal">
-    <div class="modal-content">
-      <h3>Editar Producto</h3>
-      <input type="text" id="editName" placeholder="Nombre">
-      <input type="text" id="editPrice" placeholder="Precio">
-      <input type="text" id="editImage" placeholder="URL de imagen">
-      <button id="saveProduct">Guardar</button>
-      <button id="cancelEdit" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
+// === GUARDAR NUEVO PRODUCTO (type COMO OBJETO) ===
+document.getElementById('saveNewProduct').onclick = async () => {
+  const url = document.getElementById('addImage').value.trim();
+  const hasFile = document.getElementById('addImageFile').files.length > 0;
+  if (hasFile && !url) {
+    showToast("Usa URL por ahora");
+    return;
+  }
+  if (!url && !hasFile) {
+    showToast("Agrega imagen");
+    return;
+  }
+  const typeValue = document.getElementById('addType').value;
+  let typeObj = { normal: false, carrusel: false, anuncio: false };
+  if (typeValue === 'carrusel') typeObj.carrusel = true;
+  else if (typeValue === 'publicidad') typeObj.anuncio = true;
+  else if (typeValue === 'normal') typeObj.normal = true;
+  const producto = {
+    nombre: document.getElementById('addName').value.trim(),
+    precio: parseFloat(document.getElementById('addPrice').value),
+    talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
+    descripcion: document.getElementById('addDesc').value,
+    tipo: document.getElementById('addCategory').value,
+    type: typeObj,
+    imagen: url,
+    disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
+    creado: new Date()
+  };
+  if (!producto.nombre || !producto.precio || !typeValue) {
+    showToast("Faltan datos");
+    return;
+  }
+  await addDoc(collection(db, "productos"), producto);
+  showToast("Producto agregado");
+  closeModal('addProductModal');
+};
 
-  <!-- MODAL AGREGAR PRODUCTO -->
-  <div class="modal" id="addProductModal">
-    <div class="modal-content">
-      <h3>Agregar Nuevo Producto</h3>
-      <input type="text" id="addName" placeholder="Nombre del producto">
-      <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
-      <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
-      <textarea id="addDesc" placeholder="Descripción"></textarea>
-      <select id="addCategory">
-        <option value="gorra">Gorra</option>
-        <option value="camiseta">Camiseta</option>
-        <option value="pantalon">Pantalón</option>
-        <option value="cinto">Cinto</option>
-        <option value="tenis">Tenis</option>
-        <option value="perfume">Perfume</option>
-        <option value="sudadera">Sudadera</option>
-      </select>
-      <select id="addType">
-        <option value="normal">Normal</option>
-        <option value="carrusel">Carrusel</option>
-        <option value="publicidad">Estrella</option>
-      </select>
+// === REDES SOCIALES ===
+document.getElementById('openSocialModal').onclick = () => {
+  document.getElementById('socialLinksModal').classList.add('active');
+  loadSocialLinks();
+};
+document.getElementById('cancelSocial').onclick = () => closeModal('socialLinksModal');
+document.getElementById('saveSocialLinks').onclick = async () => {
+  const links = {
+    tiktok: document.getElementById('tiktokInput').value.trim(),
+    instagram: document.getElementById('instagramInput').value.trim(),
+    facebook: document.getElementById('facebookInput').value.trim(),
+    x: document.getElementById('xInput').value.trim(),
+    whatsapp: document.getElementById('whatsappInput').value.trim()
+  };
+  await setDoc(doc(db, "links", "social"), links, { merge: true });
+  showToast("Redes guardadas");
+  closeModal('socialLinksModal');
+};
 
-     <!-- CANTIDAD DISPONIBLE: CUADRADO + -->
-<div class="available-container">
-  <div id="availableBox">+</div>
-  <div>
-    <div id="availableInput">
-      <input type="number" id="addAvailableCount" min="0" max="999" value="0">
-    </div>
-    <p class="available-label">Cantidad de producto disponible</p>
-  </div>
-</div>
+function loadSocialLinks() {
+  onSnapshot(doc(db, "links", "social"), (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      document.getElementById('tiktokInput').value = data.tiktok || '';
+      document.getElementById('instagramInput').value = data.instagram || '';
+      document.getElementById('facebookInput').value = data.facebook || '';
+      document.getElementById('xInput').value = data.x || '';
+      document.getElementById('whatsappInput').value = data.whatsapp || '';
+    }
+  });
+}
 
-      <div class="image-upload-section">
-        <label>Subir imagen:</label>
-        <input type="file" id="addImageFile" accept="image/*">
-        <div id="imagePreview" style="display:none; text-align:center; margin:10px 0;">
-          <img id="previewImg" style="max-width:100%; max-height:200px; border-radius:8px;">
-        </div>
-      </div>
-      <div class="image-url-section">
-        <label>O URL:</label>
-        <input type="text" id="addImage" placeholder="https://...">
-      </div>
-      <p style="font-size:0.8rem; color:#d00; margin:10px 0 0;">
-        Usa una URL por ahora.
-      </p>
-      <button id="saveNewProduct">Guardar Producto</button>
-      <button id="cancelAdd" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
+// === MODALES ===
+document.querySelectorAll('[id^="cancel"]').forEach(btn => {
+  btn.onclick = () => closeModal(btn.closest('.modal').id);
+});
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => e.target === m && closeModal(m.id));
+});
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
 
-  <!-- MODAL REDES SOCIALES -->
-  <div class="modal" id="socialLinksModal">
-    <div class="modal-content">
-      <h3>Agregar Redes Sociales</h3>
-      <div class="social-links-inputs">
-        <label>TikTok</label>
-        <input type="text" id="tiktokInput" placeholder="https://tiktok.com/@usuario">
-        <label>Instagram</label>
-        <input type="text" id="instagramInput" placeholder="https://instagram.com/usuario">
-        <label>Facebook</label>
-        <input type="text" id="facebookInput" placeholder="https://facebook.com/usuario">
-        <label>X (Twitter)</label>
-        <input type="text" id="xInput" placeholder="https://x.com/usuario">
-        <label>WhatsApp</label>
-        <input type="text" id="whatsappInput" placeholder="https://wa.me/521234567890">
-      </div>
-      <button id="saveSocialLinks">Guardar</button>
-      <button id="cancelSocial" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
+// === TOAST ===
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Admin Mode.</p>
-  </footer>
+// === ENGRANAJE ===
+document.getElementById('adminGear').onclick = e => {
+  e.stopPropagation();
+  document.getElementById('adminDropdown').classList.toggle('show');
+};
+document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
 
-  <script type="module" src="js/admin.js"></script>
-</body>
-</html>
+// === EDICIÓN DE TEXTOS ===
+document.getElementById('toggleTextEdit').onclick = () => {
+  textEditMode = !textEditMode;
+  const controls = document.getElementById('textEditControls');
+  const editables = document.querySelectorAll('[contenteditable="true"]');
+  if (textEditMode) {
+    controls.classList.add('active');
+    editables.forEach(el => el.classList.add('editing'));
+  } else {
+    controls.classList.remove('active');
+    editables.forEach(el => el.classList.remove('editing'));
+    textChanges = {};
+  }
+};
+
+document.getElementById('saveTextChanges').onclick = async () => {
+  for (const [key, value] of Object.entries(textChanges)) {
+    const [coll, docu, field] = key.split('|');
+    await setDoc(doc(db, coll, docu), { [field]: value }, { merge: true });
+  }
+  showToast("Cambios guardados");
+  textEditMode = false;
+  document.getElementById('textEditControls').classList.remove('active');
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.remove('editing'));
+  textChanges = {};
+};
+
+document.getElementById('cancelTextChanges').onclick = () => {
+  location.reload();
+};
+
+document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+  el.addEventListener('input', () => {
+    const key = `${el.dataset.collection}|${el.dataset.doc}|${el.dataset.field}`;
+    textChanges[key] = el.textContent.trim();
+  });
+});
+
+// === CARGAR FONDO HERO ===
+onSnapshot(doc(db, "textos", "hero"), snap => {
+  if (snap.exists() && snap.data().fondo_url) {
+    document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
+  }
+});
+
+// === INICIAR REDES Y TEXTOS ===
+loadSocialLinks();
+loadEditableTexts(); // Añadido: carga textos desde Firebase
