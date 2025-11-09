@@ -33,7 +33,7 @@
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
     .modal.active { display: flex; }
     .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-    .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+    .modal input, .modal select, .modal textarea, .modal .number-input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
     .modal button { background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
 
     /* ENGRANAJE */
@@ -74,28 +74,45 @@
       cursor: text;
       padding: 4px;
       border-radius: 4px;
+      position: relative;
     }
     [contenteditable="true"].editing {
-      outline: 2px solid #0066ff;
-      background: rgba(0, 102, 255, 0.1);
+      outline: 2px dashed #0066ff;
+      background: rgba(0, 102, 255, 0.08);
+      border-radius: 6px;
+      padding: 6px;
     }
 
-    /* PANEL DE EDICIÓN DE TEXTOS */
-    .text-editor-panel {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 3000; display: none;
+    /* BOTONES DE EDICIÓN DE TEXTOS */
+    .text-edit-controls {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #fff; padding: 12px 20px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      display: none; z-index: 2500; gap: 10px; align-items: center;
     }
-    .text-editor-panel.active { display: block; }
-    .text-editor-panel h3 { margin-top: 0; }
-    .text-editor-panel input, .text-editor-panel textarea {
-      width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px;
+    .text-edit-controls.active { display: flex; }
+    .text-edit-controls button {
+      background: #000; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
     }
-    .text-editor-panel button {
-      background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;
+    .text-edit-controls button.cancel { background: #999; }
+
+    /* INPUT NUMBER BONITO */
+    .number-input {
+      -moz-appearance: textfield;
+      appearance: textfield;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
     }
-    .text-editor-panel .close-panel {
-      position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer;
+    .number-input::-webkit-inner-spin-button,
+    .number-input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .number-input-container {
+      display: flex; align-items: center; justify-content: center; gap: 10px; margin: 15px 0;
+    }
+    .number-input-container button {
+      background: #000; color: #fff; width: 36px; height: 36px; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer;
     }
   </style>
 </head>
@@ -123,7 +140,7 @@
         <div class="logo">EFRAÍN</div>
       </div>
       <div class="header-right">
-        <div class="edit-text-btn" id="openTextEditor">Edit</div>
+        <div class="edit-text-btn" id="toggleTextEdit">Edit</div>
         <div class="add-post-btn" id="addPostBtn">+</div>
       </div>
     </div>
@@ -139,7 +156,7 @@
     </p>
   </section>
 
-  <!-- NUEVOS LANZAMIENTOS -->
+  <!-- SECCIONES -->
   <section class="infinite-carousel-section" id="newCarouselSection">
     <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
       Nuevos Lanzamientos
@@ -149,7 +166,6 @@
     </div>
   </section>
 
-  <!-- PRODUCTOS ESTRELLA -->
   <section class="infinite-carousel-section" id="starCarouselSection">
     <h2 id="titleStarDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="productos_estrella">
       Productos Estrella
@@ -159,7 +175,6 @@
     </div>
   </section>
 
-  <!-- TODOS LOS PRODUCTOS -->
   <section>
     <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
       Todos los Productos
@@ -170,24 +185,10 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- PANEL DE EDICIÓN DE TEXTOS -->
-  <div class="text-editor-panel" id="textEditorPanel">
-    <button class="close-panel" id="closeTextEditor">×</button>
-    <h3>Editar Textos</h3>
-    <label>Título Principal</label>
-    <input type="text" id="editHeroTitle">
-    <label>Subtítulo</label>
-    <input type="text" id="editHeroTag">
-    <label>Imagen de Fondo (URL)</label>
-    <input type="text" id="editHeroBg">
-    <img id="heroBgPreview" style="max-width:100%; margin-top:10px; border-radius:8px; display:none;">
-    <label>Nuevos Lanzamientos</label>
-    <input type="text" id="editNewTitle">
-    <label>Productos Estrella</label>
-    <input type="text" id="editStarTitle">
-    <label>Todos los Productos</label>
-    <input type="text" id="editAllTitle">
-    <button id="saveAllTexts">Guardar Todo</button>
+  <!-- BOTONES DE EDICIÓN DE TEXTOS -->
+  <div class="text-edit-controls" id="textEditControls">
+    <button id="saveTextChanges">Guardar Cambios</button>
+    <button id="cancelTextChanges" class="cancel">No Guardar</button>
   </div>
 
   <!-- MODAL EDITAR PRODUCTO -->
@@ -215,7 +216,7 @@
         <option value="camiseta">Camiseta</option>
         <option value="pantalon">Pantalón</option>
         <option value="cinto">Cinto</option>
-        <option>On value="tenis">Tenis</option>
+        <option value="tenis">Tenis</option>
         <option value="perfume">Perfume</option>
         <option value="sudadera">Sudadera</option>
       </select>
@@ -224,10 +225,17 @@
         <option value="carrusel">Carrusel</option>
         <option value="publicidad">Estrella</option>
       </select>
-      <label style="display:flex; align-items:center; gap:8px; margin:15px 0;">
-        <input type="checkbox" id="addAvailable"> 
-        <span>Agregar a "Productos Disponibles"</span>
-      </label>
+
+      <!-- PRODUCTOS DISPONIBLES: INPUT NUMBER BONITO -->
+      <div class="number-input-container">
+        <button type="button" id="decreaseAvailable">-</button>
+        <input type="number" id="addAvailableCount" class="number-input" value="0" min="0" max="100">
+        <button type="button" id="increaseAvailable">+</button>
+      </div>
+      <p style="text-align:center; margin:5px 0; font-size:0.9rem; color:#555;">
+        Cantidad disponible (0 = no mostrar)
+      </p>
+
       <div class="image-upload-section">
         <label>Subir imagen:</label>
         <input type="file" id="addImageFile" accept="image/*">
