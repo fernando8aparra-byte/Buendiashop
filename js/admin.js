@@ -108,7 +108,7 @@ function createProductCard(p, sectionType) {
   return div;
 }
 
-// === EDITAR ===
+// === EDITAR PRODUCTO ===
 window.editProduct = (id) => {
   const card = document.querySelector(`.product-card[data-id="${id}"]`);
   if (!card) return;
@@ -137,7 +137,7 @@ document.getElementById('saveProduct').onclick = async () => {
   closeModal('editProductModal');
 };
 
-// === ELIMINAR ===
+// === ELIMINAR PRODUCTO ===
 window.deleteProduct = async (id) => {
   if (!confirm("¿Eliminar este producto?")) return;
   await deleteDoc(doc(db, "productos", id));
@@ -245,7 +245,7 @@ document.getElementById('saveSocialLinks').onclick = async () => {
 
   try {
     await setDoc(doc(db, "links", "social"), links, { merge: true });
-    showToast("Redes sociales guardadas");
+    show・マToast("Redes sociales guardadas");
     closeModal('socialLinksModal');
   } catch (error) {
     showToast("Error: " + error.message);
@@ -272,7 +272,9 @@ document.querySelectorAll('[id^="cancel"]').forEach(btn => {
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => e.target === m && closeModal(m.id));
 });
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function closeModal(id) { 
+  document.getElementById(id).classList.remove('active'); 
+}
 
 // === TOAST ===
 function showToast(msg) {
@@ -291,3 +293,88 @@ document.addEventListener('click', () => document.getElementById('adminDropdown'
 
 // === INICIAR REDES ===
 loadSocialLinks();
+
+// ========================================
+// === NUEVO: EDITAR TEXTOS E IMAGEN ===
+// ========================================
+
+function loadAdminTexts() {
+  // Hero
+  onSnapshot(doc(db, "textos", "hero"), (docSnap) => {
+    if (docSnap.exists()) {
+      const d = docSnap.data();
+      document.getElementById('heroTitleInput').value = d.titulo || '';
+      document.getElementById('heroTagInput').value = d.subtitulo || '';
+      document.getElementById('heroBgInput').value = d.fondo_url || '';
+      
+      if (d.fondo_url) {
+        const prev = document.getElementById('heroBgPreview');
+        prev.src = d.fondo_url;
+        prev.style.display = 'block';
+      }
+
+      // Actualizar vista en vivo
+      document.getElementById('heroTitleDisplay').textContent = d.titulo || 'Asegura tu Mystery Box';
+      document.getElementById('heroTagDisplay').textContent = d.subtitulo || 'Envío Gratis en compras +$1,500';
+      if (d.fondo_url) {
+        document.getElementById('heroBanner').style.backgroundImage = `url(${d.fondo_url})`;
+        document.getElementById('heroBanner').style.backgroundSize = 'cover';
+        document.getElementById('heroBanner').style.backgroundPosition = 'center';
+        document.getElementById('heroBanner').style.color = '#fff';
+        document.getElementById('heroBanner').style.textShadow = '0 0 10px rgba(0,0,0,0.6)';
+      }
+    }
+  });
+
+  // Secciones
+  onSnapshot(doc(db, "textos", "secciones"), (docSnap) => {
+    if (docSnap.exists()) {
+      const d = docSnap.data();
+      document.getElementById('titleNewInput').value = d.nuevos_lanzamientos || '';
+      document.getElementById('titleStarInput').value = d.productos_estrella || '';
+      document.getElementById('titleAllInput').value = d.todos_productos || '';
+
+      document.getElementById('titleNewDisplay').textContent = d.nuevos_lanzamientos || 'Nuevos Lanzamientos';
+      document.getElementById('titleStarDisplay').textContent = d.productos_estrella || 'Productos Estrella';
+      document.getElementById('titleAllDisplay').textContent = d.todos_productos || 'Todos los Productos';
+    }
+  });
+}
+
+// === GUARDAR TEXTOS ===
+document.getElementById('saveTextsBtn').onclick = async () => {
+  const hero = {
+    titulo: document.getElementById('heroTitleInput').value.trim(),
+    subtitulo: document.getElementById('heroTagInput').value.trim(),
+    fondo_url: document.getElementById('heroBgInput').value.trim()
+  };
+
+  const secciones = {
+    nuevos_lanzamientos: document.getElementById('titleNewInput').value.trim(),
+    productos_estrella: document.getElementById('titleStarInput').value.trim(),
+    todos_productos: document.getElementById('titleAllInput').value.trim()
+  };
+
+  try {
+    await setDoc(doc(db, "textos", "hero"), hero, { merge: true });
+    await setDoc(doc(db, "textos", "secciones"), secciones, { merge: true });
+    showToast("Textos e imagen guardados correctamente");
+  } catch (e) {
+    showToast("Error: " + e.message);
+  }
+};
+
+// === PREVISUALIZAR IMAGEN DE FONDO ===
+document.getElementById('heroBgInput').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  const img = document.getElementById('heroBgPreview');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+});
+
+// === INICIAR CARGA DE TEXTOS ===
+loadAdminTexts();
