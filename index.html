@@ -1,325 +1,307 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    /* === TUS ESTILOS ORIGINALES (SIN CAMBIOS) === */
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; box-sizing: border-box; }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .icon-btn { color: #000 !important; background: none; border: none; cursor: pointer; }
-    .icon-btn svg { stroke: #000; fill: none; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-    .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #666; }
-    .search-bar-header { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; align-items: center; padding: 0 20px; z-index: 20; }
-    .search-bar-header.active { display: flex; }
-    .search-bar-header input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 10px 0; }
-    .menu-sidebar { position: fixed; top: 60px; left: 0; width: 300px; height: calc(100vh - 60px); background: #fff; z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
-    .menu-sidebar.open { transform: translateX(0); }
-    .menu-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .menu-overlay.show { opacity: 1; visibility: visible; }
-    .menu-item { padding: 18px 20px; border-bottom: 1px solid #eee; cursor: pointer; position: relative; display: flex; justify-content: space-between; align-items: center; }
-    .menu-item::after { content: 'Down Arrow'; font-size: 0.8rem; transition: transform 0.3s ease; }
-    .dropdown-toggle.open::after, .contact-toggle.open::after { transform: rotate(180deg); }
-    .submenu, .contact-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #f9f9f9; padding: 0 20px; }
-    .submenu.open, .contact-dropdown.open { max-height: 500px; padding: 20px; }
-    .submenu-item { padding: 12px 0; border-bottom: 1px solid #ddd; cursor: pointer; }
-    .menu-item.ofertas-btn { background: none; color: #000; text-align: left; padding: 18px 20px; margin: 0; border-radius: 0; font-weight: normal; }
-    .menu-item.login-btn { background: #000; color: #fff; text-align: center; padding: 15px 20px; margin: 20px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .menu-item.logout-btn { background: #ff0000; color: #fff; }
-    .contact-text { margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4; }
-    .social-links { display: flex; gap: 20px; justify-content: center; }
-    .social-links img { width: 40px; height: 40px; }
-    .cart-sidebar { position: fixed; top: 60px; right: 0; width: 350px; height: calc(100vh - 60px); background: #fff; z-index: 1000; transform: translateX(100%); transition: transform 0.3s ease; box-shadow: -2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-    .cart-sidebar.open { transform: translateX(0); }
-    .cart-overlay { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
-    .cart-overlay.show { opacity: 1; visibility: visible; }
-    .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
-    .cart-header { padding: 20px; border-bottom: 1px solid #eee; position: relative; }
-    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #fff; }
-    #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
-    .cart-item { position: relative; padding: 15px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
-    .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
-    .header-overlay.show { display: block; }
-    .main-container { margin-top: 20px; padding: 0 15px; }
-    .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .search-results h3 { margin-top: 0; }
-    .no-results { color: #666; font-style: italic; }
-    .go-to-pay { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
-    .footer a { color: #fff; text-decoration: underline; }
-    /* === CARRUSEL: 1 PRODUCTO POR VEZ === */
-    .carousel-container {
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      padding: 10px 0;
-      margin: 20px 0;
+// js/index.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  where,
+  getDocs,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+  authDomain: "boutique-buendia.firebaseapp.com",
+  projectId: "boutique-buendia",
+  storageBucket: "boutique-buendia.firebasestorage.app",
+  messagingSenderId: "430651152709",
+  appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// === DOM ===
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuSidebar = document.getElementById('menuSidebar');
+const closeMenu = document.getElementById('closeMenu');
+const cartBtn = document.getElementById('cartBtn');
+const cartSidebar = document.getElementById('cartSidebar');
+const closeCart = document.getElementById('closeCart');
+const searchBtn = document.getElementById('searchBtn');
+const searchContainer = document.getElementById('searchContainer');
+const closeSearch = document.getElementById('closeSearch');
+const searchInput = document.getElementById('searchInput');
+const searchResultsContainer = document.getElementById('searchResultsContainer');
+const searchResults = document.getElementById('searchResults');
+const newCarousel = document.getElementById('newCarousel');
+const starCarousel = document.getElementById('starCarousel');
+const productsGrid = document.getElementById('productsGrid');
+const cartBadge = document.getElementById('cartBadge');
+const cartItems = document.getElementById('cartItems');
+const cartTotal = document.getElementById('cartTotal');
+const goToPay = document.getElementById('goToPay');
+const toast = document.getElementById('toast');
+const welcomeMsg = document.getElementById('welcomeMsg');
+const authBtn = document.getElementById('authBtn');
+const helpBtn = document.getElementById('helpBtn');
+
+// === TÍTULOS DINÁMICOS ===
+function loadTitles() {
+  onSnapshot(doc(db, "textos", "hero"), (snap) => {
+    if (snap.exists()) {
+      const { titulo, subtitulo } = snap.data();
+      document.getElementById("heroTitle").textContent = titulo || "Asegura tu Mystery Box";
+      document.getElementById("heroTag").textContent = subtitulo || "Envío Gratis en compras +$1,500";
     }
-    .carousel-track {
-      display: flex;
-      gap: 16px;
-      transition: transform 0.4s ease;
-      padding: 0 10px;
+  });
+
+  onSnapshot(doc(db, "textos", "secciones"), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      document.getElementById("titleNew").textContent = data.nuevos_lanzamientos || "Nuevos Lanzamientos";
+      document.getElementById("titleStar").textContent = data.productos_estrella || "Anuncios";
+      document.getElementById("titleAll").textContent = data.todos_productos || "Todos los Productos";
     }
-    .carousel-item {
-      min-width: 280px;
-      max-width: 280px;
-      flex: 0 0 auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      overflow: hidden;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s;
+  });
+}
+
+// === CARGAR TIPOS DE PRODUCTOS ===
+async function loadProductTypes() {
+  const submenu = document.getElementById('categoriesSubmenu');
+  submenu.innerHTML = '<div class="submenu-item">Cargando...</div>';
+
+  try {
+    const snapshot = await getDocs(collection(db, "productos"));
+    const tipos = new Set();
+    snapshot.forEach(doc => {
+      const tipo = doc.data().tipo;
+      if (tipo) tipos.add(tipo);
+    });
+
+    submenu.innerHTML = '';
+    if (tipos.size === 0) {
+      submenu.innerHTML = '<div class="submenu-item">No hay categorías</div>';
+      return;
     }
-    .carousel-item:hover { transform: translateY(-4px); }
-    .carousel-item img {
-      width: 100%;
-      height: 280px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .carousel-item h4 {
-      margin: 10px 0 5px;
-      font-size: 1rem;
-      color: #000;
-    }
-    .carousel-item p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #666;
-      font-weight: 500;
-    }
-    .carousel-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.6);
-      color: white;
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      cursor: pointer;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.8;
-      transition: opacity 0.2s;
-    }
-    .carousel-btn:hover { opacity: 1; }
-    .carousel-btn.prev { left: 10px; }
-    .carousel-btn.next { right: 10px; }
-    .carousel-btn.hidden { display: none; }
-    /* GRID PRODUCTOS */
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
-    }
-    .product-card {
-      background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      text-align: center;
-      padding: 12px;
-    }
-    .product-card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .product-card h3 {
-      font-size: 0.95rem;
-      margin: 8px 0 4px;
-    }
-    .product-card p { margin: 0 0 8px; color: #666; }
-    .add-to-cart {
-      background: #000;
-      color: #fff;
-      border: none;
-      padding: 8px;
-      width: 100%;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #000;
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      z-index: 1001;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .toast.show { opacity: 1; }
-    /* === NUEVO: CANTIDAD DISPONIBLE === */
-    .stock-info {
-      font-size: 0.85rem;
-      color: #0a0;
-      font-weight: 500;
-      margin: 4px 0;
-    }
-    /* Responsive */
-    @media (max-width: 768px) {
-      .carousel-item { min-width: 240px; max-width: 240px; }
-      .carousel-item img { height: 240px; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-  </style>
-</head>
-<body>
-  <!-- OVERLAYS -->
-  <div class="header-overlay" id="headerOverlay"></div>
-  <div class="cart-overlay" id="cartOverlay"></div>
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <button id="menuBtn" class="icon-btn" aria-label="Menú">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="logo">Boutique-buenday</div>
+
+    [...tipos].sort().forEach(tipo => {
+      const item = document.createElement('div');
+      item.className = 'submenu-item';
+      item.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+      item.onclick = () => window.location.href = `products_tipo.html?tipo=${encodeURIComponent(tipo)}`;
+      submenu.appendChild(item);
+    });
+  } catch (e) {
+    submenu.innerHTML = '<div class="submenu-item">Error al cargar</div>';
+  }
+}
+
+// === CARGAR REDES SOCIALES ===
+function loadSocialLinks() {
+  const container = document.getElementById('socialLinksContainer');
+  onSnapshot(doc(db, "links", "social"), (snap) => {
+    container.innerHTML = '';
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const redes = [
+      { key: 'instagram', icon: 'https://imgfz.com/i/instagram-logo.png' },
+      { key: 'x', icon: 'https://imgfz.com/i/x-logo.png' },
+      { key: 'facebook', icon: 'https://imgfz.com/i/facebook-logo.png' },
+      { key: 'youtube', icon: 'https://imgfz.com/i/youtube-logo.png' },
+      { key: 'tiktok', icon: 'https://imgfz.com/i/tiktok-logo.png' },
+      { key: 'whatsapp', icon: 'https://imgfz.com/i/whatsapp-logo.png' }
+    ];
+    redes.forEach(red => {
+      if (data[red.key]) {
+        const a = document.createElement('a');
+        a.href = data[red.key];
+        a.target = '_blank';
+        a.innerHTML = `<img src="${red.icon}" alt="${red.key}" style="width:40px;height:40px;">`;
+        container.appendChild(a);
+      }
+    });
+  });
+}
+
+// === DESPLEGABLES ===
+document.getElementById('categoriesToggle').onclick = () => {
+  const submenu = document.getElementById('categoriesSubmenu');
+  submenu.classList.toggle('show');
+  document.getElementById('categoriesToggle').classList.toggle('active');
+};
+
+document.getElementById('contactToggle').onclick = () => {
+  const submenu = document.getElementById('contactDropdown');
+  submenu.classList.toggle('show');
+  document.getElementById('contactToggle').classList.toggle('active');
+};
+
+// === CARRITO ===
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+function updateCart() {
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+  const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+  cartBadge.textContent = totalQty;
+  cartBadge.style.display = totalQty > 0 ? 'flex' : 'none';
+  cartTotal.textContent = `Total: $${totalPrice.toLocaleString()}`;
+  cartItems.innerHTML = cart.length === 0
+    ? '<p class="empty-cart">Tu carrito está vacío</p>'
+    : cart.map((item, i) => `
+      <div class="cart-item">
+        <img src="${item.imagen}" alt="${item.nombre}" class="thumb">
+        <div>
+          <div>${item.nombre}</div>
+          <small>x${item.qty} • $${(item.precio * item.qty).toLocaleString()}</small>
+        </div>
+        <button onclick="removeFromCart(${i})">×</button>
       </div>
-      <div class="header-right">
-        <button id="searchBtn" class="icon-btn search-toggle" aria-label="Buscar">
-          <svg viewBox="0 0 24 24" width="26" height="26">
-            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
-            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button id="cartBtn" class="icon-btn" aria-label="Carrito">
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="cartBadge"></span>
-        </button>
+    `).join('');
+  goToPay.style.display = cart.length > 0 ? 'block' : 'none';
+}
+
+window.addToCart = (id) => {
+  const product = window.allProducts.find(p => p.id === id);
+  if (!product) return showToast("Producto no encontrado");
+  const existing = cart.find(i => i.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ id: product.id, nombre: product.nombre, precio: product.precio, imagen: product.imagen, qty: 1 });
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('¡Agregado al carrito!');
+};
+
+window.removeFromCart = (i) => {
+  cart.splice(i, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCart();
+  showToast('Producto eliminado');
+};
+
+goToPay.onclick = () => window.location.href = 'pago.html';
+
+// === PRODUCTOS ===
+let allProducts = [];
+onSnapshot(collection(db, "productos"), (snapshot) => {
+  allProducts = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    type: doc.data().type || { normal: true }
+  }));
+  window.allProducts = allProducts;
+  renderCarousel(newCarousel, p => p.type?.carrusel);
+  renderCarousel(starCarousel, p => p.type?.anuncio);
+  renderGrid();
+});
+
+function renderCarousel(container, filterFn) {
+  const filtered = allProducts.filter(filterFn);
+  container.innerHTML = filtered.length === 0
+    ? '<p style="color:#999; text-align:center; padding:40px;">No hay productos</p>'
+    : [...filtered, ...filtered].map(p => `
+      <div class="carousel-item" onclick="window.location.href='product.html?id=${p.id}'">
+        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
-      <div class="search-bar-header" id="searchBarHeader">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
-        <button id="closeSearchHeader" class="close-search-btn">x</button>
+    `).join('');
+}
+
+function renderGrid() {
+  const normales = allProducts.filter(p => p.type?.normal);
+  productsGrid.innerHTML = normales.map(p => `
+    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      <div class="card-info">
+        <h3>${p.nombre}</h3>
+        <p class="desc">${p.descripcion || ''}</p>
+        <div class="price-container">
+          ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+          <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
+        </div>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
       </div>
     </div>
-  </header>
-  <!-- RESULTADOS DE BÚSQUEDA -->
-  <div id="searchResultsContainer" class="search-results" style="display:none;">
-    <h3>Resultados de búsqueda</h3>
-    <div id="searchResults"></div>
-  </div>
-  <!-- CONTENIDO -->
-  <main class="main-container">
-    <!-- HERO BANNER -->
-    <section class="hero-banner">
-      <h1 id="heroTitle">Asegura tu Mystery Box</h1>
-      <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
-    </section>
+  `).join('');
+}
 
-    <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
-    <section class="infinite-carousel-section">
-      <h2 id="titleNew">Nuevos Lanzamientos</h2>
-      <div class="carousel-container">
-        <div class="carousel-track" id="newCarousel"></div>
-        <button class="carousel-btn prev hidden">Left Arrow</button>
-        <button class="carousel-btn next">Right Arrow</button>
-      </div>
-    </section>
+// === BÚSQUEDA ===
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const term = searchInput.value.trim().toLowerCase();
+  if (term.length < 2) {
+    searchResultsContainer.style.display = 'none';
+    return;
+  }
+  searchTimeout = setTimeout(async () => {
+    const q = query(collection(db, "productos"), where("nombre", ">=", term), where("nombre", "<=", term + '\uf8ff'));
+    const snapshot = await getDocs(q);
+    searchResults.innerHTML = snapshot.empty
+      ? '<p class="no-results">No se encontraron productos.</p>'
+      : snapshot.docs.map(doc => {
+          const p = doc.data();
+          return `<div style="padding:12px 0; border-bottom:1px solid #eee; cursor:pointer;" onclick="window.location.href='product.html?id=${doc.id}'">
+            <strong>${p.nombre}</strong><br>
+            <small>${p.descripcion || 'Sin descripción'}</small><br>
+            <strong>$${p.precio.toLocaleString()}</strong>
+          </div>`;
+        }).join('');
+    searchResultsContainer.style.display = 'block';
+  }, 300);
+});
 
-    <!-- CARRUSEL: ANUNCIOS -->
-    <section class="infinite-carousel-section">
-      <h2 id="titleStar">Anuncios</h2>
-      <div class="carousel-container">
-        <div class="carousel-track" id="starCarousel"></div>
-        <button class="carousel-btn prev hidden">Left Arrow</button>
-        <button class="carousel-btn next">Right Arrow</button>
-      </div>
-    </section>
+// === UI ===
+menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
+[menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
+cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
+closeCart.onclick = () => cartSidebar.classList.remove('open');
+searchBtn.onclick = () => searchContainer.classList.add('active');
+closeSearch.onclick = () => searchContainer.classList.remove('active');
+document.addEventListener('click', e => {
+  if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
+    searchContainer.classList.remove('active');
+    searchResultsContainer.style.display = 'none';
+  }
+});
 
-    <!-- TODOS LOS PRODUCTOS -->
-    <section>
-      <h2 id="titleAll">Todos los Productos</h2>
-      <div class="products-grid" id="productsGrid"></div>
-    </section>
-  </main>
+// === AUTH ===
+let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+let userName = localStorage.getItem('userName') || '';
+function updateAuthUI() {
+  if (isLoggedIn && userName) {
+    welcomeMsg.textContent = `¡Hola, ${userName}!`;
+    authBtn.textContent = 'Cerrar sesión';
+    authBtn.classList.add('logout-btn');
+  } else {
+    welcomeMsg.textContent = '';
+    authBtn.textContent = 'Inicia sesión o regístrate';
+    authBtn.classList.remove('logout-btn');
+  }
+}
+authBtn.onclick = () => {
+  if (isLoggedIn) {
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userName');
+    isLoggedIn = false; userName = '';
+    showToast('Sesión cerrada');
+    updateAuthUI();
+  } else {
+    window.location.href = 'login.html';
+  }
+};
+helpBtn.onclick = () => alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
 
-  <!-- MENÚ LATERAL -->
-  <div class="menu-overlay" id="menuOverlay"></div>
-  <aside class="menu-sidebar" id="menuSidebar">
-    <div class="menu-item welcome" id="welcomeMsg"></div>
-    <div class="menu-item dropdown-toggle" id="categoriesToggle">Productos</div>
-    <div class="submenu" id="categoriesSubmenu">
-      <div class="submenu-item">Gorras</div>
-      <div class="submenu-item">Camisetas</div>
-      <div class="submenu-item">Pantalones</div>
-      <div class="submenu-item">Cintos</div>
-      <div class="submenu-item">Tenis</div>
-      <div class="submenu-item">Perfumes</div>
-      <div class="submenu-item">Sudaderas</div>
-    </div>
-    <div class="menu-item ofertas-btn">Ofertas</div>
-    <div class="menu-item contact-toggle" id="contactToggle">Contacto</div>
-    <div class="contact-dropdown" id="contactDropdown">
-      <p class="contact-text">No te quedes sin tu Mystery Box</p>
-      <div class="social-links">
-        <a href="https://instagram.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/instagram-logo.png" alt="Instagram"></a>
-        <a href="https://tiktok.com/@efrainshop" target="_blank"><img src="https://imgfz.com/i/tiktok-logo.png" alt="TikTok"></a>
-        <a href="https://facebook.com/efrainshop" target="_blank"><img src="https://imgfz.com/i/facebook-logo.png" alt="Facebook"></a>
-      </div>
-    </div>
-    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
-  </aside>
+// === TOAST ===
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
-  <!-- CARRITO -->
-  <aside class="cart-sidebar" id="cartSidebar">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button class="menu-close-x" id="closeCart">x</button>
-    </div>
-    <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Tu carrito está vacío</p>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total" id="cartTotal">Total: $0</div>
-      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
-      <div id="message"></div>
-    </div>
-  </aside>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
-
-  <!-- PIE DE PÁGINA -->
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
-    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
-  </footer>
-
-  <!-- SCRIPT -->
-  <script type="module" src="js/index.js"></script>
-</body>
-</html>
+// === INICIAR ===
+updateCart();
+updateAuthUI();
+loadTitles();
+loadProductTypes();
+loadSocialLinks();
