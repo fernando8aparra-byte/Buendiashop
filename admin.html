@@ -14,13 +14,10 @@
     .icon-btn { color: #000; background: none; cursor: pointer; }
     .icon-btn svg { stroke: #000; fill: none; }
     .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-
     .hero-banner { text-align: center; padding: 60px 20px; background: #f8f8f8; }
     .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
     .hero-banner .tag { font-size: 1rem; color: #666; }
-
     .main-container { margin-top: 20px; padding: 0 15px; }
-
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
 
@@ -28,7 +25,6 @@
     .admin-btn { background: #ff4444; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; margin-left: 10px; cursor: pointer; }
     .admin-edit { background: #0066ff; }
     .admin-delete { background: #ff0000; }
-
     .product-card { position: relative; text-align: center; padding: 15px; }
     .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
     .product-card:hover .product-actions { opacity: 1; }
@@ -96,7 +92,10 @@
       <div class="header-left">
         <div class="admin-gear" id="adminGear">
           <button class="icon-btn" aria-label="Ajustes">
-            <svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+            <svg viewBox="0 0 24 24" width="26" height="26">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
           </button>
           <div class="admin-dropdown" id="adminDropdown">
             <a href="admin-map.html">Mapa de Compras</a>
@@ -151,17 +150,6 @@
       <h3>Editar Producto</h3>
       <input type="text" id="editName" placeholder="Nombre">
       <input type="text" id="editPrice" placeholder="Precio">
-      <input type="text" id="editSizes" placeholder="Tallas (S,M,L)">
-      <textarea id="editDesc" placeholder="Descripción"></textarea>
-      <select id="editType">
-        <option value="gorra">Gorra</option>
-        <option value="camiseta">Camiseta</option>
-        <option value="pantalon">Pantalón</option>
-        <option value="cinto">Cinto</option>
-        <option value="tenis">Tenis</option>
-        <option value="perfume">Perfume</option>
-        <option value="sudadera">Sudadera</option>
-      </select>
       <input type="text" id="editImage" placeholder="URL de imagen">
       <button id="saveProduct">Guardar</button>
       <button id="cancelEdit" style="background:#999;">Cancelar</button>
@@ -176,7 +164,6 @@
       <input type="text" id="addPrice" placeholder="Precio (ej: 1500)">
       <input type="text" id="addSizes" placeholder="Tallas (ej: S,M,L)">
       <textarea id="addDesc" placeholder="Descripción"></textarea>
-
       <select id="addCategory">
         <option value="gorra">Gorra</option>
         <option value="camiseta">Camiseta</option>
@@ -186,13 +173,11 @@
         <option value="perfume">Perfume</option>
         <option value="sudadera">Sudadera</option>
       </select>
-
       <select id="addType">
         <option value="normal">Normal (Todos los Productos)</option>
         <option value="carrusel">Carrusel (Nuevos Lanzamientos)</option>
         <option value="publicidad">Estrella (Productos Estrella)</option>
       </select>
-
       <div class="image-upload-section">
         <label>Subir imagen desde tu dispositivo:</label>
         <input type="file" id="addImageFile" accept="image/*">
@@ -200,16 +185,13 @@
           <img id="previewImg" src="" alt="Vista previa">
         </div>
       </div>
-
       <div class="image-url-section">
         <label>O pegar URL de imagen:</label>
         <input type="text" id="addImage" placeholder="https://ejemplo.com/imagen.jpg">
       </div>
-
       <p style="font-size:0.8rem; color:#d00; margin:10px 0 0;">
         La subida de imágenes aún no está habilitada. Usa una URL por ahora.
       </p>
-
       <button id="saveNewProduct">Guardar Producto</button>
       <button id="cancelAdd" style="background:#999;">Cancelar</button>
     </div>
