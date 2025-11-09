@@ -53,17 +53,17 @@ function loadTitles() {
   onSnapshot(doc(db, "textos", "hero"), (snap) => {
     if (snap.exists()) {
       const { titulo, subtitulo } = snap.data();
-      if (document.getElementById("heroTitle")) document.getElementById("heroTitle").textContent = titulo || "";
-      if (document.getElementById("heroTag")) document.getElementById("heroTag").textContent = subtitulo || "";
+      document.getElementById("heroTitle").textContent = titulo || "Asegura tu Mystery Box";
+      document.getElementById("heroTag").textContent = subtitulo || "Envío Gratis en compras +$1,500";
     }
   });
 
   onSnapshot(doc(db, "textos", "secciones"), (snap) => {
     if (snap.exists()) {
       const data = snap.data();
-      if (document.getElementById("titleNew")) document.getElementById("titleNew").textContent = data.nuevos_lanzamientos || "";
-      if (document.getElementById("titleStar")) document.getElementById("titleStar").textContent = data.productos_estrella || "";
-      if (document.getElementById("titleAll")) document.getElementById("titleAll").textContent = data.todos_productos || "";
+      document.getElementById("titleNew").textContent = data.nuevos_lanzamientos || "Nuevos Lanzamientos";
+      document.getElementById("titleStar").textContent = data.productos_estrella || "Anuncios";
+      document.getElementById("titleAll").textContent = data.todos_productos || "Todos los Productos";
     }
   });
 }
@@ -91,9 +91,7 @@ async function loadProductTypes() {
       const item = document.createElement('div');
       item.className = 'submenu-item';
       item.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
-      item.onclick = () => {
-        window.location.href = `products_tipo.html?tipo=${encodeURIComponent(tipo)}`;
-      };
+      item.onclick = () => window.location.href = `products_tipo.html?tipo=${encodeURIComponent(tipo)}`;
       submenu.appendChild(item);
     });
   } catch (e) {
@@ -289,7 +287,7 @@ authBtn.onclick = () => {
     showToast('Sesión cerrada');
     updateAuthUI();
   } else {
-    window.location.href utilização = 'login.html';
+    window.location.href = 'login.html';
   }
 };
 helpBtn.onclick = () => alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
