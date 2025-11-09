@@ -1,12 +1,12 @@
 // js/admin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  doc, 
+import {
+  getFirestore,
+  collection,
+  doc,
   addDoc,
-  updateDoc, 
-  deleteDoc, 
+  updateDoc,
+  deleteDoc,
   onSnapshot,
   query,
   where,
@@ -34,6 +34,31 @@ if (!localStorage.getItem('isAdmin')) {
 let textEditMode = false;
 let textChanges = {};
 
+// === CARGAR TEXTOS EDITABLES EN TIEMPO REAL ===
+function loadEditableTexts() {
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    const coll = el.dataset.collection;
+    const docu = el.dataset.doc;
+    const field = el.dataset.field;
+
+    const path = `${coll}/${docu}`;
+    const unsubscribe = onSnapshot(doc(db, coll, docu), (snap) => {
+      if (snap.exists() && snap.data()[field] !== undefined) {
+        const value = snap.data()[field];
+        if (el.textContent.trim() !== value) {
+          el.textContent = value;
+        }
+      } else {
+        // Si no existe, inicializar con valor por defecto
+        setDoc(doc(db, coll, docu), { [field]: el.textContent.trim() }, { merge: true });
+      }
+    });
+
+    // Guardar unsubscribe para limpieza futura si es necesario
+    el.dataset.unsubscribe = unsubscribe;
+  });
+}
+
 // === CARGAR TODOS LOS PRODUCTOS EN SUS SECCIONES ===
 function loadProductsByType(typeKey, containerId) {
   const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
@@ -41,21 +66,18 @@ function loadProductsByType(typeKey, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     const products = [];
-    
+   
     snapshot.forEach((docSnap) => {
       const data = { id: docSnap.id, ...docSnap.data() };
       products.push(data);
       const card = createProductCard(data, typeKey);
       container.appendChild(card);
     });
-
     if (containerId === 'newCarousel' || containerId === 'starCarousel') {
       handleAutoCarousel(container, products.length, containerId);
     }
-
     duplicateForInfiniteScroll(containerId);
   });
-
   window[`unsubscribe_${containerId}`] = unsubscribe;
 }
 
@@ -87,11 +109,9 @@ function createProductCard(p, sectionType) {
   const div = document.createElement('div');
   div.className = 'product-card';
   div.dataset.id = p.id;
-
-  const stockInfo = p.disponibles > 0 
-    ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>` 
+  const stockInfo = p.disponibles > 0
+    ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>`
     : '';
-
   if (sectionType === 'normal') {
     div.innerHTML = `
       <img src="${p.imagen}" alt="${p.nombre}">
@@ -123,13 +143,11 @@ function createProductCard(p, sectionType) {
 window.editProduct = (id) => {
   const card = document.querySelector(`.product-card[data-id="${id}"]`);
   if (!card) return;
-
   const p = {
     nombre: card.querySelector('h3').textContent,
     precio: parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0),
     imagen: card.querySelector('img').src
   };
-
   document.getElementById('editName').value = p.nombre;
   document.getElementById('editPrice').value = p.precio;
   document.getElementById('editImage').value = p.imagen;
@@ -168,7 +186,6 @@ document.getElementById('addPostBtn').onclick = () => {
   });
   document.getElementById('addImageFile').value = '';
   document.getElementById('imagePreview').style.display = 'none';
-
   // Resetear cantidad
   const box = document.getElementById('availableBox');
   const input = document.getElementById('addAvailableCount');
@@ -184,7 +201,6 @@ document.getElementById('availableBox').onclick = () => {
   const box = document.getElementById('availableBox');
   const inputContainer = document.getElementById('availableInput');
   const input = document.getElementById('addAvailableCount');
-
   box.style.display = 'none';
   inputContainer.style.display = 'block';
   input.focus();
@@ -195,7 +211,6 @@ document.getElementById('addAvailableCount').addEventListener('blur', () => {
   const box = document.getElementById('availableBox');
   const inputContainer = document.getElementById('availableInput');
   const value = document.getElementById('addAvailableCount').value.trim();
-
   box.textContent = value && value !== '0' ? value : '+';
   box.style.display = 'flex';
   inputContainer.style.display = 'none';
@@ -205,7 +220,6 @@ document.getElementById('addAvailableCount').addEventListener('blur', () => {
 document.getElementById('saveNewProduct').onclick = async () => {
   const url = document.getElementById('addImage').value.trim();
   const hasFile = document.getElementById('addImageFile').files.length > 0;
-
   if (hasFile && !url) {
     showToast("Usa URL por ahora");
     return;
@@ -214,13 +228,11 @@ document.getElementById('saveNewProduct').onclick = async () => {
     showToast("Agrega imagen");
     return;
   }
-
   const typeValue = document.getElementById('addType').value;
   let typeObj = { normal: false, carrusel: false, anuncio: false };
   if (typeValue === 'carrusel') typeObj.carrusel = true;
   else if (typeValue === 'publicidad') typeObj.anuncio = true;
   else if (typeValue === 'normal') typeObj.normal = true;
-
   const producto = {
     nombre: document.getElementById('addName').value.trim(),
     precio: parseFloat(document.getElementById('addPrice').value),
@@ -232,12 +244,10 @@ document.getElementById('saveNewProduct').onclick = async () => {
     disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
     creado: new Date()
   };
-
   if (!producto.nombre || !producto.precio || !typeValue) {
     showToast("Faltan datos");
     return;
   }
-
   await addDoc(collection(db, "productos"), producto);
   showToast("Producto agregado");
   closeModal('addProductModal');
@@ -248,9 +258,7 @@ document.getElementById('openSocialModal').onclick = () => {
   document.getElementById('socialLinksModal').classList.add('active');
   loadSocialLinks();
 };
-
 document.getElementById('cancelSocial').onclick = () => closeModal('socialLinksModal');
-
 document.getElementById('saveSocialLinks').onclick = async () => {
   const links = {
     tiktok: document.getElementById('tiktokInput').value.trim(),
@@ -259,7 +267,6 @@ document.getElementById('saveSocialLinks').onclick = async () => {
     x: document.getElementById('xInput').value.trim(),
     whatsapp: document.getElementById('whatsappInput').value.trim()
   };
-
   await setDoc(doc(db, "links", "social"), links, { merge: true });
   showToast("Redes guardadas");
   closeModal('socialLinksModal');
@@ -285,8 +292,8 @@ document.querySelectorAll('[id^="cancel"]').forEach(btn => {
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => e.target === m && closeModal(m.id));
 });
-function closeModal(id) { 
-  document.getElementById(id).classList.remove('active'); 
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
 }
 
 // === TOAST ===
@@ -309,7 +316,6 @@ document.getElementById('toggleTextEdit').onclick = () => {
   textEditMode = !textEditMode;
   const controls = document.getElementById('textEditControls');
   const editables = document.querySelectorAll('[contenteditable="true"]');
-
   if (textEditMode) {
     controls.classList.add('active');
     editables.forEach(el => el.classList.add('editing'));
@@ -350,5 +356,6 @@ onSnapshot(doc(db, "textos", "hero"), snap => {
   }
 });
 
-// === INICIAR REDES ===
+// === INICIAR REDES Y TEXTOS ===
 loadSocialLinks();
+loadEditableTexts(); // Añadido: carga textos desde Firebase
