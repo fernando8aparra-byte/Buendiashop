@@ -54,6 +54,11 @@ document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearc
   el.style.fill = 'none';
 });
 
+// === BORDE NEGRO AL BOTÓN "IR A PAGO" ===
+goToPay.style.border = '2px solid #000';
+goToPay.style.borderRadius = '8px';
+goToPay.style.fontWeight = '600';
+
 // === TÍTULOS DINÁMICOS ===
 function loadTitles() {
   onSnapshot(doc(db, "textos", "hero"), (snap) => {
@@ -198,12 +203,8 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
   }));
   window.allProducts = allProducts;
 
-  // Carrusel anuncios (infinito)
   renderCarousel(starCarousel, p => p.type?.anuncio);
-
-  // Carrusel nuevos (sin flechas, swipe, 12s rápido)
   createNewCarousel();
-
   renderGrid();
 });
 
@@ -223,7 +224,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SIN FLECHAS, SWIPE, 12s RÁPIDO) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + DRAG + 12s RÁPIDO) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -238,15 +239,19 @@ function createNewCarousel() {
 
   let current = 0;
   let autoplayInterval;
+  let isDragging = false;
+  let startX = 0;
+  let currentTranslate = 0;
+  let prevTranslate = 0;
 
-  // Crear slides con enlace
+  // Crear slides
   track.innerHTML = items.map(p => `
-    <div class="slide" onclick="window.location.href='product.html?id=${p.id}'" style="cursor:pointer;">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+    <div class="slide" style="cursor:pointer;">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'">
     </div>
   `).join('');
 
-  // Crear dots
+  // Dots
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i===0?'aria-current="true"':''}></button>
   `).join('');
@@ -255,7 +260,7 @@ function createNewCarousel() {
 
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 0.4s ease'; // RÁPIDO
+    track.style.transition = 'transform 0.4s ease';
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -272,24 +277,52 @@ function createNewCarousel() {
 
   function next() { goToSlide(current + 1); }
 
-  // Eventos dots
-  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
-
-  // Swipe
-  let touchStartX = 0;
-  track.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX;
+  // === DRAG & SWIPE ===
+  function startDrag(e) {
+    isDragging = true;
+    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    prevTranslate = currentTranslate;
+    track.style.transition = 'none';
     stopAutoplay();
-  }, { passive: true });
-  track.addEventListener('touchend', e => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? next() : goToSlide(current - 1);
+  }
+
+  function drag(e) {
+    if (!isDragging) return;
+    const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    const diff = currentX - startX;
+    currentTranslate = prevTranslate + diff;
+    track.style.transform = `translateX(${currentTranslate}px)`;
+  }
+
+  function endDrag(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    track.style.transition = 'transform 0.4s ease';
+
+    const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
+    if (Math.abs(movedBy) > 50) {
+      movedBy > 0 ? goToSlide(current - 1) : next();
+    } else {
+      goToSlide(current);
     }
     startAutoplay();
-  }, { passive: true });
+  }
 
-  // Autoplay cada 12 segundos
+  // Eventos touch (móvil)
+  track.addEventListener('touchstart', startDrag, { passive: true });
+  track.addEventListener('touchmove', drag, { passive: true });
+  track.addEventListener('touchend', endDrag, { passive: true });
+
+  // Eventos mouse (PC)
+  track.addEventListener('mousedown', startDrag);
+  track.addEventListener('mousemove', drag);
+  track.addEventListener('mouseup', endDrag);
+  track.addEventListener('mouseleave', endDrag);
+
+  // Dots
+  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
+
+  // Autoplay
   function startAutoplay() {
     stopAutoplay();
     autoplayInterval = setInterval(next, 12000);
