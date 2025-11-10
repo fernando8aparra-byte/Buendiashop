@@ -29,13 +29,11 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 1.2px;
   margin-bottom: 12px;
 }
-
 h1 { font-size: 3.75rem; line-height: 1.1; letter-spacing: -0.025em; }
 h2 { font-size: 2.25rem; line-height: 1.2; letter-spacing: 0.05em; }
 h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 
-.product-title,
-.card-info h3 {
+.product-title, .card-info h3 {
   font-weight: 700;
   font-size: 1.25rem;
   line-height: 1.4;
@@ -45,8 +43,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   color: #111111;
 }
 
-.price,
-.product-price {
+.price, .product-price {
   font-weight: 800;
   font-size: 1.875rem;
   line-height: 1.2;
@@ -68,8 +65,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   font-weight: 900;
 }
 
-.desc,
-.product-description {
+.desc, .product-description {
   font-weight: 400;
   font-size: 0.875rem;
   line-height: 1.6;
@@ -164,7 +160,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 #cartBadge {
   position: absolute;
   top: -6px;
-  right: -6px;
+ : -6px;
   background: #000000;
   color: #ffffff;
   font-size: 10px;
@@ -345,7 +341,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   CARRITO LATERAL (PAYPAL INTEGRADO)
+   CARRITO LATERAL
    ============================================= */
 .cart-sidebar {
   position: fixed;
@@ -404,6 +400,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .empty-cart {
@@ -470,25 +468,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   color: #111111;
 }
 
-#paypal-button-container {
-  margin: 0 auto 20px;
-  max-width: 280px;
-}
-
-#message {
-  margin-top: 20px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: 500;
-  min-height: 20px;
-  text-align: center;
-  font-size: 0.95rem;
-}
-
-#message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-#message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-#message.cancel { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-
 /* =============================================
    MAIN
    ============================================= */
@@ -505,7 +484,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   CARRUSEL INFINITO (SOLO IMÁGENES)
+   CARRUSEL INFINITO (ANUNCIOS) - SIN AUTO-SCROLL
    ============================================= */
 .infinite-carousel-section {
   margin-bottom: 80px;
@@ -516,11 +495,12 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   padding: 20px 0;
 }
 
-.carousel-track {
+.infinite-carousel .carousel-track {
   display: flex;
   gap: 24px;
   width: max-content;
-  animation: scroll 40s linear infinite;
+  /* ANIMACIÓN DESACTIVADA */
+  animation: none !important;
 }
 
 .carousel-item {
@@ -533,7 +513,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transform: translateY(-8px);
 }
 
-/* IMAGEN ADAPTADA SIN DEFORMAR */
 .carousel-item img {
   width: 100%;
   height: 260px;
@@ -545,11 +524,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   margin: 0 auto;
   display: block;
   image-rendering: -webkit-optimize-contrast;
-}
-
-/* OCULTAR TODO TEXTO EN CARRUSEL */
-.carousel-item .item-info {
-  display: none !important;
 }
 
 /* =============================================
@@ -564,9 +538,11 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 @media (max-width: 480px) {
   .products-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
 @media (min-width: 481px) and (max-width: 900px) {
   .products-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
 @media (min-width: 901px) {
   .products-grid { grid-template-columns: repeat(4, 1fr); }
 }
@@ -581,7 +557,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transform: translateY(-10px);
 }
 
-/* IMAGEN ADAPTADA PERFECTAMENTE SIN DEFORMAR */
 .product-card img {
   width: 100%;
   height: 280px;
@@ -594,18 +569,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   display: block;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
-}
-
-/* OCULTAR INFO EN SECCIONES ESPECIALES */
-.products-grid.destacados .product-card > *:not(img),
-.products-grid.nuevos .product-card > *:not(img) {
-  display: none !important;
-}
-
-/* MOSTRAR INFO EN SECCIONES NORMALES */
-.products-grid.normal .card-info,
-.products-grid.normal .add-btn {
-  display: block;
 }
 
 .price-container {
@@ -642,6 +605,131 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
+   CARRUSEL NUEVOS LANZAMIENTOS - SWIPE + INDICADOR SINCRONIZADO
+   ============================================= */
+#newProductsCarousel {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 40px auto;
+  border-radius: 16px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#newCarouselTrack {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+  transition: transform 0.4s ease;
+}
+
+#newCarouselTrack .slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#newCarouselTrack .slide img {
+  width: 100%;
+  height: auto;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  image-rendering: -webkit-optimize-contrast;
+  pointer-events: auto;
+}
+
+/* PAGINACIÓN */
+#newPagination {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  height: 20px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#newPagination .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  transition: background 0.3s ease;
+}
+
+#newPagination .dot.active {
+  background: #000;
+}
+
+#newPagination .indicator {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: black;
+  transform: translateY(-50%);
+  transition: transform 0.35s cubic-bezier(0.22, 0.9, 0.28, 1);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  #newProductsCarousel { max-width: 320px; }
+  #newCarouselTrack .slide img { max-height: 300px; }
+  .main-container { padding: 30px 15px; }
+  .product-card img { height: 220px; }
+  .carousel-item { min-width: 180px; }
+  .carousel-item img { height: 200px; }
+}
+
+/* =============================================
+   BOTÓN IR A PAGO
+   ============================================= */
+#goToPay {
+  border: 2px solid #000 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 12px 20px !important;
+  background: #fff !important;
+  color: #000 !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-size: 1.3rem;
+  margin: 20px auto 0;
+  max-width: 280px;
+}
+
+#goToPay:hover {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+/* =============================================
    ANIMACIONES
    ============================================= */
 @keyframes fadeIn {
@@ -652,11 +740,6 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
-}
-
-@keyframes scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
 }
 
 @keyframes shake {
@@ -695,184 +778,4 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
-}
-
-/* =============================================
-   RESPONSIVE
-   ============================================= */
-@media (max-width: 480px) {
-  .main-container { padding: 30px 15px; }
-  .product-card img { height: 220px; }
-  .carousel-item { min-width: 180px; }
-  .carousel-item img { height: 200px; }
-}
-/* AÑADIDO AL FINAL */
-.cart-items {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-/* =============================================
-   CARRUSEL NUEVOS LANZAMIENTOS - INDICATOR PERFECTO
-   ============================================= */
-.carousel {
-  position: relative;
-  width: 100%;
-  max-width: 380px;
-  margin: 40px auto;
-  overflow: hidden;
-  border-radius: 16px;
-}
-
-.carousel-track {
-  display: flex;
-  transition: transform 0.5s cubic-bezier(0.22, 0.9, 0.28, 1);
-  width: 100%;
-}
-
-.slide {
-  min-width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 8px;
-  box-sizing: border-box;
-}
-
-.slide img {
-  width: 100%;
-  height: 100%;
-  max-height: 350px;
-  object-fit: cover;
-  border-radius: 16px;
-  image-rendering: -webkit-optimize-contrast;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
-
-/* PAGINACIÓN */
-.pagination {
-  margin-top: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.06);
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.3);
-  border: none;
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-  transition: background 0.3s ease;
-}
-
-.dot.active {
-  background: #000;
-}
-
-.indicator {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: black;
-  top: 50%;
-  left: 14px; /* padding-left del .pagination */
-  transform: translateY(-50%);
-  transition: transform 0.35s cubic-bezier(0.22, 0.9, 0.28, 1);
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  .carousel { max-width: 320px; }
-  .slide img { max-height: 300px; }
-}
-
-/* BORDE NEGRO AL BOTÓN "IR A PAGO" */
-#goToPay {
-  border: 2px solid #000 !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  padding: 12px 20px !important;
-  background: #fff !important;
-  color: #000 !important;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-#goToPay:hover {
-  background: #000 !important;
-  color: #fff !important;
-}
-/* CARRUSEL NUEVOS LANZAMIENTOS - 1.3s CAMBIO */
-#newCarouselTrack {
-  transition: transform 1.3s ease-in-out !important;
-}
-
-#newProductsCarousel {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  touch-action: pan-y;
-}
-
-#newCarouselTrack {
-  display: flex;
-  width: 100%;
-  will-change: transform;
-}
-
-#newCarouselTrack .slide {
-  min-width: 100%;
-  padding: 0 8px;
-  box-sizing: border-box;
-}
-
-#newPagination {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
-  height: 20px;
-}
-
-#newPagination .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ccc;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-#newPagination .dot.active {
-  background: #000;
-}
-
-#newPagination .indicator {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 20px;
-  height: 4px;
-  background: #000;
-  border-radius: 2px;
-  transform: translateY(-50%);
-  pointer-events: none;
-  transition: transform 0.4s ease;
 }
