@@ -820,3 +820,59 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 #newCarouselTrack {
   transition: transform 1.3s ease-in-out !important;
 }
+
+#newProductsCarousel {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  touch-action: pan-y;
+}
+
+#newCarouselTrack {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+}
+
+#newCarouselTrack .slide {
+  min-width: 100%;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+#newPagination {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  height: 20px;
+}
+
+#newPagination .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#newPagination .dot.active {
+  background: #000;
+}
+
+#newPagination .indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 20px;
+  height: 4px;
+  background: #000;
+  border-radius: 2px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform 0.4s ease;
+}
