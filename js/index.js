@@ -127,7 +127,7 @@ function loadSocialLinks() {
 
 // === DESPLEGABLES ===
 document.getElementById('categoriesToggle').onclick = () => {
-  const submenu = document.getElementById('categoriesSubmenu');
+  const submenu = document.getElement  .getElementById('categoriesSubmenu');
   submenu.classList.toggle('show');
   document.getElementById('categoriesToggle').classList.toggle('active');
 };
@@ -194,13 +194,13 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
   // Carrusel anuncios (infinito)
   renderCarousel(starCarousel, p => p.type?.anuncio);
 
-  // Carrusel nuevos (stacked)
-  const newCarouselSection = document.querySelector('.infinite-carousel-section');
-  createStackedCarousel(newCarouselSection, p => p.type?.carrusel);
+  // Carrusel nuevos (indicator perfecto)
+  createNewCarousel();
 
   renderGrid();
 });
 
+// === CARRUSEL ANUNCIOS (INFINITO) ===
 function renderCarousel(container, filterFn) {
   const filtered = allProducts.filter(filterFn);
   const displayItems = filtered.length >= 5 ? [...filtered, ...filtered] : filtered;
@@ -216,6 +216,69 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
+// === CARRUSEL NUEVOS LANZAMIENTOS - INDICATOR PERFECTO ===
+function createNewCarousel() {
+  const track = document.getElementById('newCarouselTrack');
+  const pagination = document.getElementById('newPagination');
+  const indicator = pagination.querySelector('.indicator');
+  const items = allProducts.filter(p => p.type?.carrusel);
+
+  if (items.length === 0) {
+    track.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
+    return;
+  }
+
+  let current = 0;
+
+  // Crear slides
+  track.innerHTML = items.map(p => `
+    <div class="slide">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+    </div>
+  `).join('');
+
+  // Crear dots
+  const dotsHTML = items.map((_, i) => `
+    <button class="dot" data-index="${i}" ${i===0?'aria-current="true"':''}></button>
+  `).join('');
+  pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
+  const dots = pagination.querySelectorAll('.dot');
+
+  function goToSlide(index) {
+    current = index;
+    track.style.transform = `translateX(-${index * 100}%)`;
+
+    // Actualizar dots
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+      dot.setAttribute('aria-current', i === index);
+    });
+
+    // Mover indicator
+    const activeDot = dots[index];
+    const parentRect = pagination.getBoundingClientRect();
+    const dotRect = activeDot.getBoundingClientRect();
+    const offset = dotRect.left - parentRect.left + (dotRect.width / 2) - (indicator.offsetWidth / 2);
+    indicator.style.transform = `translateY(-50%) translateX(${offset}px)`;
+  }
+
+  // Eventos
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
+  });
+
+  // Resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => goToSlide(current), 100);
+  });
+
+  // Iniciar
+  goToSlide(0);
+}
+
+// === GRID DE PRODUCTOS ===
 function renderGrid() {
   const normales = allProducts.filter(p => p.type?.normal);
   productsGrid.innerHTML = normales.map(p => `
@@ -232,97 +295,6 @@ function renderGrid() {
       </div>
     </div>
   `).join('');
-}
-
-// === CARRUSEL STACKED (NUEVOS LANZAMIENTOS) ===
-function createStackedCarousel(section, filterFn) {
-  const carousel = section.querySelector('.carousel');
-  const slidesContainer = carousel.querySelector('.slides');
-  const pagination = carousel.querySelector('.pagination');
-  const prevBtn = carousel.querySelector('.prev');
-  const nextBtn = carousel.querySelector('.next');
-  const playPauseBtn = carousel.querySelector('#playPauseBtn');
-  const playIcon = playPauseBtn.querySelector('.play');
-  const pauseIcon = playPauseBtn.querySelector('.pause');
-
-  let items = allProducts.filter(filterFn);
-  if (items.length === 0) {
-    slidesContainer.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
-    return;
-  }
-
-  let activeIndex = 0;
-  let isPlaying = true;
-  let autoplayInterval;
-
-  slidesContainer.innerHTML = items.map((p, i) => `
-    <div class="slide" data-index="${i}">
-      <img src="${p.imagen}" alt="${p.nombre}" class="slide-img" loading="lazy">
-    </div>
-  `).join('');
-
-  pagination.innerHTML = `
-    <div class="indicator"></div>
-    ${items.map((_, i) => `<button class="dot" aria-label="Ir al producto ${i+1}" ${i===0?'aria-current="true"':''}></button>`).join('')}
-  `;
-
-  const slides = slidesContainer.querySelectorAll('.slide');
-  const dots = pagination.querySelectorAll('.dot');
-  const indicator = pagination.querySelector('.indicator');
-
-  function update() {
-    slides.forEach((slide, i) => {
-      slide.classList.remove('is-active', 'is-prev', 'is-next');
-      if (i === activeIndex) slide.classList.add('is-active');
-      else if (i === (activeIndex - 1 + items.length) % items.length) slide.classList.add('is-prev');
-      else if (i === (activeIndex + 1) % items.length) slide.classList.add('is-next');
-    });
-
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === activeIndex);
-      dot.setAttribute('aria-current', i === activeIndex);
-    });
-
-    const activeDot = dots[activeIndex];
-    indicator.style.transform = `translateX(${activeDot.offsetLeft - 10}px)`;
-  }
-
-  function next() { activeIndex = (activeIndex + 1) % items.length; update(); }
-  function prev() { activeIndex = (activeIndex - 1 + items.length) % items.length; update(); }
-  function goTo(index) { activeIndex = index; update(); }
-
-  function togglePlay() {
-    isPlaying = !isPlaying;
-    playIcon.style.display = isPlaying ? 'none' : 'block';
-    pauseIcon.style.display = isPlaying ? 'block' : 'none';
-    isPlaying ? startAutoplay() : stopAutoplay();
-  }
-
-  function startAutoplay() { stopAutoplay(); autoplayInterval = setInterval(next, 4000); }
-  function stopAutoplay() { clearInterval(autoplayInterval); }
-
-  nextBtn.onclick = next;
-  prevBtn.onclick = prev;
-  playPauseBtn.onclick = togglePlay;
-  dots.forEach((dot, i) => dot.onclick = () => goTo(i));
-  update();
-  startAutoplay();
-
-  let touchStartX = 0;
-  slidesContainer.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
-  slidesContainer.addEventListener('touchend', e => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
-  });
-
-  carousel.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') prev();
-    if (e.key === 'ArrowRight') next();
-    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
-  });
-
-  carousel.addEventListener('mouseenter', stopAutoplay);
-  carousel.addEventListener('mouseleave', () => isPlaying && startAutoplay());
 }
 
 // === BÚSQUEDA ===
