@@ -1,4 +1,3 @@
-// js/index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -121,7 +120,7 @@ function loadSocialLinks() {
       { key: 'instagram', icon: 'https://imgfz.com/i/instagram-logo.png' },
       { key: 'x', icon: 'https://imgfz.com/i/x-logo.png' },
       { key: 'facebook', icon: 'https://imgfz.com/i/facebook-logo.png' },
-      { key: 'youtube', icon: 'https://imgfz.com/i/youtube-logo.png' },
+      { key: 'youTube', icon: 'https://imgfz.com/i/youtube-logo.png' },
       { key: 'tiktok', icon: 'https://imgfz.com/i/tiktok-logo.png' },
       { key: 'whatsapp', icon: 'https://imgfz.com/i/whatsapp-logo.png' }
     ];
@@ -224,9 +223,8 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (12s ESTÁTICO + 1.3s CAMBIO) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (CORREGIDO CON SWIPE TÁCTIL) ===
 function createNewCarousel() {
-  const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
   const pagination = document.getElementById('newPagination');
   const indicator = pagination.querySelector('.indicator');
@@ -239,29 +237,25 @@ function createNewCarousel() {
 
   let current = 0;
   let autoplayInterval;
-  let isDragging = false;
-  let startX = 0;
-  let currentTranslate = 0;
-  let prevTranslate = 0;
 
-  // === CADA IMAGEN EN SU PROPIO CONTENEDOR ===
+  // === RENDER SLIDES ===
   track.innerHTML = items.map(p => `
     <div class="slide">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'" style="pointer-events:auto;">
     </div>
   `).join('');
 
-  // Dots
+  // === DOTS ===
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i===0?'aria-current="true"':''}></button>
   `).join('');
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === ANIMACIÓN DE CAMBIO: 1.3s ===
+  // === goToSlide: ACTUALIZA IMAGEN + INDICADOR ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 1.3s ease-in-out'; // 1.3s
+    track.style.transition = 'transform 1.3s ease-in-out';
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -278,66 +272,85 @@ function createNewCarousel() {
 
   function next() { goToSlide(current + 1); }
 
-  // === DRAG & SWIPE ===
-  function startDrag(e) {
+  // === SOPORTE TÁCTIL (SWIPE) - LÓGICA EXACTA QUE PEDISTE ===
+  let startX = 0;
+
+  track.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+    stopAutoplay(); // Pausar al tocar
+  }, { passive: true });
+
+  track.addEventListener("touchend", (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const deltaX = endX - startX;
+
+    if (deltaX > 40) {
+      goToSlide(current - 1); // Derecha → anterior
+    } else if (deltaX < -40) {
+      goToSlide(current + 1); // Izquierda → siguiente
+    }
+
+    startAutoplay(); // Reanudar
+  });
+
+  // === SOPORTE MOUSE (DRAG) - OPCIONAL, SIN ROMPER ===
+  let isDragging = false;
+  let mouseStartX = 0;
+
+  track.addEventListener('mousedown', (e) => {
     isDragging = true;
-    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-    prevTranslate = currentTranslate;
+    mouseStartX = e.pageX;
     track.style.transition = 'none';
     stopAutoplay();
-  }
+  });
 
-  function drag(e) {
+  track.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
-    const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
-    const diff = currentX - startX;
-    currentTranslate = prevTranslate + diff;
-    track.style.transform = `translateX(${currentTranslate}px)`;
-  }
+    const diff = e.pageX - mouseStartX;
+    track.style.transform = `translateX(calc(-${current * 100}% + ${diff}px))`;
+  });
 
-  function endDrag(e) {
+  track.addEventListener('mouseup', (e) => {
     if (!isDragging) return;
-    isDragging = false;
+’isDragging = false;
     track.style.transition = 'transform 1.3s ease-in-out';
 
-    const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
+    const movedBy = e.pageX - mouseStartX;
     if (Math.abs(movedBy) > 50) {
-      movedBy > 0 ? goToSlide(current - 1) : next();
+      movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
     startAutoplay();
-  }
+  });
 
-  track.addEventListener('touchstart', startDrag, { passive: true });
-  track.addEventListener('touchmove', drag, { passive: true });
-  track.addEventListener('touchend', endDrag, { passive: true });
+  track.addEventListener('mouseleave', () => {
+    if (isDragging) {
+      isDragging = false;
+      track.style.transition = 'transform 1.3s ease-in-out';
+      goToSlide(current);
+      startAutoplay();
+    }
+  });
 
-  track.addEventListener('mousedown', startDrag);
-  track.addEventListener('mousemove', drag);
-  track.addEventListener('mouseup', endDrag);
-  track.addEventListener('mouseleave', endDrag);
-
-  // Dots
+  // === DOTS CLICKEABLES ===
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
 
-  // === AUTOPLAY: 12s ESTÁTICO + 1.3s CAMBIO ===
+  // === AUTOPLAY ===
   function startAutoplay() {
     stopAutoplay();
-    autoplayInterval = setInterval(() => {
-      next();
-    }, 12000 + 1300); // 12s + 1.3s
+    autoplayInterval = setInterval(next, 12000 + 1300);
   }
   function stopAutoplay() { clearInterval(autoplayInterval); }
 
-  // Resize
+  // === RESIZE ===
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => goToSlide(current), 100);
   });
 
-  // Iniciar
+  // === INICIAR ===
   goToSlide(0);
   startAutoplay();
 }
