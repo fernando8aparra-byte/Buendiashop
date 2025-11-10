@@ -68,7 +68,6 @@ function loadTitles() {
       document.getElementById("heroTag").textContent = subtitulo || "Envío Gratis en compras +$1,500";
     }
   });
-
   onSnapshot(doc(db, "textos", "secciones"), (snap) => {
     if (snap.exists()) {
       const data = snap.data();
@@ -83,7 +82,6 @@ function loadTitles() {
 async function loadProductTypes() {
   const submenu = document.getElementById('categoriesSubmenu');
   submenu.innerHTML = '<div class="submenu-item">Cargando...</div>';
-
   try {
     const snapshot = await getDocs(collection(db, "productos"));
     const tipos = new Set();
@@ -91,13 +89,11 @@ async function loadProductTypes() {
       const tipo = doc.data().tipo;
       if (tipo) tipos.add(tipo);
     });
-
     submenu.innerHTML = '';
     if (tipos.size === 0) {
       submenu.innerHTML = '<div class="submenu-item">No hay categorías</div>';
       return;
     }
-
     [...tipos].sort().forEach(tipo => {
       const item = document.createElement('div');
       item.className = 'submenu-item';
@@ -143,7 +139,6 @@ document.getElementById('categoriesToggle').onclick = () => {
   submenu.classList.toggle('show');
   document.getElementById('categoriesToggle').classList.toggle('active');
 };
-
 document.getElementById('contactToggle').onclick = () => {
   const submenu = document.getElementById('contactDropdown');
   submenu.classList.toggle('show');
@@ -172,7 +167,6 @@ function updateCart() {
     `).join('');
   goToPay.style.display = cart.length > 0 ? 'block' : 'none';
 }
-
 window.addToCart = (id) => {
   const product = window.allProducts.find(p => p.id === id);
   if (!product) return showToast("Producto no encontrado");
@@ -183,14 +177,12 @@ window.addToCart = (id) => {
   updateCart();
   showToast('¡Agregado al carrito!');
 };
-
 window.removeFromCart = (i) => {
   cart.splice(i, 1);
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCart();
   showToast('Producto eliminado');
 };
-
 goToPay.onclick = () => window.location.href = 'pago.html';
 
 // === PRODUCTOS ===
@@ -202,17 +194,15 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
     type: doc.data().type || { normal: true }
   }));
   window.allProducts = allProducts;
-
   renderCarousel(starCarousel, p => p.type?.anuncio);
   createNewCarousel();
   renderGrid();
 });
 
-// === CARRUSEL ANUNCIOS (INFINITO) ===
+// === CARRUSEL ANUNCIOS (SIN MOVIMIENTO AUTOMÁTICO) ===
 function renderCarousel(container, filterFn) {
   const filtered = allProducts.filter(filterFn);
   const displayItems = filtered.length >= 5 ? [...filtered, ...filtered] : filtered;
-
   container.innerHTML = displayItems.length === 0
     ? '<p style="color:#999; text-align:center; padding:40px;">No hay productos</p>'
     : displayItems.map(p => `
@@ -220,8 +210,9 @@ function renderCarousel(container, filterFn) {
         <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
     `).join('');
-
-  container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
+  
+  // CAMBIO CLAVE: DESACTIVAR ANIMACIÓN AUTOMÁTICA
+  container.style.animation = 'none';
 }
 
 // === CARRUSEL NUEVOS LANZAMIENTOS (SOLO SWIPE) ===
@@ -231,53 +222,44 @@ function createNewCarousel() {
   const pagination = document.getElementById('newPagination');
   const indicator = pagination.querySelector('.indicator');
   const items = allProducts.filter(p => p.type?.carrusel);
-
   if (items.length === 0) {
     track.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
     return;
   }
-
   let current = 0;
   let isDragging = false;
   let startX = 0;
   let currentTranslate = 0;
   let prevTranslate = 0;
-
   // === CADA IMAGEN EN SU PROPIO CONTENEDOR ===
   track.innerHTML = items.map(p => `
     <div class="slide">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'" style="pointer-events:auto;">
     </div>
   `).join('');
-
   // Dots
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i===0?'aria-current="true"':''}></button>
   `).join('');
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
-
   // === ANIMACIÓN DE CAMBIO: 0.4s RÁPIDO ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     track.style.transition = 'transform 0.4s ease';
     track.style.transform = `translateX(-${current * 100}%)`;
-
     dots.forEach((dot, i) => {
       dot.classList.toggle('active', i === current);
       dot.setAttribute('aria-current', i === current);
     });
-
     const activeDot = dots[current];
     const parentRect = pagination.getBoundingClientRect();
     const dotRect = activeDot.getBoundingClientRect();
     const offset = dotRect.left - parentRect.left + (dotRect.width / 2) - (indicator.offsetWidth / 2);
     indicator.style.transform = `translateY(-50%) translateX(${offset}px)`;
   }
-
   function next() { goToSlide(current + 1); }
   function prev() { goToSlide(current - 1); }
-
   // === DRAG & SWIPE (EN CADA IMAGEN) ===
   function startDrag(e) {
     isDragging = true;
@@ -285,7 +267,6 @@ function createNewCarousel() {
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
   }
-
   function drag(e) {
     if (!isDragging) return;
     const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
@@ -293,12 +274,10 @@ function createNewCarousel() {
     currentTranslate = prevTranslate + diff;
     track.style.transform = `translateX(${currentTranslate}px)`;
   }
-
   function endDrag(e) {
     if (!isDragging) return;
     isDragging = false;
     track.style.transition = 'transform 0.4s ease';
-
     const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
     if (Math.abs(movedBy) > 50) {
       movedBy > 0 ? prev() : next();
@@ -306,29 +285,24 @@ function createNewCarousel() {
       goToSlide(current);
     }
   }
-
   // === LISTENERS EN CADA IMAGEN ===
   document.querySelectorAll('.slide img').forEach(img => {
     img.addEventListener('touchstart', startDrag, { passive: true });
     img.addEventListener('touchmove', drag, { passive: true });
     img.addEventListener('touchend', endDrag, { passive: true });
-
     img.addEventListener('mousedown', startDrag);
     img.addEventListener('mousemove', drag);
     img.addEventListener('mouseup', endDrag);
     img.addEventListener('mouseleave', endDrag);
   });
-
   // Dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
-
   // Resize
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => goToSlide(current), 100);
   });
-
   // Iniciar
   goToSlide(0);
 }
