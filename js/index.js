@@ -1,3 +1,4 @@
+// js/index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -223,7 +224,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (CORREGIDO: SWIPE EN IMÁGENES) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SOLO SWIPE) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -237,7 +238,6 @@ function createNewCarousel() {
   }
 
   let current = 0;
-  let autoplayInterval;
   let isDragging = false;
   let startX = 0;
   let currentTranslate = 0;
@@ -257,10 +257,10 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === ANIMACIÓN DE CAMBIO: 1.3s ===
+  // === ANIMACIÓN DE CAMBIO: 0.4s RÁPIDO ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 1.3s ease-in-out';
+    track.style.transition = 'transform 0.4s ease';
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -276,14 +276,14 @@ function createNewCarousel() {
   }
 
   function next() { goToSlide(current + 1); }
+  function prev() { goToSlide(current - 1); }
 
-  // === DRAG & SWIPE ===
+  // === DRAG & SWIPE (EN CADA IMAGEN) ===
   function startDrag(e) {
     isDragging = true;
     startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
-    stopAutoplay();
   }
 
   function drag(e) {
@@ -297,18 +297,17 @@ function createNewCarousel() {
   function endDrag(e) {
     if (!isDragging) return;
     isDragging = false;
-    track.style.transition = 'transform 1.3s ease-in-out';
+    track.style.transition = 'transform 0.4s ease';
 
     const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
     if (Math.abs(movedBy) > 50) {
-      movedBy > 0 ? goToSlide(current - 1) : next();
+      movedBy > 0 ? prev() : next();
     } else {
       goToSlide(current);
     }
-    startAutoplay();
   }
 
-  // === LISTENERS EN CADA IMAGEN (NO EN TRACK) ===
+  // === LISTENERS EN CADA IMAGEN ===
   document.querySelectorAll('.slide img').forEach(img => {
     img.addEventListener('touchstart', startDrag, { passive: true });
     img.addEventListener('touchmove', drag, { passive: true });
@@ -323,15 +322,6 @@ function createNewCarousel() {
   // Dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
 
-  // === AUTOPLAY: 12s ESTÁTICO + 1.3s CAMBIO ===
-  function startAutoplay() {
-    stopAutoplay();
-    autoplayInterval = setInterval(() => {
-      next();
-    }, 12000 + 1300);
-  }
-  function stopAutoplay() { clearInterval(autoplayInterval); }
-
   // Resize
   let resizeTimeout;
   window.addEventListener('resize', () => {
@@ -341,7 +331,6 @@ function createNewCarousel() {
 
   // Iniciar
   goToSlide(0);
-  startAutoplay();
 }
 
 // === GRID DE PRODUCTOS ===
