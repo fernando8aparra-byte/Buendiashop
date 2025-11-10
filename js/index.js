@@ -1,4 +1,3 @@
-// js/index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -224,7 +223,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (12s ESTÁTICO + 1.3s CAMBIO) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (CORREGIDO: SWIPE EN IMÁGENES) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -261,7 +260,7 @@ function createNewCarousel() {
   // === ANIMACIÓN DE CAMBIO: 1.3s ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 1.3s ease-in-out'; // 1.3s
+    track.style.transition = 'transform 1.3s ease-in-out';
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -309,14 +308,17 @@ function createNewCarousel() {
     startAutoplay();
   }
 
-  track.addEventListener('touchstart', startDrag, { passive: true });
-  track.addEventListener('touchmove', drag, { passive: true });
-  track.addEventListener('touchend', endDrag, { passive: true });
+  // === LISTENERS EN CADA IMAGEN (NO EN TRACK) ===
+  document.querySelectorAll('.slide img').forEach(img => {
+    img.addEventListener('touchstart', startDrag, { passive: true });
+    img.addEventListener('touchmove', drag, { passive: true });
+    img.addEventListener('touchend', endDrag, { passive: true });
 
-  track.addEventListener('mousedown', startDrag);
-  track.addEventListener('mousemove', drag);
-  track.addEventListener('mouseup', endDrag);
-  track.addEventListener('mouseleave', endDrag);
+    img.addEventListener('mousedown', startDrag);
+    img.addEventListener('mousemove', drag);
+    img.addEventListener('mouseup', endDrag);
+    img.addEventListener('mouseleave', endDrag);
+  });
 
   // Dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
@@ -326,7 +328,7 @@ function createNewCarousel() {
     stopAutoplay();
     autoplayInterval = setInterval(() => {
       next();
-    }, 12000 + 1300); // 12s + 1.3s
+    }, 12000 + 1300);
   }
   function stopAutoplay() { clearInterval(autoplayInterval); }
 
