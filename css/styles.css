@@ -799,3 +799,20 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   .carousel { max-width: 320px; }
   .slide img { max-height: 300px; }
 }
+
+/* BORDE NEGRO AL BOTÓN "IR A PAGO" */
+#goToPay {
+  border: 2px solid #000 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 12px 20px !important;
+  background: #fff !important;
+  color: #000 !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#goToPay:hover {
+  background: #000 !important;
+  color: #fff !important;
+}
