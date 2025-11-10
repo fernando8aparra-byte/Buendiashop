@@ -215,7 +215,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + PASTILLA SINCRONIZADA) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + IMAGEN + PASTILLA SINCRONIZADOS) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -240,8 +240,8 @@ function createNewCarousel() {
   track.innerHTML = items.map(p => `
     <div class="slide">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" 
-           onclick="window.location.href='product.html?id=${p.id}'" 
-           style="pointer-events:auto; width:100%; height:auto; border-radius:12px;">
+           onclick="event.stopPropagation(); window.location.href='product.html?id=${p.id}'"
+           style="width:100%; height:auto; border-radius:12px; display:block;">
     </div>
   `).join('');
 
@@ -252,13 +252,13 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === OBTENER ANCHO REAL DEL SLIDE (DESPUÉS DE RENDER) ===
+  // === CALCULAR ANCHO DEL SLIDE ===
   function updateSlideWidth() {
-    const firstSlide = track.querySelector('.slide');
-    slideWidth = firstSlide ? firstSlide.offsetWidth : 0;
+    const rect = carousel.getBoundingClientRect();
+    slideWidth = rect.width;
   }
 
-  // === MOVER AL SLIDE ===
+  // === IR AL SLIDE ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     currentTranslate = -current * slideWidth;
@@ -271,7 +271,7 @@ function createNewCarousel() {
       dot.setAttribute('aria-current', i === current);
     });
 
-    // Mover pastilla (indicador)
+    // Mover pastilla
     const activeDot = dots[current];
     const parentRect = pagination.getBoundingClientRect();
     const dotRect = activeDot.getBoundingClientRect();
@@ -282,9 +282,8 @@ function createNewCarousel() {
 
   // === DRAG & SWIPE ===
   function startDrag(e) {
-    if (e.type === 'touchstart') e = e.touches[0];
     isDragging = true;
-    startX = e.clientX;
+    startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
     indicator.style.transition = 'none';
@@ -293,8 +292,7 @@ function createNewCarousel() {
 
   function drag(e) {
     if (!isDragging) return;
-    if (e.type === 'touchmove') e = e.touches[0];
-    const currentX = e.clientX;
+    const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     const diff = currentX - startX;
     currentTranslate = prevTranslate + diff;
     track.style.transform = `translateX(${currentTranslate}px)`;
@@ -310,14 +308,18 @@ function createNewCarousel() {
       ? e.changedTouches[0].clientX - startX 
       : e.clientX - startX;
 
-    if (Math.abs(movedBy) > slideWidth * 0.3) {
-      movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
+    if (Math.abs(movedBy) > slideWidth * 0.25) {
+      if (movedBy > 0) {
+        goToSlide(current - 1);
+      } else {
+        goToSlide(current + 1);
+      }
     } else {
       goToSlide(current);
     }
   }
 
-  // === EVENTOS EN TODO EL CARRUSEL (no solo en imágenes) ===
+  // === EVENTOS EN TODO EL CARRUSEL (NO EN IMÁGENES) ===
   carousel.addEventListener('touchstart', startDrag, { passive: true });
   carousel.addEventListener('touchmove', drag, { passive: true });
   carousel.addEventListener('touchend', endDrag);
@@ -329,13 +331,13 @@ function createNewCarousel() {
 
   // === CLICKS EN DOTS ===
   dots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      const index = parseInt(dot.dataset.index);
-      goToSlide(index);
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goToSlide(parseInt(dot.dataset.index));
     });
   });
 
-  // === RESIZE: RECALCULAR ANCHO ===
+  // === RESIZE ===
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
@@ -348,6 +350,7 @@ function createNewCarousel() {
   // === INICIALIZAR ===
   updateSlideWidth();
   goToSlide(0);
+}
 
   // Exponer para depuración (opcional)
   window.newCarouselAPI = { goToSlide, current: () => current };
