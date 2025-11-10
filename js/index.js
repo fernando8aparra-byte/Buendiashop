@@ -47,6 +47,13 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
+// === FORZAR ICONOS NEGROS ===
+document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch, .carousel-control svg').forEach(el => {
+  el.style.stroke = '#000000';
+  el.style.color = '#000000';
+  el.style.fill = 'none';
+});
+
 // === TÍTULOS DINÁMICOS ===
 function loadTitles() {
   onSnapshot(doc(db, "textos", "hero"), (snap) => {
@@ -127,7 +134,7 @@ function loadSocialLinks() {
 
 // === DESPLEGABLES ===
 document.getElementById('categoriesToggle').onclick = () => {
-  const submenu = document.getElement  .getElementById('categoriesSubmenu');
+  const submenu = document.getElementById('categoriesSubmenu');
   submenu.classList.toggle('show');
   document.getElementById('categoriesToggle').classList.toggle('active');
 };
@@ -194,7 +201,7 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
   // Carrusel anuncios (infinito)
   renderCarousel(starCarousel, p => p.type?.anuncio);
 
-  // Carrusel nuevos (indicator perfecto)
+  // Carrusel nuevos (con autoplay, swipe, flechas, click)
   createNewCarousel();
 
   renderGrid();
@@ -216,8 +223,9 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS - INDICATOR PERFECTO ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (AUTOPLAY 12s, SWIPE, FLECHAS, CLICK) ===
 function createNewCarousel() {
+  const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
   const pagination = document.getElementById('newPagination');
   const indicator = pagination.querySelector('.indicator');
@@ -229,10 +237,12 @@ function createNewCarousel() {
   }
 
   let current = 0;
+  let autoplayInterval;
+  let isPaused = false;
 
-  // Crear slides
+  // Crear slides con enlace
   track.innerHTML = items.map(p => `
-    <div class="slide">
+    <div class="slide" onclick="window.location.href='product.html?id=${p.id}'" style="cursor:pointer;">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
     </div>
   `).join('');
@@ -244,28 +254,70 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  function goToSlide(index) {
-    current = index;
-    track.style.transform = `translateX(-${index * 100}%)`;
+  // Flechas
+  const prevBtn = carousel.querySelector('.carousel-control.prev') || createArrow('prev');
+  const nextBtn = carousel.querySelector('.carousel-control.next') || createArrow('next');
+  if (!carousel.querySelector('.carousel-control')) {
+    carousel.appendChild(prevBtn);
+    carousel.appendChild(nextBtn);
+  }
 
-    // Actualizar dots
+  function createArrow(dir) {
+    const btn = document.createElement('button');
+    btn.className = `carousel-control ${dir}`;
+    btn.innerHTML = dir === 'prev'
+      ? `<svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 18l-6-6 6-6" stroke="#000" stroke-width="2" fill="none"/></svg>`
+      : `<svg viewBox="0 0 24 24" width="28" height="28"><path d="M9 6l6 6-6 6" stroke="#000" stroke-width="2" fill="none"/></svg>`;
+    btn.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Siguiente');
+    return btn;
+  }
+
+  function goToSlide(index) {
+    current = (index + items.length) % items.length;
+    track.style.transition = 'transform 0.4s ease';
+    track.style.transform = `translateX(-${current * 100}%)`;
+
     dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
-      dot.setAttribute('aria-current', i === index);
+      dot.classList.toggle('active', i === current);
+      dot.setAttribute('aria-current', i === current);
     });
 
-    // Mover indicator
-    const activeDot = dots[index];
+    const activeDot = dots[current];
     const parentRect = pagination.getBoundingClientRect();
     const dotRect = activeDot.getBoundingClientRect();
     const offset = dotRect.left - parentRect.left + (dotRect.width / 2) - (indicator.offsetWidth / 2);
     indicator.style.transform = `translateY(-50%) translateX(${offset}px)`;
   }
 
+  function next() { goToSlide(current + 1); }
+  function prev() { goToSlide(current - 1); }
+
   // Eventos
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
-  });
+  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
+  nextBtn.onclick = next;
+  prevBtn.onclick = prev;
+
+  // Autoplay cada 12 segundos
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayInterval = setInterval(next, 12000);
+  }
+  function stopAutoplay() { clearInterval(autoplayInterval); }
+
+  // Swipe
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; stopAutoplay(); }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? next() : prev();
+    }
+    startAutoplay();
+  }, { passive: true });
+
+  // Pausa en hover
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', startAutoplay);
 
   // Resize
   let resizeTimeout;
@@ -276,6 +328,7 @@ function createNewCarousel() {
 
   // Iniciar
   goToSlide(0);
+  startAutoplay();
 }
 
 // === GRID DE PRODUCTOS ===
