@@ -48,7 +48,7 @@ const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
 // === FORZAR ICONOS NEGROS ===
-document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch, .carousel-control svg').forEach(el => {
+document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch').forEach(el => {
   el.style.stroke = '#000000';
   el.style.color = '#000000';
   el.style.fill = 'none';
@@ -201,7 +201,7 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
   // Carrusel anuncios (infinito)
   renderCarousel(starCarousel, p => p.type?.anuncio);
 
-  // Carrusel nuevos (con autoplay, swipe, flechas, click)
+  // Carrusel nuevos (sin flechas, swipe, 12s rápido)
   createNewCarousel();
 
   renderGrid();
@@ -223,7 +223,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (AUTOPLAY 12s, SWIPE, FLECHAS, CLICK) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SIN FLECHAS, SWIPE, 12s RÁPIDO) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -238,7 +238,6 @@ function createNewCarousel() {
 
   let current = 0;
   let autoplayInterval;
-  let isPaused = false;
 
   // Crear slides con enlace
   track.innerHTML = items.map(p => `
@@ -254,27 +253,9 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // Flechas
-  const prevBtn = carousel.querySelector('.carousel-control.prev') || createArrow('prev');
-  const nextBtn = carousel.querySelector('.carousel-control.next') || createArrow('next');
-  if (!carousel.querySelector('.carousel-control')) {
-    carousel.appendChild(prevBtn);
-    carousel.appendChild(nextBtn);
-  }
-
-  function createArrow(dir) {
-    const btn = document.createElement('button');
-    btn.className = `carousel-control ${dir}`;
-    btn.innerHTML = dir === 'prev'
-      ? `<svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 18l-6-6 6-6" stroke="#000" stroke-width="2" fill="none"/></svg>`
-      : `<svg viewBox="0 0 24 24" width="28" height="28"><path d="M9 6l6 6-6 6" stroke="#000" stroke-width="2" fill="none"/></svg>`;
-    btn.setAttribute('aria-label', dir === 'prev' ? 'Anterior' : 'Siguiente');
-    return btn;
-  }
-
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 0.4s ease';
+    track.style.transition = 'transform 0.4s ease'; // RÁPIDO
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -290,12 +271,23 @@ function createNewCarousel() {
   }
 
   function next() { goToSlide(current + 1); }
-  function prev() { goToSlide(current - 1); }
 
-  // Eventos
+  // Eventos dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
-  nextBtn.onclick = next;
-  prevBtn.onclick = prev;
+
+  // Swipe
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    stopAutoplay();
+  }, { passive: true });
+  track.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? next() : goToSlide(current - 1);
+    }
+    startAutoplay();
+  }, { passive: true });
 
   // Autoplay cada 12 segundos
   function startAutoplay() {
@@ -303,21 +295,6 @@ function createNewCarousel() {
     autoplayInterval = setInterval(next, 12000);
   }
   function stopAutoplay() { clearInterval(autoplayInterval); }
-
-  // Swipe
-  let touchStartX = 0;
-  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; stopAutoplay(); }, { passive: true });
-  track.addEventListener('touchend', e => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? next() : prev();
-    }
-    startAutoplay();
-  }, { passive: true });
-
-  // Pausa en hover
-  carousel.addEventListener('mouseenter', stopAutoplay);
-  carousel.addEventListener('mouseleave', startAutoplay);
 
   // Resize
   let resizeTimeout;
