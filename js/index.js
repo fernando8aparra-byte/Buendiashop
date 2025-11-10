@@ -210,8 +210,8 @@ function renderCarousel(container, filterFn) {
         <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
     `).join('');
-  
-  // CAMBIO CLAVE: DESACTIVAR ANIMACIÓN AUTOMÁTICA
+
+  // DESACTIVAR ANIMACIÓN AUTOMÁTICA
   container.style.animation = 'none';
 }
 
@@ -239,9 +239,9 @@ function createNewCarousel() {
   // === RENDER SLIDES ===
   track.innerHTML = items.map(p => `
     <div class="slide">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" 
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy"
            onclick="event.stopPropagation(); window.location.href='product.html?id=${p.id}'"
-           style="width:100%; height:auto; border-radius:12px; display:block;">
+           style="width:100%; height:auto; border-radius:16px; display:block;">
     </div>
   `).join('');
 
@@ -271,7 +271,7 @@ function createNewCarousel() {
       dot.setAttribute('aria-current', i === current);
     });
 
-    // Mover pastilla
+    // Mover pastilla (indicador)
     const activeDot = dots[current];
     const parentRect = pagination.getBoundingClientRect();
     const dotRect = activeDot.getBoundingClientRect();
@@ -304,8 +304,8 @@ function createNewCarousel() {
     track.style.transition = 'transform 0.4s ease';
     indicator.style.transition = 'transform 0.4s ease';
 
-    const movedBy = e.type.includes('touch') 
-      ? e.changedTouches[0].clientX - startX 
+    const movedBy = e.type.includes('touch')
+      ? e.changedTouches[0].clientX - startX
       : e.clientX - startX;
 
     if (Math.abs(movedBy) > slideWidth * 0.25) {
@@ -319,7 +319,7 @@ function createNewCarousel() {
     }
   }
 
-  // === EVENTOS EN TODO EL CARRUSEL (NO EN IMÁGENES) ===
+  // === EVENTOS EN TODO EL CARRUSEL ===
   carousel.addEventListener('touchstart', startDrag, { passive: true });
   carousel.addEventListener('touchmove', drag, { passive: true });
   carousel.addEventListener('touchend', endDrag);
@@ -350,10 +350,6 @@ function createNewCarousel() {
   // === INICIALIZAR ===
   updateSlideWidth();
   goToSlide(0);
-}
-
-  // Exponer para depuración (opcional)
-  window.newCarouselAPI = { goToSlide, current: () => current };
 }
 
 // === GRID DE PRODUCTOS ===
