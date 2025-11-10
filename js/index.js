@@ -215,7 +215,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE PERFECTO EN iOS + ANDROID) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + SOLO PUNTITOS CENTRADOS) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -240,42 +240,44 @@ function createNewCarousel() {
     <div class="slide">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy"
            onclick="event.stopPropagation(); window.location.href='product.html?id=${p.id}'"
-           style="pointer-events:none; width:100%; height:auto; border-radius:16px; display:block;">
+           style="width:100%; height:auto; border-radius:16px; display:block;">
     </div>
   `).join('');
 
-  // === RENDER PUNTITOS ===
+  // === RENDER SOLO PUNTITOS CENTRADOS ===
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>
   `).join('');
-  pagination.innerHTML = dotsHTML;
+  pagination.innerHTML = dotsHTML; // SIN .indicator
   const dots = pagination.querySelectorAll('.dot');
 
-  // === ANCHO DEL SLIDE ===
+  // === CALCULAR ANCHO ===
   function updateSlideWidth() {
-    slideWidth = carousel.offsetWidth;
+    const rect = carousel.getBoundingClientRect();
+    slideWidth = rect.width;
   }
 
   // === IR AL SLIDE ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     currentTranslate = -current * slideWidth;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
+    track.style.transition = 'transform 0.4s ease';
     track.style.transform = `translateX(${currentTranslate}px)`;
 
+    // Solo actualizar puntitos
     dots.forEach((dot, i) => {
       dot.classList.toggle('active', i === current);
+      dot.setAttribute('aria-current', i === current);
     });
   }
 
-  // === DRAG & SWIPE (OPTIMIZADO PARA iOS) ===
+  // === DRAG & SWIPE ===
   function startDrag(e) {
     isDragging = true;
     startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
     updateSlideWidth();
-    e.preventDefault();
   }
 
   function drag(e) {
@@ -289,24 +291,23 @@ function createNewCarousel() {
   function endDrag(e) {
     if (!isDragging) return;
     isDragging = false;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
+    track.style.transition = 'transform 0.4s ease';
 
     const movedBy = e.type.includes('touch')
       ? e.changedTouches[0].clientX - startX
       : e.clientX - startX;
 
-    if (Math.abs(movedBy) > slideWidth * 0.2) {
+    if (Math.abs(movedBy) > slideWidth * 0.25) {
       movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
   }
 
-  // === EVENTOS EN TODO EL CARRUSEL ===
-  carousel.addEventListener('touchstart', startDrag, { passive: false });
-  carousel.addEventListener('touchmove', drag, { passive: false });
+  // === EVENTOS EN CARRUSEL ===
+  carousel.addEventListener('touchstart', startDrag, { passive: true });
+  carousel.addEventListener('touchmove', drag, { passive: true });
   carousel.addEventListener('touchend', endDrag);
-
   carousel.addEventListener('mousedown', startDrag);
   carousel.addEventListener('mousemove', drag);
   carousel.addEventListener('mouseup', endDrag);
@@ -321,8 +322,10 @@ function createNewCarousel() {
   });
 
   // === RESIZE ===
+  let resizeTimeout;
   window.addEventListener('resize', () => {
-    setTimeout(() => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
       updateSlideWidth();
       goToSlide(current);
     }, 100);
