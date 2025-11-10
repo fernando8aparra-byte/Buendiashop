@@ -61,16 +61,21 @@
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (STACKED + PARALLAX) -->
-    <section class="infinite-carousel-section">
-      <h2 id="titleNew">Nuevos Lanzamientos</h2>
+   <!-- CARRUSEL: NUEVOS LANZAMIENTOS (STACKED + INDICATOR PERFECTO) -->
+<section class="infinite-carousel-section">
+  <h2 id="titleNew">Nuevos Lanzamientos</h2>
 
-      <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Nuevos Lanzamientos">
-        <!-- SLIDES -->
-        <div class="slides" id="newSlides">
-          <!-- SE LLENA CON JS DESDE FIREBASE -->
-        </div>
+  <div class="carousel" id="newProductsCarousel">
+    <div class="carousel-track" id="newCarouselTrack">
+      <!-- SE LLENA CON JS DESDE FIREBASE -->
+    </div>
 
+    <div class="pagination" id="newPagination">
+      <div class="indicator"></div>
+      <!-- DOTS SE CREAN CON JS -->
+    </div>
+  </div>
+</section>
         <!-- FLECHAS -->
         <button class="carousel-control prev" aria-label="Producto anterior">
           <svg viewBox="0 0 24 24" width="32" height="32">
