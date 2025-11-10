@@ -215,12 +215,11 @@ function renderCarousel(container, filterFn) {
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + IMAGEN + PASTILLA SINCRONIZADOS) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + SOLO PUNTITOS CENTRADOS) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
   const pagination = document.getElementById('newPagination');
-  const indicator = pagination.querySelector('.indicator');
   const items = allProducts.filter(p => p.type?.carrusel);
 
   if (items.length === 0) {
@@ -245,14 +244,14 @@ function createNewCarousel() {
     </div>
   `).join('');
 
-  // === RENDER DOTS ===
+  // === RENDER SOLO PUNTITOS CENTRADOS ===
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>
   `).join('');
-  pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
+  pagination.innerHTML = dotsHTML; // SIN .indicator
   const dots = pagination.querySelectorAll('.dot');
 
-  // === CALCULAR ANCHO DEL SLIDE ===
+  // === CALCULAR ANCHO ===
   function updateSlideWidth() {
     const rect = carousel.getBoundingClientRect();
     slideWidth = rect.width;
@@ -265,19 +264,11 @@ function createNewCarousel() {
     track.style.transition = 'transform 0.4s ease';
     track.style.transform = `translateX(${currentTranslate}px)`;
 
-    // Actualizar dots
+    // Solo actualizar puntitos
     dots.forEach((dot, i) => {
       dot.classList.toggle('active', i === current);
       dot.setAttribute('aria-current', i === current);
     });
-
-    // Mover pastilla (indicador)
-    const activeDot = dots[current];
-    const parentRect = pagination.getBoundingClientRect();
-    const dotRect = activeDot.getBoundingClientRect();
-    const offset = dotRect.left - parentRect.left + (dotRect.width / 2) - (indicator.offsetWidth / 2);
-    indicator.style.transition = 'transform 0.4s ease';
-    indicator.style.transform = `translateX(${offset}px) translateY(-50%)`;
   }
 
   // === DRAG & SWIPE ===
@@ -286,7 +277,6 @@ function createNewCarousel() {
     startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
-    indicator.style.transition = 'none';
     updateSlideWidth();
   }
 
@@ -302,34 +292,28 @@ function createNewCarousel() {
     if (!isDragging) return;
     isDragging = false;
     track.style.transition = 'transform 0.4s ease';
-    indicator.style.transition = 'transform 0.4s ease';
 
     const movedBy = e.type.includes('touch')
       ? e.changedTouches[0].clientX - startX
       : e.clientX - startX;
 
     if (Math.abs(movedBy) > slideWidth * 0.25) {
-      if (movedBy > 0) {
-        goToSlide(current - 1);
-      } else {
-        goToSlide(current + 1);
-      }
+      movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
   }
 
-  // === EVENTOS EN TODO EL CARRUSEL ===
+  // === EVENTOS EN CARRUSEL ===
   carousel.addEventListener('touchstart', startDrag, { passive: true });
   carousel.addEventListener('touchmove', drag, { passive: true });
   carousel.addEventListener('touchend', endDrag);
-
   carousel.addEventListener('mousedown', startDrag);
   carousel.addEventListener('mousemove', drag);
   carousel.addEventListener('mouseup', endDrag);
   carousel.addEventListener('mouseleave', endDrag);
 
-  // === CLICKS EN DOTS ===
+  // === CLICKS EN PUNTITOS ===
   dots.forEach(dot => {
     dot.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -347,7 +331,7 @@ function createNewCarousel() {
     }, 100);
   });
 
-  // === INICIALIZAR ===
+  // === INICIAR ===
   updateSlideWidth();
   goToSlide(0);
 }
