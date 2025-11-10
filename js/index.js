@@ -46,11 +46,10 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
-// === FORZAR ICONOS NEGROS ===
-document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch').forEach(el => {
-  el.style.stroke = '#000000';
-  el.style.color = '#000000';
-  el.style.fill = 'none';
+// === ICONOS DEL HEADER EN NEGRO (REFORZADO) ===
+document.querySelectorAll('#menuBtn svg, #searchBtn svg, #cartBtn svg').forEach(svg => {
+  svg.style.stroke = '#000';
+  svg.style.fill = 'none';
 });
 
 // === BORDE NEGRO AL BOTÓN "IR A PAGO" ===
@@ -120,7 +119,7 @@ function loadSocialLinks() {
       { key: 'instagram', icon: 'https://imgfz.com/i/instagram-logo.png' },
       { key: 'x', icon: 'https://imgfz.com/i/x-logo.png' },
       { key: 'facebook', icon: 'https://imgfz.com/i/facebook-logo.png' },
-      { key: 'youTube', icon: 'https://imgfz.com/i/youtube-logo.png' },
+      { key: 'youtube', icon: 'https://imgfz.com/i/youtube-logo.png' },
       { key: 'tiktok', icon: 'https://imgfz.com/i/tiktok-logo.png' },
       { key: 'whatsapp', icon: 'https://imgfz.com/i/whatsapp-logo.png' }
     ];
@@ -151,6 +150,7 @@ document.getElementById('contactToggle').onclick = () => {
 
 // === CARRITO ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
@@ -223,8 +223,9 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (CORREGIDO CON SWIPE TÁCTIL) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS — CORREGIDO CON SWIPE TÁCTIL ===
 function createNewCarousel() {
+  const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
   const pagination = document.getElementById('newPagination');
   const indicator = pagination.querySelector('.indicator');
@@ -252,7 +253,7 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === goToSlide: ACTUALIZA IMAGEN + INDICADOR ===
+  // === goToSlide: ACTUALIZA TODO ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     track.style.transition = 'transform 1.3s ease-in-out';
@@ -272,12 +273,12 @@ function createNewCarousel() {
 
   function next() { goToSlide(current + 1); }
 
-  // === SOPORTE TÁCTIL (SWIPE) - LÓGICA EXACTA QUE PEDISTE ===
+  // === SOPORTE TÁCTIL: SWIPE SIMPLE (LO QUE PEDISTE) ===
   let startX = 0;
 
   track.addEventListener("touchstart", (e) => {
     startX = e.touches[0].clientX;
-    stopAutoplay(); // Pausar al tocar
+    stopAutoplay();
   }, { passive: true });
 
   track.addEventListener("touchend", (e) => {
@@ -290,47 +291,7 @@ function createNewCarousel() {
       goToSlide(current + 1); // Izquierda → siguiente
     }
 
-    startAutoplay(); // Reanudar
-  });
-
-  // === SOPORTE MOUSE (DRAG) - OPCIONAL, SIN ROMPER ===
-  let isDragging = false;
-  let mouseStartX = 0;
-
-  track.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    mouseStartX = e.pageX;
-    track.style.transition = 'none';
-    stopAutoplay();
-  });
-
-  track.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const diff = e.pageX - mouseStartX;
-    track.style.transform = `translateX(calc(-${current * 100}% + ${diff}px))`;
-  });
-
-  track.addEventListener('mouseup', (e) => {
-    if (!isDragging) return;
-’isDragging = false;
-    track.style.transition = 'transform 1.3s ease-in-out';
-
-    const movedBy = e.pageX - mouseStartX;
-    if (Math.abs(movedBy) > 50) {
-      movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
-    } else {
-      goToSlide(current);
-    }
     startAutoplay();
-  });
-
-  track.addEventListener('mouseleave', () => {
-    if (isDragging) {
-      isDragging = false;
-      track.style.transition = 'transform 1.3s ease-in-out';
-      goToSlide(current);
-      startAutoplay();
-    }
   });
 
   // === DOTS CLICKEABLES ===
