@@ -61,15 +61,44 @@
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (STACKED + PARALLAX) -->
     <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="newCarousel"></div>
+
+      <div class="carousel" role="region" aria-roledescription="carousel" aria-label="Nuevos Lanzamientos">
+        <!-- SLIDES -->
+        <div class="slides" id="newSlides">
+          <!-- SE LLENA CON JS DESDE FIREBASE -->
+        </div>
+
+        <!-- FLECHAS -->
+        <button class="carousel-control prev" aria-label="Producto anterior">
+          <svg viewBox="0 0 24 24" width="32" height="32">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </button>
+        <button class="carousel-control next" aria-label="Siguiente producto">
+          <svg viewBox="0 0 24 24" width="32" height="32">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
+        </button>
+
+        <!-- PAGINACIÓN -->
+        <div class="pagination" id="newPagination"></div>
+
+        <!-- PLAY/PAUSE -->
+        <button class="play-pause" id="playPauseBtn" aria-label="Reproducir/Pausar">
+          <svg class="play" viewBox="0 0 24 24" width="20" height="20">
+            <path d="M8 5v14l11-7z" fill="currentColor"/>
+          </svg>
+          <svg class="pause" viewBox="0 0 24 24" width="20" height="20" style="display:none;">
+            <path d="M6 4h4v16H6zm8 0h4v16h-4z" fill="currentColor"/>
+          </svg>
+        </button>
       </div>
     </section>
 
-    <!-- CARRUSEL: ANUNCIOS -->
+    <!-- CARRUSEL: ANUNCIOS (INFINITO) -->
     <section class="infinite-carousel-section">
       <h2 id="titleStar">Anuncios</h2>
       <div class="infinite-carousel">
