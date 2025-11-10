@@ -1,5 +1,5 @@
 /* =============================================
-   ESTILO CLON EXACTO DE DROP-SHOP.MX + ADAPTACIÓN PERFECTA DE IMÁGENES
+   ESTILO CLON EXACTO DE DROP-SHOP.MX + OPTIMIZADO PARA iOS/ANDROID/PC
    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
@@ -18,6 +18,7 @@ html, body {
   letter-spacing: 0.025em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 /* =============================================
@@ -604,7 +605,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   CARRUSEL NUEVOS LANZAMIENTOS - SWIPE + SOLO PUNTITOS CENTRADOS
+   CARRUSEL NUEVOS LANZAMIENTOS - SWIPE + SOLO PUNTITOS CENTRADOS (iOS/ANDROID)
    ============================================= */
 #newProductsCarousel {
   overflow: hidden;
@@ -616,6 +617,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0);
 }
 
 #newCarouselTrack {
@@ -623,6 +626,8 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   width: 100%;
   will-change: transform;
   transition: transform 0.4s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 #newCarouselTrack .slide {
@@ -643,7 +648,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   image-rendering: -webkit-optimize-contrast;
-  pointer-events: auto;
+  pointer-events: none;
+  user-drag: none;
+  -webkit-user-drag: none;
 }
 
 /* PAGINACIÓN - SOLO PUNTITOS CENTRADOS */
@@ -676,16 +683,25 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transform: scale(1.2);
 }
 
-/* ELIMINAR COMPLETAMENTE LA PASTILLA GRANDE */
+/* ELIMINAR PASTILLA */
 #newPagination .indicator {
   display: none !important;
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE MÓVIL */
 @media (max-width: 480px) {
-  #newProductsCarousel { max-width: 320px; }
-  #newCarouselTrack .slide img { max-height: 300px; }
-  .main-container { padding: 30px 15px; }
+  #newProductsCarousel { 
+    max-width: 100%; 
+    margin: 30px 15px;
+    border-radius: 12px;
+  }
+  #newCarouselTrack .slide img { 
+    max-height: 280px; 
+    border-radius: 12px;
+  }
+  .main-container { 
+    padding: 20px 15px; 
+  }
   .product-card img { height: 220px; }
   .carousel-item { min-width: 180px; }
   .carousel-item img { height: 200px; }
