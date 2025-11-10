@@ -36,7 +36,6 @@ const closeSearch = document.getElementById('closeSearch');
 const searchInput = document.getElementById('searchInput');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 const searchResults = document.getElementById('searchResults');
-const newCarousel = document.getElementById('newCarousel');
 const starCarousel = document.getElementById('starCarousel');
 const productsGrid = document.getElementById('productsGrid');
 const cartBadge = document.getElementById('cartBadge');
@@ -191,20 +190,30 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
     type: doc.data().type || { normal: true }
   }));
   window.allProducts = allProducts;
-  renderCarousel(newCarousel, p => p.type?.carrusel);
+
+  // Carrusel anuncios (infinito)
   renderCarousel(starCarousel, p => p.type?.anuncio);
+
+  // Carrusel nuevos (stacked)
+  const newCarouselSection = document.querySelector('.infinite-carousel-section');
+  createStackedCarousel(newCarouselSection, p => p.type?.carrusel);
+
   renderGrid();
 });
 
 function renderCarousel(container, filterFn) {
   const filtered = allProducts.filter(filterFn);
-  container.innerHTML = filtered.length === 0
+  const displayItems = filtered.length >= 5 ? [...filtered, ...filtered] : filtered;
+
+  container.innerHTML = displayItems.length === 0
     ? '<p style="color:#999; text-align:center; padding:40px;">No hay productos</p>'
-    : [...filtered, ...filtered].map(p => `
+    : displayItems.map(p => `
       <div class="carousel-item" onclick="window.location.href='product.html?id=${p.id}'">
         <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
     `).join('');
+
+  container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
 function renderGrid() {
@@ -223,6 +232,97 @@ function renderGrid() {
       </div>
     </div>
   `).join('');
+}
+
+// === CARRUSEL STACKED (NUEVOS LANZAMIENTOS) ===
+function createStackedCarousel(section, filterFn) {
+  const carousel = section.querySelector('.carousel');
+  const slidesContainer = carousel.querySelector('.slides');
+  const pagination = carousel.querySelector('.pagination');
+  const prevBtn = carousel.querySelector('.prev');
+  const nextBtn = carousel.querySelector('.next');
+  const playPauseBtn = carousel.querySelector('#playPauseBtn');
+  const playIcon = playPauseBtn.querySelector('.play');
+  const pauseIcon = playPauseBtn.querySelector('.pause');
+
+  let items = allProducts.filter(filterFn);
+  if (items.length === 0) {
+    slidesContainer.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
+    return;
+  }
+
+  let activeIndex = 0;
+  let isPlaying = true;
+  let autoplayInterval;
+
+  slidesContainer.innerHTML = items.map((p, i) => `
+    <div class="slide" data-index="${i}">
+      <img src="${p.imagen}" alt="${p.nombre}" class="slide-img" loading="lazy">
+    </div>
+  `).join('');
+
+  pagination.innerHTML = `
+    <div class="indicator"></div>
+    ${items.map((_, i) => `<button class="dot" aria-label="Ir al producto ${i+1}" ${i===0?'aria-current="true"':''}></button>`).join('')}
+  `;
+
+  const slides = slidesContainer.querySelectorAll('.slide');
+  const dots = pagination.querySelectorAll('.dot');
+  const indicator = pagination.querySelector('.indicator');
+
+  function update() {
+    slides.forEach((slide, i) => {
+      slide.classList.remove('is-active', 'is-prev', 'is-next');
+      if (i === activeIndex) slide.classList.add('is-active');
+      else if (i === (activeIndex - 1 + items.length) % items.length) slide.classList.add('is-prev');
+      else if (i === (activeIndex + 1) % items.length) slide.classList.add('is-next');
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === activeIndex);
+      dot.setAttribute('aria-current', i === activeIndex);
+    });
+
+    const activeDot = dots[activeIndex];
+    indicator.style.transform = `translateX(${activeDot.offsetLeft - 10}px)`;
+  }
+
+  function next() { activeIndex = (activeIndex + 1) % items.length; update(); }
+  function prev() { activeIndex = (activeIndex - 1 + items.length) % items.length; update(); }
+  function goTo(index) { activeIndex = index; update(); }
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    playIcon.style.display = isPlaying ? 'none' : 'block';
+    pauseIcon.style.display = isPlaying ? 'block' : 'none';
+    isPlaying ? startAutoplay() : stopAutoplay();
+  }
+
+  function startAutoplay() { stopAutoplay(); autoplayInterval = setInterval(next, 4000); }
+  function stopAutoplay() { clearInterval(autoplayInterval); }
+
+  nextBtn.onclick = next;
+  prevBtn.onclick = prev;
+  playPauseBtn.onclick = togglePlay;
+  dots.forEach((dot, i) => dot.onclick = () => goTo(i));
+  update();
+  startAutoplay();
+
+  let touchStartX = 0;
+  slidesContainer.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+  slidesContainer.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+  });
+
+  carousel.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'ArrowRight') next();
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  });
+
+  carousel.addEventListener('mouseenter', stopAutoplay);
+  carousel.addEventListener('mouseleave', () => isPlaying && startAutoplay());
 }
 
 // === BÚSQUEDA ===
