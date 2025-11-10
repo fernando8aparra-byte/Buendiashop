@@ -1,3 +1,4 @@
+// js/index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -46,10 +47,11 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 
-// === ICONOS DEL HEADER EN NEGRO (REFORZADO) ===
-document.querySelectorAll('#menuBtn svg, #searchBtn svg, #cartBtn svg').forEach(svg => {
-  svg.style.stroke = '#000';
-  svg.style.fill = 'none';
+// === FORZAR ICONOS NEGROS ===
+document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch').forEach(el => {
+  el.style.stroke = '#000000';
+  el.style.color = '#000000';
+  el.style.fill = 'none';
 });
 
 // === BORDE NEGRO AL BOTÓN "IR A PAGO" ===
@@ -150,7 +152,6 @@ document.getElementById('contactToggle').onclick = () => {
 
 // === CARRITO ===
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
@@ -223,7 +224,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS — CORREGIDO CON SWIPE TÁCTIL ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (12s ESTÁTICO + 1.3s CAMBIO) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -238,25 +239,29 @@ function createNewCarousel() {
 
   let current = 0;
   let autoplayInterval;
+  let isDragging = false;
+  let startX = 0;
+  let currentTranslate = 0;
+  let prevTranslate = 0;
 
-  // === RENDER SLIDES ===
+  // === CADA IMAGEN EN SU PROPIO CONTENEDOR ===
   track.innerHTML = items.map(p => `
     <div class="slide">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'" style="pointer-events:auto;">
     </div>
   `).join('');
 
-  // === DOTS ===
+  // Dots
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i===0?'aria-current="true"':''}></button>
   `).join('');
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === goToSlide: ACTUALIZA TODO ===
+  // === ANIMACIÓN DE CAMBIO: 1.3s ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 1.3s ease-in-out';
+    track.style.transition = 'transform 1.3s ease-in-out'; // 1.3s
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -273,45 +278,66 @@ function createNewCarousel() {
 
   function next() { goToSlide(current + 1); }
 
-  // === SOPORTE TÁCTIL: SWIPE SIMPLE (LO QUE PEDISTE) ===
-  let startX = 0;
-
-  track.addEventListener("touchstart", (e) => {
-    startX = e.touches[0].clientX;
+  // === DRAG & SWIPE ===
+  function startDrag(e) {
+    isDragging = true;
+    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    prevTranslate = currentTranslate;
+    track.style.transition = 'none';
     stopAutoplay();
-  }, { passive: true });
+  }
 
-  track.addEventListener("touchend", (e) => {
-    const endX = e.changedTouches[0].clientX;
-    const deltaX = endX - startX;
+  function drag(e) {
+    if (!isDragging) return;
+    const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    const diff = currentX - startX;
+    currentTranslate = prevTranslate + diff;
+    track.style.transform = `translateX(${currentTranslate}px)`;
+  }
 
-    if (deltaX > 40) {
-      goToSlide(current - 1); // Derecha → anterior
-    } else if (deltaX < -40) {
-      goToSlide(current + 1); // Izquierda → siguiente
+  function endDrag(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    track.style.transition = 'transform 1.3s ease-in-out';
+
+    const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
+    if (Math.abs(movedBy) > 50) {
+      movedBy > 0 ? goToSlide(current - 1) : next();
+    } else {
+      goToSlide(current);
     }
-
     startAutoplay();
-  });
+  }
 
-  // === DOTS CLICKEABLES ===
+  track.addEventListener('touchstart', startDrag, { passive: true });
+  track.addEventListener('touchmove', drag, { passive: true });
+  track.addEventListener('touchend', endDrag, { passive: true });
+
+  track.addEventListener('mousedown', startDrag);
+  track.addEventListener('mousemove', drag);
+  track.addEventListener('mouseup', endDrag);
+  track.addEventListener('mouseleave', endDrag);
+
+  // Dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
 
-  // === AUTOPLAY ===
+  // === AUTOPLAY: 12s ESTÁTICO + 1.3s CAMBIO ===
   function startAutoplay() {
     stopAutoplay();
-    autoplayInterval = setInterval(next, 12000 + 1300);
+    autoplayInterval = setInterval(() => {
+      next();
+    }, 12000 + 1300); // 12s + 1.3s
   }
   function stopAutoplay() { clearInterval(autoplayInterval); }
 
-  // === RESIZE ===
+  // Resize
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => goToSlide(current), 100);
   });
 
-  // === INICIAR ===
+  // Iniciar
   goToSlide(0);
   startAutoplay();
 }
