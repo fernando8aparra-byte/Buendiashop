@@ -1,137 +1,148 @@
+
 <!DOCTYPE html>
-<html lang="es-MX">
+<html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="Boutique Buendía - Mystery Box y productos exclusivos con envío gratis en compras +$1,500" />
-  <meta name="theme-color" content="#ffffff" />
-  <title>Boutique Buendía | Mystery Box</title>
-
-  <!-- FUENTES -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-  <!-- ESTILOS -->
-  <link rel="stylesheet" href="styles.css" />
-
-  <!-- FORZAR CARGA DE IMÁGENES EN iOS -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('img').forEach(img => {
-        if (img.getAttribute('loading') === 'lazy') {
-          img.setAttribute('loading', 'eager');
-        }
-      });
-    });
-  </script>
-
-  <!-- ICONO -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efraín Shop</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- OVERLAYS -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <button id="menuBtn" class="icon-btn" aria-label="Menú">
-        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </button>
-
-      <h1 class="logo">BOUTIQUE BUENDÍA</h1>
-
+      <div class="logo">Boutique-buenday</div>
       <div class="search-cart-group">
         <button id="searchBtn" class="icon-btn" aria-label="Buscar">
-          <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2.5" fill="none"/>
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
         <button id="cartBtn" class="icon-btn" aria-label="Carrito">
-          <svg viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0v6m0-6l-1.5-7M7 19h10m-10 0a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span id="cartBadge">0</span>
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="cartBadge"></span>
         </button>
       </div>
     </div>
 
-    <!-- BÚSQUEDA -->
-    <div id="searchContainer" class="search-container">
+    <!-- BÚSQUEDA DESPLEGABLE -->
+    <div class="search-container" id="searchContainer">
       <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Buscar productos..." autocomplete="off" />
-        <button id="closeSearch" aria-label="Cerrar búsqueda">×</button>
-      </div>
-      <div id="searchResultsContainer" style="display:none; max-height:400px; overflow-y:auto; margin-top:16px;">
-        <div id="searchResults"></div>
+        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
+        <button id="closeSearch">×</button>
       </div>
     </div>
   </header>
 
-  <!-- MENÚ LATERAL -->
-  <div id="menuOverlay" class="menu-overlay"></div>
-  <aside id="menuSidebar" class="menu-sidebar">
-    <button id="closeMenu" class="menu-close" aria-label="Cerrar menú">×</button>
-    <div id="welcomeMsg" style="margin-bottom:16px; font-weight:600;"></div>
-    <button id="authBtn" style="margin-bottom:16px; padding:8px 0; background:none; border:none; font-weight:600; cursor:pointer;"></button>
-    <div class="menu-item dropdown-toggle" id="categoriesToggle">Categorías</div>
-    <div class="submenu" id="categoriesSubmenu"></div>
-    <div class="menu-item dropdown-toggle" id="contactToggle">Contacto</div>
-    <div class="submenu" id="contactDropdown">
-      <div class="submenu-item">Escríbenos a contacto@efrainshop.com</div>
-      <div class="submenu-item">Instagram @efrainshop</div>
-    </div>
-    <button id="helpBtn" class="menu-item" style="margin-top:auto;">Ayuda</button>
-  </aside>
+  <!-- RESULTADOS DE BÚSQUEDA -->
+  <div id="searchResultsContainer" style="display:none; padding:20px; background:#fff; margin:20px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div id="searchResults"></div>
+  </div>
 
-  <!-- CARRITO LATERAL -->
-  <aside id="cartSidebar" class="cart-sidebar">
-    <div class="cart-header">
-      <h3>Tu Carrito</h3>
-      <button id="closeCart" class="cart-close" aria-label="Cerrar carrito">×</button>
-    </div>
-    <div id="cartItems" class="cart-items"></div>
-    <div class="cart-footer">
-      <div id="cartTotal" class="cart-total">Total: $0</div>
-      <button id="goToPay" class="go-to-pay">IR A PAGO</button>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
+  <!-- CONTENIDO -->
   <main class="main-container">
     <!-- HERO -->
     <section class="hero-banner">
       <h1 id="heroTitle">Asegura tu Mystery Box</h1>
-      <p id="heroTag">Envío Gratis en compras +$1,500</p>
+      <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL NUEVOS LANZAMIENTOS -->
-    <section>
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (SOLO SWIPE) -->
+    <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
-      <div id="newProductsCarousel">
-        <div id="newCarouselTrack"></div>
+      <div class="carousel" id="newProductsCarousel">
+        <div class="carousel-track" id="newCarouselTrack">
+          <!-- SE LLENA CON JS DESDE FIREBASE -->
+        </div>
+        <div class="pagination" id="newPagination">
+          <div class="indicator"></div>
+          <!-- DOTS SE CREAN CON JS -->
+        </div>
       </div>
-      <div id="newPagination"></div>
     </section>
 
-    <!-- CARRUSEL ANUNCIOS (INFINITO ESTÁTICO) -->
+    <!-- CARRUSEL: ANUNCIOS (INFINITO) -->
     <section class="infinite-carousel-section">
       <h2 id="titleStar">Anuncios</h2>
-      <div id="starCarousel" class="infinite-carousel">
-        <div class="carousel-track"></div>
+      <div class="infinite-carousel">
+        <div class="carousel-track" id="starCarousel"></div>
       </div>
     </section>
 
-    <!-- GRID DE PRODUCTOS -->
+    <!-- TODOS LOS PRODUCTOS -->
     <section>
       <h2 id="titleAll">Todos los Productos</h2>
-      <div id="productsGrid" class="products-grid"></div>
-    </section>
-
-    <!-- REDES SOCIALES -->
-    <section style="text-align:center; margin:60px 0;">
-      <div id="socialLinksContainer" style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;"></div>
+      <div class="products-grid normal" id="productsGrid"></div>
     </section>
   </main>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast"></div>
+  <!-- MENÚ LATERAL -->
+  <aside class="menu-sidebar" id="menuSidebar">
+    <button class="menu-close" id="closeMenu">×</button>
+    <div class="menu-item welcome" id="welcomeMsg"></div>
 
-  <!-- FIREBASE -->
+    <!-- PRODUCTOS -->
+    <div class="menu-item dropdown-toggle" id="categoriesToggle">
+      Productos
+      <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
+        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="submenu" id="categoriesSubmenu">
+      <!-- CARGADO DESDE FIREBASE -->
+    </div>
+
+    <!-- CONTACTO -->
+    <div class="menu-item dropdown-toggle" id="contactToggle">
+      Contacto
+      <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
+        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="submenu" id="contactDropdown">
+      <p class="contact-text">Sígueme en mis redes sociales</p>
+      <div class="social-links" id="socialLinksContainer">
+        <!-- CARGADO DESDE FIREBASE -->
+      </div>
+    </div>
+
+    <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
+    <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
+  </aside>
+
+  <!-- CARRITO LATERAL -->
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3>Tu Carrito</h3>
+      <button class="cart-close" id="closeCart">×</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="empty-cart">Tu carrito está vacío</p>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total" id="cartTotal">Total: $0</div>
+      <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
+      <div id="message"></div>
+    </div>
+  </aside>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- SCRIPT -->
   <script type="module" src="js/index.js"></script>
 </body>
 </html>
