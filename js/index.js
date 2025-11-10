@@ -215,96 +215,142 @@ function renderCarousel(container, filterFn) {
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SOLO SWIPE) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + PASTILLA SINCRONIZADA) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
   const pagination = document.getElementById('newPagination');
   const indicator = pagination.querySelector('.indicator');
   const items = allProducts.filter(p => p.type?.carrusel);
+
   if (items.length === 0) {
     track.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
+    pagination.innerHTML = '';
     return;
   }
+
   let current = 0;
   let isDragging = false;
   let startX = 0;
   let currentTranslate = 0;
   let prevTranslate = 0;
-  // === CADA IMAGEN EN SU PROPIO CONTENEDOR ===
+  let slideWidth = 0;
+
+  // === RENDER SLIDES ===
   track.innerHTML = items.map(p => `
     <div class="slide">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'" style="pointer-events:auto;">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" 
+           onclick="window.location.href='product.html?id=${p.id}'" 
+           style="pointer-events:auto; width:100%; height:auto; border-radius:12px;">
     </div>
   `).join('');
-  // Dots
+
+  // === RENDER DOTS ===
   const dotsHTML = items.map((_, i) => `
-    <button class="dot" data-index="${i}" ${i===0?'aria-current="true"':''}></button>
+    <button class="dot" data-index="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>
   `).join('');
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
-  // === ANIMACIÓN DE CAMBIO: 0.4s RÁPIDO ===
+
+  // === OBTENER ANCHO REAL DEL SLIDE (DESPUÉS DE RENDER) ===
+  function updateSlideWidth() {
+    const firstSlide = track.querySelector('.slide');
+    slideWidth = firstSlide ? firstSlide.offsetWidth : 0;
+  }
+
+  // === MOVER AL SLIDE ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
+    currentTranslate = -current * slideWidth;
     track.style.transition = 'transform 0.4s ease';
-    track.style.transform = `translateX(-${current * 100}%)`;
+    track.style.transform = `translateX(${currentTranslate}px)`;
+
+    // Actualizar dots
     dots.forEach((dot, i) => {
       dot.classList.toggle('active', i === current);
       dot.setAttribute('aria-current', i === current);
     });
+
+    // Mover pastilla (indicador)
     const activeDot = dots[current];
     const parentRect = pagination.getBoundingClientRect();
     const dotRect = activeDot.getBoundingClientRect();
     const offset = dotRect.left - parentRect.left + (dotRect.width / 2) - (indicator.offsetWidth / 2);
-    indicator.style.transform = `translateY(-50%) translateX(${offset}px)`;
+    indicator.style.transition = 'transform 0.4s ease';
+    indicator.style.transform = `translateX(${offset}px) translateY(-50%)`;
   }
-  function next() { goToSlide(current + 1); }
-  function prev() { goToSlide(current - 1); }
-  // === DRAG & SWIPE (EN CADA IMAGEN) ===
+
+  // === DRAG & SWIPE ===
   function startDrag(e) {
+    if (e.type === 'touchstart') e = e.touches[0];
     isDragging = true;
-    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    startX = e.clientX;
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
+    indicator.style.transition = 'none';
+    updateSlideWidth();
   }
+
   function drag(e) {
     if (!isDragging) return;
-    const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    if (e.type === 'touchmove') e = e.touches[0];
+    const currentX = e.clientX;
     const diff = currentX - startX;
     currentTranslate = prevTranslate + diff;
     track.style.transform = `translateX(${currentTranslate}px)`;
   }
+
   function endDrag(e) {
     if (!isDragging) return;
     isDragging = false;
     track.style.transition = 'transform 0.4s ease';
-    const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
-    if (Math.abs(movedBy) > 50) {
-      movedBy > 0 ? prev() : next();
+    indicator.style.transition = 'transform 0.4s ease';
+
+    const movedBy = e.type.includes('touch') 
+      ? e.changedTouches[0].clientX - startX 
+      : e.clientX - startX;
+
+    if (Math.abs(movedBy) > slideWidth * 0.3) {
+      movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
   }
-  // === LISTENERS EN CADA IMAGEN ===
-  document.querySelectorAll('.slide img').forEach(img => {
-    img.addEventListener('touchstart', startDrag, { passive: true });
-    img.addEventListener('touchmove', drag, { passive: true });
-    img.addEventListener('touchend', endDrag, { passive: true });
-    img.addEventListener('mousedown', startDrag);
-    img.addEventListener('mousemove', drag);
-    img.addEventListener('mouseup', endDrag);
-    img.addEventListener('mouseleave', endDrag);
+
+  // === EVENTOS EN TODO EL CARRUSEL (no solo en imágenes) ===
+  carousel.addEventListener('touchstart', startDrag, { passive: true });
+  carousel.addEventListener('touchmove', drag, { passive: true });
+  carousel.addEventListener('touchend', endDrag);
+
+  carousel.addEventListener('mousedown', startDrag);
+  carousel.addEventListener('mousemove', drag);
+  carousel.addEventListener('mouseup', endDrag);
+  carousel.addEventListener('mouseleave', endDrag);
+
+  // === CLICKS EN DOTS ===
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.dataset.index);
+      goToSlide(index);
+    });
   });
-  // Dots
-  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
-  // Resize
+
+  // === RESIZE: RECALCULAR ANCHO ===
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => goToSlide(current), 100);
+    resizeTimeout = setTimeout(() => {
+      updateSlideWidth();
+      goToSlide(current);
+    }, 100);
   });
-  // Iniciar
+
+  // === INICIALIZAR ===
+  updateSlideWidth();
   goToSlide(0);
+
+  // Exponer para depuración (opcional)
+  window.newCarouselAPI = { goToSlide, current: () => current };
 }
 
 // === GRID DE PRODUCTOS ===
