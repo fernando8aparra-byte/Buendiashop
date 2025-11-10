@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-
   <!-- OVERLAYS -->
   <div class="menu-overlay" id="menuOverlay"></div>
 
@@ -54,50 +53,23 @@
 
   <!-- CONTENIDO -->
   <main class="main-container">
-
     <!-- HERO -->
     <section class="hero-banner">
       <h1 id="heroTitle">Asegura tu Mystery Box</h1>
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-   <!-- CARRUSEL: NUEVOS LANZAMIENTOS (STACKED + INDICATOR PERFECTO) -->
-<section class="infinite-carousel-section">
-  <h2 id="titleNew">Nuevos Lanzamientos</h2>
-
-  <div class="carousel" id="newProductsCarousel">
-    <div class="carousel-track" id="newCarouselTrack">
-      <!-- SE LLENA CON JS DESDE FIREBASE -->
-    </div>
-
-    <div class="pagination" id="newPagination">
-      <div class="indicator"></div>
-      <!-- DOTS SE CREAN CON JS -->
-    </div>
-  </div>
-</section>
-        <!-- FLECHAS -->
-          <svg viewBox="0 0 24 24" width="32" height="32">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none"/>
-          </svg>
-        </button>
-          <svg viewBox="0 0 24 24" width="32" height="32">
-            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/>
-          </svg>
-        </button>
-
-        <!-- PAGINACIÓN -->
-        <div class="pagination" id="newPagination"></div>
-
-        <!-- PLAY/PAUSE -->
-        <button class="play-pause" id="playPauseBtn" aria-label="Reproducir/Pausar">
-          <svg class="play" viewBox="0 0 24 24" width="20" height="20">
-            <path d="M8 5v14l11-7z" fill="currentColor"/>
-          </svg>
-          <svg class="pause" viewBox="0 0 24 24" width="20" height="20" style="display:none;">
-            <path d="M6 4h4v16H6zm8 0h4v16h-4z" fill="currentColor"/>
-          </svg>
-        </button>
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (SOLO SWIPE) -->
+    <section class="infinite-carousel-section">
+      <h2 id="titleNew">Nuevos Lanzamientos</h2>
+      <div class="carousel" id="newProductsCarousel">
+        <div class="carousel-track" id="newCarouselTrack">
+          <!-- SE LLENA CON JS DESDE FIREBASE -->
+        </div>
+        <div class="pagination" id="newPagination">
+          <div class="indicator"></div>
+          <!-- DOTS SE CREAN CON JS -->
+        </div>
       </div>
     </section>
 
@@ -114,7 +86,6 @@
       <h2 id="titleAll">Todos los Productos</h2>
       <div class="products-grid normal" id="productsGrid"></div>
     </section>
-
   </main>
 
   <!-- MENÚ LATERAL -->
