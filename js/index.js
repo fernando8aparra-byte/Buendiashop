@@ -224,7 +224,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + DRAG + 12s RÁPIDO) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (12s ESTÁTICO + 1.3s CAMBIO) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -244,10 +244,10 @@ function createNewCarousel() {
   let currentTranslate = 0;
   let prevTranslate = 0;
 
-  // Crear slides
+  // === CADA IMAGEN EN SU PROPIO CONTENEDOR ===
   track.innerHTML = items.map(p => `
-    <div class="slide" style="cursor:pointer;">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'">
+    <div class="slide">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'" style="pointer-events:auto;">
     </div>
   `).join('');
 
@@ -258,9 +258,10 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
+  // === ANIMACIÓN DE CAMBIO: 1.3s ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 0.4s ease';
+    track.style.transition = 'transform 1.3s ease-in-out'; // 1.3s
     track.style.transform = `translateX(-${current * 100}%)`;
 
     dots.forEach((dot, i) => {
@@ -297,7 +298,7 @@ function createNewCarousel() {
   function endDrag(e) {
     if (!isDragging) return;
     isDragging = false;
-    track.style.transition = 'transform 0.4s ease';
+    track.style.transition = 'transform 1.3s ease-in-out';
 
     const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
     if (Math.abs(movedBy) > 50) {
@@ -308,12 +309,10 @@ function createNewCarousel() {
     startAutoplay();
   }
 
-  // Eventos touch (móvil)
   track.addEventListener('touchstart', startDrag, { passive: true });
   track.addEventListener('touchmove', drag, { passive: true });
   track.addEventListener('touchend', endDrag, { passive: true });
 
-  // Eventos mouse (PC)
   track.addEventListener('mousedown', startDrag);
   track.addEventListener('mousemove', drag);
   track.addEventListener('mouseup', endDrag);
@@ -322,10 +321,12 @@ function createNewCarousel() {
   // Dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
 
-  // Autoplay
+  // === AUTOPLAY: 12s ESTÁTICO + 1.3s CAMBIO ===
   function startAutoplay() {
     stopAutoplay();
-    autoplayInterval = setInterval(next, 12000);
+    autoplayInterval = setInterval(() => {
+      next();
+    }, 12000 + 1300); // 12s + 1.3s
   }
   function stopAutoplay() { clearInterval(autoplayInterval); }
 
