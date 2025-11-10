@@ -223,7 +223,7 @@ function renderCarousel(container, filterFn) {
   container.style.animation = filtered.length >= 5 ? 'scroll 30s linear infinite' : 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS — CORREGIDO: DRAG EN % + FLEX + touch-action ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (CORREGIDO: SWIPE EN IMÁGENES) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -243,17 +243,10 @@ function createNewCarousel() {
   let currentTranslate = 0;
   let prevTranslate = 0;
 
-  // === ESTILOS FLEX + OVERFLOW + 100% ===
-  track.style.display = 'flex';
-  track.style.overflow = 'hidden';
-  track.style.width = '100%';
-
-  // === CADA SLIDE: min-width: 100% + touch-action ===
+  // === CADA IMAGEN EN SU PROPIO CONTENEDOR ===
   track.innerHTML = items.map(p => `
-    <div class="slide" style="min-width:100%; flex-shrink:0;">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" 
-           onclick="window.location.href='product.html?id=${p.id}'" 
-           style="pointer-events:auto; touch-action:pan-y; width:100%; height:100%; object-fit:cover;">
+    <div class="slide">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'" style="pointer-events:auto;">
     </div>
   `).join('');
 
@@ -264,7 +257,7 @@ function createNewCarousel() {
   pagination.innerHTML = `<div class="indicator"></div>${dotsHTML}`;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === goToSlide (SIN CAMBIOS) ===
+  // === ANIMACIÓN DE CAMBIO: 1.3s ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     track.style.transition = 'transform 1.3s ease-in-out';
@@ -284,7 +277,7 @@ function createNewCarousel() {
 
   function next() { goToSlide(current + 1); }
 
-  // === DRAG EN % ===
+  // === DRAG & SWIPE ===
   function startDrag(e) {
     isDragging = true;
     startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
@@ -297,8 +290,8 @@ function createNewCarousel() {
     if (!isDragging) return;
     const currentX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
     const diff = currentX - startX;
-    currentTranslate = prevTranslate + (diff / carousel.offsetWidth) * 100;
-    track.style.transform = `translateX(${currentTranslate}%)`;
+    currentTranslate = prevTranslate + diff;
+    track.style.transform = `translateX(${currentTranslate}px)`;
   }
 
   function endDrag(e) {
@@ -307,9 +300,7 @@ function createNewCarousel() {
     track.style.transition = 'transform 1.3s ease-in-out';
 
     const movedBy = e.type.includes('mouse') ? e.pageX - startX : e.changedTouches[0].clientX - startX;
-    const threshold = carousel.offsetWidth * 0 0.15; // 15% del ancho
-
-    if (Math.abs(movedBy) > threshold) {
+    if (Math.abs(movedBy) > 50) {
       movedBy > 0 ? goToSlide(current - 1) : next();
     } else {
       goToSlide(current);
@@ -317,7 +308,7 @@ function createNewCarousel() {
     startAutoplay();
   }
 
-  // === LISTENERS EN IMÁGENES ===
+  // === LISTENERS EN CADA IMAGEN (NO EN TRACK) ===
   document.querySelectorAll('.slide img').forEach(img => {
     img.addEventListener('touchstart', startDrag, { passive: true });
     img.addEventListener('touchmove', drag, { passive: true });
@@ -332,10 +323,12 @@ function createNewCarousel() {
   // Dots
   dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
 
-  // === AUTOPLAY ===
+  // === AUTOPLAY: 12s ESTÁTICO + 1.3s CAMBIO ===
   function startAutoplay() {
     stopAutoplay();
-    autoplayInterval = setInterval(next, 12000 + 1300);
+    autoplayInterval = setInterval(() => {
+      next();
+    }, 12000 + 1300);
   }
   function stopAutoplay() { clearInterval(autoplayInterval); }
 
@@ -386,7 +379,7 @@ searchInput.addEventListener('input', () => {
       ? '<p class="no-results">No se encontraron productos.</p>'
       : snapshot.docs.map(doc => {
           const p = doc.data();
-          return `<div style="padding:12px 0; border-bottom:1px solid #eee; cursor:pointer;" onclick="window.location帳.href='product.html?id=${doc.id}'">
+          return `<div style="padding:12px 0; border-bottom:1px solid #eee; cursor:pointer;" onclick="window.location.href='product.html?id=${doc.id}'">
             <strong>${p.nombre}</strong><br>
             <small>${p.descripcion || 'Sin descripción'}</small><br>
             <strong>$${p.precio.toLocaleString()}</strong>
