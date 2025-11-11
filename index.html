@@ -10,7 +10,6 @@
 <body>
   <!-- OVERLAYS -->
   <div class="menu-overlay" id="menuOverlay"></div>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
@@ -36,7 +35,6 @@
         </button>
       </div>
     </div>
-
     <!-- BÚSQUEDA DESPLEGABLE -->
     <div class="search-container" id="searchContainer">
       <div class="search-bar">
@@ -46,7 +44,7 @@
     </div>
   </header>
 
-  <!-- RESULTADOS DE BÚSQUEDA (AHORA SALEN DEBAJO COMO SI BROTARAN) -->
+  <!-- RESULTADOS DE BÚSQUEDA (BROTA DEBAJO) -->
   <div id="searchResultsContainer">
     <div id="searchResults"></div>
   </div>
@@ -59,13 +57,11 @@
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (SWIPE MÓVIL) -->
     <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
       <div class="carousel" id="newProductsCarousel">
-        <div class="carousel-track" id="newCarouselTrack">
-          <!-- SE LLENA CON JS -->
-        </div>
+        <div class="carousel-track" id="newCarouselTrack"></div>
         <div class="pagination" id="newPagination">
           <div class="indicator"></div>
         </div>
@@ -91,8 +87,6 @@
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg"></div>
-
-    <!-- PRODUCTOS -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
       <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
@@ -100,8 +94,6 @@
       </svg>
     </div>
     <div class="submenu" id="categoriesSubmenu"></div>
-
-    <!-- CONTACTO -->
     <div class="menu-item dropdown-toggle" id="contactToggle">
       Contacto
       <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
@@ -112,11 +104,8 @@
       <p class="contact-text">Sígueme en mis redes sociales</p>
       <div class="social-links" id="socialLinksContainer"></div>
     </div>
-
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
-    
-    <!-- BOTÓN ADMIN (SOLO SI ES ADMIN) -->
     <div class="menu-item admin-btn" id="adminBtn" style="display:none;">Ir a página de administrador</div>
   </aside>
 
