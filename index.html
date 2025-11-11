@@ -11,8 +11,8 @@
   <!-- OVERLAYS -->
   <div class="menu-overlay" id="menuOverlay"></div>
 
-  <!-- HEADER FIJO -->
-  <header class="header" id="header">
+  <!-- HEADER -->
+  <header class="header">
     <div class="header-inner">
       <button id="menuBtn" class="icon-btn" aria-label="Menú">
         <svg viewBox="0 0 24 24" width="24" height="24">
@@ -46,29 +46,33 @@
     </div>
   </header>
 
-  <!-- RESULTADOS FIJOS DEBAJO DEL HEADER -->
+  <!-- RESULTADOS DE BÚSQUEDA (AHORA SALEN DEBAJO COMO SI BROTARAN) -->
   <div id="searchResultsContainer">
     <div id="searchResults"></div>
   </div>
 
   <!-- CONTENIDO -->
   <main class="main-container">
+    <!-- HERO -->
     <section class="hero-banner">
       <h1 id="heroTitle">Asegura tu Mystery Box</h1>
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL NUEVOS LANZAMIENTOS (FIX MÓVIL 100%) -->
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
     <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
       <div class="carousel" id="newProductsCarousel">
-        <div class="carousel-track" id="newCarouselTrack"></div>
+        <div class="carousel-track" id="newCarouselTrack">
+          <!-- SE LLENA CON JS -->
+        </div>
         <div class="pagination" id="newPagination">
           <div class="indicator"></div>
         </div>
       </div>
     </section>
 
+    <!-- CARRUSEL: ANUNCIOS -->
     <section class="infinite-carousel-section">
       <h2 id="titleStar">Anuncios</h2>
       <div class="infinite-carousel">
@@ -76,6 +80,7 @@
       </div>
     </section>
 
+    <!-- TODOS LOS PRODUCTOS -->
     <section>
       <h2 id="titleAll">Todos los Productos</h2>
       <div class="products-grid normal" id="productsGrid"></div>
@@ -87,18 +92,20 @@
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg"></div>
 
+    <!-- PRODUCTOS -->
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
       <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
-        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="submenu" id="categoriesSubmenu"></div>
 
+    <!-- CONTACTO -->
     <div class="menu-item dropdown-toggle" id="contactToggle">
       Contacto
       <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
-        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="submenu" id="contactDropdown">
@@ -109,10 +116,11 @@
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
     
-    <!-- BOTÓN ADMIN (SOLO SI isAdmin: true) -->
+    <!-- BOTÓN ADMIN (SOLO SI ES ADMIN) -->
     <div class="menu-item admin-btn" id="adminBtn" style="display:none;">Ir a página de administrador</div>
   </aside>
 
+  <!-- CARRITO LATERAL -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -124,9 +132,11 @@
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
       <div id="goToPay" class="go-to-pay" style="display:none;">Ir a Pago</div>
+      <div id="message"></div>
     </div>
   </aside>
 
+  <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
   <script type="module" src="js/index.js"></script>
