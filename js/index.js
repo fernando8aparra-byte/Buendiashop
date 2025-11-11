@@ -91,9 +91,7 @@ async function loadProductTypes() {
     });
     submenu.innerHTML = '';
     if (tipos.size === 0) {
-      submenu.innerHTML = '<div class="submenu-item">No
-
- hay categorías</div>';
+      submenu.innerHTML = '<div class="submenu-item">No hay categorías</div>';
       return;
     }
     [...tipos].sort().forEach(tipo => {
@@ -185,7 +183,7 @@ window.removeFromCart = (i) => {
   updateCart();
   showToast('Producto eliminado');
 };
-goToPay.onclick = () => window.location.href = 'pago asteroids.html';
+goToPay.onclick = () => window.location.href = 'pago.html';
 
 // === PRODUCTOS ===
 let allProducts = [];
@@ -213,10 +211,11 @@ function renderCarousel(container, filterFn) {
       </div>
     `).join('');
 
+  // DESACTIVAR ANIMACIÓN AUTOMÁTICA
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE + PUNTITOS) - CORREGIDO ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE PERFECTO EN iOS + ANDROID) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -236,47 +235,47 @@ function createNewCarousel() {
   let prevTranslate = 0;
   let slideWidth = 0;
 
-  // RENDER SLIDES
+  // === RENDER SLIDES ===
   track.innerHTML = items.map(p => `
     <div class="slide">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy"
            onclick="event.stopPropagation(); window.location.href='product.html?id=${p.id}'"
-           style="pointer-events:auto;">
+           style="pointer-events:none; width:100%; height:auto; border-radius:16px; display:block;">
     </div>
   `).join('');
 
-  // RENDER DOTS
-  pagination.innerHTML = items.map((_, i) => `
+  // === RENDER PUNTITOS ===
+  const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>
   `).join('');
+  pagination.innerHTML = dotsHTML;
   const dots = pagination.querySelectorAll('.dot');
 
-  // CALCULAR ANCHO
+  // === ANCHO DEL SLIDE ===
   function updateSlideWidth() {
-    const rect = carousel.getBoundingClientRect();
-    slideWidth = rect.width;
+    slideWidth = carousel.offsetWidth;
   }
 
-  // IR AL SLIDE
+  // === IR AL SLIDE ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     currentTranslate = -current * slideWidth;
-    track.style.transition = 'transform 0.4s ease';
+    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
     track.style.transform = `translateX(${currentTranslate}px)`;
 
     dots.forEach((dot, i) => {
       dot.classList.toggle('active', i === current);
-      dot.setAttribute('aria-current', i === current);
     });
   }
 
-  // DRAG & SWIPE
+  // === DRAG & SWIPE (OPTIMIZADO PARA iOS) ===
   function startDrag(e) {
     isDragging = true;
     startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
     prevTranslate = currentTranslate;
     track.style.transition = 'none';
     updateSlideWidth();
+    e.preventDefault();
   }
 
   function drag(e) {
@@ -290,28 +289,30 @@ function createNewCarousel() {
   function endDrag(e) {
     if (!isDragging) return;
     isDragging = false;
-    track.style.transition = 'transform 0.4s ease';
+    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
 
     const movedBy = e.type.includes('touch')
       ? e.changedTouches[0].clientX - startX
       : e.clientX - startX;
 
-    if (Math.abs(movedBy) > slideWidth * 0.25) {
+    if (Math.abs(movedBy) > slideWidth * 0.2) {
       movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
   }
 
-  // EVENTOS
-  carousel.addEventListener('touchstart', startDrag, { passive: true });
-  carousel.addEventListener('touchmove', drag, { passive: true });
+  // === EVENTOS EN TODO EL CARRUSEL ===
+  carousel.addEventListener('touchstart', startDrag, { passive: false });
+  carousel.addEventListener('touchmove', drag, { passive: false });
   carousel.addEventListener('touchend', endDrag);
+
   carousel.addEventListener('mousedown', startDrag);
   carousel.addEventListener('mousemove', drag);
   carousel.addEventListener('mouseup', endDrag);
   carousel.addEventListener('mouseleave', endDrag);
 
+  // === CLICKS EN PUNTITOS ===
   dots.forEach(dot => {
     dot.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -319,30 +320,17 @@ function createNewCarousel() {
     });
   });
 
-  // RESIZE MEJORADO
-  let resizeTimeout;
-  const debouncedResize = () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
+  // === RESIZE ===
+  window.addEventListener('resize', () => {
+    setTimeout(() => {
       updateSlideWidth();
       goToSlide(current);
-    }, 150);
-  };
-
-  window.addEventListener('resize', debouncedResize);
-  window.addEventListener('orientationchange', () => {
-    setTimeout(debouncedResize, 300);
+    }, 100);
   });
 
-  // INICIAR
+  // === INICIAR ===
   updateSlideWidth();
   goToSlide(0);
-
-  // Forzar recalculo al cargar
-  setTimeout(() => {
-    updateSlideWidth();
-    goToSlide(current);
-  }, 300);
 }
 
 // === GRID DE PRODUCTOS ===
