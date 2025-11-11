@@ -4,9 +4,9 @@ import {
   collection,
   onSnapshot,
   query,
-  where,
   getDocs,
-  doc
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
   getAuth,
@@ -26,7 +26,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// === DOM ===
+// === ELEMENTOS DOM ===
 const menuBtn = document.getElementById('menuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
 const menuSidebar = document.getElementById('menuSidebar');
@@ -51,12 +51,28 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 const adminBtn = document.getElementById('adminBtn');
+const header = document.getElementById('header');
+const newCarouselTrack = document.getElementById('newCarouselTrack');
+const newPagination = document.getElementById('newPagination');
 
-// === ADMIN DETECTION ===
-onAuthStateChanged(auth, (user) => {
-  if (user && (user.email === "admin@boutiquebuendia.com" || user.email === "tucorreo@admin.com")) {
-    adminBtn.style.display = "block";
-    adminBtn.onclick = () => window.location.href = "admin.html";
+// === VARIABLES GLOBALES ===
+let allProducts = [];
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+let userName = localStorage.getItem('userName') || '';
+
+// === DETECCIÓN DE ADMIN (isAdmin: true en Firestore) ===
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+      if (userDoc.exists() && userDoc.data().isAdmin === true) {
+        adminBtn.style.display = "block";
+        adminBtn.onclick = () => window.location.href = "admin.html";
+      }
+    } catch (e) {
+      console.log("Error verificando admin:", e);
+    }
   }
 });
 
@@ -67,6 +83,7 @@ document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearc
   el.style.fill = 'none';
 });
 
+// === ESTILO BOTÓN IR A PAGO ===
 goToPay.style.border = '2px solid #000';
 goToPay.style.borderRadius = '8px';
 goToPay.style.fontWeight = '600';
@@ -90,7 +107,7 @@ function loadTitles() {
   });
 }
 
-// === CARGAR TIPOS DE PRODUCTOS ===
+// === CARGAR CATEGORÍAS ===
 async function loadProductTypes() {
   const submenu = document.getElementById('categoriesSubmenu');
   submenu.innerHTML = '<div class="submenu-item">Cargando...</div>';
@@ -145,20 +162,17 @@ function loadSocialLinks() {
   });
 }
 
-// === DESPLEGABLES ===
+// === DESPLEGABLES MENÚ ===
 document.getElementById('categoriesToggle').onclick = () => {
-  const submenu = document.getElementById('categoriesSubmenu');
-  submenu.classList.toggle('show');
+  document.getElementById('categoriesSubmenu').classList.toggle('show');
   document.getElementById('categoriesToggle').classList.toggle('active');
 };
 document.getElementById('contactToggle').onclick = () => {
-  const submenu = document.getElementById('contactDropdown');
-  submenu.classList.toggle('show');
+  document.getElementById('contactDropdown').classList.toggle('show');
   document.getElementById('contactToggle').classList.toggle('active');
 };
 
 // === CARRITO ===
-let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 function updateCart() {
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const totalPrice = cart.reduce((s, i) => s + i.precio * i.qty, 0);
@@ -180,7 +194,7 @@ function updateCart() {
   goToPay.style.display = cart.length > 0 ? 'block' : 'none';
 }
 window.addToCart = (id) => {
-  const product = window.allProducts.find(p => p.id === id);
+  const product = allProducts.find(p => p.id === id);
   if (!product) return showToast("Producto no encontrado");
   const existing = cart.find(i => i.id === id);
   if (existing) existing.qty++;
@@ -198,7 +212,6 @@ window.removeFromCart = (i) => {
 goToPay.onclick = () => window.location.href = 'pago.html';
 
 // === PRODUCTOS GLOBALES ===
-let allProducts = [];
 onSnapshot(collection(db, "productos"), (snapshot) => {
   allProducts = snapshot.docs.map(doc => ({
     id: doc.id,
@@ -225,114 +238,91 @@ function renderCarousel(container, filterFn) {
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (FIX ZOOM + CLIC) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (FIX MÓVIL 100%) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
-  const track = document.getElementById('newCarouselTrack');
-  const pagination = document.getElementById('newPagination');
+  const track = newCarouselTrack;
   const items = allProducts.filter(p => p.type?.carrusel);
+  newPagination.innerHTML = '<div class="indicator"></div>';
 
   if (items.length === 0) {
     track.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
-    pagination.innerHTML = '';
     return;
   }
 
   let current = 0;
-  let isDragging = false;
   let startX = 0;
-  let currentTranslate = 0;
-  let prevTranslate = 0;
-  let slideWidth = 0;
+  let slideWidth = carousel.offsetWidth;
 
   track.innerHTML = items.map(p => `
     <div class="slide" data-id="${p.id}">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" style="pointer-events:auto;">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
     </div>
   `).join('');
 
   const dotsHTML = items.map((_, i) => `
-    <button class="dot" data-index="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>
+    <button class="dot" data-index="${i}" ${i === 0 ? 'class="dot active"' : 'class="dot"'}></button>
   `).join('');
-  pagination.innerHTML = dotsHTML;
-  const dots = pagination.querySelectorAll('.dot');
-
-  function updateSlideWidth() {
-    slideWidth = carousel.offsetWidth;
-  }
+  newPagination.innerHTML += dotsHTML;
+  const dots = newPagination.querySelectorAll('.dot');
 
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    currentTranslate = -current * slideWidth;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
-    track.style.transform = `translateX(${currentTranslate}px)`;
-    dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+    track.style.transition = 'transform 0.4s ease';
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
   }
 
   function startDrag(e) {
-    isDragging = true;
-    startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-    prevTranslate = currentTranslate;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
     track.style.transition = 'none';
-    updateSlideWidth();
-    e.preventDefault();
   }
 
   function drag(e) {
-    if (!isDragging) return;
-    const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-    const diff = currentX - startX;
-    currentTranslate = prevTranslate + diff;
-    track.style.transform = `translateX(${currentTranslate}px)`;
+    if (!startX) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const walk = (x - startX) * 2;
+    track.style.transform = `translateX(calc(-${current * 100}% + ${walk}px))`;
   }
 
   function endDrag(e) {
-    if (!isDragging) return;
-    isDragging = false;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
-    const movedBy = e.type.includes('touch') ? e.changedTouches[0].clientX - startX : e.clientX - startX;
-    if (Math.abs(movedBy) > slideWidth * 0.2) {
-      movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
+    if (!startX) return;
+    const x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const walked = x - startX;
+    if (Math.abs(walked) > 50) {
+      walked > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
+    startX = null;
   }
 
-  // CLIC EN IMAGEN → PRODUCTO
-  track.querySelectorAll('.slide').forEach(slide => {
-    slide.addEventListener('click', () => {
-      const id = slide.dataset.id;
-      if (id) window.location.href = `product.html?id=${id}`;
-    });
-  });
-
-  carousel.addEventListener('touchstart', startDrag, { passive: false });
-  carousel.addEventListener('touchmove', drag, { passive: false });
+  carousel.addEventListener('touchstart', startDrag, { passive: true });
+  carousel.addEventListener('touchmove', drag, { passive: true });
   carousel.addEventListener('touchend', endDrag);
+
   carousel.addEventListener('mousedown', startDrag);
   carousel.addEventListener('mousemove', drag);
   carousel.addEventListener('mouseup', endDrag);
   carousel.addEventListener('mouseleave', endDrag);
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      goToSlide(parseInt(dot.dataset.index));
+  track.querySelectorAll('.slide').forEach(slide => {
+    slide.addEventListener('click', () => {
+      window.location.href = `product.html?id=${slide.dataset.id}`;
     });
   });
 
+  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
+
   window.addEventListener('resize', () => {
-    setTimeout(() => {
-      updateSlideWidth();
-      goToSlide(current);
-    }, 100);
+    slideWidth = carousel.offsetWidth;
+    goToSlide(current);
   });
 
-  updateSlideWidth();
   goToSlide(0);
 }
 
-// === GRID ===
+// === GRID PRODUCTOS ===
 function renderGrid() {
   const normales = allProducts.filter(p => p.type?.normal);
   productsGrid.innerHTML = normales.map(p => `
@@ -351,76 +341,68 @@ function renderGrid() {
   `).join('');
 }
 
-// === BÚSQUEDA AVANZADA (NOMBRE + DESCRIPCIÓN + IMAGEN) ===
+// === BÚSQUEDA AVANZADA (NOMBRE + DESCRIPCIÓN + TIPO) ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
-  const term = searchInput.value.trim().toLowerCase();
-  
+  const term = searchInput.value.trim();
+
   if (term.length === 0) {
     searchResultsContainer.style.display = 'none';
     return;
   }
 
-  searchTimeout = setTimeout(async () => {
-    const lowerTerm = term.toLowerCase();
-    const results = allProducts.filter(p => 
-      p.nombre?.toLowerCase().includes(lowerTerm) || 
-      p.descripcion?.toLowerCase().includes(lowerTerm)
-    );
+  searchTimeout = setTimeout(() => {
+    const normalized = term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const matches = allProducts.filter(p => {
+      const nombre = (p.nombre || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const desc = (p.descripcion || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const tipo = (p.tipo || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      return nombre.includes(normalized) || desc.includes(normalized) || tipo.includes(normalized);
+    });
 
-    if (results.length === 0) {
-      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
-    } else {
-      searchResults.innerHTML = results.map(p => `
+    searchResults.innerHTML = matches.length === 0
+      ? `<p class="no-results">No encontramos nada con "<strong>${term}</strong>"</p>`
+      : matches.map(p => `
         <div class="search-result-item" onclick="window.location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" alt="${p.nombre}">
           <div>
             <strong>${p.nombre}</strong>
-            <small>$${p.precio.toLocaleString()}</small>
+            ${p.tipo ? `<small>• ${p.tipo}</small>` : ''}
+            <span>$${p.precio.toLocaleString()}</span>
           </div>
         </div>
       `).join('');
-    }
+
     searchResultsContainer.style.display = 'block';
+    updateResultsPosition();
   }, 150);
 });
 
-// ENTER → OCULTAR TECLADO + FILTRAR
-searchInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    searchInput.blur();
-    const term = searchInput.value.trim().toLowerCase();
-    if (term) {
-      const exact = allProducts.filter(p => 
-        p.nombre?.toLowerCase().includes(term) || 
-        p.descripcion?.toLowerCase().includes(term)
-      );
-      searchResults.innerHTML = exact.length === 0 
-        ? '<p class="no-results">No hay coincidencias exactas.</p>'
-        : exact.map(p => `
-          <div class="search-result-item" onclick="window.location.href='product.html?id=${p.id}'">
-            <img src="${p.imagen}" alt="${p.nombre}">
-            <div><strong>${p.nombre}</strong><small>$${p.precio.toLocaleString()}</small></div>
-          </div>
-        `).join('');
-    }
-  }
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchInput.blur();
 });
 
-// LIMPIAR CON X
+function updateResultsPosition() {
+  const headerHeight = header.offsetHeight;
+  const searchHeight = searchContainer.classList.contains('active') ? searchContainer.offsetHeight : 0;
+  searchResultsContainer.style.top = `${headerHeight + searchHeight}px`;
+}
+
+window.addEventListener('scroll', updateResultsPosition);
+window.addEventListener('resize', updateResultsPosition);
+
+// === UI INTERACTIONS ===
+menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
+[menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
+cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
+closeCart.onclick = () => cartSidebar.classList.remove('open');
+searchBtn.onclick = () => { searchContainer.classList.add('active'); searchInput.focus(); updateResultsPosition(); };
 closeSearch.onclick = () => {
   searchContainer.classList.remove('active');
   searchInput.value = '';
   searchResultsContainer.style.display = 'none';
 };
-
-// === UI ===
-menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
-[menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
-cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
-closeCart.onclick = () => cartSidebar.classList.remove('open');
-searchBtn.onclick = () => searchContainer.classList.add('active');
 document.addEventListener('click', e => {
   if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
     searchContainer.classList.remove('active');
@@ -428,9 +410,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// === AUTH ===
-let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-let userName = localStorage.getItem('userName') || '';
+// === AUTH UI ===
 function updateAuthUI() {
   if (isLoggedIn && userName) {
     welcomeMsg.textContent = `¡Hola, ${userName}!`;
@@ -462,9 +442,11 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === INICIAR ===
+// === INICIAR TODO ===
 updateCart();
 updateAuthUI();
 loadTitles();
 loadProductTypes();
 loadSocialLinks();
+createNewCarousel();
+updateResultsPosition();
