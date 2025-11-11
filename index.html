@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -41,14 +40,14 @@
     <!-- BÚSQUEDA DESPLEGABLE -->
     <div class="search-container" id="searchContainer">
       <div class="search-bar">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
+        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus autocomplete="off">
         <button id="closeSearch">×</button>
       </div>
     </div>
   </header>
 
-  <!-- RESULTADOS DE BÚSQUEDA -->
-  <div id="searchResultsContainer" style="display:none; padding:20px; background:#fff; margin:20px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+  <!-- RESULTADOS DE BÚSQUEDA (AHORA SALEN DEBAJO COMO SI BROTARAN) -->
+  <div id="searchResultsContainer">
     <div id="searchResults"></div>
   </div>
 
@@ -60,21 +59,20 @@
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (SOLO SWIPE) -->
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
     <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
       <div class="carousel" id="newProductsCarousel">
         <div class="carousel-track" id="newCarouselTrack">
-          <!-- SE LLENA CON JS DESDE FIREBASE -->
+          <!-- SE LLENA CON JS -->
         </div>
         <div class="pagination" id="newPagination">
           <div class="indicator"></div>
-          <!-- DOTS SE CREAN CON JS -->
         </div>
       </div>
     </section>
 
-    <!-- CARRUSEL: ANUNCIOS (INFINITO) -->
+    <!-- CARRUSEL: ANUNCIOS -->
     <section class="infinite-carousel-section">
       <h2 id="titleStar">Anuncios</h2>
       <div class="infinite-carousel">
@@ -101,9 +99,7 @@
         <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div class="submenu" id="categoriesSubmenu">
-      <!-- CARGADO DESDE FIREBASE -->
-    </div>
+    <div class="submenu" id="categoriesSubmenu"></div>
 
     <!-- CONTACTO -->
     <div class="menu-item dropdown-toggle" id="contactToggle">
@@ -114,13 +110,14 @@
     </div>
     <div class="submenu" id="contactDropdown">
       <p class="contact-text">Sígueme en mis redes sociales</p>
-      <div class="social-links" id="socialLinksContainer">
-        <!-- CARGADO DESDE FIREBASE -->
-      </div>
+      <div class="social-links" id="socialLinksContainer"></div>
     </div>
 
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
+    
+    <!-- BOTÓN ADMIN (SOLO SI ES ADMIN) -->
+    <div class="menu-item admin-btn" id="adminBtn" style="display:none;">Ir a página de administrador</div>
   </aside>
 
   <!-- CARRITO LATERAL -->
@@ -142,7 +139,6 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- SCRIPT -->
   <script type="module" src="js/index.js"></script>
 </body>
 </html>
