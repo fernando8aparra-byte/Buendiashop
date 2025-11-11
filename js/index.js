@@ -61,7 +61,7 @@ let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 let isLoggedIn = localStorage.getItem('loggedIn') === 'true';
 let userName = localStorage.getItem('userName') || '';
 
-// === DETECCIÓN DE ADMIN (isAdmin: true en Firestore) ===
+// === DETECCIÓN DE ADMIN ===
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     try {
@@ -71,22 +71,17 @@ onAuthStateChanged(auth, async (user) => {
         adminBtn.onclick = () => window.location.href = "admin.html";
       }
     } catch (e) {
-      console.log("Error verificando admin:", e);
+      console.log("Error admin:", e);
     }
   }
 });
 
-// === FORZAR ICONOS NEGROS ===
+// === ICONOS NEGROS FORZADOS ===
 document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch').forEach(el => {
   el.style.stroke = '#000000';
   el.style.color = '#000000';
   el.style.fill = 'none';
 });
-
-// === ESTILO BOTÓN IR A PAGO ===
-goToPay.style.border = '2px solid #000';
-goToPay.style.borderRadius = '8px';
-goToPay.style.fontWeight = '600';
 
 // === TÍTULOS DINÁMICOS ===
 function loadTitles() {
@@ -107,7 +102,7 @@ function loadTitles() {
   });
 }
 
-// === CARGAR CATEGORÍAS ===
+// === CATEGORÍAS ===
 async function loadProductTypes() {
   const submenu = document.getElementById('categoriesSubmenu');
   submenu.innerHTML = '<div class="submenu-item">Cargando...</div>';
@@ -162,7 +157,7 @@ function loadSocialLinks() {
   });
 }
 
-// === DESPLEGABLES MENÚ ===
+// === DESPLEGABLES ===
 document.getElementById('categoriesToggle').onclick = () => {
   document.getElementById('categoriesSubmenu').classList.toggle('show');
   document.getElementById('categoriesToggle').classList.toggle('active');
@@ -211,7 +206,7 @@ window.removeFromCart = (i) => {
 };
 goToPay.onclick = () => window.location.href = 'pago.html';
 
-// === PRODUCTOS GLOBALES ===
+// === PRODUCTOS ===
 onSnapshot(collection(db, "productos"), (snapshot) => {
   allProducts = snapshot.docs.map(doc => ({
     id: doc.id,
@@ -224,7 +219,6 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
   renderGrid();
 });
 
-// === CARRUSEL ANUNCIOS ===
 function renderCarousel(container, filterFn) {
   const filtered = allProducts.filter(filterFn);
   const displayItems = filtered.length >= 5 ? [...filtered, ...filtered] : filtered;
@@ -235,14 +229,14 @@ function renderCarousel(container, filterFn) {
         <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
     `).join('');
-  container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (FIX MÓVIL 100%) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS - 100% MÓVIL FIX ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = newCarouselTrack;
   const items = allProducts.filter(p => p.type?.carrusel);
+  
   newPagination.innerHTML = '<div class="indicator"></div>';
 
   if (items.length === 0) {
@@ -252,7 +246,6 @@ function createNewCarousel() {
 
   let current = 0;
   let startX = 0;
-  let slideWidth = carousel.offsetWidth;
 
   track.innerHTML = items.map(p => `
     <div class="slide" data-id="${p.id}">
@@ -268,43 +261,35 @@ function createNewCarousel() {
 
   function goToSlide(index) {
     current = (index + items.length) % items.length;
-    track.style.transition = 'transform 0.4s ease';
+    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
     track.style.transform = `translateX(-${current * 100}%)`;
     dots.forEach((d, i) => d.classList.toggle('active', i === current));
   }
 
-  function startDrag(e) {
-    startX = e.touches ? e.touches[0].clientX : e.clientX;
+  carousel.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
     track.style.transition = 'none';
-  }
+  }, { passive: true });
 
-  function drag(e) {
+  carousel.addEventListener('touchmove', e => {
     if (!startX) return;
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const walk = (x - startX) * 2;
-    track.style.transform = `translateX(calc(-${current * 100}% + ${walk}px))`;
-  }
+    const x = e.touches[0].clientX;
+    const diff = x - startX;
+    track.style.transform = `translateX(calc(-${current * 100}% + ${diff}px))`;
+  }, { passive: true });
 
-  function endDrag(e) {
+  carousel.addEventListener('touchend', e => {
     if (!startX) return;
-    const x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-    const walked = x - startX;
-    if (Math.abs(walked) > 50) {
-      walked > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
+    const x = e.changedTouches[0].clientX;
+    const diff = x - startX;
+    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
       goToSlide(current);
     }
-    startX = null;
-  }
-
-  carousel.addEventListener('touchstart', startDrag, { passive: true });
-  carousel.addEventListener('touchmove', drag, { passive: true });
-  carousel.addEventListener('touchend', endDrag);
-
-  carousel.addEventListener('mousedown', startDrag);
-  carousel.addEventListener('mousemove', drag);
-  carousel.addEventListener('mouseup', endDrag);
-  carousel.addEventListener('mouseleave', endDrag);
+    startX = 0;
+  });
 
   track.querySelectorAll('.slide').forEach(slide => {
     slide.addEventListener('click', () => {
@@ -312,17 +297,15 @@ function createNewCarousel() {
     });
   });
 
-  dots.forEach(dot => dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index))));
-
-  window.addEventListener('resize', () => {
-    slideWidth = carousel.offsetWidth;
-    goToSlide(current);
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
   });
 
+  window.addEventListener('resize', () => goToSlide(current));
   goToSlide(0);
 }
 
-// === GRID PRODUCTOS ===
+// === GRID ===
 function renderGrid() {
   const normales = allProducts.filter(p => p.type?.normal);
   productsGrid.innerHTML = normales.map(p => `
@@ -341,7 +324,7 @@ function renderGrid() {
   `).join('');
 }
 
-// === BÚSQUEDA AVANZADA (NOMBRE + DESCRIPCIÓN + TIPO) ===
+// === BÚSQUEDA INTELIGENTE ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
@@ -379,10 +362,6 @@ searchInput.addEventListener('input', () => {
   }, 150);
 });
 
-searchInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') searchInput.blur();
-});
-
 function updateResultsPosition() {
   const headerHeight = header.offsetHeight;
   const searchHeight = searchContainer.classList.contains('active') ? searchContainer.offsetHeight : 0;
@@ -392,7 +371,7 @@ function updateResultsPosition() {
 window.addEventListener('scroll', updateResultsPosition);
 window.addEventListener('resize', updateResultsPosition);
 
-// === UI INTERACTIONS ===
+// === INTERACCIONES UI ===
 menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
 [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
 cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
@@ -403,14 +382,8 @@ closeSearch.onclick = () => {
   searchInput.value = '';
   searchResultsContainer.style.display = 'none';
 };
-document.addEventListener('click', e => {
-  if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
-    searchContainer.classList.remove('active');
-    searchResultsContainer.style.display = 'none';
-  }
-});
 
-// === AUTH UI ===
+// === AUTH ===
 function updateAuthUI() {
   if (isLoggedIn && userName) {
     welcomeMsg.textContent = `¡Hola, ${userName}!`;
@@ -433,7 +406,7 @@ authBtn.onclick = () => {
     window.location.href = 'login.html';
   }
 };
-helpBtn.onclick = () => alert('Escríbenos a contacto@efrainshop.com o en Instagram @efrainshop');
+helpBtn.onclick = () => alert('Escríbenos a contacto@boutique-buendia.com');
 
 // === TOAST ===
 function showToast(msg) {
@@ -442,7 +415,7 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// === INICIAR TODO ===
+// === INICIAR ===
 updateCart();
 updateAuthUI();
 loadTitles();
