@@ -1,4 +1,3 @@
-// js/index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getFirestore,
@@ -9,6 +8,10 @@ import {
   getDocs,
   doc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -21,6 +24,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // === DOM ===
 const menuBtn = document.getElementById('menuBtn');
@@ -46,6 +50,15 @@ const toast = document.getElementById('toast');
 const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
+const adminBtn = document.getElementById('adminBtn');
+
+// === ADMIN DETECTION ===
+onAuthStateChanged(auth, (user) => {
+  if (user && (user.email === "admin@boutiquebuendia.com" || user.email === "tucorreo@admin.com")) {
+    adminBtn.style.display = "block";
+    adminBtn.onclick = () => window.location.href = "admin.html";
+  }
+});
 
 // === FORZAR ICONOS NEGROS ===
 document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch').forEach(el => {
@@ -54,7 +67,6 @@ document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearc
   el.style.fill = 'none';
 });
 
-// === BORDE NEGRO AL BOTÓN "IR A PAGO" ===
 goToPay.style.border = '2px solid #000';
 goToPay.style.borderRadius = '8px';
 goToPay.style.fontWeight = '600';
@@ -106,7 +118,7 @@ async function loadProductTypes() {
   }
 }
 
-// === CARGAR REDES SOCIALES ===
+// === REDES SOCIALES ===
 function loadSocialLinks() {
   const container = document.getElementById('socialLinksContainer');
   onSnapshot(doc(db, "links", "social"), (snap) => {
@@ -185,7 +197,7 @@ window.removeFromCart = (i) => {
 };
 goToPay.onclick = () => window.location.href = 'pago.html';
 
-// === PRODUCTOS ===
+// === PRODUCTOS GLOBALES ===
 let allProducts = [];
 onSnapshot(collection(db, "productos"), (snapshot) => {
   allProducts = snapshot.docs.map(doc => ({
@@ -199,7 +211,7 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
   renderGrid();
 });
 
-// === CARRUSEL ANUNCIOS (SIN MOVIMIENTO AUTOMÁTICO) ===
+// === CARRUSEL ANUNCIOS ===
 function renderCarousel(container, filterFn) {
   const filtered = allProducts.filter(filterFn);
   const displayItems = filtered.length >= 5 ? [...filtered, ...filtered] : filtered;
@@ -210,12 +222,10 @@ function renderCarousel(container, filterFn) {
         <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
     `).join('');
-
-  // DESACTIVAR ANIMACIÓN AUTOMÁTICA
   container.style.animation = 'none';
 }
 
-// === CARRUSEL NUEVOS LANZAMIENTOS (SWIPE PERFECTO EN iOS + ANDROID) ===
+// === CARRUSEL NUEVOS LANZAMIENTOS (FIX ZOOM + CLIC) ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
   const track = document.getElementById('newCarouselTrack');
@@ -235,40 +245,30 @@ function createNewCarousel() {
   let prevTranslate = 0;
   let slideWidth = 0;
 
-  // === RENDER SLIDES ===
   track.innerHTML = items.map(p => `
-    <div class="slide">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy"
-           onclick="event.stopPropagation(); window.location.href='product.html?id=${p.id}'"
-           style="pointer-events:none; width:100%; height:auto; border-radius:16px; display:block;">
+    <div class="slide" data-id="${p.id}">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" style="pointer-events:auto;">
     </div>
   `).join('');
 
-  // === RENDER PUNTITOS ===
   const dotsHTML = items.map((_, i) => `
     <button class="dot" data-index="${i}" ${i === 0 ? 'aria-current="true"' : ''}></button>
   `).join('');
   pagination.innerHTML = dotsHTML;
   const dots = pagination.querySelectorAll('.dot');
 
-  // === ANCHO DEL SLIDE ===
   function updateSlideWidth() {
     slideWidth = carousel.offsetWidth;
   }
 
-  // === IR AL SLIDE ===
   function goToSlide(index) {
     current = (index + items.length) % items.length;
     currentTranslate = -current * slideWidth;
     track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
     track.style.transform = `translateX(${currentTranslate}px)`;
-
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === current);
-    });
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
   }
 
-  // === DRAG & SWIPE (OPTIMIZADO PARA iOS) ===
   function startDrag(e) {
     isDragging = true;
     startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
@@ -290,11 +290,7 @@ function createNewCarousel() {
     if (!isDragging) return;
     isDragging = false;
     track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
-
-    const movedBy = e.type.includes('touch')
-      ? e.changedTouches[0].clientX - startX
-      : e.clientX - startX;
-
+    const movedBy = e.type.includes('touch') ? e.changedTouches[0].clientX - startX : e.clientX - startX;
     if (Math.abs(movedBy) > slideWidth * 0.2) {
       movedBy > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
     } else {
@@ -302,17 +298,22 @@ function createNewCarousel() {
     }
   }
 
-  // === EVENTOS EN TODO EL CARRUSEL ===
+  // CLIC EN IMAGEN → PRODUCTO
+  track.querySelectorAll('.slide').forEach(slide => {
+    slide.addEventListener('click', () => {
+      const id = slide.dataset.id;
+      if (id) window.location.href = `product.html?id=${id}`;
+    });
+  });
+
   carousel.addEventListener('touchstart', startDrag, { passive: false });
   carousel.addEventListener('touchmove', drag, { passive: false });
   carousel.addEventListener('touchend', endDrag);
-
   carousel.addEventListener('mousedown', startDrag);
   carousel.addEventListener('mousemove', drag);
   carousel.addEventListener('mouseup', endDrag);
   carousel.addEventListener('mouseleave', endDrag);
 
-  // === CLICKS EN PUNTITOS ===
   dots.forEach(dot => {
     dot.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -320,7 +321,6 @@ function createNewCarousel() {
     });
   });
 
-  // === RESIZE ===
   window.addEventListener('resize', () => {
     setTimeout(() => {
       updateSlideWidth();
@@ -328,12 +328,11 @@ function createNewCarousel() {
     }, 100);
   });
 
-  // === INICIAR ===
   updateSlideWidth();
   goToSlide(0);
 }
 
-// === GRID DE PRODUCTOS ===
+// === GRID ===
 function renderGrid() {
   const normales = allProducts.filter(p => p.type?.normal);
   productsGrid.innerHTML = normales.map(p => `
@@ -352,31 +351,69 @@ function renderGrid() {
   `).join('');
 }
 
-// === BÚSQUEDA ===
+// === BÚSQUEDA AVANZADA (NOMBRE + DESCRIPCIÓN + IMAGEN) ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const term = searchInput.value.trim().toLowerCase();
-  if (term.length < 2) {
+  
+  if (term.length === 0) {
     searchResultsContainer.style.display = 'none';
     return;
   }
+
   searchTimeout = setTimeout(async () => {
-    const q = query(collection(db, "productos"), where("nombre", ">=", term), where("nombre", "<=", term + '\uf8ff'));
-    const snapshot = await getDocs(q);
-    searchResults.innerHTML = snapshot.empty
-      ? '<p class="no-results">No se encontraron productos.</p>'
-      : snapshot.docs.map(doc => {
-          const p = doc.data();
-          return `<div style="padding:12px 0; border-bottom:1px solid #eee; cursor:pointer;" onclick="window.location.href='product.html?id=${doc.id}'">
-            <strong>${p.nombre}</strong><br>
-            <small>${p.descripcion || 'Sin descripción'}</small><br>
-            <strong>$${p.precio.toLocaleString()}</strong>
-          </div>`;
-        }).join('');
+    const lowerTerm = term.toLowerCase();
+    const results = allProducts.filter(p => 
+      p.nombre?.toLowerCase().includes(lowerTerm) || 
+      p.descripcion?.toLowerCase().includes(lowerTerm)
+    );
+
+    if (results.length === 0) {
+      searchResults.innerHTML = '<p class="no-results">No se encontraron productos.</p>';
+    } else {
+      searchResults.innerHTML = results.map(p => `
+        <div class="search-result-item" onclick="window.location.href='product.html?id=${p.id}'">
+          <img src="${p.imagen}" alt="${p.nombre}">
+          <div>
+            <strong>${p.nombre}</strong>
+            <small>$${p.precio.toLocaleString()}</small>
+          </div>
+        </div>
+      `).join('');
+    }
     searchResultsContainer.style.display = 'block';
-  }, 300);
+  }, 150);
 });
+
+// ENTER → OCULTAR TECLADO + FILTRAR
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    searchInput.blur();
+    const term = searchInput.value.trim().toLowerCase();
+    if (term) {
+      const exact = allProducts.filter(p => 
+        p.nombre?.toLowerCase().includes(term) || 
+        p.descripcion?.toLowerCase().includes(term)
+      );
+      searchResults.innerHTML = exact.length === 0 
+        ? '<p class="no-results">No hay coincidencias exactas.</p>'
+        : exact.map(p => `
+          <div class="search-result-item" onclick="window.location.href='product.html?id=${p.id}'">
+            <img src="${p.imagen}" alt="${p.nombre}">
+            <div><strong>${p.nombre}</strong><small>$${p.precio.toLocaleString()}</small></div>
+          </div>
+        `).join('');
+    }
+  }
+});
+
+// LIMPIAR CON X
+closeSearch.onclick = () => {
+  searchContainer.classList.remove('active');
+  searchInput.value = '';
+  searchResultsContainer.style.display = 'none';
+};
 
 // === UI ===
 menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
@@ -384,7 +421,6 @@ menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classLi
 cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
 closeCart.onclick = () => cartSidebar.classList.remove('open');
 searchBtn.onclick = () => searchContainer.classList.add('active');
-closeSearch.onclick = () => searchContainer.classList.remove('active');
 document.addEventListener('click', e => {
   if (!searchContainer.contains(e.target) && !searchBtn.contains(e.target)) {
     searchContainer.classList.remove('active');
