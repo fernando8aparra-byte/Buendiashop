@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <!-- VIEWPORT CORREGIDO: permite zoom mientras debuggeas y scroll perfecto -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Efraín Shop</title>
   <link rel="stylesheet" href="css/styles.css">
@@ -11,7 +12,7 @@
   <!-- OVERLAYS -->
   <div class="menu-overlay" id="menuOverlay"></div>
   <!-- HEADER -->
-  <header class="header" id="header">
+  <header class="header">
     <div class="header-inner">
       <button id="menuBtn" class="icon-btn" aria-label="Menú">
         <svg viewBox="0 0 24 24" width="24" height="24">
@@ -44,7 +45,7 @@
     </div>
   </header>
 
-  <!-- RESULTADOS DE BÚSQUEDA (BROTA DEBAJO) -->
+  <!-- RESULTADOS DE BÚSQUEDA -->
   <div id="searchResultsContainer">
     <div id="searchResults"></div>
   </div>
@@ -57,7 +58,7 @@
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
 
-    <!-- CARRUSEL: NUEVOS LANZAMIENTOS (SWIPE MÓVIL) -->
+    <!-- CARRUSEL: NUEVOS LANZAMIENTOS -->
     <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
       <div class="carousel" id="newProductsCarousel">
