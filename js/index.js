@@ -51,7 +51,7 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 const adminBtn = document.getElementById('adminBtn');
-const header = document.querySelector('.header'); // CORREGIDO: ahora usa class
+const header = document.querySelector('.header'); // CORREGIDO: usa class, no id
 const newCarouselTrack = document.getElementById('newCarouselTrack');
 const newPagination = document.getElementById('newPagination');
 
@@ -234,8 +234,8 @@ function renderCarousel(container, filterFn) {
 // === CARRUSEL NUEVOS LANZAMIENTOS - 100% MÓVIL FIX ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
-  const track = newCarouselTrack || document.querySelector('#newCarouselTrack'); // COMPROBACIÓN SEGURA
-  if (!track || !carousel) return; // Si no existe, no hacer nada
+  const track = newCarouselTrack || document.querySelector('#newCarouselTrack');
+  if (!track || !carousel || !newPagination) return; // SEGURIDAD TOTAL
 
   const items = allProducts.filter(p => p.type?.carrusel);
   
