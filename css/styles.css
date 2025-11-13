@@ -683,12 +683,24 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 
 /* RESPONSIVE */
 @media (max-width: 480px) {
-  #newProductsCarousel { max-width: 320px; }
-  #newCarouselTrack .slide img { max-height: 300px; }
-  .main-container { padding: 30px 15px; }
-  .product-card img { height: 220px; }
-  .carousel-item { min-width: 180px; }
-  .carousel-item img { height: 200px; }
+  #newProductsCarousel { 
+    max-width: 320px; 
+  }
+  #newCarouselTrack .slide img { 
+    max-height: 300px; 
+  }
+  .main-container { 
+    padding: 30px 15px; 
+  }
+  .product-card img { 
+    height: 220px; 
+  }
+  .carousel-item { 
+    min-width: 180px; 
+  }
+  .carousel-item img { 
+    height: 200px; 
+  }
 }
 
 /* =============================================
@@ -741,23 +753,24 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 .shake { animation: shake 0.6s ease-in-out; }
 
 /* =============================================
-   FIX: CARRUSEL NUEVOS LANZAMIENTOS - SIN ZOOM EN MÓVILES
+   FIX DEFINITIVO: CARRUSEL NUEVOS LANZAMIENTOS EN MÓVIL
    ============================================= */
 @media (max-width: 480px) {
   #newProductsCarousel {
-    max-width: 100% !important;      /* Usa todo el ancho disponible */
-    padding: 0 10px;
+    max-width: 100% !important;
+    padding: 0 10px !important;
+    border-radius: 12px;
   }
 
   #newCarouselTrack .slide {
-    padding: 0 !important;           /* Elimina padding que recorta */
+    padding: 0 !important;
   }
 
-  #newCarousel  .slide img {
+  #newCarouselTrack .slide img {
     width: 100%;
-    height: auto !important;         /* Mantiene proporción natural */
-    max-height: none !important;     /* Sin recorte forzado */
-    object-fit: contain !important;  /* Muestra imagen completa */
+    height: auto !important;
+    max-height: 380px !important;
+    object-fit: contain !important;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
   }
@@ -854,17 +867,4 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   text-align: center;
   border-radius: 8px;
   font-weight: 700 !important;
-}
-
-/* FIX ZOOM CARRUSEL MÓVIL */
-@media (max-width: 480px) {
-  #newProductsCarousel {
-    max-width: 100% !important;
-    padding: 0 10px !important;
-  }
-  #newCarouselTrack .slide img {
-    object-fit: contain !important;
-    height: auto !important;
-    max-height: 380px !important;
-  }
 }
