@@ -18,7 +18,6 @@ html, body {
   letter-spacing: 0.025em;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
 }
 
 /* =============================================
@@ -230,9 +229,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   MENÚ Y CARRITO LATERAL
+   MENÚ LATERAL
    ============================================= */
-.menu-overlay, .cart-sidebar::before {
+.menu-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
@@ -263,9 +262,11 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   gap: 4px;
 }
 
-.menu-sidebar.open { left: 0; }
+.menu-sidebar.open {
+  left: 0;
+}
 
-.menu-close, .cart-close {
+.menu-close {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -282,8 +283,66 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   padding: 0;
 }
 
-.menu-close:hover, .cart-close:hover { color: #333333; }
+.menu-close:hover {
+  color: #333333;
+}
 
+.menu-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #eeeeee;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #111111;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  color: #000000;
+  font-weight: 700;
+}
+
+.dropdown-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-toggle::after {
+  content: '▼';
+  font-size: 0.8rem;
+}
+
+.dropdown-toggle.active::after {
+  content: '▲';
+}
+
+.submenu {
+  display: none;
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.submenu.show {
+  display: block;
+}
+
+.submenu-item {
+  padding: 12px 0;
+  font-size: 0.95rem;
+  color: #666666;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submenu-item:hover {
+  color: #111111;
+}
+
+/* =============================================
+   CARRITO LATERAL
+   ============================================= */
 .cart-sidebar {
   position: fixed;
   top: 0;
@@ -300,7 +359,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
 }
 
-.cart-sidebar.open { right: 0; }
+.cart-sidebar.open {
+  right: 0;
+}
 
 .cart-header {
   padding: 20px;
@@ -316,11 +377,31 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   text-transform: uppercase;
 }
 
+.cart-close {
+  background: none;
+  border: none;
+  color: #000000;
+  font-size: 32px;
+  font-weight: 300;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-close:hover {
+  color: #333333;
+}
+
 .cart-items {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .empty-cart {
@@ -403,10 +484,17 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   CARRUSEL INFINITO (ANUNCIOS)
+   CARRUSEL INFINITO (ANUNCIOS) - SIN AUTO-SCROLL
    ============================================= */
-.infinite-carousel-section { margin-bottom: 80px; }
-.infinite-carousel { overflow: hidden; padding: 20px 0; }
+.infinite-carousel-section {
+  margin-bottom: 80px;
+}
+
+.infinite-carousel {
+  overflow: hidden;
+  padding: 20px 0;
+}
+
 .infinite-carousel .carousel-track {
   display: flex;
   gap: 24px;
@@ -420,7 +508,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transition: transform 0.3s ease;
 }
 
-.carousel-item:hover { transform: translateY(-8px); }
+.carousel-item:hover {
+  transform: translateY(-8px);
+}
 
 .carousel-item img {
   width: 100%;
@@ -444,9 +534,17 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   margin-top: 48px;
 }
 
-@media (max-width: 480px)  { .products-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 481px) and (max-width: 900px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 901px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 480px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 481px) and (max-width: 900px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 901px) {
+  .products-grid { grid-template-columns: repeat(4, 1fr); }
+}
 
 .product-card {
   text-align: center;
@@ -454,7 +552,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transition: transform 0.3s ease;
 }
 
-.product-card:hover { transform: translateY(-10px); }
+.product-card:hover {
+  transform: translateY(-10px);
+}
 
 .product-card img {
   width: 100%;
@@ -504,7 +604,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   CARRUSEL NUEVOS LANZAMIENTOS - SWIPE + PUNTITOS
+   CARRUSEL NUEVOS LANZAMIENTOS - SWIPE + SOLO PUNTITOS CENTRADOS
    ============================================= */
 #newProductsCarousel {
   overflow: hidden;
@@ -546,7 +646,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   pointer-events: auto;
 }
 
-/* PAGINACIÓN */
+/* PAGINACIÓN - SOLO PUNTITOS CENTRADOS */
 #newPagination {
   display: flex;
   justify-content: center;
@@ -576,10 +676,23 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transform: scale(1.2);
 }
 
-#newPagination .indicator { display: none !important; }
+/* ELIMINAR COMPLETAMENTE LA PASTILLA GRANDE */
+#newPagination .indicator {
+  display: none !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  #newProductsCarousel { max-width: 320px; }
+  #newCarouselTrack .slide img { max-height: 300px; }
+  .main-container { padding: 30px 15px; }
+  .product-card img { height: 220px; }
+  .carousel-item { min-width: 180px; }
+  .carousel-item img { height: 200px; }
+}
 
 /* =============================================
-   BOTÓN IR A PAGO + TOAST
+   BOTÓN IR A PAGO
    ============================================= */
 #goToPay {
   border: 2px solid #000;
@@ -604,6 +717,55 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   color: #fff;
 }
 
+/* =============================================
+   ANIMACIONES
+   ============================================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.fade-in { animation: fadeIn 0.5s ease-out forwards; }
+.pulse { animation: pulse 2s infinite ease-in-out; }
+.shake { animation: shake 0.6s ease-in-out; }
+
+/* =============================================
+   FIX: CARRUSEL NUEVOS LANZAMIENTOS - SIN ZOOM EN MÓVILES
+   ============================================= */
+@media (max-width: 480px) {
+  #newProductsCarousel {
+    max-width: 100% !important;      /* Usa todo el ancho disponible */
+    padding: 0 10px;
+  }
+
+  #newCarouselTrack .slide {
+    padding: 0 !important;           /* Elimina padding que recorta */
+  }
+
+  #newCarousel  .slide img {
+    width: 100%;
+    height: auto !important;         /* Mantiene proporción natural */
+    max-height: none !important;     /* Sin recorte forzado */
+    object-fit: contain !important;  /* Muestra imagen completa */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+}
+
+/* =============================================
+   TOAST
+   ============================================= */
 .toast {
   position: fixed;
   bottom: 30px;
@@ -629,7 +791,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transform: translateX(-50%) translateY(0);
 }
 
-/* === RESULTADOS DE BÚSQUEDA === */
+/* === RESULTADOS DE BÚSQUEDA (SALEN DEBAJO COMO SI BROTARAN) === */
 #searchResultsContainer {
   position: absolute;
   top: 100%;
@@ -662,7 +824,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   transition: background 0.2s;
 }
 
-.search-result-item:hover { background: #f8f8f8; }
+.search-result-item:hover {
+  background: #f8f8f8;
+}
 
 .search-result-item img {
   width: 60px;
@@ -672,8 +836,15 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   background: #fafafa;
 }
 
-.search-result-item strong { font-weight: 600; font-size: 1rem; }
-.search-result-item small { color: #e63946; font-weight: 700; }
+.search-result-item strong {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.search-result-item small {
+  color: #e63946;
+  font-weight: 700;
+}
 
 /* BOTÓN ADMIN */
 .admin-btn {
@@ -685,48 +856,15 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   font-weight: 700 !important;
 }
 
-/* =============================================
-   ANIMACIONES
-   ============================================= */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
-}
-
-.pulse { animation: pulse 2s infinite ease-in-out; }
-.shake { animation: shake 0.6s ease-in-out; }
-
-/* =============================================
-   FIX DEFINITIVO MÓVIL - UNA SOLA REGLA LIMPIA Y POTENTE
-   ============================================= */
+/* FIX ZOOM CARRUSEL MÓVIL */
 @media (max-width: 480px) {
-  .main-container { padding: 30px 15px; }
-  .product-card img { height: 220px; }
-  .carousel-item { min-width: 180px; }
-  .carousel-item img { height: 200px; }
-
   #newProductsCarousel {
     max-width: 100% !important;
     padding: 0 10px !important;
-    border-radius: 12px;
   }
-
-  #newCarouselTrack .slide {
-    padding: 0 !important;
-  }
-
   #newCarouselTrack .slide img {
-    width: 100% !important;
+    object-fit: contain !important;
     height: auto !important;
     max-height: 380px !important;
-    object-fit: contain !important;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
   }
 }
