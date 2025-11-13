@@ -51,7 +51,7 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 const adminBtn = document.getElementById('adminBtn');
-const header = document.querySelector('.header'); // CORREGIDO: usa class, no id
+const header = document.getElementById('header');
 const newCarouselTrack = document.getElementById('newCarouselTrack');
 const newPagination = document.getElementById('newPagination');
 
@@ -234,9 +234,7 @@ function renderCarousel(container, filterFn) {
 // === CARRUSEL NUEVOS LANZAMIENTOS - 100% MÓVIL FIX ===
 function createNewCarousel() {
   const carousel = document.getElementById('newProductsCarousel');
-  const track = newCarouselTrack || document.querySelector('#newCarouselTrack');
-  if (!track || !carousel || !newPagination) return; // SEGURIDAD TOTAL
-
+  const track = newCarouselTrack;
   const items = allProducts.filter(p => p.type?.carrusel);
   
   newPagination.innerHTML = '<div class="indicator"></div>';
@@ -365,11 +363,9 @@ searchInput.addEventListener('input', () => {
 });
 
 function updateResultsPosition() {
-  const headerHeight = header ? header.offsetHeight : 0;
-  const searchHeight = (searchContainer && searchContainer.classList.contains('active')) ? searchContainer.offsetHeight : 0;
-  if (searchResultsContainer) {
-    searchResultsContainer.style.top = `${headerHeight + searchHeight}px`;
-  }
+  const headerHeight = header.offsetHeight;
+  const searchHeight = searchContainer.classList.contains('active') ? searchContainer.offsetHeight : 0;
+  searchResultsContainer.style.top = `${headerHeight + searchHeight}px`;
 }
 
 window.addEventListener('scroll', updateResultsPosition);
