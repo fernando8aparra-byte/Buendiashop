@@ -1,5 +1,5 @@
 /* =============================================
-   ESTILO CLON EXACTO DE DROP-SHOP.MX + ADAPTACIÓN PERFECTA
+   ESTILO CLON EXACTO DE DROP-SHOP.MX + ADAPTACIÓN PERFECTA DE IMÁGENES
    ============================================= */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 * {
@@ -83,7 +83,7 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   HEADER - AJUSTADO EN MÓVIL
+   HEADER
    ============================================= */
 .header {
   position: sticky;
@@ -434,37 +434,25 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 
 /* =============================================
-   CARRUSEL ADAPTATIVO - SIN ZOOM EN MÓVIL
+   CARRUSEL INFINITO (ANUNCIOS) - SIN AUTO-SCROLL
    ============================================= */
 .infinite-carousel-section {
   margin-bottom: 80px;
 }
-.carousel,
 .infinite-carousel {
   overflow: hidden;
-  position: relative;
-  width: 100%;
-  max-width: 380px;
-  margin: 40px auto;
-  border-radius: 16px;
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
+  padding: 20px 0;
+  touch-action: pan-x;
   -webkit-overflow-scrolling: touch;
 }
-.carousel-track {
+.infinite-carousel .carousel-track {
   display: flex;
-  width: 100%;
-  will-change: transform;
-  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1);
+  gap: 24px;
+  width: max-content;
+  animation: none !important;
 }
 .carousel-item {
-  flex-shrink: 0;
-  padding: 0 8px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  min-width: 220px;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
@@ -473,41 +461,15 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 }
 .carousel-item img {
   width: 100%;
-  height: auto;
-  max-height: 380px;
+  height: 260px;
   object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  object-position: center;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  margin: 0 auto;
   display: block;
   image-rendering: -webkit-optimize-contrast;
-  pointer-events: auto;
-}
-
-/* PAGINACIÓN - SOLO EN MÓVIL */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 16px;
-  height: 20px;
-  padding: 0 20px;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.3);
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease;
-}
-.dot.active {
-  background: #000;
-  transform: scale(1.2);
 }
 
 /* =============================================
@@ -576,6 +538,111 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
 .add-btn:disabled {
   background: #cccccc;
   cursor: not-allowed;
+}
+
+/* =============================================
+   CARRUSEL NUEVOS LANZAMIENTOS - SWIPE + SOLO PUNTITOS CENTRADOS
+   ============================================= */
+#newProductsCarousel {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 40px auto;
+  border-radius: 16px;
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#newCarouselTrack {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+  transition: transform 0.4s ease;
+}
+#newCarouselTrack .slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#newCarouselTrack .slide img {
+  width: 100%;
+  height: auto;
+  max-height: 350px;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  image-rendering: -webkit-optimize-contrast;
+  pointer-events: auto;
+}
+
+/* PAGINACIÓN - SOLO PUNTITOS CENTRADOS */
+#newPagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  height: 20px;
+  padding: 0 20px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+#newPagination .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  z-index: 2;
+}
+#newPagination .dot.active {
+  background: #000;
+  transform: scale(1.2);
+}
+
+/* ELIMINAR COMPLETAMENTE LA PASTILLA GRANDE */
+#newPagination .indicator {
+  display: none !important;
+}
+
+/* =============================================
+   RESPONSIVE IPHONE
+   ============================================= */
+@media (max-width: 480px) {
+  .main-container { padding: 30px 15px; }
+  .product-card img { height: 220px; }
+  .carousel-item { min-width: 180px; }
+  .carousel-item img { height: 200px; }
+
+  /* FIX ZOOM EN CARRUSEL MÓVIL */
+  #newProductsCarousel {
+    max-width: 100% !important;
+    padding: 0 10px;
+  }
+  #newCarouselTrack .slide {
+    padding: 0 !important;
+  }
+  #newCarouselTrack .slide img {
+    max-height: 300px !important;
+    object-fit: contain !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+
+  /* HEADER AJUSTADO */
+  .header-inner { gap: 6px; }
+  .logo { font-size: 1.25rem !important; }
+  .icon-btn svg { width: 22px; height: 22px; }
 }
 
 /* =============================================
@@ -707,34 +774,9 @@ h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: 0.025em; }
   text-align: center;
   border-radius: 8px;
   font-weight: 700 !important;
-  padding: 12px;
 }
 
-/* =============================================
-   RESPONSIVE MÓVIL - FIX ZOOM + HEADER + CARRUSEL
-   ============================================= */
-@media (max-width: 480px) {
-  .main-container { padding: 30px 15px; }
-  .product-card img { height: 220px; }
-  .carousel,
-  .infinite-carousel { 
-    max-width: 100% !important; 
-    padding: 0 10px;
-  }
-  .carousel-item img {
-    max-height: 300px !important;
-  }
-  .carousel-item {
-    padding: 0 !important;
-  }
-  .header-inner {
-    gap: 6px;
-  }
-  .logo {
-    font-size: 1.25rem !important;
-  }
-  .icon-btn svg {
-    width: 22px;
-    height: 22px;
-  }
+/* FIX FINAL: SCROLL SUAVE EN ANUNCIOS */
+.infinite-carousel {
+  -webkit-overflow-scrolling: touch;
 }
