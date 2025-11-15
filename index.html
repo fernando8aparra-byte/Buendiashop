@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Efraín Shop</title>
+  <title>Efraín Shop</Hello>
   <link rel="stylesheet" href="css/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
@@ -174,14 +174,47 @@
     }
     @media (max-width: 480px) {
       #newProductsCarousel .carousel-item img {
-        max-height: 340px;
+        max-height: 300px;
       }
       #newProductsCarousel,
       #starCarousel {
         padding: 0 10px;
       }
+      .header-inner {
+        gap: 8px;
+      }
+      .logo {
+        font-size: 1.3rem !important;
+      }
     }
   </style>
+
+  <!-- DETECCIÓN DE DISPOSITIVO (SIN TOCAR NADA MÁS) -->
+  <script>
+    // Detectar si es móvil (ancho <= 768px)
+    const isMobileDevice = () => window.innerWidth <= 768;
+    const isSmallScreen = () => window.innerWidth <= 480;
+
+    // Añadir clase al body
+    const updateDeviceClass = () => {
+      document.body.classList.remove('desktop', 'mobile', 'small-screen');
+      if (isSmallScreen()) {
+        document.body.classList.add('small-screen');
+      } else if (isMobileDevice()) {
+        document.body.classList.add('mobile');
+      } else {
+        document.body.classList.add('desktop');
+      }
+    };
+
+    // Ejecutar al cargar y en resize
+    updateDeviceClass();
+    window.addEventListener('resize', updateDeviceClass);
+
+    // Exponer globalmente para que JS lo use
+    window.isMobileDevice = isMobileDevice;
+    window.isSmallScreen = isSmallScreen;
+  </script>
 
   <script type="module" src="js/index.js"></script>
 </body>
