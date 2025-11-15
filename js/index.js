@@ -40,7 +40,6 @@ const closeSearch = document.getElementById('closeSearch');
 const searchInput = document.getElementById('searchInput');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 const searchResults = document.getElementById('searchResults');
-const starCarousel = document.getElementById('starCarousel');
 const productsGrid = document.getElementById('productsGrid');
 const cartBadge = document.getElementById('cartBadge');
 const cartItems = document.getElementById('cartItems');
@@ -51,9 +50,7 @@ const welcomeMsg = document.getElementById('welcomeMsg');
 const authBtn = document.getElementById('authBtn');
 const helpBtn = document.getElementById('helpBtn');
 const adminBtn = document.getElementById('adminBtn');
-const header = document.getElementById('header');
-const newCarouselTrack = document.getElementById('newCarouselTrack');
-const newPagination = document.getElementById('newPagination');
+const header = document.querySelector('.header');
 
 // === VARIABLES GLOBALES ===
 let allProducts = [];
@@ -206,103 +203,115 @@ window.removeFromCart = (i) => {
 };
 goToPay.onclick = () => window.location.href = 'pago.html';
 
-// === PRODUCTOS ===
-onSnapshot(collection(db, "productos"), (snapshot) => {
-  allProducts = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data(),
-    type: doc.data().type || { normal: true }
-  }));
-  window.allProducts = allProducts;
-  renderCarousel(starCarousel, p => p.type?.anuncio);
-  createNewCarousel();
-  renderGrid();
-});
+// === CARRUSEL UNIVERSAL MEJORADO ===
+function createMobileCarousel(containerId, filterFn, isNewLaunch = false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-function renderCarousel(container, filterFn) {
-  const filtered = allProducts.filter(filterFn);
-  const displayItems = filtered.length >= 5 ? [...filtered, ...filtered] : filtered;
-  container.innerHTML = displayItems.length === 0
-    ? '<p style="color:#999; text-align:center; padding:40px;">No hay productos</p>'
-    : displayItems.map(p => `
-      <div class="carousel-item" onclick="window.location.href='product.html?id=${p.id}'">
-        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-      </div>
-    `).join('');
-}
+  const track = document.createElement('div');
+  track.className = 'carousel-track';
+  const pagination = isNewLaunch ? document.createElement('div') : null;
+  if (pagination) pagination.className = 'pagination';
 
-// === CARRUSEL NUEVOS LANZAMIENTOS - 100% MÓVIL FIX ===
-function createNewCarousel() {
-  const carousel = document.getElementById('newProductsCarousel');
-  const track = newCarouselTrack;
-  const items = allProducts.filter(p => p.type?.carrusel);
-  
-  newPagination.innerHTML = '<div class="indicator"></div>';
+  container.innerHTML = '';
+  container.appendChild(track);
+  if (pagination) container.appendChild(pagination);
 
+  const items = allProducts.filter(filterFn);
   if (items.length === 0) {
-    track.innerHTML = '<p style="text-align:center; color:#999; padding:60px;">No hay productos</p>';
+    track.innerHTML = '<p style="text-align:center; color:#999; padding:40px;">No hay productos</p>';
     return;
   }
 
-  let current = 0;
-  let startX = 0;
+  const displayItems = containerId === 'starCarousel' ? [...items, ...items] : items;
 
-  track.innerHTML = items.map(p => `
-    <div class="slide" data-id="${p.id}">
+  track.innerHTML = displayItems.map((p, i) => `
+    <div class="carousel-item" data-id="${p.id}" style="cursor:pointer;">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
     </div>
   `).join('');
 
-  const dotsHTML = items.map((_, i) => `
-    <button class="dot" data-index="${i}" ${i === 0 ? 'class="dot active"' : 'class="dot"'}></button>
-  `).join('');
-  newPagination.innerHTML += dotsHTML;
-  const dots = newPagination.querySelectorAll('.dot');
-
-  function goToSlide(index) {
-    current = (index + items.length) % items.length;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
-    track.style.transform = `translateX(-${current * 100}%)`;
-    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  if (isNewLaunch && items.length > 1) {
+    pagination.innerHTML = items.map((_, i) => `
+      <button class="dot" data-index="${i}" ${i === 0 ? 'class="dot active"' : 'class="dot"'}></button>
+    `).join('');
   }
 
-  carousel.addEventListener('touchstart', e => {
+  let startX = 0, currentX = 0, currentTranslate = 0, prevTranslate = 0;
+  let isDragging = false;
+  let currentIndex = 0;
+  const itemCount = items.length;
+  const isInfinite = containerId === 'starCarousel';
+
+  const slides = track.querySelectorAll('.carousel-item');
+
+  function setPosition() {
+    track.style.transition = isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
+    track.style.transform = `translateX(${currentTranslate}%)`;
+  }
+
+  function updateDots() {
+    if (!isNewLaunch || itemCount <= 1) return;
+    const dots = pagination.querySelectorAll('.dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function goToSlide(index) {
+    currentIndex = index;
+    if (isInfinite && index >= itemCount) currentIndex = 0;
+    if (isInfinite && index < 0) currentIndex = itemCount - 1;
+    currentTranslate = -currentIndex * 100;
+    setPosition();
+    updateDots();
+  }
+
+  track.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
+    isDragging = true;
+    prevTranslate = currentTranslate;
     track.style.transition = 'none';
   }, { passive: true });
 
-  carousel.addEventListener('touchmove', e => {
-    if (!startX) return;
-    const x = e.touches[0].clientX;
-    const diff = x - startX;
-    track.style.transform = `translateX(calc(-${current * 100}% + ${diff}px))`;
+  track.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    currentX = e.touches[0].clientX;
+    const diff = ((currentX - startX) / container.offsetWidth) * 100;
+    currentTranslate = prevTranslate + diff;
+    setPosition();
   }, { passive: true });
 
-  carousel.addEventListener('touchend', e => {
-    if (!startX) return;
-    const x = e.changedTouches[0].clientX;
-    const diff = x - startX;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? goToSlide(current - 1) : goToSlide(current + 1);
+  track.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    const movedBy = currentX - startX;
+    const threshold = container.offsetWidth * 0.15;
+
+    if (Math.abs(movedBy) > threshold) {
+      if (movedBy > 0) goToSlide(currentIndex - 1);
+      else goToSlide(currentIndex + 1);
     } else {
-      goToSlide(current);
+      goToSlide(currentIndex);
     }
-    startX = 0;
   });
 
-  track.querySelectorAll('.slide').forEach(slide => {
+  slides.forEach(slide => {
     slide.addEventListener('click', () => {
-      window.location.href = `product.html?id=${slide.dataset.id}`;
+      if (Math.abs(currentX - startX) < 10) {
+        window.location.href = `product.html?id=${slide.dataset.id}`;
+      }
     });
   });
 
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
-  });
+  if (isNewLaunch && pagination) {
+    pagination.querySelectorAll('.dot').forEach(dot => {
+      dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
+    });
+  }
 
-  window.addEventListener('resize', () => goToSlide(current));
   goToSlide(0);
+  window.addEventListener('resize', () => goToSlide(currentIndex));
 }
 
 // === GRID ===
@@ -329,12 +338,10 @@ let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const term = searchInput.value.trim();
-
   if (term.length === 0) {
     searchResultsContainer.style.display = 'none';
     return;
   }
-
   searchTimeout = setTimeout(() => {
     const normalized = term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const matches = allProducts.filter(p => {
@@ -343,7 +350,6 @@ searchInput.addEventListener('input', () => {
       const tipo = (p.tipo || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       return nombre.includes(normalized) || desc.includes(normalized) || tipo.includes(normalized);
     });
-
     searchResults.innerHTML = matches.length === 0
       ? `<p class="no-results">No encontramos nada con "<strong>${term}</strong>"</p>`
       : matches.map(p => `
@@ -356,7 +362,6 @@ searchInput.addEventListener('input', () => {
           </div>
         </div>
       `).join('');
-
     searchResultsContainer.style.display = 'block';
     updateResultsPosition();
   }, 150);
@@ -367,7 +372,6 @@ function updateResultsPosition() {
   const searchHeight = searchContainer.classList.contains('active') ? searchContainer.offsetHeight : 0;
   searchResultsContainer.style.top = `${headerHeight + searchHeight}px`;
 }
-
 window.addEventListener('scroll', updateResultsPosition);
 window.addEventListener('resize', updateResultsPosition);
 
@@ -421,5 +425,20 @@ updateAuthUI();
 loadTitles();
 loadProductTypes();
 loadSocialLinks();
-createNewCarousel();
 updateResultsPosition();
+
+// === CARGAR PRODUCTOS Y CARRUSELES ===
+onSnapshot(collection(db, "productos"), (snapshot) => {
+  allProducts = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+    type: doc.data().type || { normal: true }
+  }));
+  window.allProducts = allProducts;
+
+  // CARRUSELES NUEVOS
+  createMobileCarousel('newProductsCarousel', p => p.type?.carrusel, true);
+  createMobileCarousel('starCarousel', p => p.type?.anuncio, false);
+
+  renderGrid();
+});
