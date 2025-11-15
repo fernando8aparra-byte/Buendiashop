@@ -43,12 +43,10 @@
       </div>
     </div>
   </header>
-
   <!-- RESULTADOS DE BÚSQUEDA (BROTA DEBAJO) -->
   <div id="searchResultsContainer">
     <div id="searchResults"></div>
   </div>
-
   <!-- CONTENIDO -->
   <main class="main-container">
     <!-- HERO -->
@@ -56,33 +54,26 @@
       <h1 id="heroTitle">Asegura tu Mystery Box</h1>
       <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
     </section>
-
     <!-- CARRUSEL: NUEVOS LANZAMIENTOS (SWIPE MÓVIL) -->
     <section class="infinite-carousel-section">
       <h2 id="titleNew">Nuevos Lanzamientos</h2>
       <div class="carousel" id="newProductsCarousel">
-        <div class="carousel-track" id="newCarouselTrack"></div>
-        <div class="pagination" id="newPagination">
-          <div class="indicator"></div>
-        </div>
+        <!-- track y pagination se inyectan con JS -->
       </div>
     </section>
-
     <!-- CARRUSEL: ANUNCIOS -->
     <section class="infinite-carousel-section">
       <h2 id="titleStar">Anuncios</h2>
-      <div class="infinite-carousel">
-        <div class="carousel-track" id="starCarousel"></div>
+      <div class="infinite-carousel" id="starCarousel">
+        <!-- track se inyecta con JS -->
       </div>
     </section>
-
     <!-- TODOS LOS PRODUCTOS -->
     <section>
       <h2 id="titleAll">Todos los Productos</h2>
       <div class="products-grid normal" id="productsGrid"></div>
     </section>
   </main>
-
   <!-- MENÚ LATERAL -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
@@ -108,7 +99,6 @@
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
     <div class="menu-item admin-btn" id="adminBtn" style="display:none;">Ir a página de administrador</div>
   </aside>
-
   <!-- CARRITO LATERAL -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
@@ -124,9 +114,74 @@
       <div id="message"></div>
     </div>
   </aside>
-
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
+
+  <!-- ESTILO MÍNIMO PARA FIX MÓVIL (SIN TOCAR styles.css) -->
+  <style>
+    /* FIX ZOOM + SWIPE SUAVE EN MÓVIL */
+    #newProductsCarousel,
+    #starCarousel {
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      overflow: hidden;
+      position: relative;
+    }
+    #newProductsCarousel .carousel-track,
+    #starCarousel .carousel-track {
+      display: flex;
+      width: 100%;
+      will-change: transform;
+      transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1);
+    }
+    #newProductsCarousel .carousel-item,
+    #starCarousel .carousel-item {
+      min-width: 100%;
+      flex-shrink: 0;
+      padding: 0 8px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #newProductsCarousel .carousel-item img,
+    #starCarousel .carousel-item img {
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+    }
+    #newProductsCarousel .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    #newProductsCarousel .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.3);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #newProductsCarousel .dot.active {
+      background: #000;
+      transform: scale(1.2);
+    }
+    @media (max-width: 480px) {
+      #newProductsCarousel .carousel-item img {
+        max-height: 340px;
+      }
+      #newProductsCarousel,
+      #starCarousel {
+        padding: 0 10px;
+      }
+    }
+  </style>
 
   <script type="module" src="js/index.js"></script>
 </body>
