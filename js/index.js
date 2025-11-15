@@ -203,7 +203,7 @@ window.removeFromCart = (i) => {
 };
 goToPay.onclick = () => window.location.href = 'pago.html';
 
-// === CARRUSEL ADAPTATIVO SEGÚN DISPOSITIVO ===
+// === CARRUSEL ADAPTATIVO ===
 function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -227,10 +227,9 @@ function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
   const isMobile = document.body.classList.contains('mobile') || document.body.classList.contains('small-screen');
   const isDesktop = document.body.classList.contains('desktop');
 
-  // === CONFIGURACIÓN POR DISPOSITIVO ===
   let itemsPerView = 1;
   let showPagination = isNewLaunch && isMobile;
-  let isInfinite = containerId === 'starCarousel' && !isMobile;
+  let isInfinite = containerId === 'starCarousel';
 
   if (isDesktop) {
     itemsPerView = containerId === 'starCarousel' ? 4 : 3;
@@ -238,15 +237,14 @@ function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
     isInfinite = true;
   }
 
-  // Duplicar para infinito
   let displayItems = items;
   if (isInfinite && items.length > itemsPerView) {
     displayItems = [...items, ...items];
   }
 
-  // Renderizar
+  // Renderizar items
   track.innerHTML = displayItems.map((p, i) => `
-    <div class="carousel-item" data-id="${p.id}" style="cursor:pointer; min-width: ${100 / itemsPerView}%;">
+    <div class="carousel-item" data-id="${p.id}" style="min-width: ${100 / itemsPerView}%; cursor:pointer;">
       <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" style="width:100%; height:auto; max-height:${isMobile ? '300px' : '380px'}; object-fit:contain; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.12);">
     </div>
   `).join('');
@@ -257,7 +255,7 @@ function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
     `).join('');
   }
 
-  // === LÓGICA DE SWIPE (SOLO MÓVIL) ===
+  // === SWIPE MÓVIL ===
   if (isMobile) {
     let startX = 0, currentX = 0, currentTranslate = 0, prevTranslate = 0;
     let isDragging = false;
@@ -328,8 +326,10 @@ function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
     goToSlide(0);
   }
 
-  // === ESCRITORIO: SCROLL SUAVE ===
+  // === SCROLL ESCRITORIO ===
   if (isDesktop) {
+    container.style.overflowX = 'auto';
+    container.style.scrollBehavior = 'smooth';
     let isDown = false;
     let startX, scrollLeft;
 
@@ -340,16 +340,8 @@ function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
       scrollLeft = container.scrollLeft;
     });
 
-    track.addEventListener('mouseleave', () => {
-      isDown = false;
-      track.style.cursor = 'grab';
-    });
-
-    track.addEventListener('mouseup', () => {
-      isDown = false;
-      track.style.cursor = 'grab';
-    });
-
+    track.addEventListener('mouseleave', () => { isDown = false; track.style.cursor = 'grab'; });
+    track.addEventListener('mouseup', () => { isDown = false; track.style.cursor = 'grab'; });
     track.addEventListener('mousemove', e => {
       if (!isDown) return;
       e.preventDefault();
@@ -357,16 +349,11 @@ function createAdaptiveCarousel(containerId, filterFn, isNewLaunch = false) {
       const walk = (x - startX) * 2;
       container.scrollLeft = scrollLeft - walk;
     });
-
-    container.style.overflowX = 'auto';
-    container.style.scrollBehavior = 'smooth';
   }
 
   // Resize
   window.addEventListener('resize', () => {
-    setTimeout(() => {
-      createAdaptiveCarousel(containerId, filterFn, isNewLaunch);
-    }, 100);
+    setTimeout(() => createAdaptiveCarousel(containerId, filterFn, isNewLaunch), 100);
   });
 }
 
@@ -389,7 +376,7 @@ function renderGrid() {
   `).join('');
 }
 
-// === BÚSQUEDA INTELIGENTE ===
+// === BÚSQUEDA ===
 let searchTimeout;
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
@@ -431,7 +418,7 @@ function updateResultsPosition() {
 window.addEventListener('scroll', updateResultsPosition);
 window.addEventListener('resize', updateResultsPosition);
 
-// === INTERACCIONES UI ===
+// === UI ===
 menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
 [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
 cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
@@ -483,7 +470,7 @@ loadProductTypes();
 loadSocialLinks();
 updateResultsPosition();
 
-// === CARGAR PRODUCTOS Y CARRUSELES ===
+// === CARGAR PRODUCTOS ===
 onSnapshot(collection(db, "productos"), (snapshot) => {
   allProducts = snapshot.docs.map(doc => ({
     id: doc.id,
