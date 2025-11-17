@@ -22,6 +22,7 @@
       --red: #ef4444;
       --blue: #3b82f6;
       --yellow: #f59e0b;
+      --purple: #8b5cf6;
     }
 
     [data-theme="dark"] {
@@ -30,8 +31,8 @@
       --border: #333333;
       --card-bg: #111111;
       --accent-light: #1a1a1a;
-      --shadow: 0 8px 25px rgba(0,0,0,0.3);
-      --shadow-hover: 0 20px 40px rgba(0,0,0,0.4);
+      --shadow: 0 8px 25px rgba(0,0,0,0.4);
+      --shadow-hover: 0 20px 40px rgba(0,0,0,0.5);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -43,6 +44,7 @@
       transition: var(--transition);
     }
 
+    /* Header */
     .header {
       position: sticky;
       top: 0;
@@ -50,7 +52,7 @@
       border-bottom: 1px solid var(--border);
       z-index: 1000;
       padding: 16px 20px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
     .header-inner {
       max-width: 1400px;
@@ -62,14 +64,14 @@
     }
     .logo {
       font-weight: 800;
-      font-size: 1.6rem;
-      letter-spacing: -0.5px;
+      font-size: 1.7rem;
+      letter-spacing: -0.8px;
       color: var(--accent);
     }
     .back-btn, .theme-toggle {
       background: none;
       border: none;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       cursor: pointer;
       padding: 10px;
       border-radius: 12px;
@@ -81,84 +83,90 @@
       transform: translateY(-2px);
     }
     .total-ventas {
-      padding: 10px 24px;
+      background: var(--green);
+      color: white;
+      padding: 12px 28px;
       border-radius: 50px;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       letter-spacing: 0.5px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      transition: var(--transition);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+    .total-ventas.negative { background: var(--red); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3); }
 
+    /* Main */
     .main-container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 40px 20px;
     }
     .page-title {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 800;
       margin-bottom: 32px;
-      color: var(--text);
-      letter-spacing: -0.8px;
+      letter-spacing: -1px;
     }
 
-    /* Panel de Estadísticas */
+    /* Estadísticas */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
     }
     .stat-card {
       background: var(--card-bg);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      padding: 28px;
       box-shadow: var(--shadow);
       transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
     .stat-card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-8px);
       box-shadow: var(--shadow-hover);
     }
     .stat-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       color: white;
     }
     .stat-info h3 {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: #888;
-      margin-bottom: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
     }
     .stat-info p {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 800;
       margin: 0;
       letter-spacing: -1px;
     }
 
+    /* Búsqueda */
     .search-bar {
       margin-bottom: 40px;
     }
     .search-input {
       width: 100%;
-      padding: 16px 20px;
+      padding: 18px 24px;
       border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-size: 1.05rem;
+      border-radius: 14px;
+      font-size: 1.1rem;
       background: var(--card-bg);
       color: var(--text);
       transition: var(--transition);
@@ -166,71 +174,56 @@
     .search-input:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+      box-shadow: 0 0 0 5px rgba(0,0,0,0.06);
     }
-    .search-input::placeholder { color: #999; }
 
+    /* Órdenes */
     .orders-grid {
       display: grid;
-      gap: 24px;
+      gap: 28px;
     }
     .order-card {
       background: var(--card-bg);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: var(--transition);
       box-shadow: var(--shadow);
+      transition: var(--transition);
     }
     .order-card:hover {
-      transform: translateY(-8px);
+      transform: translateY(-10px);
       box-shadow: var(--shadow-hover);
       border-color: var(--accent);
     }
     .order-header {
       background: var(--accent);
       color: white;
-      padding: 18px 24px;
+      padding: 20px 28px;
       font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: 0.8px;
+      font-size: 1.2rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .order-body {
       padding: 28px;
     }
     .order-total {
-      font-size: 2.4rem;
+      font-size: 2.6rem;
       font-weight: 800;
       margin-bottom: 20px;
-      letter-spacing: -1px;
       color: var(--accent);
     }
-    .order-meta {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
-      padding: 20px;
-      background: var(--accent-light);
-      border-radius: 12px;
+    .order-id { font-size: 0.95rem; color: #666; margin-bottom: 8px; }
+    .order-date {
       font-size: 0.95rem;
-    }
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .meta-item i {
-      color: var(--accent);
-      font-size: 1.1rem;
-      width: 20px;
+      color: #888;
+      margin-top: 16px;
+      font-weight: 500;
     }
     .order-products {
       background: var(--accent-light);
-      padding: 18px;
+      padding: 20px;
       border-radius: 12px;
       margin: 20px 0;
     }
@@ -238,51 +231,37 @@
       display: flex;
       justify-content: space-between;
       padding: 10px 0;
-      font-size: 0.98rem;
       border-bottom: 1px solid var(--border);
+      font-size: 1rem;
     }
-    .order-product:last-child { border-bottom: none; }
-    .btn-print {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 14px 24px;
+    .order-product:last-child { border: none; }
+    .order-address {
+      background: var(--accent-light);
+      padding: 20px;
       border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.95rem;
-      transition: var(--transition);
-      width: 100%;
-      justify-content: center;
-    }
-    .btn-print:hover {
-      background: #111;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      line-height: 1.8;
+      font-size: 1rem;
     }
 
     .empty-state {
       text-align: center;
       padding: 120px 20px;
       color: #999;
-      font-size: 1.4rem;
     }
     .empty-state i {
       font-size: 5rem;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       opacity: 0.3;
     }
 
     @media (max-width: 768px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
-      .order-meta { grid-template-columns: 1fr; }
+      .order-total { font-size: 2.2rem; }
     }
   </style>
 </head>
 <body data-theme="light">
+
   <div class="header">
     <div class="header-inner">
       <button class="back-btn" onclick="location.href='admin.html'">
@@ -290,7 +269,7 @@
       </button>
       <div class="logo">EFRAÍN SHOP</div>
       <div style="display:flex; align-items:center; gap:20px;">
-        <div class="total-ventas" id="totalVentas" style="background:var(--green); color:white;">
+        <div class="total-ventas" id="totalVentas">
           <i class="fas fa-dollar-sign"></i> $0
         </div>
         <button class="theme-toggle" id="themeToggle">
@@ -303,46 +282,46 @@
   <div class="main-container">
     <h1 class="page-title">Panel de Ventas</h1>
 
-    <!-- Panel de Estadísticas -->
+    <!-- Estadísticas -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon" style="background:#10b981;"><i class="fas fa-box"></i></div>
+        <div class="stat-icon" style="background:var(--green);"><i class="fas fa-box"></i></div>
         <div class="stat-info">
           <h3>Productos Vendidos</h3>
           <p id="totalItems">0</p>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:#3b82f6;"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-icon" style="background:var(--blue);"><i class="fas fa-shopping-cart"></i></div>
         <div class="stat-info">
-          <h3>Órdenes Completadas</h3>
-          <p id="completedOrders">0</p>
+          <h3>Total Órdenes</h3>
+          <p id="totalOrders">0</p>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-times-circle"></i></div>
+        <div class="stat-icon" style="background:var(--yellow);"><i class="fas fa-clock"></i></div>
         <div class="stat-info">
-          <h3>Canceladas</h3>
-          <p id="canceledOrders">0</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-clock"></i></div>
-        <div class="stat-info">
-          <h3>Pendientes</h3>
+          <h3>Órdenes Pendientes</h3>
           <p id="pendingOrders">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:var(--purple);"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info">
+          <h3>Completadas Hoy</h3>
+          <p id="todayOrders">0</p>
         </div>
       </div>
     </div>
 
     <div class="search-bar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por cliente, teléfono, producto, colonia, ID de orden...">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono, colonia, ID de orden...">
     </div>
 
     <div class="orders-grid" id="ordersContainer">
       <div class="empty-state">
         <i class="fas fa-spinner fa-spin"></i>
-        <p>Cargando órdenes...</p>
+        <p>Cargando compras...</p>
       </div>
     </div>
   </div>
@@ -363,51 +342,61 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    if (!localStorage.getItem('isAdmin')) window.location.href = 'login.html';
+    // Proteger admin
+    if (!localStorage.getItem('isAdmin')) {
+      window.location.href = 'login.html';
+    }
 
     let orders = [];
+    let unsubscribe = null;
 
     const ordersRef = collection(db, "orders");
     const q = query(ordersRef, orderBy("date", "desc"));
 
-    onSnapshot(q, (snapshot) => {
+    unsubscribe = onSnapshot(q, (snapshot) => {
       orders = [];
       let totalItems = 0;
-      let completed = 0, canceled = 0, pending = 0;
+      let totalRevenue = 0;
+      let pending = 0;
+      let todayCount = 0;
+      const today = new Date().toLocaleDateString('es-MX');
 
       snapshot.forEach(doc => {
         const data = doc.data();
         const order = { id: doc.id, ...data };
         orders.push(order);
 
-        // Contar productos
+        // Contar productos vendidos
         if (data.products) {
           totalItems += data.products.reduce((sum, p) => sum + (p.qty || 1), 0);
         }
 
-        // Contar estados (ajusta según tus campos reales)
-        if (data.status === 'cancelada') canceled++;
-        else if (data.status === 'pendiente' || !data.status) pending++;
-        else completed++;
+        totalRevenue += Number(data.total || 0);
+
+        // Pendientes (sin status o "pendiente")
+        if (!data.status || data.status === "pendiente") pending++;
+
+        // Órdenes de hoy
+        const orderDate = data.date?.toDate?.() || new Date(data.date);
+        if (orderDate.toLocaleDateString('es-MX') === today) todayCount++;
       });
 
       renderOrders();
-      updateStats(totalItems, completed, canceled, pending);
-      updateTotalVentas(orders);
+      updateStats(totalItems, orders.length, pending, todayCount);
+      updateTotalVentas(totalRevenue);
     });
 
-    function updateStats(items, completed, canceled, pending) {
+    function updateStats(items, total, pending, today) {
       document.getElementById('totalItems').textContent = items.toLocaleString();
-      document.getElementById('completedOrders').textContent = completed;
-      document.getElementById('canceledOrders').textContent = canceled;
+      document.getElementById('totalOrders').textContent = total;
       document.getElementById('pendingOrders').textContent = pending;
+      document.getElementById('todayOrders').textContent = today;
     }
 
-    function updateTotalVentas(ordersList) {
-      const total = ordersList.reduce((sum, o) => sum + Number(o.total || 0), 0);
-      const totalEl = document.getElementById('totalVentas');
-      totalEl.innerHTML = `<i class="fas fa-dollar-sign"></i> $${total.toLocaleString('es-MX')}`;
-      totalEl.style.background = total >= 0 ? 'var(--green)' : 'var(--red)';
+    function updateTotalVentas(amount) {
+      const el = document.getElementById('totalVentas');
+      el.innerHTML = `<i class="fas fa-dollar-sign"></i> $${amount.toLocaleString('es-MX')}`;
+      el.classList.toggle('negative', amount < 0);
     }
 
     function renderOrders() {
@@ -415,40 +404,47 @@
       container.innerHTML = '';
 
       if (orders.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-bag"></i><p>No hay órdenes aún</p></div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-bag"></i><p>No hay compras aún</p></div>`;
         return;
       }
 
       orders.forEach(order => {
-        const addr = order.address || {};
-        const productsHtml = (order.products || []).map(p => 
-          `<div class="order-product">
-            <span>${p.name} ${p.qty > 1 ? `×${p.qty}` : ''}</span>
-            <strong>$${(p.price * (p.qty || 1)).toFixed(2)}</strong>
-          </div>`
-        ).join('');
+        const date = order.date?.toDate?.() || new Date(order.date);
+        const formattedDate = date.toLocaleString('es-MX', {
+          weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+
+        const productsHtml = (order.products || []).map(p => `
+          <div class="order-product">
+            <span>${p.name} (x${p.qty || 1})</span>
+            <span>$${(p.price * (p.qty || 1)).toFixed(2)}</span>
+          </div>
+        `).join('');
+
+        const address = order.address || {};
+        const fullAddress = `${address.street || ''}, ${address.colonia || ''}, ${address.cp || ''}, ${address.state || ''}`;
 
         const card = document.createElement('div');
         card.className = 'order-card';
         card.innerHTML = `
           <div class="order-header">
-            <i class="fas fa-receipt"></i> Orden #${order.id.slice(0,8).toUpperCase()}
+            <i class="fas fa-receipt"></i>
+            Compra #${order.id.slice(0, 8).toUpperCase()}
           </div>
           <div class="order-body">
             <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX')}</div>
-            
-            <div class="order-meta">
-              <div class="meta-item"><i class="fas fa-user"></i> ${addr.name || 'Sin nombre'}</div>
-              <div class="meta-item"><i class="fas fa-phone"></i> ${addr.phone || '—'}</div>
-              <div class="meta-item"><i class="fas fa-map-marker-alt"></i> ${addr.colonia || 'Sin colonia'}</div>
-              <div class="meta-item"><i class="fas fa-calendar"></i> ${new Date(order.date?.seconds * 1000 || Date.now()).toLocaleDateString('es-MX')}</div>
-            </div>
-
+            ${order.paymentId ? `<div class="order-id">ID de pago: ${order.paymentId}</div>` : ''}
             <div class="order-products">${productsHtml}</div>
-
-            <button class="btn-print" onclick="printLabel('${order.id}')">
-              <i class="fas fa-print"></i> Imprimir Etiqueta
-            </button>
+            <div class="order-address">
+              <strong>${address.name || 'Sin nombre'}</strong><br>
+              ${fullAddress}<br>
+              Tel: ${address.phone || '—'}<br>
+              Cliente: ${order.userId || 'Anónimo'}
+            </div>
+            <div class="order-date">
+              <i class="fas fa-calendar-alt"></i> ${  }
+            </div>
           </div>
         `;
         container.appendChild(card);
@@ -464,40 +460,18 @@
       });
     });
 
-    // Tema
+    // Tema oscuro
     const toggle = document.getElementById('themeToggle');
     const saved = localStorage.getItem('theme') || 'light';
     document.body.setAttribute('data-theme', saved);
     toggle.innerHTML = saved === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+
     toggle.onclick = () => {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
       const newTheme = isDark ? 'light' : 'dark';
       document.body.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
       toggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    };
-
-    // Imprimir etiqueta (igual que antes)
-    window.printLabel = function(id) {
-      const card = [...document.querySelectorAll('.order-card')].find(c => 
-        c.querySelector('.order-header')?.textContent.includes(id)
-      );
-      if (!card) return;
-      const label = card.querySelector('.order-body')?.innerHTML || '';
-      const win = window.open('', '', 'width=600,height=800');
-      win.document.write(`
-        <html><head><title>Etiqueta #${id.slice(0,8)}</title>
-        <style>
-          body{font-family:'Inter',sans-serif;padding:60px;background:white;color:black;line-height:1.8;font-size:18px}
-          .total{font-size:32px;font-weight:800;margin:20px 0}
-          .meta{margin:30px 0;font-size:16px}
-        </style></head><body>
-          <h1 style="text-align:center;font-size:36px;margin-bottom:40px">EFRAÍN SHOP</h1>
-          ${card.querySelector('.order-body').innerHTML}
-        </body></html>
-      `);
-      win.document.close();
-      setTimeout(() => { win.print(); win.close(); }, 600);
     };
   </script>
 </body>
