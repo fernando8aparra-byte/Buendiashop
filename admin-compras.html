@@ -4,271 +4,372 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compras • Efraín Shop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #1e293b;
-      --text-light: #64748b;
-      --border: #e2e8f0;
-      --primary: #000000;
-      --accent: #25D366;
-      --shadow: 0 10px 25px rgba(0,0,0,0.08);
-      --radius: 20px;
-      --transition: all 0.3s ease;
-    }
-    [data-theme="dark"] {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --text: #f1f5f9;
-      --text-light: #94a3b8;
-      --border: #334155;
-      --shadow: 0 10px 25px rgba(0,0,0,0.4);
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+    html, body {
+      font-family: 'Poppins', sans-serif;
+      background: #ffffff;
+      color: #111111;
+      font-size: 16px;
       line-height: 1.6;
-      padding-top: 80px;
-      transition: var(--transition);
+      letter-spacing: 0.025em;
+      -webkit-font-smoothing: antialiased;
     }
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 80px;
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    h1,h2,h3,h4,h5,h6 { font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      border-bottom: 1px solid #eeeeee;
       z-index: 1000;
-      display: flex;
+      padding: 16px 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .header-inner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
-      padding: 0 20px;
-      gap: 20px;
+      gap: 12px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .logo {
+      font-weight: 900;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #111111;
     }
     .back-btn {
-      background: rgba(0,0,0,0.08);
-      border: none;
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      color: var(--text);
-      font-size: 1.4rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .back-btn:hover { background: rgba(0,0,0,0.15); transform: scale(1.1); }
-    .logo { font-weight: 900; font-size: 1.6rem; letter-spacing: -1px; }
-    .header-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 20px;
+      background: none; border: none; font-size: 1.5rem; cursor: pointer;
     }
     .total-ventas {
-      font-size: 1.1rem;
-      font-weight: 700;
-      background: var(--primary);
-      color: white;
+      background: #000;
+      color: #fff;
       padding: 10px 20px;
       border-radius: 50px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .icon-btn {
-      background: none; border: none; font-size: 1.4rem; color: var(--text-light);
-      cursor: pointer; padding: 10px; border-radius: 50%; transition: var(--transition);
+    .theme-toggle {
+      background: none; border: none; font-size: 1.3rem; cursor: pointer; padding: 8px; border-radius: 8px;
     }
-    .icon-btn:hover { background: rgba(0,0,0,0.1); color: var(--text); }
+    .theme-toggle:hover { background: #f5f5f5; }
 
-    main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
-
+    /* Main */
+    .main-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
     .search-bar {
       display: flex;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       flex-wrap: wrap;
     }
     .search-input, .date-input {
       padding: 14px 18px;
-      border: 2px solid var(--border);
-      border-radius: 14px;
-      background: var(--surface);
+      border: 2px solid #111111;
+      border-radius: 8px;
       font-size: 1rem;
+      font-weight: 500;
       flex: 1;
       min-width: 250px;
-      transition: var(--transition);
     }
-    .search-input:focus, .date-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
-    }
+    .search-input::placeholder { color: #999999; }
 
+    /* Orders Grid */
     .orders-grid {
       display: grid;
-      gap: 24px;
+      gap: 28px;
     }
     .order-card {
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
+      background: #ffffff;
+      border: 2px solid #111111;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
+      transition: transform 0.3s ease;
     }
     .order-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-      border-color: var(--primary);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
     }
     .order-header {
-      background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-      color: white;
-      padding: 20px 24px;
-      font-size: 1.3rem;
+      background: #000;
+      color: #fff;
+      padding: 18px 24px;
       font-weight: 800;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .order-body { padding: 24px; }
+    .order-body {
+      padding: 24px;
+    }
     .order-total {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 900;
-      color: var(--primary);
       margin-bottom: 16px;
+      letter-spacing: -0.5px;
     }
     .order-products {
-      background: rgba(0,0,0,0.04);
+      background: #f9f9f9;
       padding: 16px;
-      border-radius: 12px;
+      border-radius: 8px;
       margin: 16px 0;
     }
     .order-product {
       display: flex;
       justify-content: space-between;
-      padding: 8px 0;
+      padding: 6px 0;
       font-size: 0.98rem;
     }
     .order-address {
-      background: rgba(0,0,0,0.03);
+      background: #f9f9f9;
       padding: 16px;
-      border-radius: 12px;
-      line-height: 1.7;
-      font-size: 0.95rem;
+      border-radius: 8px;
+      line-height: 1.8;
+      font-size: 0.98rem;
+      margin: 16px 0;
     }
-    .order-date {
-      margin-top: 16px;
-      color: var(--text-light);
+    .order-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .btn-print {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-size: 0.9rem;
-      text-align: right;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
     }
+    .btn-print:hover { background: #111; }
 
-    .empty {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--text-light);
-      font-size: 1.2rem;
+    /* Dark Mode */
+    [data-theme="dark"] {
+      background: #000;
+      color: #fff;
     }
-    .empty i { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
+    [data-theme="dark"] .header,
+    [data-theme="dark"] .order-card,
+    [data-theme="dark"] .search-input,
+    [data-theme="dark"] .date-input {
+      background: #111;
+      border-color: #333;
+      color: #fff;
+    }
+    [data-theme="dark"] .order-header { background: #fff; color: #000; }
+    [data-theme="dark"] .order-products,
+    [data-theme="dark"] .order-address { background: #1a1a1a; }
+    [data-theme="dark"] .total-ventas { background: #fff; color: #000; }
 
-    @media (max-width: 768px) {
-      .search-bar { flex-direction: column; }
-      .search-input, .date-input { min-width: 100%; }
-      .order-total { font-size: 1.7rem; }
+    /* Print Label */
+    @media print {
+      body * { visibility: hidden; }
+      .print-label, .print-label * { visibility: visible; }
+      .print-label {
+        position: absolute;
+        left: 0; top: 0;
+        width: 100%;
+        padding: 40px;
+        background: white;
+        color: black;
+        font-size: 14px;
+      }
+      .print-header { font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 30px; }
+      .print-info { margin: 20px 0; line-height: 2; font-size: 18px; }
+      .print-products { margin: 30px 0; }
+      .print-product { padding: 8px 0; border-bottom: 1px solid #eee; }
     }
   </style>
 </head>
 <body data-theme="light">
 
-  <header>
-    <button class="back-btn" onclick="window.location.href='admin.html'">
-      ←
-    </button>
-    <div class="logo">EFRAÍN SHOP</div>
-    <div class="header-right">
-      <div class="total-ventas" id="totalVentas">$0 MXN</div>
-      <button class="icon-btn" id="themeToggle">Moon</button>
-      <button class="icon-btn" id="sortBtn">Sort</button>
+  <div class="header">
+    <div class="header-inner">
+      <button class="back-btn" onclick="location.href='admin.html'">←</button>
+      <div class="logo">EFRAÍN SHOP</div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="total-ventas" id="totalVentas">$0</div>
+        <button class="theme-toggle" id="themeToggle">Moon</button>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <main>
+  <div class="main-container">
     <div class="search-bar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono, producto, colonia, ID, etc...">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono, producto, colonia, ID...">
       <input type="date" class="date-input" id="dateFilter">
     </div>
 
     <div class="orders-grid" id="ordersContainer">
-      <div class="empty">
-        <i class="fas fa-spinner fa-spin"></i>
-        <div>Cargando compras...</div>
-      </div>
+      <p style="text-align:center; padding:80px 0; color:#999; font-size:1.2rem;">
+        <i class="fas fa-spinner fa-spin"></i> Cargando compras...
+      </p>
     </div>
-  </main>
+  </div>
 
-  <!-- TU JS ORIGINAL (SIN CAMBIOS) -->
-  <script type="module" src="js/compras.js"></script>
+  <!-- TU JS MODIFICADO (MEJORADO) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-  <script>
-    // === MODO OSCURO ===
-    const themeToggle = document.getElementById('themeToggle');
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', currentTheme);
-    themeToggle.innerHTML = currentTheme === 'dark' ? 'Sun' : 'Moon';
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    themeToggle.addEventListener('click', () => {
+    if (!localStorage.getItem('isAdmin')) window.location.href = 'login.html';
+
+    let orders = [];
+    let sortAsc = false;
+
+    const ordersRef = collection(db, "orders");
+    let unsubscribe = null;
+
+    function loadOrders(order = 'desc') {
+      const q = query(ordersRef, orderBy("date", order));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        orders = [];
+        snapshot.forEach(doc => {
+          orders.push({ id: doc.id, ...doc.data() });
+        });
+        renderOrders();
+        updateTotalVentas();
+      });
+    }
+    loadOrders('desc');
+
+    function renderOrders() {
+      const container = document.getElementById('ordersContainer');
+      container.innerHTML = '';
+      if (orders.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999; padding:100px 0; font-size:1.3rem;">No hay compras aún.</p>';
+        return;
+      }
+
+      orders.forEach(order => {
+        const addr = order.address || {};
+        const productsHtml = (order.products || []).map(p => 
+          `<div class="order-product"><span>${p.name} (x${p.qty || 1})</span><span>$${(p.price * (p.qty||1)).toFixed(2)}</span></div>`
+        ).join('');
+
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.innerHTML = `
+          <div class="order-header">Orden #${order.id.slice(0,8).toUpperCase()}</div>
+          <div class="order-body">
+            <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX')}</div>
+            <div class="order-products">${productsHtml}</div>
+            <div class="order-address">
+              <strong>${addr.name || 'Sin nombre'}</strong><br>
+              ${addr.phone || ''}<br>
+              ${addr.street || ''}, ${addr.colonia || ''}<br>
+              CP ${addr.cp || ''}, ${addr.state || ''}
+            </div>
+            <div class="order-actions">
+              <button class="btn-print" onclick="printLabel('${order.id}')">
+                Imprimir etiqueta
+              </button>
+            </div>
+          </div>
+          <div class="print-label" style="display:none;">
+            <div class="print-header">EFRAÍN SHOP</div>
+            <div class="print-info">
+              <strong>Cliente:</strong> ${addr.name}<br>
+              <strong>Tel:</strong> ${addr.phone}<br>
+              <strong>Dirección:</strong> ${addr.street}, ${addr.colonia}, CP ${addr.cp}, ${addr.state}<br>
+              <strong>Orden:</strong> #${order.id}<br>
+              <strong>Total:</strong> $${(order.total || 0).toFixed(2)} MXN
+            </div>
+            <div class="print-products">
+              ${order.products.map(p => `<div class="print-product">${p.name} x${p.qty || 1}</div>`).join('')}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateTotalVentas() {
+      const total = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+      document.getElementById('totalVentas').textContent = `$${total.toLocaleString('es-MX')}`;
+    }
+
+    // Imprimir etiqueta
+    window.printLabel = function(id) {
+      const label = document.querySelector(`[onclick="printLabel('${id}')"]`).closest('.order-card').querySelector('.print-label');
+      const win = window.open('', '', 'width=600,height=800');
+      win.document.write(`
+        <html><head><title>Etiqueta #${id}</title>
+        <style>
+          body{font-family:'Poppins',sans-serif;padding:40px;background:white;color:black;font-size:16px;line-height:1.8}
+          .header{font-size:32px;font-weight:900;text-align:center;margin-bottom:40px}
+          .info{font-size:20px;margin:30px 0}
+          .products{margin:40px 0}
+          .product{padding:10px 0;border-bottom:1px solid #ddd}
+        </style></head><body>${label.innerHTML}</body></html>
+      `);
+      win.document.close();
+      setTimeout(() => { win.print(); win.close(); }, 500);
+    };
+
+    // Filtros
+    document.getElementById('searchInput').addEventListener('input', filter);
+    document.getElementById('dateFilter').addEventListener('change', filter);
+    function filter() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const date = document.getElementById('dateFilter').value;
+      document.querySelectorAll('.order-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const matches = (!term || text.includes(term)) && (!date || text.includes(date.split('-').reverse().join('/').slice(0,10)));
+        card.style.display = matches ? 'block' : 'none';
+      });
+    }
+
+    // Modo oscuro
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', saved);
+    toggle.innerHTML = saved === 'dark' ? 'Sun' : 'Moon';
+    toggle.onclick = () => {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
       const newTheme = isDark ? 'light' : 'dark';
       document.body.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
-      themeToggle.innerHTML = newTheme === 'dark' ? 'Sun' : 'Moon';
-    });
-
-    // === BÚSQUEDA AVANZADA + FILTRO POR FECHA ===
-    const searchInput = document.getElementById('searchInput');
-    const dateFilter = document.getElementById('dateFilter');
-
-    function filterOrders() {
-      const term = searchInput.value.toLowerCase().trim();
-      const selectedDate = dateFilter.value;
-
-      const cards = document.querySelectorAll('.order-card');
-      cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const dateElement = card.querySelector('.order-date');
-        const orderDate = dateElement ? dateElement.textContent : '';
-
-        const matchesSearch = !term || text.includes(term);
-        const matchesDate = !selectedDate || orderDate.includes(selectedDate.split('-').reverse().join('/').slice(0,10));
-
-        card.style.display = (matchesSearch && matchesDate) ? 'block' : 'none';
-      });
-    }
-
-    searchInput.addEventListener('input', filterOrders);
-    dateFilter.addEventListener('change', filterOrders);
-
-    // === TOTAL DE VENTAS EN DINERO ===
-    const totalVentasEl = document.getElementById('totalVentas');
-    const originalRender = window.renderOrders || renderOrders;
-    
-    window.renderOrders = function() {
-      originalRender();
-
-      // Calcular total de ventas
-      let total = 0;
-      window.orders.forEach(order => {
-        total += Number(order.total || 0);
-      });
-      totalVentasEl.textContent = `$${total.toLocaleString('es-MX')} MXN`;
-
-      // Aplicar filtro después de renderizar
-      setTimeout(filterOrders, 100);
+      toggle.innerHTML = newTheme === 'dark' ? 'Sun' : 'Moon';
     };
 
-    // Hacer que el botón de ordenar siga funcionando
-    document.getElementById('sortBtn').addEventListener('click', () => {
-      document.getElementById('sortBtn').click(); // Dispara el evento original
+    // Ordenar
+    document.getElementById('sortBtn')?.addEventListener('click', () => {
+      sortAsc = !sortAsc;
+      if (unsubscribe) unsubscribe();
+      loadOrders(sortAsc ? 'asc' : 'desc');
     });
   </script>
 </body>
