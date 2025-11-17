@@ -4,117 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapa de Compras - Admin</title>
-  <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Font Awesome para el ícono de gráfico -->
+  <!-- Font Awesome para ícono minimalista -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <style>
-    body { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; }
+    :root {
+      --bg: #f9f9fb;
+      --text: #222;
+      --accent: #4a6cf7;
+      --panel-bg: #fff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --radius: 10px;
+      --transition: 0.25s ease;
+    }
 
-    /* BARRA ADMIN */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg); color: var(--text); padding-top: 64px;
+    }
+
+    /* BARRA SUPERIOR - MINIMALISTA */
     .admin-bar {
-      position: fixed; top: 0; left: 0; width: 100%; background: #000; color: #fff;
-      padding: 15px 20px; z-index: 2000; display: flex; align-items: center;
-      font-weight: 700; text-transform: uppercase; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      gap: 15px;
+      position: fixed; top: 0; left: 0; width: 100%; height: 64px;
+      background: #fff; box-shadow: var(--shadow); z-index: 2000;
+      display: flex; align-items: center; padding: 0 20px; gap: 16px;
     }
 
-    /* FLECHA IZQUIERDA */
-    .back-btn-header {
-      background: transparent; color: #fff; border: none; font-size: 1.4rem;
-      cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s;
+    .back-btn {
+      background: none; border: none; font-size: 1.4rem; color: #666;
+      cursor: pointer; padding: 8px; border-radius: 50%; transition: var(--transition);
     }
-    .back-btn-header:hover { background: rgba(255,255,255,0.1); }
+    .back-btn:hover { background: #f0f0f0; color: #000; }
 
-    /* TÍTULO */
-    .title { flex: 1; }
-
-    /* BOTÓN ESTADÍSTICAS (exacto como pediste) */
-    #btnEstadisticas {
-      background: white;
-      color: black;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: 0.2s;
-    }
-    #btnEstadisticas:hover {
-      background: #f0f0f0;
-      transform: translateY(-1px);
+    .title {
+      flex: 1; font-size: 1.1rem; font-weight: 600; color: #333;
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    .admin-btn {
-      background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700;
-      cursor: pointer; font-size: 0.9rem; border: none; transition: 0.2s;
+    /* BOTÓN ESTADÍSTICAS - MINIMALISTA */
+    .stats-btn {
+      background: #f8f9ff; color: var(--accent); border: none;
+      padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: var(--transition); box-shadow: 0 1px 3px rgba(74,108,247,0.15);
     }
-    .admin-btn:hover { background: #f0f0f0; }
+    .stats-btn:hover {
+      background: #eef0ff; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(74,108,247,0.2);
+    }
+    .stats-btn i { font-size: 1rem; }
+
+    .logout-btn {
+      background: #fff; color: #666; border: 1px solid #ddd;
+      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+    }
+    .logout-btn:hover { background: #f5f5f5; color: #000; }
 
     /* MAPA */
-    .map-container {
-      position: relative; height: calc(100vh - 70px); background: #f8f8f8;
-    }
+    .map-container { position: relative; height: calc(100vh - 64px); }
     #map { width: 100%; height: 100%; }
 
-    /* LEYENDA - OCULTABLE */
+    /* LEYENDA - MINIMALISTA */
     .legend {
-      position: absolute; bottom: 20px; left: 20px; background: #fff; padding: 15px;
-      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
-      font-size: 0.9rem; transition: all 0.3s ease; min-width: 180px;
+      position: absolute; bottom: 16px; left: 16px; background: var(--panel-bg);
+      padding: 12px 14px; border-radius: var(--radius); box-shadow: var(--shadow);
+      font-size: 0.85rem; min-width: 160px; transition: all 0.3s ease;
+      opacity: 1; transform: translateY(0);
     }
-    .legend.hidden { transform: translateY(120px); opacity: 0; pointer-events: none; }
+    .legend.hidden { opacity: 0; transform: translateY(40px); pointer-events: none; }
     .legend h4 {
-      margin: 0 0 10px; font-size: 1rem; text-transform: uppercase;
+      margin: 0 0 8px; font-size: 0.9rem; font-weight: 600; color: #444;
       display: flex; justify-content: space-between; align-items: center;
     }
     .close-legend {
-      background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999;
+      background: none; border: none; font-size: 1.1rem; color: #bbb;
+      cursor: pointer; padding: 2px; border-radius: 4px;
     }
-    .close-legend:hover { color: #000; }
-    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .legend-color { width: 16px; height: 16px; border-radius: 50%; }
+    .close-legend:hover { color: #999; background: #f0f0f0; }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 0.8rem;
+    }
+    .legend-color {
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+    }
 
-    /* PANEL ESTADÍSTICAS - OCULTABLE */
+    /* PANEL ESTADÍSTICAS - MINIMALISTA */
     .stats-panel {
-      position: absolute; top: 90px; right: 20px; width: 300px; background: #fff; padding: 20px;
-      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
-      transition: all 0.3s ease;
+      position: absolute; top: 80px; right: 16px; width: 280px; background: var(--panel-bg);
+      padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow);
+      transition: all 0.3s ease; opacity: 1; transform: translateX(0);
     }
-    .stats-panel.hidden { transform: translateX(350px); opacity: 0; pointer-events: none; }
+    .stats-panel.hidden { opacity: 0; transform: translateX(320px); pointer-events: none; }
     .stats-panel h3 {
-      margin: 0 0 15px; font-size: 1.3rem; display: flex; justify-content: space-between;
-      align-items: center;
+      margin: 0 0 12px; font-size: 1.1rem; font-weight: 600; color: #333;
+      display: flex; justify-content: space-between; align-items: center;
     }
     .close-stats {
-      background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999;
+      background: none; border: none; font-size: 1.1rem; color: #bbb;
+      cursor: pointer; padding: 2px; border-radius: 4px;
     }
-    .close-stats:hover { color: #000; }
-    .stat { margin-bottom: 12px; }
-    .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; }
-    .stat-value { font-size: 1.8rem; font-weight: 800; }
+    .close-stats:hover { color: #999; background: #f0f0f0; }
+    .stat { margin-bottom: 10px; }
+    .stat-label { font-size: 0.75rem; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 1.6rem; font-weight: 700; color: #222; margin-top: 2px; }
   </style>
 </head>
 <body>
 
   <!-- BARRA SUPERIOR -->
   <div class="admin-bar">
-    <!-- FLECHA IZQUIERDA -->
-    <button class="back-btn-header" id="backBtnHeader" title="Volver al Panel">←</button>
-
-    <!-- TÍTULO -->
-    <div class="title">MAPA DE COMPRAS</div>
-
-    <!-- BOTÓN ESTADÍSTICAS (exacto como pediste) -->
-    <button id="btnEstadisticas">
+    <button class="back-btn" id="backBtnHeader" title="Volver">←</button>
+    <div class="title">Mapa de Compras</div>
+    <button class="stats-btn" id="statsBtn">
       <i class="fa fa-chart-bar"></i> Estadísticas
     </button>
-
-    <!-- CERRAR SESIÓN -->
-    <button class="admin-btn" id="logoutBtn">Cerrar Sesión</button>
+    <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
   </div>
 
   <!-- MAPA -->
@@ -133,15 +138,15 @@
       </div>
       <div class="legend-item">
         <div class="legend-color" style="background:#f1c40f;"></div>
-        <span>2-5 compras</span>
+        <span>2–5 compras</span>
       </div>
       <div class="legend-item">
         <div class="legend-color" style="background:#e67e22;"></div>
-        <span>6-10 compras</span>
+        <span>6–10 compras</span>
       </div>
       <div class="legend-item">
         <div class="legend-color" style="background:#e74c3c;"></div>
-        <span>11-20 compras</span>
+        <span>11–20 compras</span>
       </div>
       <div class="legend-item">
         <div class="legend-color" style="background:#c0392b;"></div>
@@ -156,7 +161,7 @@
         <button class="close-stats" id="closeStatsBtn">×</button>
       </h3>
       <div class="stat">
-        <div class="stat-label">Total de Órdenes</div>
+        <div class="stat-label">Total Órdenes</div>
         <div class="stat-value" id="totalOrders">0</div>
       </div>
       <div class="stat">
@@ -175,11 +180,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // === FIREBASE ===
+    // === FIREBASE CONFIG ===
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: " boutique-buendia",
+      projectId: "boutique-buendia",
       storageBucket: "boutique-buendia.firebasestorage.app",
       messagingSenderId: "430651152709",
       appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
@@ -200,7 +205,7 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // === COORDENADAS POR ESTADO ===
+    // === COORDENADAS ===
     const stateCoords = {
       AGS: [21.88, -102.29], BC: [30.0, -115.0], BCS: [26.0, -111.5], CAM: [18.6, -90.7],
       CHIS: [16.5, -92.5], CHIH: [28.6, -106.0], CDMX: [19.43, -99.13], COAH: [27.0, -102.0],
@@ -212,13 +217,13 @@
       TLAX: [19.4, -98.2], VER: [19.2, -96.1], YUC: [20.7, -89.1], ZAC: [22.7, -102.5]
     };
 
-    // === FUNCIÓN PARA OBTENER COLOR SEGÚN COMPRAS ===
+    // === COLOR POR COMPRAS ===
     function getColor(count) {
-      if (count === 1) return '#2ecc71';     // Verde brillante
-      if (count <= 5)  return '#f1c40f';     // Amarillo
-      if (count <= 10) return '#e67e22';     // Naranja
-      if (count <= 20) return '#e74c3c';     // Rojo claro
-      return '#c0392b';                      // Rojo oscuro
+      if (count === 1) return '#2ecc71';
+      if (count <= 5)  return '#f1c40f';
+      if (count <= 10) return '#e67e22';
+      if (count <= 20) return '#e74c3c';
+      return '#c0392b';
     }
 
     // === CONTADORES ===
@@ -226,7 +231,7 @@
     let totalRevenue = 0;
     const stateCount = {};
 
-    // === CARGAR ÓRDENES ===
+    // === CARGAR ÓRDENES DESDE FIREBASE ===
     db.collection('orders').get().then(snapshot => {
       snapshot.forEach(doc => {
         const data = doc.data();
@@ -255,34 +260,30 @@
                 Orden: <b>${doc.id}</b><br>
                 Total: <b>$${data.total}</b><br>
                 Fecha: ${new Date(data.date?.toDate()).toLocaleDateString('es-MX')}<br>
-                <small><i>${count} compra${count > 1 ? 's' : ''} en este estado</i></small>
+                <small><i>${count} compra${count > 1 ? 's' : ''} aquí</i></small>
               `);
           }
         }
       });
 
-      // Actualizar estadísticas
+      // Actualizar panel
       document.getElementById('totalOrders').textContent = totalOrders;
       document.getElementById('totalRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
       const top = Object.entries(stateCount).sort((a,b) => b[1] - a[1])[0];
-      if (top) {
-        document.getElementById('topState').textContent = `${top[0]} (${top[1]})`;
-      }
+      if (top) document.getElementById('topState').textContent = `${top[0]} (${top[1]})`;
     });
 
-    // === ELEMENTOS DOM ===
+    // === ELEMENTOS ===
     const statsPanel = document.getElementById('statsPanel');
     const legendPanel = document.getElementById('legendPanel');
-    const btnEstadisticas = document.getElementById('btnEstadisticas');
+    const statsBtn = document.getElementById('statsBtn');
     const closeStatsBtn = document.getElementById('closeStatsBtn');
     const closeLegendBtn = document.getElementById('closeLegendBtn');
 
-    // === MOSTRAR/OCULTAR AMBOS PANELES CON EL BOTÓN ESTADÍSTICAS ===
-    btnEstadisticas.addEventListener('click', () => {
+    // === BOTÓN ESTADÍSTICAS: MOSTRAR/OCULTAR AMBOS ===
+    statsBtn.addEventListener('click', () => {
       const bothHidden = statsPanel.classList.contains('hidden') && legendPanel.classList.contains('hidden');
-      const bothVisible = !statsPanel.classList.contains('hidden') && !legendPanel.classList.contains('hidden');
-
-      if (bothHidden || !bothVisible) {
+      if (bothHidden) {
         statsPanel.classList.remove('hidden');
         legendPanel.classList.remove('hidden');
       } else {
@@ -291,19 +292,12 @@
       }
     });
 
-    // === CERRAR INDIVIDUALMENTE ===
-    closeStatsBtn.addEventListener('click', () => {
-      statsPanel.classList.add('hidden');
-    });
+    // === CERRAR INDIVIDUAL ===
+    closeStatsBtn.addEventListener('click', () => statsPanel.classList.add('hidden'));
+    closeLegendBtn.addEventListener('click', () => legendPanel.classList.add('hidden'));
 
-    closeLegendBtn.addEventListener('click', () => {
-      legendPanel.classList.add('hidden');
-    });
-
-    // === VOLVER AL PANEL ===
+    // === NAVEGACIÓN ===
     document.getElementById('backBtnHeader').onclick = () => window.location.href = 'admin.html';
-
-    // === CERRAR SESIÓN ===
     document.getElementById('logoutBtn').onclick = () => {
       localStorage.removeItem('isAdmin');
       localStorage.removeItem('loggedIn');
