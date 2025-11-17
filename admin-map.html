@@ -8,74 +8,98 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; }
+    
+    /* BARRA ADMIN */
     .admin-bar {
       position: fixed; top: 0; left: 0; width: 100%; background: #000; color: #fff;
       padding: 15px 20px; z-index: 2000; display: flex; justify-content: space-between;
       align-items: center; font-weight: 700; text-transform: uppercase; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     .admin-bar .left { display: flex; gap: 20px; align-items: center; }
-    .admin-bar .right { display: flex; gap: 15px; align-items: center; }
-    .admin-btn { background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+    .admin-bar .right { display: flex; gap: 12px; align-items: center; }
+    .admin-btn {
+      background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700;
+      cursor: pointer; font-size: 0.9rem; border: none; transition: 0.2s;
+    }
     .admin-btn:hover { background: #f0f0f0; }
+    .icon-btn {
+      background: transparent; color: #fff; border: none; font-size: 1.3rem; cursor: pointer;
+      padding: 8px; border-radius: 50%; transition: 0.2s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.1); }
+
+    /* MAPA */
     .map-container {
       position: relative; height: calc(100vh - 70px); background: #f8f8f8;
     }
     #map { width: 100%; height: 100%; }
-    
-    /* LEYENDA */
+
+    /* BOTÓN VOLVER - FLECHA */
+    .back-btn {
+      position: absolute; top: 90px; left: 20px; background: #000; color: #fff;
+      width: 44px; height: 44px; border-radius: 50%; font-size: 1.4rem;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      z-index: 1000; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .back-btn:hover { background: #333; }
+
+    /* LEYENDA - OCULTABLE */
     .legend {
       position: absolute; bottom: 20px; left: 20px; background: #fff; padding: 15px; border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; font-size: 0.9rem; transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; font-size: 0.9rem;
+      transition: transform 0.3s ease, opacity 0.3s ease; min-width: 180px;
+    }
+    .legend.hidden {
+      transform: translateY(100px);
+      opacity: 0;
+      pointer-events: none;
     }
     .legend h4 { margin: 0 0 10px; font-size: 1rem; text-transform: uppercase; }
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
     .legend-color { width: 16px; height: 16px; border-radius: 50%; }
 
-    /* PANEL DE ESTADÍSTICAS - OCULTABLE */
+    /* PANEL ESTADÍSTICAS - OCULTABLE */
     .stats-panel {
       position: absolute; top: 90px; right: 20px; width: 300px; background: #fff; padding: 20px;
-      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; transition: transform 0.3s ease, opacity 0.3s ease;
+      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
     .stats-panel.hidden {
       transform: translateX(350px);
       opacity: 0;
       pointer-events: none;
     }
-    .stats-panel h3 { margin-top: 0; font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
-    .toggle-stats {
-      background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666;
-    }
+    .stats-panel h3 { margin: 0 0 15px; font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
+    .toggle-stats { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666; }
     .toggle-stats:hover { color: #000; }
     .stat { margin-bottom: 12px; }
     .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; }
     .stat-value { font-size: 1.8rem; font-weight: 800; }
-
-    .back-btn {
-      position: absolute; top: 90px; left: 20px; background: #000; color: #fff; padding: 10px 16px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; z-index: 1000;
-    }
   </style>
 </head>
 <body>
+
   <!-- BARRA ADMIN -->
   <div class="admin-bar">
     <div class="left">
       <span>MAPA DE COMPRAS</span>
     </div>
     <div class="right">
+      <button class="icon-btn" id="toggleLegendBtn" title="Leyenda">ℹ️</button>
+      <button class="icon-btn" id="toggleStatsBtn" title="Estadísticas">📊</button>
       <button class="admin-btn" id="logoutBtn">Cerrar Sesión</button>
     </div>
   </div>
 
-  <!-- BOTÓN VOLVER -->
-  <button class="back-btn" id="backBtn">Volver al Panel</button>
+  <!-- BOTÓN VOLVER - FLECHA -->
+  <button class="back-btn" id="backBtn" title="Volver al Panel">←</button>
 
   <!-- MAPA -->
   <div class="map-container">
     <div id="map"></div>
 
     <!-- LEYENDA -->
-    <div class="legend">
+    <div class="legend" id="legendPanel">
       <h4>Leyenda</h4>
       <div class="legend-item">
         <div class="legend-color" style="background:#2ecc71;"></div>
@@ -99,11 +123,11 @@
       </div>
     </div>
 
-    <!-- PANEL DE ESTADÍSTICAS -->
+    <!-- PANEL ESTADÍSTICAS -->
     <div class="stats-panel" id="statsPanel">
       <h3>
         Resumen
-        <button class="toggle-stats" id="toggleStats">✕</button>
+        <button class="toggle-stats" id="closeStatsBtn">✕</button>
       </h3>
       <div class="stat">
         <div class="stat-label">Total de Órdenes</div>
@@ -120,7 +144,7 @@
     </div>
   </div>
 
-  <!-- FIREBASE & LEAFLET -->
+  <!-- SCRIPTS -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -150,7 +174,7 @@
       attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // === COORDENADAS POR ESTADO ===
+    // === COORDENADAS ===
     const stateCoords = {
       AGS: [21.88, -102.29], BC: [30.0, -115.0], BCS: [26.0, -111.5], CAM: [18.6, -90.7],
       CHIS: [16.5, -92.5], CHIH: [28.6, -106.0], CDMX: [19.43, -99.13], COAH: [27.0, -102.0],
@@ -162,13 +186,13 @@
       TLAX: [19.4, -98.2], VER: [19.2, -96.1], YUC: [20.7, -89.1], ZAC: [22.7, -102.5]
     };
 
-    // === FUNCIÓN PARA OBTENER COLOR SEGÚN COMPRAS ===
+    // === COLOR POR COMPRAS ===
     function getColor(count) {
-      if (count === 1) return '#2ecc71';     // Verde brillante
-      if (count <= 5)  return '#f1c40f';     // Amarillo
-      if (count <= 10) return '#e67e22';     // Naranja
-      if (count <= 20) return '#e74c3c';     // Rojo claro
-      return '#c0392b';                      // Rojo oscuro
+      if (count === 1) return '#2ecc71';
+      if (count <= 5)  return '#f1c40f';
+      if (count <= 10) return '#e67e22';
+      if (count <= 20) return '#e74c3c';
+      return '#c0392b';
     }
 
     // === CONTADORES ===
@@ -188,7 +212,7 @@
           const coords = stateCoords[code];
           if (coords) {
             const count = stateCount[code];
-            const radius = Math.min(10 + count * 1.5, 40); // Más grande con más compras
+            const radius = Math.min(10 + count * 1.5, 40);
             const color = getColor(count);
             const opacity = count > 20 ? 0.9 : count > 10 ? 0.8 : count > 5 ? 0.7 : 0.6;
 
@@ -211,7 +235,6 @@
         }
       });
 
-      // Actualizar estadísticas
       document.getElementById('totalOrders').textContent = totalOrders;
       document.getElementById('totalRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
       const top = Object.entries(stateCount).sort((a,b) => b[1] - a[1])[0];
@@ -220,15 +243,49 @@
       }
     });
 
-    // === OCULTAR/MOSTRAR PANEL ===
+    // === ELEMENTOS DOM ===
     const statsPanel = document.getElementById('statsPanel');
-    const toggleBtn = document.getElementById('toggleStats');
-    toggleBtn.addEventListener('click', () => {
-      statsPanel.classList.toggle('hidden');
-      toggleBtn.textContent = statsPanel.classList.contains('hidden') ? '⋮' : '✕';
+    const legendPanel = document.getElementById('legendPanel');
+    const toggleStatsBtn = document.getElementById('toggleStatsBtn');
+    const toggleLegendBtn = document.getElementById('toggleLegendBtn');
+    const closeStatsBtn = document.getElementById('closeStatsBtn');
+
+    // === FUNCIÓN PARA MOSTRAR/OCULTAR PANEL ===
+    function togglePanel(panel, show) {
+      if (show) {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+
+    // === BOTÓN ESTADÍSTICAS EN BARRA (comportamiento inteligente) ===
+    toggleStatsBtn.addEventListener('click', () => {
+      const statsHidden = statsPanel.classList.contains('hidden');
+      const legendHidden = legendPanel.classList.contains('hidden');
+
+      if (statsHidden && legendHidden) {
+        togglePanel(statsPanel, true);
+        togglePanel(legendPanel, true);
+      } else if (statsHidden) {
+        togglePanel(statsPanel, true);
+      } else {
+        togglePanel(statsPanel, false);
+        if (!legendHidden) togglePanel(legendPanel, false);
+      }
     });
 
-    // === VOLVER ===
+    // === BOTÓN LEYENDA EN BARRA ===
+    toggleLegendBtn.addEventListener('click', () => {
+      legendPanel.classList.toggle('hidden');
+    });
+
+    // === CERRAR ESTADÍSTICAS DESDE EL PANEL ===
+    closeStatsBtn.addEventListener('click', () => {
+      togglePanel(statsPanel, false);
+    });
+
+    // === BOTÓN VOLVER ===
     document.getElementById('backBtn').onclick = () => window.location.href = 'admin.html';
 
     // === CERRAR SESIÓN ===
