@@ -4,277 +4,272 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compras • Efraín Shop</title>
-  <meta name="theme-color" content="#000000">
-
-  <!-- Fuentes + Iconos -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
   <style>
     :root {
-      --bg: #fafafa;
+      --bg: #f8fafc;
       --surface: #ffffff;
-      --text: #1a1a1a;
-      --text-muted: #666666;
+      --text: #1e293b;
+      --text-light: #64748b;
       --border: #e2e8f0;
       --primary: #000000;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --info: #3b82f6;
-      --danger: #ef4444;
-      --whatsapp: #25D366;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
-      --radius: 18px;
-      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --accent: #25D366;
+      --shadow: 0 10px 25px rgba(0,0,0,0.08);
+      --radius: 20px;
+      --transition: all 0.3s ease;
     }
     [data-theme="dark"] {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --text: #f5f5f5;
-      --text-muted: #aaaaaa;
-      --border: #2d2d2d;
-      --shadow-lg: 0 20px 40px rgba(0,0,0,0.4);
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-light: #94a3b8;
+      --border: #334155;
+      --shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
-
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      min-height: 100dvh;
-      padding-top: 76px;
+      padding-top: 80px;
       transition: var(--transition);
     }
-
-    /* Header premium */
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
-      height: 76px;
+      height: 80px;
       background: var(--surface);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       z-index: 1000;
       display: flex;
       align-items: center;
       padding: 0 20px;
       gap: 20px;
     }
-    .logo { font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; }
-    .header-actions {
+    .back-btn {
+      background: rgba(0,0,0,0.08);
+      border: none;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      color: var(--text);
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .back-btn:hover { background: rgba(0,0,0,0.15); transform: scale(1.1); }
+    .logo { font-weight: 900; font-size: 1.6rem; letter-spacing: -1px; }
+    .header-right {
       margin-left: auto;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
-    .stat {
-      text-align: right;
-      font-size: 0.925rem;
+    .total-ventas {
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: var(--primary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
     }
-    .stat strong { font-weight: 800; font-size: 1.1rem; display: block; color: var(--success); }
-
     .icon-btn {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.06);
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      transition: var(--transition);
-      display: grid;
-      place-items: center;
-      font-size: 1.2rem;
+      background: none; border: none; font-size: 1.4rem; color: var(--text-light);
+      cursor: pointer; padding: 10px; border-radius: 50%; transition: var(--transition);
     }
-    .icon-btn:hover { background: rgba(0,0,0,0.12); transform: scale(1.08); }
-    [data-theme="dark"] .icon-btn { background: rgba(255,255,255,0.08); }
-    [data-theme="dark"] .icon-btn:hover { background: rgba(255,255,255,0.16); }
+    .icon-btn:hover { background: rgba(0,0,0,0.1); color: var(--text); }
 
-    main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+    main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
 
-    .filters {
+    .search-bar {
       display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 28px;
-      align-items: center;
     }
-    .search {
-      flex: 1;
-      min-width: 280px;
+    .search-input, .date-input {
       padding: 14px 18px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
       background: var(--surface);
       font-size: 1rem;
+      flex: 1;
+      min-width: 250px;
       transition: var(--transition);
     }
-    .search:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(0,0,0,0.08); }
+    .search-input:focus, .date-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+    }
 
-    .stats-grid {
+    .orders-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 18px;
-      margin-bottom: 32px;
+      gap: 24px;
     }
-    .stat-card {
+    .order-card {
       background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    .stat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-    .stat-card h3 { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .stat-card p { font-size: 1.8rem; font-weight: 800; }
-
-    .orders-list { display: grid; gap: 22px; }
-
-    .order {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow);
       transition: var(--transition);
     }
-    .order:hover { box-shadow: var(--shadow-lg); transform: translateY(-5px); }
-
+    .order-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      border-color: var(--primary);
+    }
     .order-header {
-      background: linear-gradient(135deg, #000 0%, #222 100%);
+      background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
       color: white;
-      padding: 20px 26px;
+      padding: 20px 24px;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+    .order-body { padding: 24px; }
+    .order-total {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    .order-products {
+      background: rgba(0,0,0,0.04);
+      padding: 16px;
+      border-radius: 12px;
+      margin: 16px 0;
+    }
+    .order-product {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      padding: 8px 0;
+      font-size: 0.98rem;
     }
-    .order-id { font-size: 1.35rem; font-weight: 900; }
-    .order-date { font-size: 0.95rem; opacity: 0.9; }
-
-    .order-body { padding: 26px; }
-    .order-total { font-size: 2.1rem; font-weight: 900; margin-bottom: 20px; color: var(--primary); }
-    .products { background: rgba(0,0,0,0.03); padding: 18px; border-radius: 12px; margin: 18px 0; }
-    .product-line { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.98rem; }
-    .address {
-      background: rgba(0,0,0,0.02);
-      padding: 18px;
+    .order-address {
+      background: rgba(0,0,0,0.03);
+      padding: 16px;
       border-radius: 12px;
-      font-size: 0.95rem;
       line-height: 1.7;
-      margin: 18px 0;
-    }
-    .order-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .btn {
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       font-size: 0.95rem;
     }
-    .btn-whatsapp { background: var(--whatsapp); color: white; }
-    .btn-whatsapp:hover { background: #128C7E; transform: translateY(-2px); }
-    .btn-print { background: transparent; border: 2px solid var(--border); color: var(--text); }
-    .btn-print:hover { background: rgba(0,0,0,0.06); }
-
-    .status-btn {
-      font-weight: 700;
-      color: white;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 0.5px;
+    .order-date {
+      margin-top: 16px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      text-align: right;
     }
-    .status-paid { background: var(--info); }
-    .status-pending { background: var(--warning); }
-    .status-shipped { background: #8b5cf6; }
-    .status-delivered { background: var(--success); }
-    .status-cancelled { background: var(--danger); }
 
-    .toast {
-      position: fixed;
-      bottom: 30px; left: 50%;
-      transform: translateX(-50%);
-      background: #000;
-      color: white;
-      padding: 16px 36px;
-      border-radius: 50px;
-      font-weight: 600;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s ease;
-      box-shadow: var(--shadow-lg);
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-light);
+      font-size: 1.2rem;
     }
-    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); }
+    .empty i { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
 
-    @media (max-width: 640px) {
-      header { padding: 0 16px; gap: 12px; }
-      .logo { font-size: 1.3rem; }
-      .order-actions { grid-template-columns: 1fr; }
-      .search { min-width: 100%; }
+    @media (max-width: 768px) {
+      .search-bar { flex-direction: column; }
+      .search-input, .date-input { min-width: 100%; }
+      .order-total { font-size: 1.7rem; }
     }
   </style>
 </head>
 <body data-theme="light">
 
-  <!-- Header -->
   <header>
-    <button class="icon-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
+    <button class="back-btn" onclick="window.location.href='admin.html'">
+      ←
+    </button>
     <div class="logo">EFRAÍN SHOP</div>
-    <div class="header-actions">
-      <div class="stat">
-        <div id="totalCompras">Total: 0</div>
-        <strong id="totalVentas">$0 MXN</strong>
-      </div>
-      <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+    <div class="header-right">
+      <div class="total-ventas" id="totalVentas">$0 MXN</div>
+      <button class="icon-btn" id="themeToggle">Moon</button>
+      <button class="icon-btn" id="sortBtn">Sort</button>
     </div>
   </header>
 
   <main>
-    <div class="filters">
-      <input type="text" class="search" id="searchInput" placeholder="Buscar por nombre, teléfono o ID...">
-      <select class="search" style="width:auto;" id="statusFilter">
-        <option value="">Todos los estados</option>
-        <option value="paid">Pagado</option>
-        <option value="pending">Pendiente</option>
-        <option value="shipped">Enviado</option>
-        <option value="delivered">Entregado</option>
-        <option value="cancelled">Cancelado</option>
-      </select>
+    <div class="search-bar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono, producto, colonia, ID, etc...">
+      <input type="date" class="date-input" id="dateFilter">
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card"><h3>Órdenes totales</h3><p id="summaryTotal">0</p></div>
-      <div class="stat-card"><h3>Ingresos totales</h3><p class="success">$<span id="summaryRevenue">0</span></p></div>
-      <div class="stat-card"><h3>Pendientes</h3><p id="summaryPending">0</p></div>
-      <div class="stat-card"><h3>Enviados hoy</h3><p id="summaryToday">0</p></div>
-    </div>
-
-    <div class="orders-list" id="ordersContainer">
-      <div style="text-align:center;padding:100px;color:var(--text-muted);">
-        <i class="fas fa-spinner fa-spin fa-3x"></i>
-        <p style="margin-top:20px;font-size:1.2rem;">Cargando tus compras...</p>
+    <div class="orders-grid" id="ordersContainer">
+      <div class="empty">
+        <i class="fas fa-spinner fa-spin"></i>
+        <div>Cargando compras...</div>
       </div>
     </div>
   </main>
 
-  <div class="toast" id="toast">Listo</div>
-
-  <!-- TU ARCHIVO ORIGINAL (sin tocar nada) -->
+  <!-- TU JS ORIGINAL (SIN CAMBIOS) -->
   <script type="module" src="js/compras.js"></script>
+
+  <script>
+    // === MODO OSCURO ===
+    const themeToggle = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', currentTheme);
+    themeToggle.innerHTML = currentTheme === 'dark' ? 'Sun' : 'Moon';
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      const newTheme = isDark ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      themeToggle.innerHTML = newTheme === 'dark' ? 'Sun' : 'Moon';
+    });
+
+    // === BÚSQUEDA AVANZADA + FILTRO POR FECHA ===
+    const searchInput = document.getElementById('searchInput');
+    const dateFilter = document.getElementById('dateFilter');
+
+    function filterOrders() {
+      const term = searchInput.value.toLowerCase().trim();
+      const selectedDate = dateFilter.value;
+
+      const cards = document.querySelectorAll('.order-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const dateElement = card.querySelector('.order-date');
+        const orderDate = dateElement ? dateElement.textContent : '';
+
+        const matchesSearch = !term || text.includes(term);
+        const matchesDate = !selectedDate || orderDate.includes(selectedDate.split('-').reverse().join('/').slice(0,10));
+
+        card.style.display = (matchesSearch && matchesDate) ? 'block' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterOrders);
+    dateFilter.addEventListener('change', filterOrders);
+
+    // === TOTAL DE VENTAS EN DINERO ===
+    const totalVentasEl = document.getElementById('totalVentas');
+    const originalRender = window.renderOrders || renderOrders;
+    
+    window.renderOrders = function() {
+      originalRender();
+
+      // Calcular total de ventas
+      let total = 0;
+      window.orders.forEach(order => {
+        total += Number(order.total || 0);
+      });
+      totalVentasEl.textContent = `$${total.toLocaleString('es-MX')} MXN`;
+
+      // Aplicar filtro después de renderizar
+      setTimeout(filterOrders, 100);
+    };
+
+    // Hacer que el botón de ordenar siga funcionando
+    document.getElementById('sortBtn').addEventListener('click', () => {
+      document.getElementById('sortBtn').click(); // Dispara el evento original
+    });
+  </script>
 </body>
 </html>
