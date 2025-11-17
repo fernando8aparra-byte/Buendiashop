@@ -3,174 +3,278 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compras - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Compras • Efraín Shop</title>
+  <meta name="theme-color" content="#000000">
+
+  <!-- Fuentes + Iconos -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
   <style>
     :root {
-      --primary: #000;
-      --secondary: #fff;
-      --accent: #25D366; /* WhatsApp */
-      --border: #eee;
-      --shadow: 0 2px 8px rgba(0,0,0,0.05);
-      --radius: 12px;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #666666;
+      --border: #e2e8f0;
+      --primary: #000000;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --danger: #ef4444;
+      --whatsapp: #25D366;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+      --radius: 18px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --text: #f5f5f5;
+      --text-muted: #aaaaaa;
+      --border: #2d2d2d;
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.4);
     }
 
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: 'Segoe UI', Arial, sans-serif; background: #f9f9f9; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: var(--secondary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
-    .header-left { display: flex; align-items: center; gap: 15px; }
-    .header-right { display: flex; align-items: center; gap: 15px; }
-    .icon-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; transition: background 0.2s; }
-    .icon-btn:hover { background: #f0f0f0; }
-    .icon-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; }
-
-    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
-
-    .back-btn {
-      display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 500;
-      color: var(--primary); text-decoration: none; cursor: pointer; border-radius: 8px; padding: 6px 10px;
-      transition: background 0.2s;
-    }
-    .back-btn:hover { background: #f0f0f0; }
-
-    .main-container { padding: 20px 15px; max-width: 1400px; margin: 0 auto; }
-
-    .total-compras {
-      font-size “1.1rem; font-weight: 600; color: var(--primary);
-      background: #f0f0f0; padding: 8px 16px; border-radius: 20px; white-space: nowrap;
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100dvh;
+      padding-top: 76px;
+      transition: var(--transition);
     }
 
-    .sort-btn {
-      position: absolute; top: 10px; right: 15px; background: var(--primary); color: white;
-      padding: 8px 14px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
-      display: flex; align-items: center; gap: 6px; border: none; font-weight: 500;
-      transition: all 0.2s;
+    /* Header premium */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 76px;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
     }
-    .sort-btn:hover { background: #333; }
-
-    .orders-container {
-      overflow-x: auto; white-space: nowrap; padding: 50px 0 20px;
-      -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
+    .logo { font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; }
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .order-card {
-      display: inline-block; width: 340px; background: white; border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 18px; margin-right: 16px; box-shadow: var(--shadow);
-      vertical-align: top; transition: transform 0.2s, box-shadow 0.2s;
+    .stat {
+      text-align: right;
+      font-size: 0.925rem;
     }
-    .order-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .stat strong { font-weight: 800; font-size: 1.1rem; display: block; color: var(--success); }
 
-    .order-header { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
-    .order-id { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
-    .order-total { font-weight: 700; color: #000; font-size: 1.15rem; margin: 10px 0; }
-    .order-products { margin: 12px 0; max-height: 120px; overflow-y: auto; }
-    .order-product { font-size: 0.9rem; margin: 6px 0; color: #333; }
-    .order-address { font-size: 0.85rem; color: #555; margin-top: 12px; line-height: 1.5; background: #f8f8f8; padding: 10px; border-radius: 8px; }
+    .icon-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.06);
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      transition: var(--transition);
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+    }
+    .icon-btn:hover { background: rgba(0,0,0,0.12); transform: scale(1.08); }
+    [data-theme="dark"] .icon-btn { background: rgba(255,255,255,0.08); }
+    [data-theme="dark"] .icon-btn:hover { background: rgba(255,255,255,0.16); }
 
+    main { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 28px;
+      align-items: center;
+    }
+    .search {
+      flex: 1;
+      min-width: 280px;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    .search:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(0,0,0,0.08); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    .stat-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .stat-card h3 { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card p { font-size: 1.8rem; font-weight: 800; }
+
+    .orders-list { display: grid; gap: 22px; }
+
+    .order {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    .order:hover { box-shadow: var(--shadow-lg); transform: translateY(-5px); }
+
+    .order-header {
+      background: linear-gradient(135deg, #000 0%, #222 100%);
+      color: white;
+      padding: 20px 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .order-id { font-size: 1.35rem; font-weight: 900; }
+    .order-date { font-size: 0.95rem; opacity: 0.9; }
+
+    .order-body { padding: 26px; }
+    .order-total { font-size: 2.1rem; font-weight: 900; margin-bottom: 20px; color: var(--primary); }
+    .products { background: rgba(0,0,0,0.03); padding: 18px; border-radius: 12px; margin: 18px 0; }
+    .product-line { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.98rem; }
+    .address {
+      background: rgba(0,0,0,0.02);
+      padding: 18px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin: 18px 0;
+    }
     .order-actions {
-      display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
     }
     .btn {
-      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
-      cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
-      transition: all 0.2s;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.95rem;
     }
-    .btn-whatsapp { background: var(--accent); color: white; }
-    .btn-whatsapp:hover { background: #128C7E; }
-    .btn-sent { background: #28a745; color: white; }
-    .btn-sent:disabled { background: #6c757d; cursor: not-allowed; }
+    .btn-whatsapp { background: var(--whatsapp); color: white; }
+    .btn-whatsapp:hover { background: #128C7E; transform: translateY(-2px); }
+    .btn-print { background: transparent; border: 2px solid var(--border); color: var(--text); }
+    .btn-print:hover { background: rgba(0,0,0,0.06); }
+
+    .status-btn {
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    .status-paid { background: var(--info); }
+    .status-pending { background: var(--warning); }
+    .status-shipped { background: #8b5cf6; }
+    .status-delivered { background: var(--success); }
+    .status-cancelled { background: var(--danger); }
 
     .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #333; color: white; padding: 12px 24px; border-radius: 8px;
-      z-index: 3000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      animation: fadeInOut 3s forwards;
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: white;
+      padding: 16px 36px;
+      border-radius: 50px;
+      font-weight: 600;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+      box-shadow: var(--shadow-lg);
     }
-    .toast.show { display: block; }
-    @keyframes fadeInOut { 0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); } 15%, 85% { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); }
 
-    .admin-gear { position: relative; }
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 0; background: white; border: 1px solid var(--border);
-      border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; z-index: 1001; width: 220px;
-      overflow: hidden;
-    }
-    .admin-dropdown.show { display: block; animation: drop 0.2s ease; }
-    @keyframes drop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 14px 20px; color: #000; text-decoration: none;
-      background: none; border: none; text-align: left; cursor: pointer; font-size: 0.95rem;
-      font-weight: 500; transition: background 0.2s;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-
-    .notifications {
-      position: fixed; top: 70px; right: 15px; width: 320px; max-height: 80vh; overflow-y: auto;
-      background: white; border: 1px solid var(--border); border-radius: var(--radius);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 999; padding: 12px; display: none;
-    }
-    .notifications.show { display: block; }
-    .notification-item {
-      padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .notification-time { font-size: 0.75rem; color: #888; }
-
-    @media (max-width: 768px) {
-      .order-card { width: 300px; }
-      .notifications { width: 90%; right: 5%; }
+    @media (max-width: 640px) {
+      header { padding: 0 16px; gap: 12px; }
+      .logo { font-size: 1.3rem; }
+      .order-actions { grid-template-columns: 1fr; }
+      .search { min-width: 100%; }
     }
   </style>
 </head>
-<body>
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <a href="admin.html" class="back-btn" aria-label="Regresar al panel">
-          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg>
-          Regresar
-        </a>
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn" aria-label="Menú de administrador" aria-haspopup="true" aria-expanded="false">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-          </button>
-          <nav class="admin-dropdown" id="adminDropdown" role="menu">
-            <a href="admin-map.html" role="menuitem">Mapa de Compras</a>
-            <a href="admin-compras.html" role="menuitem">Compras</a>
-            <a href="admin-estadisticas.html" role="menuitem">Estadísticas</a>
-            <button id="logoutBtn" role="menuitem">Cerrar Sesión</button>
-          </nav>
-        </div>
-        <div class="logo">EFRAÍN</div>
+<body data-theme="light">
+
+  <!-- Header -->
+  <header>
+    <button class="icon-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
+    <div class="logo">EFRAÍN SHOP</div>
+    <div class="header-actions">
+      <div class="stat">
+        <div id="totalCompras">Total: 0</div>
+        <strong id="totalVentas">$0 MXN</strong>
       </div>
-      <div class="header-right">
-        <div class="total-compras" id="totalCompras">Total: 0 compras</div>
-      </div>
+      <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
     </div>
   </header>
 
-  <!-- NOTIFICACIONES -->
-  <div class="notifications" id="notifications" aria-live="polite">
-    <div class="notification-item">Cargando compras recientes...</div>
-  </div>
-
-  <!-- CONTENIDO -->
-  <main class="main-container">
-    <div style="position:relative;">
-      <button class="sort-btn" id="sortBtn" aria-label="Ordenar compras">
-        <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z" fill="currentColor"/><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-        <span>Ordenar</span>
-      </button>
+  <main>
+    <div class="filters">
+      <input type="text" class="search" id="searchInput" placeholder="Buscar por nombre, teléfono o ID...">
+      <select class="search" style="width:auto;" id="statusFilter">
+        <option value="">Todos los estados</option>
+        <option value="paid">Pagado</option>
+        <option value="pending">Pendiente</option>
+        <option value="shipped">Enviado</option>
+        <option value="delivered">Entregado</option>
+        <option value="cancelled">Cancelado</option>
+      </select>
     </div>
-    <div class="orders-container" id="ordersContainer" role="region" aria-label="Lista de compras">
-      <!-- Órdenes inyectadas aquí -->
+
+    <div class="stats-grid">
+      <div class="stat-card"><h3>Órdenes totales</h3><p id="summaryTotal">0</p></div>
+      <div class="stat-card"><h3>Ingresos totales</h3><p class="success">$<span id="summaryRevenue">0</span></p></div>
+      <div class="stat-card"><h3>Pendientes</h3><p id="summaryPending">0</p></div>
+      <div class="stat-card"><h3>Enviados hoy</h3><p id="summaryToday">0</p></div>
+    </div>
+
+    <div class="orders-list" id="ordersContainer">
+      <div style="text-align:center;padding:100px;color:var(--text-muted);">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p style="margin-top:20px;font-size:1.2rem;">Cargando tus compras...</p>
+      </div>
     </div>
   </main>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast" role="alert"></div>
+  <div class="toast" id="toast">Listo</div>
 
-  <!-- SCRIPT -->
+  <!-- TU ARCHIVO ORIGINAL (sin tocar nada) -->
   <script type="module" src="js/compras.js"></script>
 </body>
 </html>
