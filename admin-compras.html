@@ -118,7 +118,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const ORDERS_COLLECTION = "orders";
 
     const ordersContainer = document.getElementById('ordersContainer');
     const productsSummary = document.getElementById('productsSummary');
@@ -126,14 +125,12 @@
     const totalVentasEl = document.getElementById('totalVentas');
     const toast = document.getElementById('toast');
 
-    // === QUITADO: RESTRICCIÓN DE ADMIN ===
-    // Ya no se verifica localStorage.getItem('admin')
-
-    // === CARGAR ÓRDENES ===
+    // === CARGAR ÓRDENES DESDE FIRESTORE (API MODERNA) ===
     async function loadOrders() {
       try {
-        const q = query(collection(db, ORDERS_COLLECTION), orderBy("date", "desc"));
+        const q = query(collection(db, 'orders'), orderBy('date', 'desc'));
         const snapshot = await getDocs(q);
+
         let totalVentas = 0;
         let totalOrdenes = 0;
         const productMap = {};
@@ -143,9 +140,9 @@
           ordersHTML = '<div style="text-align:center;color:#666;padding:30px;">No hay compras aún.</div>';
         } else {
           totalOrdenes = snapshot.size;
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const id = doc.id;
+          snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const id = docSnap.id;
             const monto = Number(data.total) || 0;
             totalVentas += monto;
 
@@ -163,11 +160,9 @@
           });
         }
 
-        // Actualizar encabezado
         totalComprasEl.textContent = `Total: ${totalOrdenes}`;
         totalVentasEl.textContent = `Total Ventas: $${totalVentas.toLocaleString('es-MX', {minimumFractionDigits: 2})}`;
 
-        // Resumen de productos
         const top = Object.entries(productMap)
           .sort((a, b) => b[1].qty - a[1].qty)
           .slice(0, 10);
@@ -179,11 +174,11 @@
         setupActionButtons();
       } catch (err) {
         console.error("Error:", err);
-        showToast("Error al cargar datos: " + err.message);
+        showToast("Error al cargar: " + err.message);
       }
     }
 
-    // === CREAR TARJETA CON BOTONES FUNCIONALES ===
+    // === CREAR TARJETA ===
     function createOrderCard(order) {
       const productosHTML = (order.products || []).map(p => `
         <div class="order-product">
@@ -204,13 +199,13 @@
         ? new Date(order.date.toDate()).toLocaleString('es-MX')
         : '—';
 
-      const status = order.status || 'pending';
+      const status = order.status || 'paid';
       const statusText = {
-        pending: 'Pendiente',
+        paid: 'Pagado',
         shipped: 'Enviado',
         delivered: 'Entregado',
         cancelled: 'Cancelado'
-      }[status];
+      }[status] || 'Pagado';
 
       return `
         <div class="order-card printable-order" id="order-${order.id}">
@@ -236,25 +231,21 @@
         </div>`;
     }
 
-    // === CONFIGURAR BOTONES ===
+    // === BOTONES ===
     function setupActionButtons() {
-      // Imprimir
       document.querySelectorAll('.print-btn').forEach(btn => {
         btn.onclick = () => printOrder(btn.dataset.orderId);
       });
 
-      // Enviar (marcar como enviado)
       document.querySelectorAll('.send-btn').forEach(btn => {
         btn.onclick = () => sendOrder(btn.dataset.orderId);
       });
 
-      // Cambiar estado
       document.querySelectorAll('.status-btn').forEach(btn => {
         btn.onclick = () => changeStatus(btn.dataset.orderId, btn.dataset.current);
       });
     }
 
-    // === IMPRIMIR ORDEN ===
     window.printOrder = function(id) {
       const el = document.getElementById(`order-${id}`);
       if (!el) return;
@@ -278,45 +269,33 @@
       setTimeout(() => { win.print(); setTimeout(() => win.close(), 500); }, 300);
     };
 
-    // === ENVIAR PEDIDO (marcar como enviado) ===
     async function sendOrder(id) {
-      if (!confirm('¿Marcar esta orden como ENVIADA?')) return;
+      if (!confirm('¿Marcar como ENVIADO?')) return;
       try {
-        const orderRef = doc(db, ORDERS_COLLECTION, id);
-        await updateDoc(orderRef, {
+        await updateDoc(doc(db, 'orders', id), {
           status: 'shipped',
           shippedAt: serverTimestamp()
         });
-        showToast('Orden marcada como enviada');
-        loadOrders(); // Recargar
-      } catch (err) {
-        showToast('Error al enviar: ' + err.message);
-      }
-    }
-
-    // === CAMBIAR ESTADO ===
-    async function changeStatus(id, current) {
-      const options = {
-        pending: 'shipped',
-        shipped: 'delivered',
-        delivered: 'cancelled',
-        cancelled: 'pending'
-      };
-      const next = options[current] || 'pending';
-      const texts = { pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
-      if (!confirm(`¿Cambiar a ${texts[next]}?`)) return;
-
-      try {
-        const orderRef = doc(db, ORDERS_COLLECTION, id);
-        await updateDoc(orderRef, { status: next });
-        showToast(`Estado cambiado a ${texts[next]}`);
+        showToast('Enviado');
         loadOrders();
       } catch (err) {
         showToast('Error: ' + err.message);
       }
     }
 
-    // === TOAST ===
+    async function changeStatus(id, current) {
+      const next = { paid: 'shipped', shipped: 'delivered', delivered: 'cancelled', cancelled: 'paid' }[current] || 'shipped';
+      const texts = { paid: 'Pagado', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
+      if (!confirm(`¿Cambiar a ${texts[next]}?`)) return;
+      try {
+        await updateDoc(doc(db, 'orders', id), { status: next });
+        showToast(`Ahora: ${texts[next]}`);
+        loadOrders();
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    }
+
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
@@ -327,7 +306,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadOrders();
       document.getElementById('sortBtn').addEventListener('click', () => {
-        showToast('Ya está ordenado por fecha ↓');
+        showToast('Ordenado por fecha ↓');
       });
     });
   </script>
