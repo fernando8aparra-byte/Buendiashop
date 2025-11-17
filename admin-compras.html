@@ -4,751 +4,173 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compras - Efraín Shop</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css">
   <style>
     :root {
-      --bg: #f9f9fb;
-      --card-bg: #ffffff;
-      --text: #1a1a1a;
-      --text-light: #555;
-      --accent: #000000;
-      --accent-light: #333333;
-      --border: #e0e0e0;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-      --radius: 14px;
-      --transition: 0.25s ease;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --info: #3b82f6;
-      --danger: #ef4444;
-      --pending: #f59e0b;
-      --shipped: #3b82f6;
-      --delivered: #10b981;
-      --cancelled: #ef4444;
+      --primary: #000;
+      --secondary: #fff;
+      --accent: #25D366; /* WhatsApp */
+      --border: #eee;
+      --shadow: 0 2px 8px rgba(0,0,0,0.05);
+      --radius: 12px;
     }
-    [data-theme="dark"] {
-      --bg: #0f0f0f;
-      --card-bg: #1a1a1a;
-      --text: #f0f0f0;
-      --text-light: #aaaaaa;
-      --accent: #ffffff;
-      --accent-light: #cccccc;
-      --border: #333333;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      padding-top: 70px;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    /* HEADER */
-    .header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 70px;
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      transition: all var(--transition);
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+
+    body { margin: 0; padding: 0; padding-top: 60px; font-family: 'Segoe UI', Arial, sans-serif; background: #f9f9f9; }
+    .header { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: var(--secondary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .header-right { display: flex; align-items: center; gap: 15px; }
+    .icon-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; transition: background 0.2s; }
+    .icon-btn:hover { background: #f0f0f0; }
+    .icon-btn svg { width: 24px; height: 24px; stroke: currentColor; fill: none; }
+
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+
     .back-btn {
-      background: rgba(0, 0, 0, 0.08);
-      border: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-      color: var(--text);
+      display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 500;
+      color: var(--primary); text-decoration: none; cursor: pointer; border-radius: 8px; padding: 6px 10px;
+      transition: background 0.2s;
     }
-    .back-btn:hover {
-      background: rgba(0, 0, 0, 0.15);
-      transform: translateX(-2px);
-    }
-    [data-theme="dark"] .back-btn {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    [data-theme="dark"] .back-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    .header-center {
-      flex: 1;
-      text-align: center;
-      font-weight: 800;
-      font-size: 1.25rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-      font-size: 0.875rem;
-    }
+    .back-btn:hover { background: #f0f0f0; }
+
+    .main-container { padding: 20px 15px; max-width: 1400px; margin: 0 auto; }
+
     .total-compras {
-      font-weight: 600;
+      font-size “1.1rem; font-weight: 600; color: var(--primary);
+      background: #f0f0f0; padding: 8px 16px; border-radius: 20px; white-space: nowrap;
     }
-    .total-ventas {
-      color: var(--success);
-      font-weight: 700;
+
+    .sort-btn {
+      position: absolute; top: 10px; right: 15px; background: var(--primary); color: white;
+      padding: 8px 14px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; border: none; font-weight: 500;
+      transition: all 0.2s;
     }
-    /* MODO OSCURO */
-    .theme-toggle {
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      color: var(--text-light);
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      transition: var(--transition);
-    }
-    .theme-toggle:hover {
-      background: rgba(0, 0, 0, 0.1);
-      color: var(--text);
-    }
-    [data-theme="dark"] .theme-toggle:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-    /* CONTENEDOR PRINCIPAL */
-    .main-container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 24px 16px;
-    }
-    /* FILTROS */
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
-      align-items: center;
-    }
-    .search-input {
-      flex: 1;
-      min-width: 200px;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      background: var(--card-bg);
-      color: var(--text);
-      font-size: 0.95rem;
-      transition: var(--transition);
-    }
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
-    }
-    .filter-select {
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      background: var(--card-bg);
-      color: var(--text);
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .filter-select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-    /* RESUMEN */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .summary-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    .summary-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-    .summary-title {
-      font-size: 0.875rem;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-    .summary-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .summary-value.accent {
-      color: var(--accent);
-    }
-    .summary-value.success {
-      color: var(--success);
-    }
-    /* LISTA DE ÓRDENES */
+    .sort-btn:hover { background: #333; }
+
     .orders-container {
-      display: grid;
-      gap: 18px;
-      max-height: calc(100vh - 320px);
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .orders-container::-webkit-scrollbar {
-      width: 6px;
-    }
-    .orders-container::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .orders-container::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 10px;
+      overflow-x: auto; white-space: nowrap; padding: 50px 0 20px;
+      -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
     }
     .order-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
+      display: inline-block; width: 340px; background: white; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px; margin-right: 16px; box-shadow: var(--shadow);
+      vertical-align: top; transition: transform 0.2s, box-shadow 0.2s;
     }
-    .order-card:hover {
-      border-color: var(--accent-light);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .order-id {
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-    .order-date {
-      font-size: 0.875rem;
-      color: var(--text-light);
-    }
-    .order-total {
-      font-weight: 800;
-      font-size: 1.4rem;
-      color: var(--accent);
-      margin: 12px 0;
-    }
-    .order-products {
-      background: rgba(0, 0, 0, 0.03);
-      padding: 14px;
-      border-radius: 10px;
-      margin: 14px 0;
-    }
-    .order-product {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.95rem;
-      margin-bottom: 6px;
-    }
-    .order-product:last-child {
-      margin-bottom: 0;
-    }
-    .order-address {
-      font-size: 0.925rem;
-      color: var(--text-light);
-      line-height: 1.7;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px dashed var(--border);
-    }
-    .order-address strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-    .action-btns {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-top: 16px;
+    .order-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+    .order-header { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+    .order-id { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
+    .order-total { font-weight: 700; color: #000; font-size: 1.15rem; margin: 10px 0; }
+    .order-products { margin: 12px 0; max-height: 120px; overflow-y: auto; }
+    .order-product { font-size: 0.9rem; margin: 6px 0; color: #333; }
+    .order-address { font-size: 0.85rem; color: #555; margin-top: 12px; line-height: 1.5; background: #f8f8f8; padding: 10px; border-radius: 8px; }
+
+    .order-actions {
+      display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;
     }
     .btn {
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
+      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
     }
-    .btn-print {
-      background: rgba(0, 0, 0, 0.06);
-      color: var(--text);
-      border: 1.5px solid var(--border);
-    }
-    .btn-print:hover {
-      background: rgba(0, 0, 0, 0.12);
-    }
-    .btn-send {
-      background: #25D366;
-      color: white;
-    }
-    .btn-send:hover {
-      background: #128C7E;
-    }
-    .btn-status {
-      font-weight: 700;
-      color: white;
-    }
-    .btn-status.paid { background: var(--info); }
-    .btn-status.pending { background: var(--pending); }
-    .btn-status.shipped { background: var(--shipped); }
-    .btn-status.delivered { background: var(--delivered); }
-    .btn-status.cancelled { background: var(--cancelled); }
-    .btn i {
-      font-size: 1rem;
-    }
-    /* TOAST */
+    .btn-whatsapp { background: var(--accent); color: white; }
+    .btn-whatsapp:hover { background: #128C7E; }
+    .btn-sent { background: #28a745; color: white; }
+    .btn-sent:disabled { background: #6c757d; cursor: not-allowed; }
+
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent);
-      color: white;
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-weight: 600;
-      z-index: 3000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: #333; color: white; padding: 12px 24px; border-radius: 8px;
+      z-index: 3000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: fadeInOut 3s forwards;
     }
-    .toast.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
+    .toast.show { display: block; }
+    @keyframes fadeInOut { 0%, 100% { opacity: 0; transform: translateX(-50%) translateY(10px); } 15%, 85% { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+    .admin-gear { position: relative; }
+    .admin-dropdown {
+      position: absolute; top: 60px; left: 0; background: white; border: 1px solid var(--border);
+      border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; z-index: 1001; width: 220px;
+      overflow: hidden;
     }
-    /* LOADER */
-    .loader {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      border: 3px solid rgba(0, 0, 0, 0.1);
-      border-top: 3px solid var(--accent);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 12px;
+    .admin-dropdown.show { display: block; animation: drop 0.2s ease; }
+    @keyframes drop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .admin-dropdown a, .admin-dropdown button {
+      display: block; width: 100%; padding: 14px 20px; color: #000; text-decoration: none;
+      background: none; border: none; text-align: left; cursor: pointer; font-size: 0.95rem;
+      font-weight: 500; transition: background 0.2s;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
+
+    .notifications {
+      position: fixed; top: 70px; right: 15px; width: 320px; max-height: 80vh; overflow-y: auto;
+      background: white; border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 999; padding: 12px; display: none;
     }
-    /* EMPTY STATE */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-light);
+    .notifications.show { display: block; }
+    .notification-item {
+      padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      color: var(--border);
-    }
-    /* PRINT STYLES */
-    @media print {
-      body * { visibility: hidden; }
-      .printable-order, .printable-order * { visibility: visible; }
-      .printable-order {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 30px;
-        background: white;
-        box-shadow: none;
-      }
-      .action-btns, .header, .filters, .summary-grid { display: none !important; }
-      .order-address strong { display: inline-block; width: 140px; font-weight: 600; }
-    }
-    /* RESPONSIVE */
-    @media (max-width: 640px) {
-      .header { padding: 0 16px; height: 64px; }
-      .header-center { font-size: 1.1rem; }
-      .filters { flex-direction: column; }
-      .search-input, .filter-select { width: 100%; }
-      .action-btns { grid-template-columns: 1fr; }
-      .summary-grid { grid-template-columns: 1fr; }
+    .notification-time { font-size: 0.75rem; color: #888; }
+
+    @media (max-width: 768px) {
+      .order-card { width: 300px; }
+      .notifications { width: 90%; right: 5%; }
     }
   </style>
 </head>
-<body data-theme="light">
+<body>
   <!-- HEADER -->
   <header class="header">
-    <div class="header-left">
-      <button class="back-btn" id="backBtn">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <button class="theme-toggle" id="themeToggle" title="Modo Oscuro">
-        <i class="fas fa-moon"></i>
-      </button>
-    </div>
-    <div class="header-center">COMPRAS</div>
-    <div class="header-right">
-      <div class="total-compras" id="totalCompras">Total: 0</div>
-      <div class="total-ventas" id="totalVentas">$0.00</div>
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="admin.html" class="back-btn" aria-label="Regresar al panel">
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg>
+          Regresar
+        </a>
+        <div class="admin-gear" id="adminGear">
+          <button class="icon-btn" aria-label="Menú de administrador" aria-haspopup="true" aria-expanded="false">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          </button>
+          <nav class="admin-dropdown" id="adminDropdown" role="menu">
+            <a href="admin-map.html" role="menuitem">Mapa de Compras</a>
+            <a href="admin-compras.html" role="menuitem">Compras</a>
+            <a href="admin-estadisticas.html" role="menuitem">Estadísticas</a>
+            <button id="logoutBtn" role="menuitem">Cerrar Sesión</button>
+          </nav>
+        </div>
+        <div class="logo">EFRAÍN</div>
+      </div>
+      <div class="header-right">
+        <div class="total-compras" id="totalCompras">Total: 0 compras</div>
+      </div>
     </div>
   </header>
 
-  <!-- CONTENIDO -->
-  <div class="main-container">
-    <!-- FILTROS -->
-    <div class="filters">
-      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono o ID...">
-      <select class="filter-select" id="statusFilter">
-        <option value="">Todos los estados</option>
-        <option value="paid">Pagado</option>
-        <option value="pending">Pendiente</option>
-        <option value="shipped">Enviado</option>
-        <option value="delivered">Entregado</option>
-        <option value="cancelled">Cancelado</option>
-      </select>
-    </div>
-
-    <!-- RESUMEN -->
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="summary-title">Órdenes Totales</div>
-        <div class="summary-value" id="summaryTotal">0</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-title">Ingresos Totales</div>
-        <div class="summary-value success" id="summaryRevenue">$0</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-title">Pendientes</div>
-        <div class="summary-value accent" id="summaryPending">0</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-title">Enviados Hoy</div>
-        <div class="summary-value" id="summaryShippedToday">0</div>
-      </div>
-    </div>
-
-    <!-- ÓRDENES -->
-    <div class="orders-container" id="ordersContainer">
-      <div class="empty-state">
-        <div class="loader"></div>
-        <div>Cargando órdenes...</div>
-      </div>
-    </div>
+  <!-- NOTIFICACIONES -->
+  <div class="notifications" id="notifications" aria-live="polite">
+    <div class="notification-item">Cargando compras recientes...</div>
   </div>
 
+  <!-- CONTENIDO -->
+  <main class="main-container">
+    <div style="position:relative;">
+      <button class="sort-btn" id="sortBtn" aria-label="Ordenar compras">
+        <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z" fill="currentColor"/><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+        <span>Ordenar</span>
+      </button>
+    </div>
+    <div class="orders-container" id="ordersContainer" role="region" aria-label="Lista de compras">
+      <!-- Órdenes inyectadas aquí -->
+    </div>
+  </main>
+
   <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="alert"></div>
 
-  <!-- Firebase + Lógica -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Elementos
-    const ordersContainer = document.getElementById('ordersContainer');
-    const totalComprasEl = document.getElementById('totalCompras');
-    const totalVentasEl = document.getElementById('totalVentas');
-    const summaryTotal = document.getElementById('summaryTotal');
-    const summaryRevenue = document.getElementById('summaryRevenue');
-    const summaryPending = document.getElementById('summaryPending');
-    const summaryShippedToday = document.getElementById('summaryShippedToday');
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const toast = document.getElementById('toast');
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = themeToggle.querySelector('i');
-    const backBtn = document.getElementById('backBtn');
-
-    // Estado
-    let allOrders = [];
-
-    // === MODO OSCURO ===
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', savedTheme);
-    themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    themeToggle.addEventListener('click', () => {
-      const isDark = document.body.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    });
-
-    // === NAVEGACIÓN ===
-    backBtn.onclick = () => window.location.href = 'index.html';
-
-    // === TOAST ===
-    function showToast(msg, type = 'info') {
-      toast.textContent = msg;
-      toast.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#000';
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    // === CARGAR ÓRDENES ===
-    async function loadOrders() {
-      try {
-        const q = query(collection(db, 'orders'), orderBy('date', 'desc'));
-        const snapshot = await getDocs(q);
-        allOrders = [];
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          data.id = doc.id;
-          allOrders.push(data);
-        });
-        renderOrders();
-        updateSummary();
-      } catch (err) {
-        console.error(err);
-        showToast('Error al cargar órdenes', 'error');
-      }
-    }
-
-    // === RENDER ÓRDENES ===
-    function renderOrders() {
-      const search = searchInput.value.toLowerCase().trim();
-      const status = statusFilter.value;
-      let filtered = allOrders;
-
-      if (search) {
-        filtered = filtered.filter(order => {
-          const addr = order.address || {};
-          const name = (addr.name || '').toLowerCase();
-          const phone = (addr.phone || '');
-          const id = order.id.toLowerCase();
-          return name.includes(search) || phone.includes(search) || id.includes(search);
-        });
-      }
-      if (status) {
-        filtered = filtered.filter(order => (order.status || 'paid') === status);
-      }
-
-      if (filtered.length === 0) {
-        ordersContainer.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <div>No se encontraron órdenes</div>
-          </div>
-        `;
-        return;
-      }
-
-      const html = filtered.map(order => createOrderCard(order)).join('');
-      ordersContainer.innerHTML = html;
-      setupActionButtons();
-    }
-
-    // === CREAR TARJETA ===
-    function createOrderCard(order) {
-      const productosHTML = (order.products || []).map(p => `
-        <div class="order-product">
-          <span>${p.qty || 1}× ${p.name || 'Producto'}</span>
-          <span>$${(Number(p.price) * (p.qty || 1)).toFixed(2)}</span>
-        </div>
-      `).join('');
-
-      const addr = order.address || {};
-      const addressHTML = `
-        <strong>Nombre:</strong> ${addr.name || '—'}<br>
-        <strong>Tel:</strong> ${addr.phone || '—'}<br>
-        <strong>Dir:</strong> ${addr.street || ''}, ${addr.colonia || ''}, CP ${addr.cp || ''}<br>
-        <strong>Estado:</strong> ${addr.state || '—'}
-      `;
-
-      const fecha = order.date?.toDate?.()
-        ? new Date(order.date.toDate()).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' })
-        : '—';
-
-      const status = order.status || 'paid';
-      const statusText = {
-        paid: 'Pagado', pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado'
-      }[status] || 'Pagado';
-
-      return `
-        <div class="order-card printable-order" id="order-${order.id}">
-          <div class="order-header">
-            <div class="order-id">#${order.id}</div>
-            <div class="order-date">${fecha}</div>
-          </div>
-          <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</div>
-          <div class="order-products">${productosHTML}</div>
-          <div class="order-address">${addressHTML}</div>
-          <div class="action-btns">
-            <button class="btn btn-print" data-order-id="${order.id}">
-              <i class="fas fa-print"></i> Imprimir
-            </button>
-            <button class="btn btn-send" data-order-id="${order.id}">
-              <i class="fab fa-whatsapp"></i> WhatsApp
-            </button>
-            <button class="btn btn-status ${status}" data-order-id="${order.id}" data-current="${status}">
-              ${statusText}
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    // === BOTONES ===
-    function setupActionButtons() {
-      document.querySelectorAll('.btn-print').forEach(btn => {
-        btn.onclick = () => printOrder(btn.dataset.orderId);
-      });
-      document.querySelectorAll('.btn-send').forEach(btn => {
-        btn.onclick = () => sendWhatsApp(btn.dataset.orderId);
-      });
-      document.querySelectorAll('.btn-status').forEach(btn => {
-        btn.onclick = () => changeStatus(btn.dataset.orderId, btn.dataset.current);
-      });
-    }
-
-    // === IMPRIMIR ===
-    window.printOrder = function(id) {
-      const el = document.getElementById(`order-${id}`);
-      if (!el) return;
-      const win = window.open('', '', 'width=800,height=700');
-      win.document.write(`
-        <!DOCTYPE html>
-        <html><head><title>Orden ${id}</title>
-        <style>
-          body{font-family:'Inter',sans-serif;padding:40px;background:white;color:#000}
-          .card{border:1px solid #ddd;border-radius:14px;padding:30px;max-width:600px;margin:auto}
-          .header{font-size:1.5rem;font-weight:800;margin-bottom:16px}
-          .total{font-size:1.6rem;font-weight:800;margin:16px 0}
-          .products{background:#f9f9f9;padding:16px;border-radius:10px;margin:16px 0}
-          .product{display:flex;justify-content:space-between;margin:8px 0}
-          .address{line-height:1.8;margin:16px 0;font-size:1rem}
-          .address strong{display:inline-block;width:140px;font-weight:600}
-          .date{text-align:right;color:#666;margin-top:20px}
-          @page{margin:1.5cm}
-        </style></head>
-        <body>${el.outerHTML}</body></html>
-      `);
-      win.document.close();
-      setTimeout(() => { win.print(); setTimeout(() => win.close(), 500); }, 300);
-    };
-
-    // === ENVIAR POR WHATSAPP ===
-    function sendWhatsApp(id) {
-      const order = allOrders.find(o => o.id === id);
-      if (!order) return;
-
-      const addr = order.address || {};
-      const productos = (order.products || []).map(p => 
-        `• ${p.name} (x${p.qty || 1}) - $${(Number(p.price) * (p.qty || 1)).toFixed(2)}`
-      ).join('\n');
-
-      const mensaje = `*¡Orden Confirmada! #${order.id}*\n\n` +
-        `*Cliente:* ${addr.name || '—'}\n` +
-        `*Tel:* ${addr.phone || '—'}\n` +
-        `*Total:* $${Number(order.total || 0).toFixed(2)} MXN\n\n` +
-        `*Productos:*\n${productos}\n\n` +
-        `*Entrega:*\n${addr.street || ''}, ${addr.colonia || ''}, CP ${addr.cp || ''}\n${addr.state || ''}\n\n` +
-        `¡Gracias por tu compra! ❤️`;
-
-      const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, '_blank');
-      showToast('Abriendo WhatsApp...', 'success');
-    }
-
-    // === CAMBIAR ESTADO ===
-    async function changeStatus(id, current) {
-      const cycle = { paid: 'shipped', pending: 'shipped', shipped: 'delivered', delivered: 'cancelled', cancelled: 'paid' };
-      const next = cycle[current] || 'shipped';
-      const texts = { paid: 'Pagado', pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
-      if (!confirm(`¿Cambiar a ${texts[next]}?`)) return;
-      try {
-        await updateDoc(doc(db, 'orders', id), { 
-          status: next,
-          ...(next === 'shipped' ? { shippedAt: serverTimestamp() } : {})
-        });
-        showToast(`Estado: ${texts[next]}`, 'success');
-        loadOrders();
-      } catch (err) {
-        showToast('Error', 'error');
-      }
-    }
-
-    // === RESUMEN ===
-    function updateSummary() {
-      const total = allOrders.length;
-      const revenue = allOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
-      const pending = allOrders.filter(o => ['paid', 'pending'].includes(o.status || 'paid')).length;
-      const today = new Date().toDateString();
-      const shippedToday = allOrders.filter(o => {
-        if (!o.shippedAt) return false;
-        const shippedDate = o.shippedAt.toDate?.() || new Date(o.shippedAt);
-        return shippedDate.toDateString() === today;
-      }).length;
-
-      summaryTotal.textContent = total;
-      summaryRevenue.textContent = `$${revenue.toLocaleString('es-MX')}`;
-      summaryPending.textContent = pending;
-      summaryShippedToday.textContent = shippedToday;
-      totalComprasEl.textContent = `Total: ${total}`;
-      totalVentasEl.textContent = `$${revenue.toLocaleString('es-MX')}`;
-    }
-
-    // === FILTROS ===
-    searchInput.addEventListener('input', () => renderOrders());
-    statusFilter.addEventListener('change', () => renderOrders());
-
-    // === INICIO ===
-    loadOrders();
-  </script>
+  <!-- SCRIPT -->
+  <script type="module" src="js/compras.js"></script>
 </body>
 </html>
