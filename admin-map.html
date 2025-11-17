@@ -17,16 +17,21 @@
     }
     .admin-bar .left { display: flex; gap: 20px; align-items: center; }
     .admin-bar .right { display: flex; gap: 12px; align-items: center; }
+    
+    /* BOTÓN ESTADÍSTICAS CON BARRITAS */
+    .stats-toggle-btn {
+      background: #fff; color: #000; border: none; padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; font-weight: 700; display: flex; flex-direction: column; gap: 4px;
+      transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .stats-toggle-btn:hover { background: #f0f0f0; transform: translateY(-1px); }
+    .bar { width: 20px; height: 2px; background: #000; border-radius: 1px; }
+
     .admin-btn {
       background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700;
       cursor: pointer; font-size: 0.9rem; border: none; transition: 0.2s;
     }
     .admin-btn:hover { background: #f0f0f0; }
-    .icon-btn {
-      background: transparent; color: #fff; border: none; font-size: 1.3rem; cursor: pointer;
-      padding: 8px; border-radius: 50%; transition: 0.2s;
-    }
-    .icon-btn:hover { background: rgba(255,255,255,0.1); }
 
     /* MAPA */
     .map-container {
@@ -69,9 +74,7 @@
       opacity: 0;
       pointer-events: none;
     }
-    .stats-panel h3 { margin: 0 0 15px; font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
-    .toggle-stats { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666; }
-    .toggle-stats:hover { color: #000; }
+    .stats-panel h3 { margin: 0 0 15px; font-size: 1.3rem; }
     .stat { margin-bottom: 12px; }
     .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; }
     .stat-value { font-size: 1.8rem; font-weight: 800; }
@@ -85,8 +88,12 @@
       <span>MAPA DE COMPRAS</span>
     </div>
     <div class="right">
-      <button class="icon-btn" id="toggleLegendBtn" title="Leyenda">ℹ️</button>
-      <button class="icon-btn" id="toggleStatsBtn" title="Estadísticas">📊</button>
+      <!-- BOTÓN ESTADÍSTICAS CON BARRITAS -->
+      <button class="stats-toggle-btn" id="toggleBothBtn" title="Mostrar/Ocultar Paneles">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </button>
       <button class="admin-btn" id="logoutBtn">Cerrar Sesión</button>
     </div>
   </div>
@@ -125,10 +132,7 @@
 
     <!-- PANEL ESTADÍSTICAS -->
     <div class="stats-panel" id="statsPanel">
-      <h3>
-        Resumen
-        <button class="toggle-stats" id="closeStatsBtn">✕</button>
-      </h3>
+      <h3>Resumen</h3>
       <div class="stat">
         <div class="stat-label">Total de Órdenes</div>
         <div class="stat-value" id="totalOrders">0</div>
@@ -246,43 +250,22 @@
     // === ELEMENTOS DOM ===
     const statsPanel = document.getElementById('statsPanel');
     const legendPanel = document.getElementById('legendPanel');
-    const toggleStatsBtn = document.getElementById('toggleStatsBtn');
-    const toggleLegendBtn = document.getElementById('toggleLegendBtn');
-    const closeStatsBtn = document.getElementById('closeStatsBtn');
+    const toggleBothBtn = document.getElementById('toggleBothBtn');
 
-    // === FUNCIÓN PARA MOSTRAR/OCULTAR PANEL ===
-    function togglePanel(panel, show) {
-      if (show) {
-        panel.classList.remove('hidden');
+    // === MOSTRAR/OCULTAR AMBOS PANELES ===
+    toggleBothBtn.addEventListener('click', () => {
+      const bothHidden = statsPanel.classList.contains('hidden') && legendPanel.classList.contains('hidden');
+      const bothVisible = !statsPanel.classList.contains('hidden') && !legendPanel.classList.contains('hidden');
+
+      if (bothHidden || !bothVisible) {
+        // Mostrar ambos
+        statsPanel.classList.remove('hidden');
+        legendPanel.classList.remove('hidden');
       } else {
-        panel.classList.add('hidden');
+        // Ocultar ambos
+        statsPanel.classList.add('hidden');
+        legendPanel.classList.add('hidden');
       }
-    }
-
-    // === BOTÓN ESTADÍSTICAS EN BARRA (comportamiento inteligente) ===
-    toggleStatsBtn.addEventListener('click', () => {
-      const statsHidden = statsPanel.classList.contains('hidden');
-      const legendHidden = legendPanel.classList.contains('hidden');
-
-      if (statsHidden && legendHidden) {
-        togglePanel(statsPanel, true);
-        togglePanel(legendPanel, true);
-      } else if (statsHidden) {
-        togglePanel(statsPanel, true);
-      } else {
-        togglePanel(statsPanel, false);
-        if (!legendHidden) togglePanel(legendPanel, false);
-      }
-    });
-
-    // === BOTÓN LEYENDA EN BARRA ===
-    toggleLegendBtn.addEventListener('click', () => {
-      legendPanel.classList.toggle('hidden');
-    });
-
-    // === CERRAR ESTADÍSTICAS DESDE EL PANEL ===
-    closeStatsBtn.addEventListener('click', () => {
-      togglePanel(statsPanel, false);
     });
 
     // === BOTÓN VOLVER ===
