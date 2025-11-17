@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compras - Efraín Shop Admin</title>
+  <title>Compras - Efraín Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,9 +27,8 @@
     .icon-btn { color: #fff; background: none; cursor: pointer; border: none; }
     .icon-btn svg { stroke: #fff; fill: none; width: 26px; height: 26px; }
     .main-container { padding: 20px 15px; max-width: 900px; margin: 0 auto; }
-
     .back-btn {
-      background: rgba(255,255,255,0.15); padding: 10px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.15); padding: 10   10px 14px; border-radius: 10px;
       transition: 0.2s; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;
       color: #fff; text-decoration: none;
     }
@@ -38,14 +36,12 @@
       background: rgba(255,255,255,0.25); transform: translateX(-2px);
     }
     .back-btn svg { width: 18px; height: 18px; fill: #fff; }
-
     .sort-btn {
       position: absolute; top: 10px; right: 15px; background: #fff; color: #000;
       padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
       display: flex; align-items: center; gap: 6px; z-index: 10; font-weight: 600;
     }
     .sort-btn svg { width: 16px; height: 16px; fill: #000; }
-
     .summary-box {
       background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.95rem;
@@ -53,14 +49,12 @@
     .summary-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 10px; color: #000; }
     .summary-item { display: flex; justify-content: space-between; margin: 6px 0; }
     .summary-item strong { color: #000; }
-
     .orders-container {
       margin-top: 20px; max-height: calc(100vh - 220px); overflow-y: auto; padding-right: 5px;
     }
     .orders-container::-webkit-scrollbar { width: 6px; }
     .orders-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
     .orders-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-
     .order-card {
       background: #fff; border: 1.5px solid #eee; border-radius: 12px;
       padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -79,28 +73,12 @@
     }
     .print-btn:hover { background: #e0e0e0; border-color: #aaa; }
     .print-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
-
     .toast {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
       background: #000; color: #fff; padding: 12px 24px; border-radius: 8px;
       z-index: 3000; opacity: 0; transition: opacity 0.3s; font-weight: 600;
     }
     .toast.show { opacity: 1; }
-
-    .admin-gear { position: relative; }
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
-      border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; z-index: 1001; width: 220px;
-    }
-    .admin-dropdown.show { display: block; }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 14px 20px; color: #000; text-decoration: none;
-      border-bottom: 1px solid #eee; background: none; border: none; text-align: left;
-      cursor: pointer; font-size: 0.95rem; font-weight: 500;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-    .admin-dropdown a:last-child, .admin-dropdown button:last-child { border-bottom: none; }
-
     @media print {
       body * { visibility: hidden; }
       .printable-order, .printable-order * { visibility: visible; }
@@ -111,25 +89,12 @@
   </style>
 </head>
 <body>
+
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn" aria-label="Ajustes">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </button>
-          <div class="admin-dropdown" id="adminDropdown">
-            <a href="admin-map.html">Mapa de Compras</a>
-            <a href="admin-compras.html">Compras</a>
-            <a href="admin-estadisticas.html">Estadísticas</a>
-            <button id="logoutBtn">Cerrar Sesión</button>
-          </div>
-        </div>
-        <!-- BOTÓN REGRESAR A ADMIN -->
+        <!-- BOTÓN REGRESAR -->
         <a href="admin.html" class="back-btn">
           <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg>
           Regresar
@@ -197,44 +162,26 @@
     const totalVentasEl = document.getElementById('totalVentas');
     const toast = document.getElementById('toast');
 
-    // === PROTECCIÓN ADMIN ===
-    if (localStorage.getItem('admin') !== 'true') {
-      alert('Acceso denegado. Solo administradores.');
-      window.location.href = 'login.html';
-    }
-
-    // === CERRAR SESIÓN ===
-    document.getElementById('logoutBtn').onclick = () => {
-      if (confirm('¿Cerrar sesión?')) {
-        localStorage.clear();
-        window.location.href = 'login.html';
-      }
-    };
-
     // === CARGAR ÓRDENES Y RESUMEN ===
     async function loadOrders() {
       try {
         const q = query(collection(db, "orders"), orderBy("date", "desc"));
         const snapshot = await getDocs(q);
-
         let totalVentas = 0;
         let totalOrdenes = 0;
-        const productMap = {}; // Para sumar cantidades por producto
-
+        const productMap = {};
         let ordersHTML = '';
 
         if (snapshot.empty) {
           ordersHTML = '<div style="text-align:center; color:#666; padding:30px;">No hay compras aún.</div>';
         } else {
           totalOrdenes = snapshot.size;
-
           snapshot.forEach(doc => {
             const data = doc.data();
             const id = doc.id;
             const monto = parseFloat(data.total) || 0;
             totalVentas += monto;
 
-            // Sumar productos
             (data.products || []).forEach(p => {
               const name = p.name || 'Producto sin nombre';
               const qty = p.qty || 1;
@@ -249,15 +196,12 @@
           });
         }
 
-        // Actualizar encabezado
         totalComprasEl.textContent = `Total: ${totalOrdenes}`;
         totalVentasEl.textContent = `Total Ventas: $${totalVentas.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
 
-        // Mostrar resumen de productos
         const sortedProducts = Object.entries(productMap)
           .sort((a, b) => b[1].qty - a[1].qty)
           .slice(0, 10);
-
         let summaryHTML = '';
         if (sortedProducts.length === 0) {
           summaryHTML = '<em>No hay productos vendidos aún.</em>';
@@ -270,18 +214,15 @@
           `).join('');
         }
         productsSummary.innerHTML = summaryHTML;
-
-        // Mostrar órdenes
         ordersContainer.innerHTML = ordersHTML;
         setupPrintButtons();
-
       } catch (error) {
-        console.error("Error al cargar órdenes:", error);
+        console.error("Error:", error);
         showToast("Error al cargar datos");
       }
     }
 
-    // === CREAR TARJETA DE PEDIDO ===
+    // === CREAR TARJETA ===
     function createOrderCard(order) {
       const productos = order.products || [];
       const productosHTML = productos.map(p =>
@@ -319,7 +260,7 @@
       `;
     }
 
-    // === IMPRIMIR PEDIDO ===
+    // === IMPRIMIR ===
     function setupPrintButtons() {
       document.querySelectorAll('.print-btn').forEach(btn => {
         btn.onclick = () => {
@@ -368,17 +309,6 @@
     // === INICIAR ===
     document.addEventListener('DOMContentLoaded', () => {
       loadOrders();
-
-      // Menú engranaje
-      document.getElementById('adminGear').addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.getElementById('adminDropdown').classList.toggle('show');
-      });
-      document.addEventListener('click', () => {
-        document.getElementById('adminDropdown').classList.remove('show');
-      });
-
-      // Botón ordenar
       document.getElementById('sortBtn').addEventListener('click', () => {
         showToast("Ya está ordenado por fecha ↓");
       });
