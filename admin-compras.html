@@ -6,6 +6,7 @@
   <title>Compras • Efraín Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  
   <style>
     :root {
       --bg: #ffffff;
@@ -14,10 +15,9 @@
       --card-bg: #ffffff;
       --accent: #000000;
       --accent-light: #f8f8f8;
-      --shadow: 0 8px 25px rgba(0,0,0,0.06);
-      --shadow-hover: 0 20px 40px rgba(0,0,0,0.1);
-      --radius: 16px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow: 0 8px 30px rgba(0,0,0,0.07);
+      --radius: 18px;
+      --transition: all 0.35s ease;
       --green: #10b981;
       --red: #ef4444;
       --blue: #3b82f6;
@@ -28,11 +28,10 @@
     [data-theme="dark"] {
       --bg: #000000;
       --text: #f5f5f5;
-      --border: #333333;
-      --card-bg: #111111;
+      --border: #333;
+      --card-bg: #111;
       --accent-light: #1a1a1a;
-      --shadow: 0 8px 25px rgba(0,0,0,0.4);
-      --shadow-hover: 0 20px 40px rgba(0,0,0,0.5);
+      --shadow: 0 8px 30px rgba(0,0,0,0.5);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -40,11 +39,9 @@
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
       transition: var(--transition);
     }
 
-    /* Header */
     .header {
       position: sticky;
       top: 0;
@@ -64,21 +61,26 @@
     }
     .logo {
       font-weight: 800;
-      font-size: 1.7rem;
+      font-size: 1.8rem;
       letter-spacing: -0.8px;
       color: var(--accent);
     }
-    .back-btn, .theme-toggle {
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .back-btn, .theme-toggle, .toggle-stats-btn {
       background: none;
       border: none;
       font-size: 1.5rem;
       cursor: pointer;
       padding: 10px;
       border-radius: 12px;
-      transition: var(--transition);
       color: var(--text);
+      transition: var(--transition);
     }
-    .back-btn:hover, .theme-toggle:hover {
+    .back-btn:hover, .theme-toggle:hover, .toggle-stats-btn:hover {
       background: var(--accent-light);
       transform: translateY(-2px);
     }
@@ -87,17 +89,14 @@
       color: white;
       padding: 12px 28px;
       border-radius: 50px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      letter-spacing: 0.5px;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-weight: 800;
+      font-size: 1.5rem;
+      box-shadow: 0 6px 20px rgba(16,185,129,0.3);
+      min-width: 150px;
+      text-align: center;
     }
-    .total-ventas.negative { background: var(--red); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3); }
+    .total-ventas.negative { background: var(--red); box-shadow: 0 6px 20px rgba(239,68,68,0.3); }
 
-    /* Main */
     .main-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -110,57 +109,7 @@
       letter-spacing: -1px;
     }
 
-    /* Estadísticas */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      margin-bottom: 48px;
-    }
-    .stat-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .stat-card:hover {
-      transform: translateY(-8px);
-      box-shadow: var(--shadow-hover);
-    }
-    .stat-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      color: white;
-    }
-    .stat-info h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 6px;
-    }
-    .stat-info p {
-      font-size: 2rem;
-      font-weight: 800;
-      margin: 0;
-      letter-spacing: -1px;
-    }
-
-    /* Búsqueda */
-    .search-bar {
-      margin-bottom: 40px;
-    }
+    .search-bar { margin-bottom: 40px; }
     .search-input {
       width: 100%;
       padding: 18px 24px;
@@ -169,7 +118,6 @@
       font-size: 1.1rem;
       background: var(--card-bg);
       color: var(--text);
-      transition: var(--transition);
     }
     .search-input:focus {
       outline: none;
@@ -177,11 +125,7 @@
       box-shadow: 0 0 0 5px rgba(0,0,0,0.06);
     }
 
-    /* Órdenes */
-    .orders-grid {
-      display: grid;
-      gap: 28px;
-    }
+    .orders-grid { display: grid; gap: 28px; }
     .order-card {
       background: var(--card-bg);
       border: 1.5px solid var(--border);
@@ -192,7 +136,7 @@
     }
     .order-card:hover {
       transform: translateY(-10px);
-      box-shadow: var(--shadow-hover);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
       border-color: var(--accent);
     }
     .order-header {
@@ -205,58 +149,119 @@
       align-items: center;
       gap: 12px;
     }
-    .order-body {
-      padding: 28px;
-    }
+    .order-body { padding: 28px; }
     .order-total {
       font-size: 2.6rem;
       font-weight: 800;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       color: var(--accent);
     }
-    .order-id { font-size: 0.95rem; color: #666; margin-bottom: 8px; }
+    .order-id { font-size: 0.95rem; color: #666; margin-bottom: 12px; }
     .order-date {
       font-size: 0.95rem;
       color: #888;
-      margin-top: 16px;
+      margin-top: 20px;
       font-weight: 500;
     }
-    .order-products {
+    .order-products, .order-address {
       background: var(--accent-light);
       padding: 20px;
       border-radius: 12px;
       margin: 20px 0;
+      line-height: 1.8;
     }
     .order-product {
       display: flex;
       justify-content: space-between;
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
-      font-size: 1rem;
     }
     .order-product:last-child { border: none; }
-    .order-address {
-      background: var(--accent-light);
-      padding: 20px;
-      border-radius: 12px;
-      line-height: 1.8;
-      font-size: 1rem;
-    }
 
     .empty-state {
       text-align: center;
       padding: 120px 20px;
       color: #999;
+      font-size: 1.3rem;
     }
-    .empty-state i {
-      font-size: 5rem;
-      margin-bottom: 24px;
-      opacity: 0.3;
+    .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.4; }
+
+    /* Panel Estadísticas (lateral deslizable) */
+    .stats-panel {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100vh;
+      background: var(--card-bg);
+      border-left: 1.5px solid var(--border);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      z-index: 999;
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .stats-panel.open { right: 0; }
+    .stats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    .close-stats {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #999;
+    }
+    .stats-grid {
+      display: grid;
+      gap: 20px;
+    }
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px;
+      background: var(--accent-light);
+      border-radius: 14px;
+    }
+    .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: white;
+    }
+    .stat-icon.green { background: var(--green); }
+    .stat-icon.blue { background: var(--blue); }
+    .stat-icon.yellow { background: var(--yellow); }
+    .stat-icon.purple { background: var(--purple); }
+    .stat-info h3 {
+      font-size: 0.9rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .stat-info p {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-top: 4px;
     }
 
     @media (max-width: 768px) {
-      .stats-grid { grid-template-columns: 1fr 1fr; }
-      .order-total { font-size: 2.2rem; }
+      .stats-panel { width: 100%; right: -100%; }
+      .stats-panel.open { right: 0; }
     }
   </style>
 </head>
@@ -268,10 +273,11 @@
         <i class="fas fa-arrow-left"></i>
       </button>
       <div class="logo">EFRAÍN SHOP</div>
-      <div style="display:flex; align-items:center; gap:20px;">
-        <div class="total-ventas" id="totalVentas">
-          <i class="fas fa-dollar-sign"></i> $0
-        </div>
+      <div class="header-right">
+        <div class="total-ventas" id="totalVentas">$0</div>
+        <button class="toggle-stats-btn" id="toggleStats">
+          <i class="fas fa-chart-bar"></i>
+        </button>
         <button class="theme-toggle" id="themeToggle">
           <i class="fas fa-moon"></i>
         </button>
@@ -279,40 +285,46 @@
     </div>
   </div>
 
-  <div class="main-container">
-    <h1 class="page-title">Panel de Ventas</h1>
-
-    <!-- Estadísticas -->
+  <!-- Panel Estadísticas (oculto por defecto) -->
+  <div class="stats-panel" id="statsPanel">
+    <div class="stats-header">
+      <h2>Estadísticas</h2>
+      <button class="close-stats" id="closeStats">×</button>
+    </div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon" style="background:var(--green);"><i class="fas fa-box"></i></div>
+        <div class="stat-icon green"><i class="fas fa-box"></i></div>
         <div class="stat-info">
           <h3>Productos Vendidos</h3>
           <p id="totalItems">0</p>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:var(--blue);"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
         <div class="stat-info">
           <h3>Total Órdenes</h3>
           <p id="totalOrders">0</p>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:var(--yellow);"><i class="fas fa-clock"></i></div>
+        <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
         <div class="stat-info">
-          <h3>Órdenes Pendientes</h3>
+          <h3>Pendientes</h3>
           <p id="pendingOrders">0</p>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background:var(--purple);"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-icon purple"><i class="fas fa-calendar-check"></i></div>
         <div class="stat-info">
-          <h3>Completadas Hoy</h3>
+          <h3>Hoy</h3>
           <p id="todayOrders">0</p>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="main-container">
+    <h1 class="page-title">Historial de Compras</h1>
 
     <div class="search-bar">
       <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono, colonia, ID de orden...">
@@ -326,153 +338,7 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Proteger admin
-    if (!localStorage.getItem('isAdmin')) {
-      window.location.href = 'login.html';
-    }
-
-    let orders = [];
-    let unsubscribe = null;
-
-    const ordersRef = collection(db, "orders");
-    const q = query(ordersRef, orderBy("date", "desc"));
-
-    unsubscribe = onSnapshot(q, (snapshot) => {
-      orders = [];
-      let totalItems = 0;
-      let totalRevenue = 0;
-      let pending = 0;
-      let todayCount = 0;
-      const today = new Date().toLocaleDateString('es-MX');
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const order = { id: doc.id, ...data };
-        orders.push(order);
-
-        // Contar productos vendidos
-        if (data.products) {
-          totalItems += data.products.reduce((sum, p) => sum + (p.qty || 1), 0);
-        }
-
-        totalRevenue += Number(data.total || 0);
-
-        // Pendientes (sin status o "pendiente")
-        if (!data.status || data.status === "pendiente") pending++;
-
-        // Órdenes de hoy
-        const orderDate = data.date?.toDate?.() || new Date(data.date);
-        if (orderDate.toLocaleDateString('es-MX') === today) todayCount++;
-      });
-
-      renderOrders();
-      updateStats(totalItems, orders.length, pending, todayCount);
-      updateTotalVentas(totalRevenue);
-    });
-
-    function updateStats(items, total, pending, today) {
-      document.getElementById('totalItems').textContent = items.toLocaleString();
-      document.getElementById('totalOrders').textContent = total;
-      document.getElementById('pendingOrders').textContent = pending;
-      document.getElementById('todayOrders').textContent = today;
-    }
-
-    function updateTotalVentas(amount) {
-      const el = document.getElementById('totalVentas');
-      el.innerHTML = `<i class="fas fa-dollar-sign"></i> $${amount.toLocaleString('es-MX')}`;
-      el.classList.toggle('negative', amount < 0);
-    }
-
-    function renderOrders() {
-      const container = document.getElementById('ordersContainer');
-      container.innerHTML = '';
-
-      if (orders.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-bag"></i><p>No hay compras aún</p></div>`;
-        return;
-      }
-
-      orders.forEach(order => {
-        const date = order.date?.toDate?.() || new Date(order.date);
-        const formattedDate = date.toLocaleString('es-MX', {
-          weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
-          hour: '2-digit', minute: '2-digit'
-        });
-
-        const productsHtml = (order.products || []).map(p => `
-          <div class="order-product">
-            <span>${p.name} (x${p.qty || 1})</span>
-            <span>$${(p.price * (p.qty || 1)).toFixed(2)}</span>
-          </div>
-        `).join('');
-
-        const address = order.address || {};
-        const fullAddress = `${address.street || ''}, ${address.colonia || ''}, ${address.cp || ''}, ${address.state || ''}`;
-
-        const card = document.createElement('div');
-        card.className = 'order-card';
-        card.innerHTML = `
-          <div class="order-header">
-            <i class="fas fa-receipt"></i>
-            Compra #${order.id.slice(0, 8).toUpperCase()}
-          </div>
-          <div class="order-body">
-            <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX')}</div>
-            ${order.paymentId ? `<div class="order-id">ID de pago: ${order.paymentId}</div>` : ''}
-            <div class="order-products">${productsHtml}</div>
-            <div class="order-address">
-              <strong>${address.name || 'Sin nombre'}</strong><br>
-              ${fullAddress}<br>
-              Tel: ${address.phone || '—'}<br>
-              Cliente: ${order.userId || 'Anónimo'}
-            </div>
-            <div class="order-date">
-              <i class="fas fa-calendar-alt"></i> ${  }
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // Búsqueda
-    document.getElementById('searchInput').addEventListener('input', () => {
-      const term = document.getElementById('searchInput').value.toLowerCase();
-      document.querySelectorAll('.order-card').forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(term) ? 'block' : 'none';
-      });
-    });
-
-    // Tema oscuro
-    const toggle = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', saved);
-    toggle.innerHTML = saved === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-    toggle.onclick = () => {
-      const isDark = document.body.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      toggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    };
-  </script>
+  <!-- JavaScript separado -->
+  <script type="module" src="js/compras.js"></script>
 </body>
 </html>
