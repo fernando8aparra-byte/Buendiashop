@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body { margin: 0; padding: 0; padding-top: 70px; }
+    body { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; }
     .admin-bar {
       position: fixed; top: 0; left: 0; width: 100%; background: #000; color: #fff;
       padding: 15px 20px; z-index: 2000; display: flex; justify-content: space-between;
@@ -17,24 +17,35 @@
     .admin-bar .right { display: flex; gap: 15px; align-items: center; }
     .admin-btn { background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
     .admin-btn:hover { background: #f0f0f0; }
-
     .map-container {
       position: relative; height: calc(100vh - 70px); background: #f8f8f8;
     }
     #map { width: 100%; height: 100%; }
+    
+    /* LEYENDA */
     .legend {
       position: absolute; bottom: 20px; left: 20px; background: #fff; padding: 15px; border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; font-size: 0.9rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; font-size: 0.9rem; transition: all 0.3s ease;
     }
     .legend h4 { margin: 0 0 10px; font-size: 1rem; text-transform: uppercase; }
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
     .legend-color { width: 16px; height: 16px; border-radius: 50%; }
 
+    /* PANEL DE ESTADÍSTICAS - OCULTABLE */
     .stats-panel {
       position: absolute; top: 90px; right: 20px; width: 300px; background: #fff; padding: 20px;
-      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
+      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    .stats-panel h3 { margin-top: 0; font-size: 1.3rem; }
+    .stats-panel.hidden {
+      transform: translateX(350px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .stats-panel h3 { margin-top: 0; font-size: 1.3rem; display: flex; justify-content: space-between; align-items: center; }
+    .toggle-stats {
+      background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #666;
+    }
+    .toggle-stats:hover { color: #000; }
     .stat { margin-bottom: 12px; }
     .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; }
     .stat-value { font-size: 1.8rem; font-weight: 800; }
@@ -46,7 +57,6 @@
   </style>
 </head>
 <body>
-
   <!-- BARRA ADMIN -->
   <div class="admin-bar">
     <div class="left">
@@ -68,26 +78,33 @@
     <div class="legend">
       <h4>Leyenda</h4>
       <div class="legend-item">
-        <div class="legend-color" style="background:#e63946;"></div>
-        <span>1 Compra</span>
+        <div class="legend-color" style="background:#2ecc71;"></div>
+        <span>1 compra</span>
       </div>
       <div class="legend-item">
-        <div class="legend-color" style="background:#e63946; opacity:0.8;"></div>
-        <span>2-5 Compras</span>
+        <div class="legend-color" style="background:#f1c40f;"></div>
+        <span>2-5 compras</span>
       </div>
       <div class="legend-item">
-        <div class="legend-color" style="background:#e63946; opacity:0.6;"></div>
-        <span>6-10 Compras</span>
+        <div class="legend-color" style="background:#e67e22;"></div>
+        <span>6-10 compras</span>
       </div>
       <div class="legend-item">
-        <div class="legend-color" style="background:#e63946; opacity:0.4;"></div>
-        <span>11+ Compras</span>
+        <div class="legend-color" style="background:#e74c3c;"></div>
+        <span>11-20 compras</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#c0392b;"></div>
+        <span>20+ compras</span>
       </div>
     </div>
 
     <!-- PANEL DE ESTADÍSTICAS -->
-    <div class="stats-panel">
-      <h3>Resumen</h3>
+    <div class="stats-panel" id="statsPanel">
+      <h3>
+        Resumen
+        <button class="toggle-stats" id="toggleStats">✕</button>
+      </h3>
       <div class="stat">
         <div class="stat-label">Total de Órdenes</div>
         <div class="stat-value" id="totalOrders">0</div>
@@ -107,7 +124,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script>
     // === FIREBASE ===
     const firebaseConfig = {
@@ -146,6 +162,15 @@
       TLAX: [19.4, -98.2], VER: [19.2, -96.1], YUC: [20.7, -89.1], ZAC: [22.7, -102.5]
     };
 
+    // === FUNCIÓN PARA OBTENER COLOR SEGÚN COMPRAS ===
+    function getColor(count) {
+      if (count === 1) return '#2ecc71';     // Verde brillante
+      if (count <= 5)  return '#f1c40f';     // Amarillo
+      if (count <= 10) return '#e67e22';     // Naranja
+      if (count <= 20) return '#e74c3c';     // Rojo claro
+      return '#c0392b';                      // Rojo oscuro
+    }
+
     // === CONTADORES ===
     let totalOrders = 0;
     let totalRevenue = 0;
@@ -158,28 +183,29 @@
         if (data.address && data.address.stateCode) {
           totalOrders++;
           totalRevenue += data.total || 0;
-
           const code = data.address.stateCode;
           stateCount[code] = (stateCount[code] || 0) + 1;
-
           const coords = stateCoords[code];
           if (coords) {
             const count = stateCount[code];
-            const radius = Math.min(8 + count * 2, 30);
-            const opacity = count > 10 ? 0.4 : count > 5 ? 0.6 : count > 1 ? 0.8 : 1;
+            const radius = Math.min(10 + count * 1.5, 40); // Más grande con más compras
+            const color = getColor(count);
+            const opacity = count > 20 ? 0.9 : count > 10 ? 0.8 : count > 5 ? 0.7 : 0.6;
 
             L.circleMarker(coords, {
               radius: radius,
-              color: '#e63946',
+              color: color,
+              fillColor: color,
               fillOpacity: opacity,
               weight: 2
             }).addTo(map)
               .bindPopup(`
-                <b>${data.address.name}</b><br>
-                ${data.address.state}<br>
+                <b>${data.address.name || 'Cliente'}</b><br>
+                ${data.address.state || 'Estado'}<br>
                 Orden: <b>${doc.id}</b><br>
                 Total: <b>$${data.total}</b><br>
-                Fecha: ${new Date(data.date?.toDate()).toLocaleDateString('es-MX')}
+                Fecha: ${new Date(data.date?.toDate()).toLocaleDateString('es-MX')}<br>
+                <small><i>${count} compra${count > 1 ? 's' : ''} en este estado</i></small>
               `);
           }
         }
@@ -188,11 +214,18 @@
       // Actualizar estadísticas
       document.getElementById('totalOrders').textContent = totalOrders;
       document.getElementById('totalRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
-
       const top = Object.entries(stateCount).sort((a,b) => b[1] - a[1])[0];
       if (top) {
         document.getElementById('topState').textContent = `${top[0]} (${top[1]})`;
       }
+    });
+
+    // === OCULTAR/MOSTRAR PANEL ===
+    const statsPanel = document.getElementById('statsPanel');
+    const toggleBtn = document.getElementById('toggleStats');
+    toggleBtn.addEventListener('click', () => {
+      statsPanel.classList.toggle('hidden');
+      toggleBtn.textContent = statsPanel.classList.contains('hidden') ? '⋮' : '✕';
     });
 
     // === VOLVER ===
