@@ -1,12 +1,5 @@
-// js/compras.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  onSnapshot,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
@@ -20,142 +13,134 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// === PROTEGER ADMIN ===
+// Proteger acceso admin
 if (!localStorage.getItem('isAdmin')) {
   window.location.href = 'login.html';
 }
 
-// === VARIABLES ===
 let orders = [];
-let sortAsc = false;
-
-// === CARGAR COMPRAS ===
-const ordersRef = collection(db, "orders");
 let unsubscribe = null;
 
-function loadOrders(order = 'desc') {
-  const q = query(ordersRef, orderBy("date", order));
-  unsubscribe = onSnapshot(q, (snapshot) => {
-    orders = [];
-    snapshot.forEach(doc => {
-      orders.push({ id: doc.id, ...doc.data() });
-    });
-    renderOrders();
-    updateTotal();
-    updateNotifications();
+const ordersRef = collection(db, "orders");
+const q = query(ordersRef, orderBy("date", "desc"));
+
+unsubscribe = onSnapshot(q, (snapshot) => {
+  orders = [];
+  let totalItems = 0;
+  let totalRevenue = 0;
+  let pending = 0;
+  let todayCount = 0;
+  const today = new Date().toLocaleDateString('es-MX');
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const order = { id: doc.id, ...data };
+    orders.push(order);
+
+    if (data.products) {
+      totalItems += data.products.reduce((sum, p) => sum + (p.qty || 1), 0);
+    }
+
+    totalRevenue += Number(data.total || 0);
+    if (!data.status || data.status === "pendiente") pending++;
+
+    const orderDate = data.date?.toDate?.() || new Date(data.date);
+    if (orderDate.toLocaleDateString('es-MX') === today) todayCount++;
   });
+
+  renderOrders();
+  updateStats(totalItems, orders.length, pending, todayCount);
+  updateTotalVentas(totalRevenue);
+});
+
+function updateStats(items, total, pending, today) {
+  document.getElementById('totalItems').textContent = items.toLocaleString();
+  document.getElementById('totalOrders').textContent = total;
+  document.getElementById('pendingOrders').textContent = pending;
+  document.getElementById('todayOrders').textContent = today;
 }
 
-loadOrders('desc');
+function updateTotalVentas(amount) {
+  const el = document.getElementById('totalVentas');
+  el.textContent = `$${amount.toLocaleString('es-MX')}`;
+  el.classList.toggle('negative', amount < 0);
+}
 
-// === RENDERIZAR COMPRAS (VERTICAL) ===
 function renderOrders() {
   const container = document.getElementById('ordersContainer');
   container.innerHTML = '';
 
   if (orders.length === 0) {
-    container.innerHTML = '<p style="text-align:center; color:#666; padding:40px 0;">No hay compras aún.</p>';
+    container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-bag"></i><p>No hay compras aún</p></div>`;
     return;
   }
 
   orders.forEach(order => {
-    const card = document.createElement('div');
-    card.className = 'order-card';
-
     const date = order.date?.toDate?.() || new Date(order.date);
     const formattedDate = date.toLocaleString('es-MX', {
       weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
 
-    const productsHtml = order.products.map(p => `
+    const productsHtml = (order.products || []).map(p => `
       <div class="order-product">
-        <span>${p.name} (x${p.qty})</span>
-        <span>$${(p.price * p.qty).toLocaleString()}</span>
+        <span>${p.name} (x${p.qty || 1})</span>
+        <span>$${(p.price * (p.qty || 1)).toFixed(2)}</span>
       </div>
     `).join('');
 
-    const address = order.address;
-    const fullAddress = `${address.street}, ${address.colonia}, ${address.cp}, ${address.state}`;
+    const address = order.address || {};
+    const fullAddress = [address.street, address.colonia, address.cp, address.state].filter(Boolean).join(', ');
 
+    const card = document.createElement('div');
+    card.className = 'order-card';
     card.innerHTML = `
-      <div class="order-header">Compra #${order.id.slice(0, 8).toUpperCase()}</div>
-      <div class="order-id">ID de pago: ${order.paymentId}</div>
-      <div class="order-total">Total: $${order.total.toLocaleString()}</div>
-      <div class="order-products">${productsHtml}</div>
-      <div class="order-address">
-        <strong>${address.name}</strong><br>
-        ${fullAddress}<br>
-        Tel: ${address.phone}<br>
-        Cliente: ${order.userId}
+      <div class="order-header">
+        <i class="fas fa-receipt"></i> Compra #${order.id.slice(0, 8).toUpperCase()}
       </div>
-      <div class="order-date">${formattedDate}</div>
+      <div class="order-body">
+        <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX')}</div>
+        ${order.paymentId ? `<div class="order-id">ID: ${order.paymentId}</div>` : ''}
+        <div class="order-products">${productsHtml}</div>
+        <div class="order-address">
+          <strong>${address.name || 'Sin nombre'}</strong><br>
+          ${fullAddress || 'Sin dirección'}<br>
+          Tel: ${address.phone || '—'}
+        </div>
+        <div class="order-date">${formattedDate}</div>
+      </div>
     `;
-
     container.appendChild(card);
   });
 }
 
-// === ACTUALIZAR TOTAL (solo número de órdenes) ===
-function updateTotal() {
-  const count = orders.length;
-  document.getElementById('totalCompras').textContent = `Total: ${count}`;
-}
-
-// === NOTIFICACIONES (ÚLTIMAS 5) ===
-function updateNotifications() {
-  const notif = document.getElementById('notifications');
-  notif.innerHTML = '';
-
-  const recent = orders.slice(0, 5);
-  if (recent.length === 0) {
-    notif.innerHTML = '<div class="notification-item">No hay compras recientes.</div>';
-    return;
-  }
-
-  recent.forEach(order => {
-    const date = order.date?.toDate?.() || new Date(order.date);
-    const time = date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-
-    const item = document.createElement('div');
-    item.className = 'notification-item';
-    item.innerHTML = `
-      <strong>Nueva compra</strong><br>
-      ${order.address.name} - $${order.total.toLocaleString()}<br>
-      <span class="notification-time">${time}</span>
-    `;
-    notif.appendChild(item);
+// Búsqueda
+document.getElementById('searchInput')?.addEventListener('input', () => {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.order-card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(term) ? 'block' : 'none';
   });
+});
 
-  notif.classList.add('show');
-  setTimeout(() => notif.classList.remove('show'), 6000);
-}
+// Panel estadísticas
+document.getElementById('toggleStats')?.addEventListener('click', () => {
+  document.getElementById('statsPanel').classList.toggle('open');
+});
+document.getElementById('closeStats')?.addEventListener('click', () => {
+  document.getElementById('statsPanel').classList.remove('open');
+});
 
-// === ORDENAR ===
-document.getElementById('sortBtn').onclick = () => {
-  sortAsc = !sortAsc;
-  const order = sortAsc ? 'asc' : 'desc';
-  document.getElementById('sortBtn').innerHTML = `
-    <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z" fill="currentColor"/><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-    ${sortAsc ? 'Antiguas primero' : 'Recientes primero'}
-  `;
-  if (unsubscribe) unsubscribe();
-  loadOrders(order);
-};
+// Tema oscuro
+const toggle = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'light';
+document.body.setAttribute('data-theme', saved);
+toggle.innerHTML = saved === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 
-// === CERRAR SESIÓN ===
-document.getElementById('logoutBtn').onclick = () => {
-  if (confirm("¿Cerrar sesión?")) {
-    localStorage.removeItem('isAdmin');
-    window.location.href = 'login.html';
-  }
-};
-
-// === ENGRANAJE ===
-document.getElementById('adminGear').onclick = e => {
-  e.stopPropagation();
-  document.getElementById('adminDropdown').classList.toggle('show');
-};
-document.addEventListener('click', () => {
-  document.getElementById('adminDropdown').classList.remove('show');
+toggle.addEventListener('click', () => {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  toggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 });
