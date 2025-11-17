@@ -23,7 +23,6 @@
     .summary-box{background:#fff;border-radius:12px;padding:16px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);font-size:.95rem}
     .summary-title{font-weight:800;font-size:1.1rem;margin-bottom:10px;color:#000}
     .summary-item{display:flex;justify-content:space-between;margin:6px 0}
-    .summary-item strong{color:#000}
     .orders-container{margin-top:20px;max-height:calc(100vh-220px);overflow-y:auto;padding-right:5px}
     .orders-container::-webkit-scrollbar{width:6px}
     .orders-container::-webkit-scrollbar-track{background:#f1f1f1;border-radius:10px}
@@ -40,28 +39,23 @@
     .print-btn,.send-btn,.status-btn{background:#f0f0f0;border:1px solid #ddd;cursor:pointer;padding:8px 12px;border-radius:6px;font-size:.9rem;color:#000;display:inline-flex;align-items:center;gap:6px;transition:.2s;font-weight:600;flex:1;justify-content:center}
     .print-btn:hover,.send-btn:hover,.status-btn:hover{background:#e0e0e0;border-color:#aaa}
     .print-btn svg,.send-btn svg{width:18px;height:18px;stroke:currentColor;fill:none}
-    .status-btn{background:#4CAF50;color:#fff;border:none}
-    .status-btn.pending{background:#FFC107;color:#000}
+    .status-btn{background:#FFC107;color:#000;border:none}
     .status-btn.shipped{background:#2196F3;color:#fff}
     .status-btn.delivered{background:#4CAF50;color:#fff}
     .status-btn.cancelled{background:#f44336;color:#fff}
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:12px 24px;border-radius:8px;z-index:3000;opacity:0;transition:opacity .3s;font-weight:600}
     .toast.show{opacity:1}
-    .sort-btn{background:#fff;border:1px solid #ddd;padding:8px 12px;border-radius:6px;font-size:.9rem;display:flex;align-items:center;gap:6px;cursor:pointer;transition:.2s}
-    .sort-btn:hover{background:#f0f0f0}
-    .sort-btn svg{width:16px;height:16px;stroke:currentColor;fill:none}
     @keyframes spin{to{transform:rotate(360deg)}}
     @media print{
       body *{visibility:hidden}
       .printable-order,.printable-order *{visibility:visible}
       .printable-order{position:absolute;left:0;top:0;width:100%;padding:20px;background:white}
-      .action-btns,.header,.sort-btn,.toast,.summary-box{display:none!important}
+      .action-btns,.header,.summary-box{display:none!important}
       .order-address strong{display:inline-block;width:130px;font-weight:600}
     }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
@@ -79,15 +73,8 @@
   </header>
 
   <main class="main-container">
-    <div style="position:relative; margin-bottom:20px;">
-      <button class="sort-btn" id="sortBtn">
-        <svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z" fill="currentColor"/></svg>
-        Ordenar por fecha
-      </button>
-    </div>
-
     <div class="summary-box">
-      <div class="summary-title">Resumen de Productos Vendidos</div>
+      <div class="summary-title">Resumen de Productos</div>
       <div id="productsSummary">Cargando...</div>
     </div>
 
@@ -101,6 +88,7 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- Firebase v9+ (MODERNA) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { 
@@ -125,7 +113,6 @@
     const totalVentasEl = document.getElementById('totalVentas');
     const toast = document.getElementById('toast');
 
-    // === CARGAR ÓRDENES DESDE FIRESTORE (API MODERNA) ===
     async function loadOrders() {
       try {
         const q = query(collection(db, 'orders'), orderBy('date', 'desc'));
@@ -146,7 +133,6 @@
             const monto = Number(data.total) || 0;
             totalVentas += monto;
 
-            // Sumar productos
             (data.products || []).forEach(p => {
               const name = p.name || 'Sin nombre';
               const qty = Number(p.qty) || 1;
@@ -174,11 +160,10 @@
         setupActionButtons();
       } catch (err) {
         console.error("Error:", err);
-        showToast("Error al cargar: " + err.message);
+        showToast("Error: " + err.message);
       }
     }
 
-    // === CREAR TARJETA ===
     function createOrderCard(order) {
       const productosHTML = (order.products || []).map(p => `
         <div class="order-product">
@@ -201,10 +186,7 @@
 
       const status = order.status || 'paid';
       const statusText = {
-        paid: 'Pagado',
-        shipped: 'Enviado',
-        delivered: 'Entregado',
-        cancelled: 'Cancelado'
+        paid: 'Pagado', pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado'
       }[status] || 'Pagado';
 
       return `
@@ -231,16 +213,13 @@
         </div>`;
     }
 
-    // === BOTONES ===
     function setupActionButtons() {
       document.querySelectorAll('.print-btn').forEach(btn => {
         btn.onclick = () => printOrder(btn.dataset.orderId);
       });
-
       document.querySelectorAll('.send-btn').forEach(btn => {
         btn.onclick = () => sendOrder(btn.dataset.orderId);
       });
-
       document.querySelectorAll('.status-btn').forEach(btn => {
         btn.onclick = () => changeStatus(btn.dataset.orderId, btn.dataset.current);
       });
@@ -256,10 +235,8 @@
           body{font-family:'Poppins',sans-serif;padding:30px;color:#000;background:white}
           .order-card{border:1px solid #ddd;border-radius:12px;padding:25px;max-width:600px;margin:auto}
           .order-header{font-size:1.4rem;font-weight:800;margin-bottom:12px}
-          .order-id{color:#555;font-size:.9rem}
           .order-total{font-size:1.5rem;font-weight:800;margin:15px 0}
           .order-products{background:#f9f9f9;padding:15px;border-radius:8px;margin:15px 0}
-          .order-product{display:flex;justify-content:space-between;margin:8px 0;font-size:1rem}
           .order-address{line-height:1.8;margin:15px 0;font-size:.95rem}
           .order-address strong{display:inline-block;width:130px;font-weight:600}
           .order-date{text-align:right;color:#777;margin-top:20px;font-size:.9rem}
@@ -272,28 +249,21 @@
     async function sendOrder(id) {
       if (!confirm('¿Marcar como ENVIADO?')) return;
       try {
-        await updateDoc(doc(db, 'orders', id), {
-          status: 'shipped',
-          shippedAt: serverTimestamp()
-        });
+        await updateDoc(doc(db, 'orders', id), { status: 'shipped', shippedAt: serverTimestamp() });
         showToast('Enviado');
         loadOrders();
-      } catch (err) {
-        showToast('Error: ' + err.message);
-      }
+      } catch (err) { showToast('Error: ' + err.message); }
     }
 
     async function changeStatus(id, current) {
-      const next = { paid: 'shipped', shipped: 'delivered', delivered: 'cancelled', cancelled: 'paid' }[current] || 'shipped';
-      const texts = { paid: 'Pagado', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
+      const next = { paid: 'shipped', pending: 'shipped', shipped: 'delivered', delivered: 'cancelled', cancelled: 'paid' }[current] || 'shipped';
+      const texts = { paid: 'Pagado', pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado', cancelled: 'Cancelado' };
       if (!confirm(`¿Cambiar a ${texts[next]}?`)) return;
       try {
         await updateDoc(doc(db, 'orders', id), { status: next });
         showToast(`Ahora: ${texts[next]}`);
         loadOrders();
-      } catch (err) {
-        showToast('Error: ' + err.message);
-      }
+      } catch (err) { showToast('Error: ' + err.message); }
     }
 
     function showToast(msg) {
@@ -302,13 +272,7 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // === INICIO ===
-    document.addEventListener('DOMContentLoaded', () => {
-      loadOrders();
-      document.getElementById('sortBtn').addEventListener('click', () => {
-        showToast('Ordenado por fecha ↓');
-      });
-    });
+    loadOrders();
   </script>
 </body>
 </html>
