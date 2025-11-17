@@ -18,6 +18,10 @@
       --shadow-hover: 0 20px 40px rgba(0,0,0,0.1);
       --radius: 16px;
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --green: #10b981;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
     }
 
     [data-theme="dark"] {
@@ -39,7 +43,6 @@
       transition: var(--transition);
     }
 
-    /* Header */
     .header {
       position: sticky;
       top: 0;
@@ -78,54 +81,95 @@
       transform: translateY(-2px);
     }
     .total-ventas {
-      background: var(--accent);
-      color: white;
-      padding: 10px 20px;
+      padding: 10px 24px;
       border-radius: 50px;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 1.1rem;
       letter-spacing: 0.5px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      transition: var(--transition);
     }
 
-    /* Main */
     .main-container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 40px 20px;
     }
     .page-title {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 800;
       margin-bottom: 32px;
       color: var(--text);
-      letter-spacing: -0.5px;
+      letter-spacing: -0.8px;
     }
-    .search-bar {
-      display: flex;
-      gap: 16px;
+
+    /* Panel de Estadísticas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
       margin-bottom: 40px;
-      flex-wrap: wrap;
     }
-    .search-input, .date-input {
-      padding: 14px 18px;
+    .stat-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    .stat-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+    }
+    .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: white;
+    }
+    .stat-info h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-info p {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -1px;
+    }
+
+    .search-bar {
+      margin-bottom: 40px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 16px 20px;
       border: 1.5px solid var(--border);
       border-radius: 12px;
-      font-size: 1rem;
+      font-size: 1.05rem;
       background: var(--card-bg);
       color: var(--text);
       transition: var(--transition);
-      flex: 1;
-      min-width: 280px;
     }
-    .search-input:focus, .date-input:focus {
+    .search-input:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
     }
     .search-input::placeholder { color: #999; }
 
-    /* Orders Grid */
     .orders-grid {
       display: grid;
       gap: 24px;
@@ -154,8 +198,6 @@
       align-items: center;
       gap: 10px;
     }
-    .order-header i { font-size: 1.2rem; }
-
     .order-body {
       padding: 28px;
     }
@@ -168,8 +210,8 @@
     }
     .order-meta {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
       margin: 20px 0;
       padding: 20px;
       background: var(--accent-light);
@@ -180,14 +222,12 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      color: var(--text);
     }
     .meta-item i {
       color: var(--accent);
       font-size: 1.1rem;
       width: 20px;
     }
-
     .order-products {
       background: var(--accent-light);
       padding: 18px;
@@ -202,15 +242,11 @@
       border-bottom: 1px solid var(--border);
     }
     .order-product:last-child { border-bottom: none; }
-
-    .order-actions {
-      margin-top: 24px;
-      display: flex;
-      gap: 12px;
-    }
-    .btn {
-      padding: 12px 20px;
+    .btn-print {
+      background: var(--accent);
+      color: white;
       border: none;
+      padding: 14px 24px;
       border-radius: 12px;
       font-weight: 600;
       cursor: pointer;
@@ -219,12 +255,8 @@
       gap: 10px;
       font-size: 0.95rem;
       transition: var(--transition);
-      flex: 1;
+      width: 100%;
       justify-content: center;
-    }
-    .btn-print {
-      background: var(--accent);
-      color: white;
     }
     .btn-print:hover {
       background: #111;
@@ -232,24 +264,21 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    /* Empty state */
     .empty-state {
       text-align: center;
-      padding: 100px 20px;
+      padding: 120px 20px;
       color: #999;
-      font-size: 1.3rem;
+      font-size: 1.4rem;
     }
     .empty-state i {
-      font-size: 4rem;
+      font-size: 5rem;
       margin-bottom: 20px;
       opacity: 0.3;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
       .order-meta { grid-template-columns: 1fr; }
-      .search-bar { flex-direction: column; }
-      .search-input, .date-input { min-width: 100%; }
     }
   </style>
 </head>
@@ -261,7 +290,9 @@
       </button>
       <div class="logo">EFRAÍN SHOP</div>
       <div style="display:flex; align-items:center; gap:20px;">
-        <div class="total-ventas" id="totalVentas">$0</div>
+        <div class="total-ventas" id="totalVentas" style="background:var(--green); color:white;">
+          <i class="fas fa-dollar-sign"></i> $0
+        </div>
         <button class="theme-toggle" id="themeToggle">
           <i class="fas fa-moon"></i>
         </button>
@@ -270,17 +301,48 @@
   </div>
 
   <div class="main-container">
-    <h1 class="page-title">Historial de Compras</h1>
-    
+    <h1 class="page-title">Panel de Ventas</h1>
+
+    <!-- Panel de Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#10b981;"><i class="fas fa-box"></i></div>
+        <div class="stat-info">
+          <h3>Productos Vendidos</h3>
+          <p id="totalItems">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#3b82f6;"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info">
+          <h3>Órdenes Completadas</h3>
+          <p id="completedOrders">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ef4444;"><i class="fas fa-times-circle"></i></div>
+        <div class="stat-info">
+          <h3>Canceladas</h3>
+          <p id="canceledOrders">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#f59e0b;"><i class="fas fa-clock"></i></div>
+        <div class="stat-info">
+          <h3>Pendientes</h3>
+          <p id="pendingOrders">0</p>
+        </div>
+      </div>
+    </div>
+
     <div class="search-bar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por cliente, teléfono, producto, colonia...">
-      <input type="date" class="date-input" id="dateFilter">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por cliente, teléfono, producto, colonia, ID de orden...">
     </div>
 
     <div class="orders-grid" id="ordersContainer">
       <div class="empty-state">
         <i class="fas fa-spinner fa-spin"></i>
-        <p>Cargando compras...</p>
+        <p>Cargando órdenes...</p>
       </div>
     </div>
   </div>
@@ -304,32 +366,56 @@
     if (!localStorage.getItem('isAdmin')) window.location.href = 'login.html';
 
     let orders = [];
-    const ordersRef = collection(db, "orders");
-    let unsubscribe = null;
 
-    function loadOrders(order = 'desc') {
-      const q = query(ordersRef, orderBy("date", order));
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        orders = [];
-        snapshot.forEach(doc => {
-          orders.push({ id: doc.id, ...doc.data() });
-        });
-        renderOrders();
-        updateTotalVentas();
+    const ordersRef = collection(db, "orders");
+    const q = query(ordersRef, orderBy("date", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      orders = [];
+      let totalItems = 0;
+      let completed = 0, canceled = 0, pending = 0;
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const order = { id: doc.id, ...data };
+        orders.push(order);
+
+        // Contar productos
+        if (data.products) {
+          totalItems += data.products.reduce((sum, p) => sum + (p.qty || 1), 0);
+        }
+
+        // Contar estados (ajusta según tus campos reales)
+        if (data.status === 'cancelada') canceled++;
+        else if (data.status === 'pendiente' || !data.status) pending++;
+        else completed++;
       });
+
+      renderOrders();
+      updateStats(totalItems, completed, canceled, pending);
+      updateTotalVentas(orders);
+    });
+
+    function updateStats(items, completed, canceled, pending) {
+      document.getElementById('totalItems').textContent = items.toLocaleString();
+      document.getElementById('completedOrders').textContent = completed;
+      document.getElementById('canceledOrders').textContent = canceled;
+      document.getElementById('pendingOrders').textContent = pending;
     }
-    loadOrders('desc');
+
+    function updateTotalVentas(ordersList) {
+      const total = ordersList.reduce((sum, o) => sum + Number(o.total || 0), 0);
+      const totalEl = document.getElementById('totalVentas');
+      totalEl.innerHTML = `<i class="fas fa-dollar-sign"></i> $${total.toLocaleString('es-MX')}`;
+      totalEl.style.background = total >= 0 ? 'var(--green)' : 'var(--red)';
+    }
 
     function renderOrders() {
       const container = document.getElementById('ordersContainer');
       container.innerHTML = '';
 
       if (orders.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-shopping-bag"></i>
-            <p>No hay compras registradas aún.</p>
-          </div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-bag"></i><p>No hay órdenes aún</p></div>`;
         return;
       }
 
@@ -337,7 +423,7 @@
         const addr = order.address || {};
         const productsHtml = (order.products || []).map(p => 
           `<div class="order-product">
-            <span>${p.name} ${p.qty > 1 ? `<small>×${p.qty}</small>` : ''}</span>
+            <span>${p.name} ${p.qty > 1 ? `×${p.qty}` : ''}</span>
             <strong>$${(p.price * (p.qty || 1)).toFixed(2)}</strong>
           </div>`
         ).join('');
@@ -346,94 +432,72 @@
         card.className = 'order-card';
         card.innerHTML = `
           <div class="order-header">
-            <i class="fas fa-receipt"></i>
-            Orden #${order.id.slice(0,8).toUpperCase()}
+            <i class="fas fa-receipt"></i> Orden #${order.id.slice(0,8).toUpperCase()}
           </div>
           <div class="order-body">
             <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX')}</div>
             
             <div class="order-meta">
               <div class="meta-item"><i class="fas fa-user"></i> ${addr.name || 'Sin nombre'}</div>
-              <div class="meta-item"><i class="fas fa-phone"></i> ${addr.phone || 'Sin teléfono'}</div>
+              <div class="meta-item"><i class="fas fa-phone"></i> ${addr.phone || '—'}</div>
               <div class="meta-item"><i class="fas fa-map-marker-alt"></i> ${addr.colonia || 'Sin colonia'}</div>
               <div class="meta-item"><i class="fas fa-calendar"></i> ${new Date(order.date?.seconds * 1000 || Date.now()).toLocaleDateString('es-MX')}</div>
             </div>
 
             <div class="order-products">${productsHtml}</div>
 
-            <div class="order-actions">
-              <button class="btn btn-print" onclick="printLabel('${order.id}')">
-                <i class="fas fa-print"></i>
-                Imprimir Etiqueta
-              </button>
-            </div>
-          </div>
-
-          <div class="print-label" style="display:none;">
-            <h2>EFRAÍN SHOP</h2>
-            <p><strong>Cliente:</strong> ${addr.name}<br>
-               <strong>Tel:</strong> ${addr.phone}<br>
-               <strong>Dirección:</strong> ${addr.street}, ${addr.colonia}, CP ${addr.cp}, ${addr.state}<br>
-               <strong>Orden #${order.id}</strong> • Total: $${(order.total || 0).toFixed(2)}</p>
-            <hr>
-            ${order.products.map(p => `<p>• ${p.name} × ${p.qty || 1}</p>`).join('')}
+            <button class="btn-print" onclick="printLabel('${order.id}')">
+              <i class="fas fa-print"></i> Imprimir Etiqueta
+            </button>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
-    function updateTotalVentas() {
-      const total = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
-      document.getElementById('totalVentas').textContent = `$${total.toLocaleString('es-MX')}`;
-    }
-
-    window.printLabel = function(id) {
-      const card = [...document.querySelectorAll('.order-card')].find(c => 
-        c.querySelector('.order-header')?.textContent.includes(id)
-      );
-      const label = card.querySelector('.print-label');
-      const win = window.open('', '', 'width=600,height=800');
-      win.document.write(`
-        <html><head><title>Etiqueta #${id.slice(0,8)}</title>
-        <style>
-          body{font-family:'Inter',sans-serif;padding:50px;background:white;color:black;line-height:1.8;font-size:18px}
-          h2{font-size:32px;font-weight:800;text-align:center;margin-bottom:30px}
-          p strong{display:inline-block;width:100px;}
-          hr{border:none;border-top:2px dashed #000;margin:30px 0;}
-        </style></head><body>${label.innerHTML}</body></html>
-      `);
-      win.document.close();
-      setTimeout(() => { win.print(); win.close(); }, 500);
-    };
-
-    // Filtros y búsqueda
-    document.getElementById('searchInput').addEventListener('input', filter);
-    document.getElementById('dateFilter').addEventListener('change', filter);
-
-    function filter() {
+    // Búsqueda
+    document.getElementById('searchInput').addEventListener('input', () => {
       const term = document.getElementById('searchInput').value.toLowerCase();
-      const date = document.getElementById('dateFilter').value;
       document.querySelectorAll('.order-card').forEach(card => {
         const text = card.textContent.toLowerCase();
-        const matchesSearch = !term || text.includes(term);
-        const matchesDate = !date || text.includes(date.split('-').reverse().join('/'));
-        card.style.display = (matchesSearch && matchesDate) ? 'block' : 'none';
+        card.style.display = text.includes(term) ? 'block' : 'none';
       });
-    }
+    });
 
-    // Tema oscuro
+    // Tema
     const toggle = document.getElementById('themeToggle');
     const saved = localStorage.getItem('theme') || 'light';
     document.body.setAttribute('data-theme', saved);
     toggle.innerHTML = saved === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
     toggle.onclick = () => {
       const isDark = document.body.getAttribute('data-theme') === 'dark';
       const newTheme = isDark ? 'light' : 'dark';
       document.body.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
       toggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    };
+
+    // Imprimir etiqueta (igual que antes)
+    window.printLabel = function(id) {
+      const card = [...document.querySelectorAll('.order-card')].find(c => 
+        c.querySelector('.order-header')?.textContent.includes(id)
+      );
+      if (!card) return;
+      const label = card.querySelector('.order-body')?.innerHTML || '';
+      const win = window.open('', '', 'width=600,height=800');
+      win.document.write(`
+        <html><head><title>Etiqueta #${id.slice(0,8)}</title>
+        <style>
+          body{font-family:'Inter',sans-serif;padding:60px;background:white;color:black;line-height:1.8;font-size:18px}
+          .total{font-size:32px;font-weight:800;margin:20px 0}
+          .meta{margin:30px 0;font-size:16px}
+        </style></head><body>
+          <h1 style="text-align:center;font-size:36px;margin-bottom:40px">EFRAÍN SHOP</h1>
+          ${card.querySelector('.order-body').innerHTML}
+        </body></html>
+      `);
+      win.document.close();
+      setTimeout(() => { win.print(); win.close(); }, 600);
     };
   </script>
 </body>
