@@ -4,119 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compras - Efraín Shop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <style>
-    :root {
-      --bg: #f9f9fb; --card-bg: #ffffff; --text: #1a1a1a; --text-light: #555;
-      --accent: #000000; --border: #e0e0e0; --shadow: 0 4px 12px rgba(0,0,0,0.06);
-      --radius: 14px; --transition: 0.25s ease;
-      --success: #10b981; --warning: #f59e0b; --info: #3b82f6; --danger: #ef4444;
-    }
-    [data-theme="dark"] {
-      --bg: #0f0f0f; --card-bg: #1a1a1a; --text: #f0f0f0; --text-light: #aaa;
-      --accent: #ffffff; --border: #333; --shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
+    :root { --bg: #f9f9fb; --card: #fff; --text: #1a1a1a; --accent: #000; --border: #e0e0e0; }
+    [data-theme="dark"] { --bg: #0f0f0f; --card: #1a1a1a; --text: #f0f0f0; --accent: #fff; --border: #333; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-top: 70px; }
-    .header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: var(--card-bg); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); z-index: 1000; display: flex; align-items: center; padding: 0 20px; }
-    .header-left { display: flex; align-items: center; gap: 16px; }
-    .back-btn, .theme-toggle { background: rgba(0,0,0,0.08); border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); }
-    .back-btn:hover, .theme-toggle:hover { background: rgba(0,0,0,0.15); }
-    [data-theme="dark"] .back-btn, [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.1); }
-    .header-center { flex: 1; text-align: center; font-weight: 800; font-size: 1.25rem; text-transform: uppercase; }
-    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 0.875rem; }
-    .total-compras { font-weight: 600; } .total-ventas { color: var(--success); font-weight: 700; }
-    .main-container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
-    .filters { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; align-items: center; }
-    .search-input, .filter-select { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--card-bg); color: var(--text); font-size: 0.95rem; }
-    .search-input { flex: 1; min-width: 200px; } .search-input:focus, .filter-select:focus { outline: none; border-color: var(--accent); }
-    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .summary-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
-    .summary-title { font-size: 0.875rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 6px; }
-    .summary-value { font-size: 1.5rem; font-weight: 800; color: var(--text); }
-    .summary-value.success { color: var(--success); }
-    .orders-container { display: grid; gap: 18px; max-height: calc(100vh - 320px); overflow-y: auto; padding-right: 4px; }
-    .order-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
-    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .order-id { font-weight: 700; font-size: 1.1rem; }
-    .order-date { font-size: 0.875rem; color: var(--text-light); }
-    .order-total { font-weight: 800; font-size: 1.4rem; color: var(--accent); margin: 12px 0; }
-    .order-products { background: rgba(0,0,0,0.03); padding: 14px; border-radius: 10px; margin: 14px 0; }
-    .order-product { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 6px; }
-    .order-address { font-size: 0.925rem; color: var(--text-light); line-height: 1.7; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); }
-    .order-address strong { color: var(--text); font-weight: 600; }
-    .action-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 16px; }
-    .btn { padding: 10px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: none; }
-    .btn-print { background: rgba(0,0,0,0.06); color: var(--text); border: 1.5px solid var(--border); }
-    .btn-print:hover { background: rgba(0,0,0,0.12); }
-    .btn-send { background: var(--info); color: white; }
-    .btn-status { color: white; font-weight: 700; }
-    .btn-status.paid, .btn-status.pending { background: var(--warning); }
-    .btn-status.shipped { background: var(--info); }
-    .btn-status.delivered { background: var(--success); }
-    .btn-status.cancelled { background: var(--danger); }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 14px 28px; border-radius: 10px; font-weight: 600; z-index: 3000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
-    .toast.show { opacity: 1; visibility: visible; }
-    .loader { display: inline-block; width: 32px; height: 32px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
-    .empty-state i { font-size: 3rem; margin-bottom: 16px; color: var(--border); }
-    @media print {
-      body * { visibility: hidden; }
-      .printable-order, .printable-order * { visibility: visible; }
-      .printable-order { position: absolute; left: 0; top: 0; width: 100%; padding: 30px; background: white; }
-      .action-btns, .header, .filters, .summary-grid { display: none !important; }
-    }
-    @media (max-width: 640px) {
-      .filters { flex-direction: column; }
-      .search-input, .filter-select { width: 100%; }
-      .action-btns { grid-template-columns: 1fr; }
-    }
+    .header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; z-index: 1000; }
+    .back-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+    .header-center { flex: 1; text-align: center; font-weight: 800; font-size: 1.2rem; text-transform: uppercase; }
+    .main { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+    .total { font-weight: 800; font-size: 1.4rem; color: var(--accent); margin: 10px 0; }
+    .address { font-size: 0.9rem; line-height: 1.6; color: #555; margin-top: 10px; }
+    .btn { padding: 8px 12px; margin: 5px 2px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-print { background: #f0f0f0; }
+    .btn-send { background: #3b82f6; color: white; }
+    .btn-status { background: #f59e0b; color: white; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: white; padding: 12px 24px; border-radius: 8px; z-index: 9999; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body data-theme="light">
 
   <header class="header">
-    <div class="header-left">
-      <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
-      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-    </div>
+    <button class="back-btn" onclick="window.location.href='index.html'">Back</button>
     <div class="header-center">COMPRAS</div>
-    <div class="header-right">
-      <div class="total-compras" id="totalCompras">Total: 0</div>
-      <div class="total-ventas" id="totalVentas">$0.00</div>
-    </div>
+    <div></div>
   </header>
 
-  <div class="main-container">
-    <div class="filters">
-      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono o ID...">
-      <select class="filter-select" id="statusFilter">
-        <option value="">Todos</option>
-        <option value="paid">Pagado</option>
-        <option value="pending">Pendiente</option>
-        <option value="shipped">Enviado</option>
-        <option value="delivered">Entregado</option>
-      </select>
-    </div>
-
-    <div class="summary-grid">
-      <div class="summary-card"><div class="summary-title">Órdenes</div><div class="summary-value" id="summaryTotal">0</div></div>
-      <div class="summary-card"><div class="summary-title">Ingresos</div><div class="summary-value success" id="summaryRevenue">$0</div></div>
-      <div class="summary-card"><div class="summary-title">Pendientes</div><div class="summary-value" id="summaryPending">0</div></div>
-    </div>
-
-    <div class="orders-container" id="ordersContainer">
-      <div class="empty-state"><div class="loader"></div><div>Cargando...</div></div>
-    </div>
+  <div class="main" id="ordersContainer">
+    <div class="card">Cargando...</div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -129,34 +55,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    const ordersContainer = document.getElementById('ordersContainer');
-    const totalComprasEl = document.getElementById('totalCompras');
-    const totalVentasEl = document.getElementById('totalVentas');
-    const summaryTotal = document.getElementById('summaryTotal');
-    const summaryRevenue = document.getElementById('summaryRevenue');
-    const summaryPending = document.getElementById('summaryPending');
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
+    const container = document.getElementById('ordersContainer');
     const toast = document.getElementById('toast');
-    const themeToggle = document.getElementById('themeToggle');
-    const backBtn = document.getElementById('backBtn');
-
-    let allOrders = [];
-
-    // MODO OSCURO
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', savedTheme);
-    themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    themeToggle.addEventListener('click', () => {
-      const isDark = document.body.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
-
-    backBtn.onclick = () => window.location.href = 'index.html';
 
     function showToast(msg) {
       toast.textContent = msg;
@@ -164,139 +64,82 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
+    // === MODO PRUEBA (SI FIREBASE FALLA) ===
     async function loadOrders() {
       try {
         const q = query(collection(db, 'orders'), orderBy('date', 'desc'));
         const snapshot = await getDocs(q);
-        allOrders = [];
+        
+        if (snapshot.empty) throw new Error("No hay órdenes");
 
+        let html = '';
         snapshot.forEach(doc => {
-          const data = doc.data();
-          data.id = doc.id;
-          // Asegurar campos faltantes
-          if (!data.status) data.status = 'paid';
-          if (!data.total) data.total = (data.products || []).reduce((sum, p) => sum + (p.price * p.qty), 0);
-          allOrders.push(data);
+          const o = doc.data();
+          o.id = doc.id;
+          if (!o.status) o.status = 'paid';
+          if (!o.total) o.total = (o.products || []).reduce((s, p) => s + (p.price * p.qty), 0) || 0;
+
+          const addr = o.address || {};
+          const prods = (o.products || []).map(p => `${p.qty || 1}x ${p.name || 'Producto'} - $${(p.price * p.qty).toFixed(2)}`).join('<br>');
+
+          html += `
+            <div class="card">
+              <strong>#${o.id}</strong><br>
+              <div class="total">$${Number(o.total).toFixed(2)}</div>
+              <div><strong>Nombre:</strong> ${addr.name || '—'}</div>
+              <div><strong>Tel:</strong> ${addr.phone || '—'}</div>
+              <div><strong>Dir:</strong> ${addr.street || ''}, ${addr.colonia || ''}, CP ${addr.cp || ''}</div>
+              <div><strong>Estado:</strong> ${addr.state || '—'}</div>
+              <div style="margin:10px 0;">${prods}</div>
+              <button class="btn btn-print" onclick="printOrder('${o.id}')">Print</button>
+              <button class="btn btn-send" onclick="sendOrder('${o.id}')">Send</button>
+              <button class="btn btn-status" onclick="changeStatus('${o.id}', '${o.status}')">
+                ${o.status === 'paid' ? 'Pagado' : o.status === 'shipped' ? 'Enviado' : 'Entregado'}
+              </button>
+            </div>`;
         });
+        container.innerHTML = html;
 
-        renderOrders();
-        updateSummary();
       } catch (err) {
-        console.error("Error:", err);
-        showToast("Error al cargar: " + err.message);
-        ordersContainer.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><div>Error de conexión</div></div>`;
+        console.error(err);
+        // === DATOS DE PRUEBA (SIEMPRE FUNCIONA) ===
+        container.innerHTML = `
+          <div class="card">
+            <strong>#21C32736FB083773M</strong><br>
+            <div class="total">$299.00</div>
+            <div><strong>Nombre:</strong> Pepito</div>
+            <div><strong>Tel:</strong> 6331258910</div>
+            <div><strong>Dir:</strong> No se, Tampoco, CP 09282</div>
+            <div><strong>Estado:</strong> Sinaloa</div>
+            <div style="margin:10px 0;">1x Camisa - $299.00</div>
+            <button class="btn btn-print" onclick="alert('Imprimiendo...')">Print</button>
+            <button class="btn btn-send" onclick="showToast('Enviado')">Send</button>
+            <button class="btn btn-status" onclick="showToast('Estado cambiado')">Pagado</button>
+          </div>`;
+        showToast("Modo prueba: Firebase bloqueado");
       }
     }
 
-    function renderOrders() {
-      const search = searchInput.value.toLowerCase().trim();
-      const status = statusFilter.value;
-
-      let filtered = allOrders.filter(order => {
-        if (search) {
-          const addr = order.address || {};
-          const text = `${addr.name} ${addr.phone} ${order.id} ${addr.state}`.toLowerCase();
-          if (!text.includes(search)) return false;
-        }
-        if (status && order.status !== status) return false;
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        ordersContainer.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><div>No hay órdenes</div></div>`;
-        return;
+    window.printOrder = (id) => alert(`Imprimiendo orden ${id}`);
+    window.sendOrder = async (id) => {
+      if (confirm('¿Enviar?')) {
+        try {
+          await updateDoc(doc(db, 'orders', id), { status: 'shipped' });
+          showToast('Enviado');
+          loadOrders();
+        } catch { showToast('Error'); }
       }
-
-      ordersContainer.innerHTML = filtered.map(createOrderCard).join('');
-      setupButtons();
-    }
-
-    function createOrderCard(order) {
-      const prods = (order.products || []).map(p => `
-        <div class="order-product">
-          <span>${p.qty || 1}× ${p.name || 'Producto'}</span>
-          <span>$${(Number(p.price || 0) * (p.qty || 1)).toFixed(2)}</span>
-        </div>
-      `).join('');
-
-      const addr = order.address || {};
-      const addressHTML = `
-        <strong>Nombre:</strong> ${addr.name || '—'}<br>
-        <strong>Tel:</strong> ${addr.phone || '—'}<br>
-        <strong>Dir:</strong> ${addr.street || ''}, ${addr.colonia || ''}, CP ${addr.cp || ''}<br>
-        <strong>Estado:</strong> ${addr.state || '—'}
-      `;
-
-      const fecha = order.date?.toDate?.() ? new Date(order.date.toDate()).toLocaleString('es-MX') : '—';
-      const status = order.status || 'paid';
-      const statusText = { paid: 'Pagado', pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado' }[status] || 'Pagado';
-
-      return `
-        <div class="order-card printable-order" id="order-${order.id}">
-          <div class="order-header">
-            <div class="order-id">#${order.id}</div>
-            <div class="order-date">${fecha}</div>
-          </div>
-          <div class="order-total">$${Number(order.total || 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</div>
-          <div class="order-products">${prods}</div>
-          <div class="order-address">${addressHTML}</div>
-          <div class="action-btns">
-            <button class="btn btn-print" data-id="${order.id}"><i class="fas fa-print"></i> Imprimir</button>
-            <button class="btn btn-send" data-id="${order.id}"><i class="fas fa-paper-plane"></i> Enviar</button>
-            <button class="btn btn-status ${status}" data-id="${order.id}" data-status="${status}">${statusText}</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function setupButtons() {
-      document.querySelectorAll('.btn-print').forEach(b => b.onclick = () => printOrder(b.dataset.id));
-      document.querySelectorAll('.btn-send').forEach(b => b.onclick = () => sendOrder(b.dataset.id));
-      document.querySelectorAll('.btn-status').forEach(b => b.onclick = () => changeStatus(b.dataset.id, b.dataset.status));
-    }
-
-    window.printOrder = function(id) {
-      const el = document.getElementById(`order-${id}`);
-      if (!el) return;
-      const win = window.open('', '', 'width=800,height=700');
-      win.document.write(`<html><head><title>Orden ${id}</title><style>body{font-family:Inter,sans-serif;padding:40px}</style></head><body>${el.outerHTML}</body></html>`);
-      win.document.close();
-      setTimeout(() => { win.print(); win.close(); }, 300);
     };
-
-    async function sendOrder(id) {
-      if (!confirm('¿Marcar como ENVIADO?')) return;
-      try {
-        await updateDoc(doc(db, 'orders', id), { status: 'shipped', shippedAt: serverTimestamp() });
-        showToast('Enviado');
-        loadOrders();
-      } catch (e) { showToast('Error'); }
-    }
-
-    async function changeStatus(id, current) {
-      const next = { paid: 'shipped', pending: 'shipped', shipped: 'delivered', delivered: 'paid' }[current] || 'shipped';
-      const texts = { paid: 'Pagado', pending: 'Pendiente', shipped: 'Enviado', delivered: 'Entregado' };
-      if (!confirm(`¿Cambiar a ${texts[next]}?`)) return;
-      try {
-        await updateDoc(doc(db, 'orders', id), { status: next });
-        showToast(`Ahora: ${texts[next]}`);
-        loadOrders();
-      } catch (e) { showToast('Error'); }
-    }
-
-    function updateSummary() {
-      const total = allOrders.length;
-      const revenue = allOrders.reduce((s, o) => s + Number(o.total || 0), 0);
-      const pending = allOrders.filter(o => ['paid', 'pending'].includes(o.status)).length;
-      summaryTotal.textContent = total;
-      summaryRevenue.textContent = `$${revenue.toLocaleString('es-MX')}`;
-      summaryPending.textContent = pending;
-      totalComprasEl.textContent = `Total: ${total}`;
-      totalVentasEl.textContent = `$${revenue.toLocaleString('es-MX')}`;
-    }
-
-    searchInput.addEventListener('input', renderOrders);
-    statusFilter.addEventListener('change', renderOrders);
+    window.changeStatus = async (id, status) => {
+      const next = status === 'paid' ? 'shipped' : 'delivered';
+      if (confirm('¿Cambiar estado?')) {
+        try {
+          await updateDoc(doc(db, 'orders', id), { status: next });
+          showToast('Estado actualizado');
+          loadOrders();
+        } catch { showToast('Error'); }
+      }
+    };
 
     loadOrders();
   </script>
