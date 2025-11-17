@@ -27,20 +27,18 @@
     /* TÍTULO */
     .title { flex: 1; }
 
-    /* BOTÓN ESTADÍSTICAS VERTICAL - BARRAS CRECIENTES DE ARRIBA A ABAJO */
+    /* BOTÓN BARRITAS (ESTADÍSTICAS SIN FONDO) */
     .stats-bars-btn {
-      background: transparent; border: none; display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 2px; cursor: pointer;
-      padding: 10px 8px; border-radius: 8px; transition: 0.2s; width: 36px;
+      background: transparent; border: none; display: flex; align-items: center;
+      gap: 3px; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s;
     }
     .stats-bars-btn:hover { background: rgba(255,255,255,0.1); }
-
     .bar {
-      background: #fff; width: 4px; border-radius: 2px; transition: 0.2s;
+      background: #fff; border-radius: 1px; height: 12px; transition: 0.2s;
     }
-    .bar-1 { height: 0.5vh; }   /* 0.005 → 0.5vh */
-    .bar-2 { height: 0.7vh; }   /* 0.007 → 0.7vh */
-    .bar-3 { height: 1.0vh; }   /* 0.010 → 1.0vh */
+    .bar-1 { width: 3px; }
+    .bar-2 { width: 5px; }
+    .bar-3 { width: 7px; }
 
     .admin-btn {
       background: #fff; color: #000; padding: 8px 16px; border-radius: 8px; font-weight: 700;
@@ -48,55 +46,222 @@
     }
     .admin-btn:hover { background: #f0f0f0; }
 
-    /* ... resto del CSS igual (leyenda, panel, etc.) ... */
-    .legend { /* sin cambios */ }
-    .stats-panel { /* sin cambios */ }
+    /* MAPA */
+    .map-container {
+      position: relative; height: calc(100vh - 70px); background: #f8f8f8;
+    }
+    #map { width: 100%; height: 100%; }
+
+    /* LEYENDA */
+    .legend {
+      position: absolute; bottom: 20px; left: 20px; background: #fff; padding: 15px;
+      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
+      font-size: 0.9rem; transition: all 0.3s ease; min-width: 180px;
+    }
+    .legend.hidden { transform: translateY(120px); opacity: 0; pointer-events: none; }
+    .legend h4 {
+      margin: 0 0 10px; font-size: 1rem; text-transform: uppercase;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .close-legend {
+      background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999;
+    }
+    .close-legend:hover { color: #000; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .legend-color { width: 16px; height: 16px; border-radius: 50%; }
+
+    /* PANEL ESTADÍSTICAS */
+    .stats-panel {
+      position: absolute; top: 90px; right: 20px; width: 300px; background: #fff; padding: 20px;
+      border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    .stats-panel.hidden { transform: translateX(350px); opacity: 0; pointer-events: none; }
+    .stats-panel h3 {
+      margin: 0 0 15px; font-size: 1.3rem; display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .close-stats {
+      background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #999;
+    }
+    .close-stats:hover { color: #000; }
+    .stat { margin-bottom: 12px; }
+    .stat-label { font-size: 0.9rem; color: #666; text-transform: uppercase; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; }
   </style>
 </head>
 <body>
 
   <!-- BARRA SUPERIOR -->
   <div class="admin-bar">
+    <!-- FLECHA IZQUIERDA -->
     <button class="back-btn-header" id="backBtnHeader" title="Volver al Panel">←</button>
+
+    <!-- TÍTULO -->
     <div class="title">MAPA DE COMPRAS</div>
 
-    <!-- BOTÓN ESTADÍSTICAS VERTICAL -->
+    <!-- BARRITAS (ESTADÍSTICAS) -->
     <button class="stats-bars-btn" id="toggleBothBtn" title="Mostrar Paneles">
       <div class="bar bar-1"></div>
       <div class="bar bar-2"></div>
       <div class="bar bar-3"></div>
     </button>
 
+    <!-- CERRAR SESIÓN -->
     <button class="admin-btn" id="logoutBtn">Cerrar Sesión</button>
   </div>
 
-  <!-- MAPA + LEYENDA + PANEL (sin cambios) -->
+  <!-- MAPA -->
   <div class="map-container">
     <div id="map"></div>
 
+    <!-- LEYENDA -->
     <div class="legend" id="legendPanel">
       <h4>
         Leyenda
         <button class="close-legend" id="closeLegendBtn">×</button>
       </h4>
-      <!-- ítems de leyenda -->
+      <div class="legend-item">
+        <div class="legend-color" style="background:#2ecc71;"></div>
+        <span>1 compra</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#f1c40f;"></div>
+        <span>2-5 compras</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#e67e22;"></div>
+        <span>6-10 compras</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#e74c3c;"></div>
+        <span>11-20 compras</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background:#c0392b;"></div>
+        <span>20+ compras</span>
+      </div>
     </div>
 
+    <!-- PANEL ESTADÍSTICAS -->
     <div class="stats-panel" id="statsPanel">
       <h3>
         Resumen
         <button class="close-stats" id="closeStatsBtn">×</button>
       </h3>
-      <!-- estadísticas -->
+      <div class="stat">
+        <div class="stat-label">Total de Órdenes</div>
+        <div class="stat-value" id="totalOrders">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Ingresos Totales</div>
+        <div class="stat-value" id="totalRevenue">$0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Estado Líder</div>
+        <div class="stat-value" id="topState">-</div>
+      </div>
     </div>
   </div>
 
-  <!-- SCRIPTS (sin cambios) -->
+  <!-- SCRIPTS -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // === FIREBASE, MAPA, DATOS (sin cambios) ===
+    // === FIREBASE ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
+      measurementId: "G-9KJ2330RN7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // === VERIFICAR ADMIN ===
+    if (localStorage.getItem('isAdmin') !== 'true') {
+      alert('Acceso denegado');
+      window.location.href = 'index.html';
+    }
+
+    // === MAPA ===
+    const map = L.map('map').setView([23.5, -102], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // === COORDENADAS ===
+    const stateCoords = {
+      AGS: [21.88, -102.29], BC: [30.0, -115.0], BCS: [26.0, -111.5], CAM: [18.6, -90.7],
+      CHIS: [16.5, -92.5], CHIH: [28.6, -106.0], CDMX: [19.43, -99.13], COAH: [27.0, -102.0],
+      COL: [19.2, -103.7], DGO: [24.0, -104.6], GTO: [21.0, -101.0], GRO: [17.5, -99.5],
+      HGO: [20.5, -98.5], JAL: [20.6, -103.3], MEX: [19.3, -99.6], MICH: [19.0, -101.5],
+      MOR: [18.9, -99.0], NAY: [21.5, -104.8], NL: [25.6, -100.3], OAX: [17.0, -96.7],
+      PUE: [19.0, -98.0], QRO: [20.6, -100.3], QROO: [19.2, -88.5], SLP: [22.1, -100.9],
+      SIN: [24.5, -107.5], SON: [29.0, -110.9], TAB: [17.9, -92.9], TAM: [24.0, -98.5],
+      TLAX: [19.4, -98.2], VER: [19.2, -96.1], YUC: [20.7, -89.1], ZAC: [22.7, -102.5]
+    };
+
+    // === COLOR POR COMPRAS ===
+    function getColor(count) {
+      if (count === 1) return '#2ecc71';
+      if (count <= 5)  return '#f1c40f';
+      if (count <= 10) return '#e67e22';
+      if (count <= 20) return '#e74c3c';
+      return '#c0392b';
+    }
+
+    // === CONTADORES ===
+    let totalOrders = 0;
+    let totalRevenue = 0;
+    const stateCount = {};
+
+    // === CARGAR ÓRDENES ===
+    db.collection('orders').get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.address && data.address.stateCode) {
+          totalOrders++;
+          totalRevenue += data.total || 0;
+          const code = data.address.stateCode;
+          stateCount[code] = (stateCount[code] || 0) + 1;
+          const coords = stateCoords[code];
+          if (coords) {
+            const count = stateCount[code];
+            const radius = Math.min(10 + count * 1.5, 40);
+            const color = getColor(count);
+            const opacity = count > 20 ? 0.9 : count > 10 ? 0.8 : count > 5 ? 0.7 : 0.6;
+
+            L.circleMarker(coords, {
+              radius: radius,
+              color: color,
+              fillColor: color,
+              fillOpacity: opacity,
+              weight: 2
+            }).addTo(map)
+              .bindPopup(`
+                <b>${data.address.name || 'Cliente'}</b><br>
+                ${data.address.state || 'Estado'}<br>
+                Orden: <b>${doc.id}</b><br>
+                Total: <b>$${data.total}</b><br>
+                Fecha: ${new Date(data.date?.toDate()).toLocaleDateString('es-MX')}<br>
+                <small><i>${count} compra${count > 1 ? 's' : ''} en este estado</i></small>
+              `);
+          }
+        }
+      });
+
+      document.getElementById('totalOrders').textContent = totalOrders;
+      document.getElementById('totalRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+      const top = Object.entries(stateCount).sort((a,b) => b[1] - a[1])[0];
+      if (top) {
+        document.getElementById('topState').textContent = `${top[0]} (${top[1]})`;
+      }
+    });
 
     // === ELEMENTOS ===
     const statsPanel = document.getElementById('statsPanel');
@@ -119,12 +284,19 @@
       }
     });
 
-    // === CERRAR INDIVIDUAL ===
-    closeStatsBtn.addEventListener('click', () => statsPanel.classList.add('hidden'));
-    closeLegendBtn.addEventListener('click', () => legendPanel.classList.add('hidden'));
+    // === CERRAR INDIVIDUALMENTE ===
+    closeStatsBtn.addEventListener('click', () => {
+      statsPanel.classList.add('hidden');
+    });
 
-    // === VOLVER Y CERRAR SESIÓN ===
+    closeLegendBtn.addEventListener('click', () => {
+      legendPanel.classList.add('hidden');
+    });
+
+    // === VOLVER AL PANEL ===
     document.getElementById('backBtnHeader').onclick = () => window.location.href = 'admin.html';
+
+    // === CERRAR SESIÓN ===
     document.getElementById('logoutBtn').onclick = () => {
       localStorage.removeItem('isAdmin');
       localStorage.removeItem('loggedIn');
