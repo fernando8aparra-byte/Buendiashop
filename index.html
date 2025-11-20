@@ -11,7 +11,7 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     html,body { font-family:'Poppins',sans-serif; background:#fff; color:#111; overflow-x:hidden; }
     
-    h1,h2,h3 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
+    h1,h2 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
 
@@ -21,18 +21,22 @@
     .logo { font-weight:900; font-size:1.5rem; text-transform:uppercase; letter-spacing:1.5px; }
     .icon-btn { background:none; border:none; cursor:pointer; padding:8px; border-radius:8px; position:relative; }
     .icon-btn svg { width:24px; height:24px; stroke:#000; stroke-width:2.5; fill:none; }
-    #cartBadge { position:absolute; top:-6px; right:-6px; background:#000; color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; display:none; }
+    
+    /* ICONOS NEGROS SIEMPRE (MÓVIL Y PC) */
+    .icon-btn svg { stroke:#000 !important; }
+    #cartBadge { background:#000 !important; }
+
+    #cartBadge { position:absolute; top:-6px; right:-6px; color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; display:none; }
 
     /* BÚSQUEDA */
     .search-container { position:absolute; top:100%; left:0; right:0; background:#fff; border-top:1px solid #eee; padding:16px 20px; display:none; z-index:900; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
     .search-container.active { display:block; }
-    .search-bar { display:flex; align-items:center; border:1.5px solid #111; border-radius:8px; overflow:hidden; max-width:600px; margin:0 auto; }
+    .search-bar { display:flex; align-items:center; border:2px solid #111; border-radius:8px; overflow:hidden; max-width:600px; margin:0 auto; }
     .search-bar input { flex:1; padding:12px 16px; border:none; background:transparent; font-size:1rem; font-weight:500; }
-    .search-bar input::placeholder { color:#999; }
-    #closeSearch { padding:10px 16px; font-size:28px; background:none; border:none; cursor:pointer; }
+    #closeSearch { padding:10px 16px; font-size:28px; background:none; border:none; cursor:pointer; color:#111; }
 
-    #searchResultsContainer { position:absolute; top:100%; left:20px; right:20px; background:#fff; border:1.5px solid #111; border-top:none; border-radius:0 0 12px 12px; max-height:70vh; overflow-y:auto; z-index:899; box-shadow:0 10px 30px rgba(0,0,0,0.15); display:none; }
-    .search-result-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #eee; cursor:pointer; }
+    #searchResultsContainer { position:absolute; top:100%; left:20px; right:20px; background:#fff; border:2px solid #111; border-top:none; border-radius:0 0 12px 12px; max-height:70vh; overflow-y:auto; z-index:899; box-shadow:0 10px 30px rgba(0,0,0,0.15); display:none; }
+    .search-result-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #eee; cursor:pointer; transition:background 0.2s; }
     .search-result-item:hover { background:#f8f8f8; }
     .search-result-item img { width:60px; height:60px; object-fit:contain; border-radius:8px; background:#fafafa; }
 
@@ -44,13 +48,12 @@
     .menu-close { position:absolute; top:20px; right:20px; background:none; border:none; font-size:32px; cursor:pointer; color:#000; }
     .menu-item { padding:16px 0; border-bottom:1px solid #eee; font-weight:600; text-transform:uppercase; cursor:pointer; font-size:0.95rem; }
     .dropdown-toggle { display:flex; justify-content:space-between; align-items:center; }
-    .dropdown-toggle::after { display:none !important; }
     .dropdown-arrow { transition:transform .3s; width:16px; height:16px; }
     .dropdown-toggle.active .dropdown-arrow { transform:rotate(180deg); }
     .submenu { display:none; padding-left:20px; margin-top:8px; }
     .submenu.show { display:block; }
     .submenu-item { padding:12px 0; font-size:0.95rem; color:#666; cursor:pointer; }
-    .submenu-item:hover { color:#111; }
+    .submenu-item:hover { color:#111; font-weight:600; }
 
     /* CARRITO */
     .cart-sidebar { position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh; background:#fff; transition:right .3s; z-index:1200; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.08); }
@@ -147,7 +150,7 @@
     </section>
   </main>
 
-  <!-- MENÚ LATERAL COMPLETO -->
+  <!-- MENÚ LATERAL -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg">¡Hola!</div>
@@ -195,8 +198,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, doc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -211,7 +214,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // DOM
     const menuBtn = document.getElementById('menuBtn');
     const menuOverlay = document.getElementById('menuOverlay');
     const menuSidebar = document.getElementById('menuSidebar');
@@ -236,11 +238,9 @@
 
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    let currentUser = null;
 
-    // === AUTH ===
+    // AUTH
     onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
       if (user) {
         const userDoc = await getDoc(doc(db, "usuarios", user.uid));
         const data = userDoc.exists() ? userDoc.data() : {};
@@ -256,45 +256,62 @@
       }
     });
 
-    // === MENÚS DINÁMICOS ===
-    onSnapshot(doc(db, "menu", "categorias"), (snap) => {
-      if (snap.exists()) {
-        const cats = snap.data();
-        document.getElementById('categoriesSubmenu').innerHTML = Object.keys(cats).map(key => 
-          `<div class="submenu-item" onclick="location.href='categoria.html?c=${key}'">${cats[key]}</div>`
-        ).join('');
-      }
+    // CATEGORÍAS DESDE FIREBASE
+    onSnapshot(collection(db, "categorias"), (snap) => {
+      const cats = [];
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.activa !== false) cats.push({ id: doc.id, nombre: data.nombre });
+      });
+      document.getElementById('categoriesSubmenu').innerHTML = cats.map(cat => 
+        `<div class="submenu-item" onclick="location.href='categoria.html?id=${cat.id}'">${cat.nombre}</div>`
+      ).join('');
     });
 
+    // REDES SOCIALES
     onSnapshot(doc(db, "menu", "redes"), (snap) => {
       if (snap.exists()) {
         const redes = snap.data();
-        document.getElementById('socialLinksContainer').innerHTML = Object.keys(redes).map(key => 
-          `<div class="submenu-item" onclick="window.open('${redes[key]}','_blank')">${key.charAt(0).toUpperCase() + key.slice(1)}</div>`
-        ).join('');
+        document.getElementById('socialLinksContainer').innerHTML = Object.entries(redes)
+          .map(([nombre, url]) => `<div class="submenu-item" onclick="window.open('${url}','_blank')">${nombre}</div>`).join('');
       }
     });
 
-    // === BÚSQUEDA ===
+    // BÚSQUEDA EN TIEMPO REAL
     searchBtn.onclick = () => searchContainer.classList.add('active');
     [closeSearch, menuOverlay].forEach(el => el.onclick = () => searchContainer.classList.remove('active'));
-    searchInput.oninput = () => {
-      const query = searchInput.value.toLowerCase().trim();
-      if (query.length < 2) { searchResultsContainer.style.display = 'none'; return; }
-      const results = allProducts.filter(p => p.nombre.toLowerCase().includes(query));
-      searchResults.innerHTML = results.map(p => `
-        <div class="search-result-item" onclick="location.href='product.html?id=${p.id}'">
-          <img src="${p.imagen}">
-          <div>
-            <div style="font-weight:600;">${p.nombre}</div>
-            <div style="font-size:1.4rem;font-weight:800;">$${p.precio.toLocaleString()}</div>
+
+    searchInput.oninput = async () => {
+      const q = searchInput.value.trim();
+      if (q.length < 2) { searchResultsContainer.style.display = 'none'; return; }
+
+      let results = [];
+      if (q.startsWith('#')) {
+        const tag = q.slice(1).toLowerCase();
+        const snap = await getDocs(query(collection(db, "productos"), where("tags", "array-contains", tag)));
+        results = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      } else {
+        const snap = await getDocs(query(collection(db, "productos"), 
+          where("nombre", ">=", q), where("nombre", "<=", q + '\uf8ff')));
+        results = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      }
+
+      searchResults.innerHTML = results.length === 0 
+        ? '<div style="padding:20px;text-align:center;color:#999;">No se encontraron productos</div>'
+        : results.map(p => `
+          <div class="search-result-item" onclick="location.href='product.html?id=${p.id}'">
+            <img src="${p.imagen}" loading="lazy">
+            <div>
+              <div style="font-weight:600;">${p.nombre}</div>
+              <div style="font-size:1.4rem;font-weight:800;">$${p.precio.toLocaleString()}</div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+
       searchResultsContainer.style.display = results.length ? 'block' : 'none';
     };
 
-    // === CARRITO ===
+    // CARRITO
     function updateCart() {
       const qty = cart.reduce((s,i)=>s+i.qty,0);
       const total = cart.reduce((s,i)=>s+i.precio*i.qty,0);
@@ -328,7 +345,7 @@
 
     window.removeFromCart = i => { cart.splice(i,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); };
 
-    // === UI ===
+    // UI
     menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
     [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesSubmenu').classList.toggle('show');
@@ -337,18 +354,16 @@
     closeCart.onclick = () => cartSidebar.classList.remove('open');
     goToPay.onclick = () => location.href = 'pago.html';
 
-    // === PRODUCTOS ===
+    // PRODUCTOS
     onSnapshot(collection(db, "productos"), snap => {
       allProducts = snap.docs.map(d => ({id:d.id, ...d.data(), type:d.data().type||{normal:true}}));
       
-      // Nuevos lanzamientos
       document.getElementById('newProductsWrapper').innerHTML = allProducts
         .filter(p => p.type?.carrusel)
         .map(p => `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" loading="lazy">
         </div>`).join('');
 
-      // Grid normal
       document.getElementById('productsGrid').innerHTML = allProducts
         .filter(p => p.type?.normal || !p.type?.carrusel)
         .map(p => `
