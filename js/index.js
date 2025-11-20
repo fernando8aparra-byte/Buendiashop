@@ -63,13 +63,11 @@ onAuthStateChanged(auth, async (user) => {
         adminBtn.style.display = "block";
         adminBtn.onclick = () => window.location.href = "admin.html";
       }
-    } catch (e) {
-      console.log("Error admin:", e);
-    }
+    } catch (e) { console.log("Error admin:", e); }
   }
 });
 
-// === ICONOS NEGROS FORZADOS ===
+// === ICONOS NEGROS ===
 document.querySelectorAll('svg, .icon-btn, .menu-close, .cart-close, #closeSearch').forEach(el => {
   el.style.stroke = '#000000';
   el.style.color = '#000000';
@@ -95,22 +93,16 @@ function loadTitles() {
   });
 }
 
-// === CATEGORÍAS ===
+// === CATEGORÍAS Y REDES ===
 async function loadProductTypes() {
   const submenu = document.getElementById('categoriesSubmenu');
   submenu.innerHTML = '<div class="submenu-item">Cargando...</div>';
   try {
     const snapshot = await getDocs(collection(db, "productos"));
     const tipos = new Set();
-    snapshot.forEach(doc => {
-      const tipo = doc.data().tipo;
-      if (tipo) tipos.add(tipo);
-    });
+    snapshot.forEach(doc => { if (doc.data().tipo) tipos.add(doc.data().tipo); });
     submenu.innerHTML = '';
-    if (tipos.size === 0) {
-      submenu.innerHTML = '<div class="submenu-item">No hay categorías</div>';
-      return;
-    }
+    if (tipos.size === 0) { submenu.innerHTML = '<div class="submenu-item">No hay categorías</div>'; return; }
     [...tipos].sort().forEach(tipo => {
       const item = document.createElement('div');
       item.className = 'submenu-item';
@@ -123,7 +115,6 @@ async function loadProductTypes() {
   }
 }
 
-// === REDES SOCIALES ===
 function loadSocialLinks() {
   const container = document.getElementById('socialLinksContainer');
   onSnapshot(doc(db, "links", "social"), (snap) => {
@@ -150,7 +141,7 @@ function loadSocialLinks() {
   });
 }
 
-// === DESPLEGABLES ===
+// === DESPLEGABLES CON UN SOLO TRIANGULITO ===
 document.getElementById('categoriesToggle').onclick = () => {
   document.getElementById('categoriesSubmenu').classList.toggle('show');
   document.getElementById('categoriesToggle').classList.toggle('active');
@@ -159,6 +150,104 @@ document.getElementById('contactToggle').onclick = () => {
   document.getElementById('contactDropdown').classList.toggle('show');
   document.getElementById('contactToggle').classList.toggle('active');
 };
+
+// === CARRUSEL NUEVOS LANZAMIENTOS (RESPONSIVO + SWIPE) ===
+function createNewCarousel() {
+  const container = document.getElementById('newProductsCarousel');
+  const track = document.getElementById('newCarouselTrack');
+  const pagination = document.getElementById('newPagination');
+  const items = allProducts.filter(p => p.type?.carrusel);
+  
+  track.innerHTML = '';
+  pagination.innerHTML = '';
+
+  if (items.length === 0) {
+    track.innerHTML = '<p style="text-align:center;color:#999;padding:60px;">No hay productos</p>';
+    return;
+  }
+
+  items.forEach((p, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide';
+    slide.innerHTML = `<img src="${p.imagen}" alt="${p.nombre}" loading="lazy" onclick="window.location.href='product.html?id=${p.id}'">`;
+    track.appendChild(slide);
+
+    const dot = document.createElement('button');
+    dot.className = 'dot';
+    if (i === 0) dot.classList.add('active');
+    dot.onclick = () => goToSlide(i);
+    pagination.appendChild(dot);
+  });
+
+  const dots = pagination.querySelectorAll('.dot');
+  let currentIndex = 0;
+
+  function goToSlide(index) {
+    currentIndex = index;
+    track.style.transform = `translateX(-${index * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  let startX = 0;
+  container.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    track.style.transition = 'none';
+  }, { passive: true });
+
+  container.addEventListener('touchmove', e => {
+    if (!startX) return;
+    const x = e.touches[0].clientX;
+    const diff = x - startX;
+    const offset = (diff / container.offsetWidth) * 100;
+    track.style.transform = `translateX(calc(-${currentIndex * 100}% + ${offset}%))`;
+  }, { passive: false });
+
+  container.addEventListener('touchend', () => {
+    if (!startX) return;
+    const movedBy = parseInt(track.style.transform.match(/calc\(-?\d+% \+ (-?\d+\.?\d*)%\)/)?.[1] || 0);
+    if (Math.abs(movedBy) > 20) {
+      movedBy > 0 ? goToSlide(currentIndex - 1) : goToSlide(currentIndex + 1);
+    } else {
+      goToSlide(currentIndex);
+    }
+    startX = 0;
+    track.style.transition = 'transform 0.4s ease';
+  });
+}
+
+// === CARRUSEL ANUNCIOS (HORIZONTAL DESLIZABLE) ===
+function createStarCarousel() {
+  const container = document.getElementById('starCarousel');
+  const items = allProducts.filter(p => p.type?.anuncio);
+  if (items.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">No hay productos</p>';
+    return;
+  }
+  container.innerHTML = items.map(p => `
+    <div class="carousel-item" onclick="window.location.href='product.html?id=${p.id}'">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+    </div>
+  `).join('');
+}
+
+// === GRID Y CARRITO (sin cambios) ===
+function renderGrid() {
+  const normales = allProducts.filter(p => p.type?.normal);
+  productsGrid.innerHTML = normales.map(p => `
+    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      <div class="card-info">
+        <h3>${p.nombre}</h3>
+        <p class="desc">${p.descripcion || ''}</p>
+        <div class="price-container">
+          ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+          <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
+        </div>
+        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
+      </div>
+    </div>
+  `).join('');
+}
 
 // === CARRITO ===
 function updateCart() {
@@ -199,222 +288,14 @@ window.removeFromCart = (i) => {
 };
 goToPay.onclick = () => window.location.href = 'pago.html';
 
-// === CARRUSEL MÓVIL: NUEVOS LANZAMIENTOS (SWIPE + DOTS) ===
-function createMobileCarousel() {
-  const container = document.getElementById('newProductsCarousel');
-  const track = document.getElementById('newCarouselTrack');
-  const pagination = document.getElementById('newPagination');
-  const items = allProducts.filter(p => p.type?.carrusel);
-
-  track.innerHTML = '';
-  pagination.innerHTML = '';
-
-  if (items.length === 0) {
-    track.innerHTML = '<p style="text-align:center;color:#999;padding:60px;">No hay productos</p>';
-    return;
-  }
-
-  track.innerHTML = items.map(p => `
-    <div class="slide" data-id="${p.id}">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-    </div>
-  `).join('');
-
-  pagination.innerHTML = items.map((_, i) => `
-    <button class="dot" data-index="${i}" ${i === 0 ? 'class="dot active"' : ''}></button>
-  `).join('');
-
-  const dots = pagination.querySelectorAll('.dot');
-  let currentIndex = 0;
-  let startX = 0;
-  let isDragging = false;
-
-  function goToSlide(index) {
-    currentIndex = (index + items.length) % items.length;
-    track.style.transition = 'transform 0.4s cubic-bezier(0.22, 0.61, 0.35, 1)';
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-    dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
-  }
-
-  container.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    isDragging = true;
-    track.style.transition = 'none';
-  }, { passive: true });
-
-  container.addEventListener('touchmove', e => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.touches[0].clientX;
-    const diff = ((x - startX) / container.offsetWidth) * 100;
-    track.style.transform = `translateX(calc(-${currentIndex * 100}% + ${diff}%))`;
-  }, { passive: false });
-
-  container.addEventListener('touchend', () => {
-    if (!isDragging) return;
-    isDragging = false;
-    const movedBy = parseFloat(track.style.transform.match(/calc\(-?\d+% \+ (-?\d+\.?\d*)%\)/)?.[1] || 0);
-    const threshold = 15;
-    if (Math.abs(movedBy) > threshold) {
-      movedBy > 0 ? goToSlide(currentIndex - 1) : goToSlide(currentIndex + 1);
-    } else {
-      goToSlide(currentIndex);
-    }
-  });
-
-  track.querySelectorAll('.slide').forEach(slide => {
-    slide.addEventListener('click', () => {
-      window.location.href = `product.html?id=${slide.dataset.id}`;
-    });
-  });
-
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
-  });
-
-  goToSlide(0);
-}
-
-// === CARRUSEL INFINITO: ANUNCIOS (SCROLL HORIZONTAL) ===
-function createInfiniteCarousel() {
-  const container = document.getElementById('starCarousel');
-  const items = allProducts.filter(p => p.type?.anuncio);
-
-  if (items.length === 0) {
-    container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">No hay productos</p>';
-    return;
-  }
-
-  const displayItems = [...items, ...items];
-  container.innerHTML = displayItems.map(p => `
-    <div class="carousel-item" onclick="window.location.href='product.html?id=${p.id}'">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-    </div>
-  `).join('');
-
-  let isDown = false;
-  let startX, scrollLeft;
-
-  container.addEventListener('mousedown', e => {
-    isDown = true;
-    container.style.cursor = 'grabbing';
-    startX = e.pageX - container.offsetLeft;
-    scrollLeft = container.scrollLeft;
-  });
-
-  container.addEventListener('mouseleave', () => { isDown = false; container.style.cursor = 'grab'; });
-  container.addEventListener('mouseup', () => { isDown = false; container.style.cursor = 'grab'; });
-  container.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - container.offsetLeft;
-    const walk = (x - startX) * 2;
-    container.scrollLeft = scrollLeft - walk;
-  });
-
-  container.style.touchAction = 'pan-x';
-  container.style.webkitOverflowScrolling = 'touch';
-}
-
-// === GRID ===
-function renderGrid() {
-  const normales = allProducts.filter(p => p.type?.normal);
-  productsGrid.innerHTML = normales.map(p => `
-    <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-      <div class="card-info">
-        <h3>${p.nombre}</h3>
-        <p class="desc">${p.descripcion || ''}</p>
-        <div class="price-container">
-          ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
-          <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
-        </div>
-        <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// === BÚSQUEDA ===
-let searchTimeout;
-searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  const term = searchInput.value.trim();
-  if (term.length === 0) {
-    searchResultsContainer.style.display = 'none';
-    return;
-  }
-  searchTimeout = setTimeout(() => {
-    const normalized = term.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const matches = allProducts.filter(p => {
-      const nombre = (p.nombre || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const desc = (p.descripcion || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const tipo = (p.tipo || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return nombre.includes(normalized) || desc.includes(normalized) || tipo.includes(normalized);
-    });
-    searchResults.innerHTML = matches.length === 0
-      ? `<p class="no-results">No encontramos nada con "<strong>${term}</strong>"</p>`
-      : matches.map(p => `
-        <div class="search-result-item" onclick="window.location.href='product.html?id=${p.id}'">
-          <img src="${p.imagen}" alt="${p.nombre}">
-          <div>
-            <strong>${p.nombre}</strong>
-            ${p.tipo ? `<small>• ${p.tipo}</small>` : ''}
-            <span>$${p.precio.toLocaleString()}</span>
-          </div>
-        </div>
-      `).join('');
-    searchResultsContainer.style.display = 'block';
-    updateResultsPosition();
-  }, 150);
-});
-
-function updateResultsPosition() {
-  const headerHeight = header.offsetHeight;
-  const searchHeight = searchContainer.classList.contains('active') ? searchContainer.offsetHeight : 0;
-  searchResultsContainer.style.top = `${headerHeight + searchHeight}px`;
-}
-window.addEventListener('scroll', updateResultsPosition);
-window.addEventListener('resize', updateResultsPosition);
-
-// === UI ===
+// === UI Y TOAST ===
 menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
 [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
 cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
 closeCart.onclick = () => cartSidebar.classList.remove('open');
-searchBtn.onclick = () => { searchContainer.classList.add('active'); searchInput.focus(); updateResultsPosition(); };
-closeSearch.onclick = () => {
-  searchContainer.classList.remove('active');
-  searchInput.value = '';
-  searchResultsContainer.style.display = 'none';
-};
+searchBtn.onclick = () => { searchContainer.classList.add('active'); searchInput.focus(); };
+closeSearch.onclick = () => { searchContainer.classList.remove('active'); searchInput.value = ''; searchResultsContainer.style.display = 'none'; };
 
-// === AUTH ===
-function updateAuthUI() {
-  if (isLoggedIn && userName) {
-    welcomeMsg.textContent = `¡Hola, ${userName}!`;
-    authBtn.textContent = 'Cerrar sesión';
-    authBtn.classList.add('logout-btn');
-  } else {
-    welcomeMsg.textContent = '';
-    authBtn.textContent = 'Inicia sesión o regístrate';
-    authBtn.classList.remove('logout-btn');
-  }
-}
-authBtn.onclick = () => {
-  if (isLoggedIn) {
-    localStorage.removeItem('loggedIn');
-    localStorage.removeItem('userName');
-    isLoggedIn = false; userName = '';
-    showToast('Sesión cerrada');
-    updateAuthUI();
-  } else {
-    window.location.href = 'login.html';
-  }
-};
-helpBtn.onclick = () => alert('Escríbenos a contacto@boutique-buendia.com');
-
-// === TOAST ===
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
@@ -423,11 +304,9 @@ function showToast(msg) {
 
 // === INICIAR ===
 updateCart();
-updateAuthUI();
 loadTitles();
 loadProductTypes();
 loadSocialLinks();
-updateResultsPosition();
 
 // === CARGAR PRODUCTOS ===
 onSnapshot(collection(db, "productos"), (snapshot) => {
@@ -436,8 +315,7 @@ onSnapshot(collection(db, "productos"), (snapshot) => {
     ...doc.data(),
     type: doc.data().type || { normal: true }
   }));
-
-  createMobileCarousel();     // NUEVO: Swipe + Dots
-  createInfiniteCarousel();   // NUEVO: Scroll infinito
+  createNewCarousel();
+  createStarCarousel();
   renderGrid();
 });
