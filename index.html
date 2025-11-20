@@ -12,13 +12,13 @@
       background:#fff; color:#111; overflow-x:hidden;
       -webkit-tap-highlight-color:transparent;
     }
-    button, a, [onclick], input { -webkit-tap-highlight-color:transparent; outline:none; }
+    button, input, a { -webkit-tap-highlight-color:transparent; outline:none; }
 
     h1,h2 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
 
-    /* HEADER */
+    /* HEADER FIJO */
     .header {
       position:fixed; top:0; left:0; right:0; background:#fff;
       border-bottom:1px solid #eee; z-index:1000; padding:16px 20px;
@@ -43,56 +43,37 @@
     }
     body { padding-top:76px; }
 
-    /* === BÚSQUEDA PANTALLA COMPLETA CON X EN LA BARRA === */
-    .search-fullscreen {
-      position:fixed; inset:0; background:#fff; z-index:999;
-      transform:translateY(-100%); transition:transform .35s cubic-bezier(0.4,0,0.2,1);
-      display:flex; flex-direction:column;
+    /* BARRA DE BÚSQUEDA FIJA AL TOCAR LUPA */
+    .search-bar-container {
+      position:fixed; top:76px; left:0; right:0; background:#fff;
+      border-bottom:2px solid #000; padding:16px 20px;
+      display:none; align-items:center; gap:12px; z-index:998;
     }
-    .search-fullscreen.active { transform:translateY(0); }
-
-    .search-bar-full {
-      position:sticky; top:0; background:#fff; border-bottom:2px solid #000;
-      padding:18px 20px; display:flex; align-items:center; gap:16px; z-index:10;
+    .search-bar-container.active { display:flex; }
+    .search-bar-input {
+      flex:1; border:none; font-size:1.1rem; font-weight:500; padding:8px 0;
     }
-    .search-bar-full input {
-      flex:1; border:none; background:transparent; font-size:1.15rem; font-weight:500;
-      padding:8px 0;
-    }
-    .close-search-btn {
+    .close-search-x {
       background:none; border:none; font-size:36px; cursor:pointer; color:#000;
-      width:44px; height:44px; display:flex; align-items:center; justify-content:center;
     }
 
-    .search-full-content {
-      flex:1; overflow-y:auto; padding:20px; padding-top:10px; padding-bottom:120px;
+    /* RESULTADOS DE BÚSQUEDA */
+    .search-results-overlay {
+      position:fixed; top:140px; left:0; right:0; bottom:0; background:#fff;
+      overflow-y:auto; padding:20px; display:none; z-index:997;
     }
-    .search-section-title {
-      font-weight:800; font-size:0.95rem; text-transform:uppercase;
-      letter-spacing:1.5px; margin:32px 0 16px;
-    }
-    .suggestions-chips {
-      display:flex; flex-wrap:wrap; gap:10px; margin-bottom:30px;
-    }
-    .chip {
-      background:#f5f5f5; padding:10px 16px; border-radius:8px;
-      font-weight:600; font-size:0.95rem; cursor:pointer;
-    }
-    .search-full-results {
+    .search-results-overlay.active { display:block; }
+    .search-results-grid {
       display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:20px;
     }
-    .search-full-item {
+    .result-item {
       text-align:center; cursor:pointer;
     }
-    .search-full-item img {
+    .result-item img {
       width:100%; height:180px; object-fit:contain; background:#fafafa; border-radius:12px;
     }
-    .search-full-name {
-      font-weight:600; font-size:0.95rem; margin:10px 0 4px;
-    }
-    .search-full-price {
-      font-weight:700; font-size:1.1rem; color:#e63946;
-    }
+    .result-name { font-weight:600; font-size:0.95rem; margin:10px 0 4px; }
+    .result-price { font-weight:700; font-size:1.1rem; color:#e63946; }
 
     /* MENÚ HAMBURGUESA */
     .menu-overlay {
@@ -126,9 +107,9 @@
       display:flex; align-items:center; gap:14px;
     }
     .submenu-item:hover { color:#111; font-weight:600; }
-    .social-icon { width:28px; height:28px; border-radius:6px; object-fit:contain; }
+    .social-icon { width:28px; height:28px; object-fit:contain; }
 
-    /* CARRITO */
+    /* CARRITO Y PRODUCTOS (igual que antes) */
     .cart-sidebar { position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh; background:#fff; transition:right .3s; z-index:1200; display:flex; flex-direction:column; }
     .cart-sidebar.open { right:0; }
     .cart-header { padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
@@ -148,7 +129,7 @@
     .new-products-wrapper::-webkit-scrollbar { display:none; }
     .new-product-card { min-width:260px; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.15); cursor:pointer; scroll-snap-align:center; }
     .new-product-card img { width:100%; height:320px; object-fit:contain; background:#fafafa; }
-    .new-product-card .title { padding:16px; text-align:center; font-weight:700; font-size:1rem; background:#fff; border-radius:0 0 16px 16px; }
+    .new-product-card .title { padding:16px; text-align:center; font-weight:700; font-size:1rem; background:#fff; }
 
     .products-grid { display:grid; gap:28px; margin-top:48px; }
     @media (max-width:480px) { .products-grid { grid-template-columns:repeat(2,1fr); gap:16px; } }
@@ -196,61 +177,48 @@
     </div>
   </header>
 
-  <!-- BÚSQUEDA PANTALLA COMPLETA CON X EN LA BARRA -->
-  <div class="search-fullscreen" id="searchFullscreen">
-    <div class="search-bar-full">
-      <input type="text" id="fullSearchInput" placeholder="Buscar productos..." autocomplete="off">
-      <button class="close-search-btn" id="closeSearchBtn">×</button>
-    </div>
-    <div class="search-full-content">
-      <div class="search-section-title">SUGERENCIAS</div>
-      <div class="suggestions-chips">
-        <div class="chip" onclick="searchThis('gorra')">Gorra</div>
-        <div class="chip" onclick="searchThis('camiseta')">Camiseta</div>
-        <div class="chip" onclick="searchThis('sudadera')">Sudadera</div>
-        <div class="chip" onclick="searchThis('tenis')">Tenis</div>
-        <div class="chip" onclick="searchThis('mystery')">Mystery Box</div>
-      </div>
-      <div class="search-section-title">PRODUCTOS</div>
-      <div class="search-full-results" id="fullSearchResults"></div>
-    </div>
+  <!-- BARRA DE BÚSQUEDA FIJA -->
+  <div class="search-bar-container" id="searchBarContainer">
+    <input type="text" class="search-bar-input" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
+    <button class="close-search-x" id="closeSearch">×</button>
   </div>
 
-  <main class="main-container">
+  <!-- RESULTADOS DE BÚSQUEDA -->
+  <div class="search-results-overlay" id="searchResultsOverlay">
+    <div class="search-results-grid" id="searchResults"></div>
+  </div>
+
+  <main class="main-container" id="mainContent">
     <section class="hero-banner">
       <h1 id="heroTitle">Cargando...</h1>
       <p class="tag" id="heroSubtitle">Cargando...</p>
     </section>
     <section>
-      <h2 id="newReleasesTitle">Nuevos Lanzamientos</h2>
+      <h2>Nuevos Lanzamientos</h2>
       <div class="new-products-wrapper" id="newProductsWrapper"></div>
     </section>
     <section>
-      <h2 id="allProductsTitle">Todos los Productos</h2>
+      <h2>Todos los Productos</h2>
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
 
-  <!-- MENÚ LATERAL -->
+  <!-- MENÚ HAMBURGUESA -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg">¡Bienvenido!</div>
 
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
-      <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
-        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
-      </svg>
+      <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
-    <div class="submenu" id="categoriesSubmenu"></div>
+    <div class="submenu" id="categoriesList"></div>
 
     <div class="menu-item dropdown-toggle" id="socialToggle">
       Mis redes sociales
-      <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
-        <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
-      </svg>
+      <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
-    <div class="submenu" id="socialDropdown"></div>
+    <div class="submenu" id="socialList"></div>
 
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item" id="authBtn">Inicia sesión o regístrate</div>
@@ -294,76 +262,77 @@
     const auth = getAuth(app);
 
     const searchBtn = document.getElementById('searchBtn');
-    const searchFullscreen = document.getElementById('searchFullscreen');
-    const closeSearchBtn = document.getElementById('closeSearchBtn');
-    const fullSearchInput = document.getElementById('fullSearchInput');
-    const fullSearchResults = document.getElementById('fullSearchResults');
+    const searchBarContainer = document.getElementById('searchBarContainer');
+    const searchInput = document.getElementById('searchInput');
+    const closeSearch = document.getElementById('closeSearch');
+    const searchResultsOverlay = document.getElementById('searchResultsOverlay');
+    const searchResults = document.getElementById('searchResults');
+    const mainContent = document.getElementById('mainContent');
 
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
     // ABRIR BÚSQUEDA
     searchBtn.onclick = () => {
-      searchFullscreen.classList.add('active');
-      setTimeout(() => fullSearchInput.focus(), 350);
+      searchBarContainer.classList.add('active');
+      searchResultsOverlay.classList.add('active');
+      mainContent.style.display = 'none';
+      setTimeout(() => searchInput.focus(), 300);
     };
 
-    // CERRAR CON LA X
-    closeSearchBtn.onclick = () => {
-      searchFullscreen.classList.remove('active');
-      fullSearchInput.value = '';
-      fullSearchResults.innerHTML = '';
+    // CERRAR BÚSQUEDA
+    closeSearch.onclick = () => {
+      searchBarContainer.classList.remove('active');
+      searchResultsOverlay.classList.remove('active');
+      mainContent.style.display = 'block';
+      searchInput.value = '';
+      searchResults.innerHTML = '';
     };
 
     // BUSCAR EN TIEMPO REAL
-    fullSearchInput.oninput = () => {
-      const q = fullSearchInput.value.toLowerCase().trim();
-      if (q.length < 2) {
-        fullSearchResults.innerHTML = '';
+    searchInput.oninput = () => {
+      const query = searchInput.value.toLowerCase().trim();
+      if (query.length < 2) {
+        searchResults.innerHTML = '';
         return;
       }
-
-      const results = allProducts.filter(p =>
-        (p.nombre || '').toLowerCase().includes(q) ||
-        (p.descripcion || '').toLowerCase().includes(q) ||
-        (p.tipo || '').toLowerCase().includes(q)
+      const filtered = allProducts.filter(p =>
+        p.nombre?.toLowerCase().includes(query) ||
+        p.descripcion?.toLowerCase().includes(query) ||
+        p.tipo?.toLowerCase().includes(query)
       );
 
-      fullSearchResults.innerHTML = results.length === 0
+      searchResults.innerHTML = filtered.length === 0
         ? '<div style="text-align:center;padding:80px;color:#999;">No se encontraron productos</div>'
-        : results.map(p => `
-          <div class="search-full-item" onclick="location.href='product.html?id=${p.id}'; searchFullscreen.classList.remove('active')">
+        : filtered.map(p => `
+          <div class="result-item" onclick="location.href='product.html?id=${p.id}'">
             <img src="${p.imagen}" loading="lazy">
-            <div class="search-full-name">${p.nombre}</div>
-            <div class="search-full-price">$${p.precio.toLocaleString()}</div>
+            <div class="result-name">${p.nombre}</div>
+            <div class="result-price">$${p.precio.toLocaleString()}</div>
           </div>
         `).join('');
     };
 
-    window.searchThis = (term) => {
-      fullSearchInput.value = term;
-      fullSearchInput.dispatchEvent(new Event('input'));
-    };
-
-    // CARGAR PRODUCTOS Y EL RESTO (todo igual que antes)
+    // CARGAR PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderProducts();
-      loadCategories();
+      loadCategoriesFromFirebase();
     });
 
     function renderProducts() {
-      document.getElementById('newProductsWrapper').innerHTML = allProducts.filter(p => p.type?.carrusel || p.type?.anuncio).map(p => `
+      const carrusel = allProducts.filter(p => p.type?.carrusel || p.type?.anuncio);
+      document.getElementById('newProductsWrapper').innerHTML = carrusel.map(p => `
         <div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" loading="lazy"><div class="title">${p.nombre}</div>
         </div>`).join('');
 
-      document.getElementById('productsGrid').innerHTML = allProducts
-        .filter(p => p.type?.normal !== false && !p.type?.carrusel)
-        .map(p => `<div class="product-card" onclick="location.href='product.html?id=${p.id}'">
+      const normales = allProducts.filter(p => p.type?.normal !== false && !p.type?.carrusel);
+      document.getElementById('productsGrid').innerHTML = normales.map(p => `
+        <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" loading="lazy">
           <div class="product-title">${p.nombre}</div>
-          <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+          <div style="display:flex;justify-content:center;gap:8px;">
             ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
             <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
           </div>
@@ -371,43 +340,76 @@
         </div>`).join('');
     }
 
-    // Todo lo demás (menú, redes, carrito, auth) igual que en la versión anterior
-    // (lo dejo funcionando 100% igual, solo acortado aquí por espacio)
+    // CATEGORÍAS REALES DESDE FIREBASE
+    function loadCategoriesFromFirebase() {
+      const tipos = [...new Set(allProducts.map(p => p.tipo).filter(Boolean))].sort();
+      document.getElementById('categoriesList').innerHTML = tipos.map(tipo => `
+        <div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(tipo)}'">
+          ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+        </div>
+      `).join('');
+    }
 
-    // REDES SOCIALES
+    // REDES SOCIALES CON ICONOS DESDE FIREBASE
     onSnapshot(doc(db, "admin", "links"), (snap) => {
       if (!snap.exists()) return;
       const links = snap.data();
-      const icons = { instagram: "https://img.icons8.com/ios-filled/100/000000/instagram-new.png", facebook: "https://img.icons8.com/ios-filled/100/000000/facebook-new.png", tiktok: "https://img.icons8.com/ios-filled/100/000000/tiktok.png", youtube: "https://img.icons8.com/ios-filled/100/000000/youtube-play.png", x: "https://img.icons8.com/ios-filled/100/000000/x.png" };
-      document.getElementById('socialDropdown').innerHTML = Object.keys(links).filter(k => links[k]).map(k => `
-        <div class="submenu-item" onclick="window.open('${links[k]}','_blank')">
-          <img src="${icons[k] || icons.x}" class="social-icon" alt="${k}">
-          <span>${k.charAt(0).toUpperCase() + k.slice(1)}</span>
-        </div>`).join('');
+      const icons = {
+        instagram: "https://img.icons8.com/ios-filled/100/000000/instagram-new.png",
+        tiktok: "https://img.icons8.com/ios-filled/100/000000/tiktok.png",
+        facebook: "https://img.icons8.com/ios-filled/100/000000/facebook-new.png",
+        youtube: "https://img.icons8.com/ios-filled/100/000000/youtube.png",
+        whatsapp: "https://img.icons8.com/ios-filled/100/000000/whatsapp.png"
+      };
+      document.getElementById('socialList').innerHTML = Object.keys(links)
+        .filter(key => links[key])
+        .map(key => `
+          <div class="submenu-item" onclick="window.open('${links[key]}','_blank')">
+            <img src="${icons[key] || 'https://img.icons8.com/ios-filled/100/000000/link.png'}" class="social-icon">
+            <span>${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+          </div>
+        `).join('');
     });
 
-    // CARRITO (resumido, funciona igual)
+    // CARRITO (funciona igual)
     function updateCart() {
-      const qty = cart.reduce((s,i)=>s+i.qty,0);
-      const total = cart.reduce((s,i)=>s+i.precio*i.qty,0);
+      const qty = cart.reduce((a,b) => a + b.qty, 0);
+      const total = cart.reduce((a,b) => a + b.precio * b.qty, 0);
       document.getElementById('cartBadge').textContent = qty;
-      document.getElementById('cartBadge').style.display = qty>0?'flex':'none';
+      document.getElementById('cartBadge').style.display = qty > 0 ? 'flex' : 'none';
       document.getElementById('cartTotal').textContent = `Total: $${total.toLocaleString()}`;
-      document.getElementById('cartItems').innerHTML = cart.length===0 ? '<p style="text-align:center;color:#999;padding:60px 20px;">Tu carrito está vacío</p>' : cart.map((item,i)=>`
-        <div class="cart-item"><img src="${item.imagen}" class="thumb">
-          <div><div>${item.nombre}</div><small>x${item.qty} • $${(item.precio*item.qty).toLocaleString()}</small></div>
-          <button onclick="removeFromCart(${i})" style="background:none;border:none;font-size:28px;cursor:pointer;color:#999;">×</button>
-        </div>`).join('');
-      document.getElementById('goToPay').style.display = cart.length>0?'block':'none';
+      document.getElementById('cartItems').innerHTML = cart.length === 0
+        ? '<p style="text-align:center;color:#999;padding:60px;">Tu carrito está vacío</p>'
+        : cart.map((item,i) => `<div class="cart-item">
+            <img src="${item.imagen}" class="thumb">
+            <div><div>${item.nombre}</div><small>x${item.qty} • $${(item.precio*item.qty).toLocaleString()}</small></div>
+            <button onclick="removeFromCart(${i})" style="background:none;border:none;font-size:28px;color:#999;">×</button>
+          </div>`).join('');
+      document.getElementById('goToPay').style.display = cart.length > 0 ? 'block' : 'none';
     }
-    window.addToCart = (id) => { const p = allProducts.find(x=>x.id===id); const e = cart.find(x=>x.id===id); e?e.qty++:cart.push({id:p.id,nombre:p.nombre,precio:p.precio,imagen:p.imagen,qty:1}); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); document.getElementById('toast').textContent='¡Agregado!'; document.getElementById('toast').classList.add('show'); setTimeout(()=>document.getElementById('toast').classList.remove('show'),3000); };
+    window.addToCart = (id) => {
+      const p = allProducts.find(x => x.id === id);
+      const existe = cart.find(x => x.id === id);
+      existe ? existe.qty++ : cart.push({...p, qty:1});
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      document.getElementById('toast').textContent = '¡Agregado!';
+      document.getElementById('toast').classList.add('show');
+      setTimeout(() => document.getElementById('toast').classList.remove('show'), 2500);
+    };
     window.removeFromCart = (i) => { cart.splice(i,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); };
 
-    // UI
-    document.getElementById('menuBtn').onclick = () => { document.getElementById('menuSidebar').classList.add('open'); document.getElementById('menuOverlay').classList.add('show'); };
-    [document.getElementById('menuOverlay'), document.getElementById('closeMenu')].forEach(el => el.onclick = () => { document.getElementById('menuSidebar').classList.remove('open'); document.getElementById('menuOverlay').classList.remove('show'); });
-    document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesSubmenu').classList.toggle('show');
-    document.getElementById('socialToggle').onclick = () => document.getElementById('socialDropdown').classList.toggle('show');
+    // MENÚ Y UI
+    document.getElementById('menuBtn').onclick = () => {
+      document.getElementById('menuSidebar').classList.add('open');
+      document.getElementById('menuOverlay').classList.add('show');
+    };
+    [document.getElementById('menuOverlay'), document.getElementById('closeMenu')].forEach(el => el.onclick = () => {
+      document.getElementById('menuSidebar').classList.remove('open');
+      document.getElementById('menuOverlay').classList.remove('show');
+    });
+    document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesList').classList.toggle('show');
+    document.getElementById('socialToggle').onclick = () => document.getElementById('socialList').classList.toggle('show');
     document.getElementById('cartBtn').onclick = () => { document.getElementById('cartSidebar').classList.add('open'); updateCart(); };
     document.getElementById('closeCart').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
     document.getElementById('goToPay').onclick = () => location.href = 'pago.html';
