@@ -10,23 +10,18 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html,body { font-family:'Poppins',sans-serif; background:#fff; color:#111; overflow-x:hidden; }
-    
+
     h1,h2 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
 
-    /* HEADER */
+    /* HEADER - ICONOS NEGROS SIEMPRE */
     .header { position:sticky; top:0; background:#fff; border-bottom:1px solid #eee; z-index:1000; padding:16px 20px; box-shadow:0 2px 10px rgba(0,0,0,0.03); }
     .header-inner { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:12px; max-width:1400px; margin:0 auto; }
     .logo { font-weight:900; font-size:1.5rem; text-transform:uppercase; letter-spacing:1.5px; }
     .icon-btn { background:none; border:none; cursor:pointer; padding:8px; border-radius:8px; position:relative; }
-    .icon-btn svg { width:24px; height:24px; stroke:#000; stroke-width:2.5; fill:none; }
-    
-    /* ICONOS NEGROS SIEMPRE (MÓVIL Y PC) */
-    .icon-btn svg { stroke:#000 !important; }
-    #cartBadge { background:#000 !important; }
-
-    #cartBadge { position:absolute; top:-6px; right:-6px; color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; display:none; }
+    .icon-btn svg { width:24px; height:24px; stroke:#000 !important; stroke-width:2.5; fill:none; }
+    #cartBadge { position:absolute; top:-6px; right:-6px; background:#000; color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; display:none; }
 
     /* BÚSQUEDA */
     .search-container { position:absolute; top:100%; left:0; right:0; background:#fff; border-top:1px solid #eee; padding:16px 20px; display:none; z-index:900; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
@@ -36,7 +31,7 @@
     #closeSearch { padding:10px 16px; font-size:28px; background:none; border:none; cursor:pointer; color:#111; }
 
     #searchResultsContainer { position:absolute; top:100%; left:20px; right:20px; background:#fff; border:2px solid #111; border-top:none; border-radius:0 0 12px 12px; max-height:70vh; overflow-y:auto; z-index:899; box-shadow:0 10px 30px rgba(0,0,0,0.15); display:none; }
-    .search-result-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #eee; cursor:pointer; transition:background 0.2s; }
+    .search-result-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #eee; cursor:pointer; }
     .search-result-item:hover { background:#f8f8f8; }
     .search-result-item img { width:60px; height:60px; object-fit:contain; border-radius:8px; background:#fafafa; }
 
@@ -52,8 +47,9 @@
     .dropdown-toggle.active .dropdown-arrow { transform:rotate(180deg); }
     .submenu { display:none; padding-left:20px; margin-top:8px; }
     .submenu.show { display:block; }
-    .submenu-item { padding:12px 0; font-size:0.95rem; color:#666; cursor:pointer; }
+    .submenu-item { padding:12px 0; font-size:0.95rem; color:#666; cursor:pointer; display:flex; align-items:center; gap:12px; }
     .submenu-item:hover { color:#111; font-weight:600; }
+    .social-icon { width:24px; height:24px; }
 
     /* CARRITO */
     .cart-sidebar { position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh; background:#fff; transition:right .3s; z-index:1200; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.08); }
@@ -74,7 +70,7 @@
     .tag { display:inline-block; background:#000; color:#fff; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:4px; margin-top:8px; text-transform:uppercase; }
 
     /* NUEVOS LANZAMIENTOS */
-    .new-products-wrapper { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; gap:20px; padding:20px 0; scrollbar-width:none; }
+    .new-products-wrapper { display:flex; overflow overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; gap:20px; padding:20px 0; scrollbar-width:none; }
     .new-products-wrapper::-webkit-scrollbar { display:none; }
     .new-product-card { min-width:280px; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.15); cursor:pointer; scroll-snap-align:center; }
     .new-product-card img { width:100%; height:340px; object-fit:contain; }
@@ -93,7 +89,6 @@
     .offer-price { color:#e63946; }
     .add-btn { background:#000; color:#fff; border:none; padding:12px; border-radius:8px; margin-top:12px; width:100%; font-weight:700; text-transform:uppercase; cursor:pointer; }
 
-    /* TOAST */
     .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#000; color:#fff; padding:14px 28px; border-radius:8px; font-weight:700; z-index:1300; opacity:0; transition:all .35s; text-transform:uppercase; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(-20px); }
   </style>
@@ -123,20 +118,18 @@
 
     <div class="search-container" id="searchContainer">
       <div class="search-bar">
-        <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
+        <input type="text" placeholder="Buscar por nombre, tipo o detalles..." id="searchInput" autofocus>
         <button id="closeSearch">×</button>
       </div>
     </div>
   </header>
 
-  <div id="searchResultsContainer">
-    <div id="searchResults"></div>
-  </div>
+  <div id="searchResultsContainer"><div id="searchResults"></div></div>
 
   <main class="main-container">
     <section class="hero-banner">
-      <h1 id="heroTitle">Asegura tu Mystery Box</h1>
-      <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
+      <h1>Asegura tu Mystery Box</h1>
+      <p class="tag">Envío Gratis en compras +$1,500</p>
     </section>
 
     <section>
@@ -169,10 +162,7 @@
         <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
       </svg>
     </div>
-    <div class="submenu" id="contactDropdown">
-      <p>Sígueme en mis redes sociales</p>
-      <div id="socialLinksContainer"></div>
-    </div>
+    <div class="submenu" id="contactDropdown"></div>
 
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item login-btn" id="authBtn">Inicia sesión o regístrate</div>
@@ -198,7 +188,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -256,45 +246,55 @@
       }
     });
 
-    // CATEGORÍAS DESDE FIREBASE
-    onSnapshot(collection(db, "categorias"), (snap) => {
-      const cats = [];
-      snap.forEach(doc => {
-        const data = doc.data();
-        if (data.activa !== false) cats.push({ id: doc.id, nombre: data.nombre });
-      });
-      document.getElementById('categoriesSubmenu').innerHTML = cats.map(cat => 
-        `<div class="submenu-item" onclick="location.href='categoria.html?id=${cat.id}'">${cat.nombre}</div>`
+    // CATEGORÍAS REALES DESDE PRODUCTOS (campo "tipo")
+    const tiposSet = new Set();
+    onSnapshot(collection(db, "productos"), (snap) => {
+      allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      tiposSet.clear();
+      allProducts.forEach(p => p.tipo && tiposSet.add(p.tipo.trim()));
+      
+      document.getElementById('categoriesSubmenu').innerHTML = [...tiposSet].sort().map(tipo => 
+        `<div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(tipo)}'">${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</div>`
       ).join('');
+      
+      renderProducts();
     });
 
-    // REDES SOCIALES
-    onSnapshot(doc(db, "menu", "redes"), (snap) => {
+    // REDES SOCIALES CON ICONOS REALES
+    onSnapshot(doc(db, "admin", "links"), (snap) => {
       if (snap.exists()) {
-        const redes = snap.data();
-        document.getElementById('socialLinksContainer').innerHTML = Object.entries(redes)
-          .map(([nombre, url]) => `<div class="submenu-item" onclick="window.open('${url}','_blank')">${nombre}</div>`).join('');
+        const links = snap.data();
+        const icons = {
+          instagram: "https://img.icons8.com/ios-filled/100/000000/instagram-new.png",
+          facebook: "https://img.icons8.com/ios-filled/100/000000/facebook-new.png",
+          tiktok: "https://img.icons8.com/ios-filled/100/000000/tiktok.png",
+          x: "https://img.icons8.com/ios-filled/100/000000/x.png",
+          youtube: "https://img.icons8.com/ios-filled/100/000000/youtube-play.png"
+        };
+        document.getElementById('contactDropdown').innerHTML = Object.keys(links)
+          .filter(key => links[key])
+          .map(key => `
+            <div class="submenu-item" onclick="window.open('${links[key]}','_blank')">
+              <img src="${icons[key] || icons.x}" class="social-icon" alt="${key}">
+              <span>${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+            </div>
+          `).join('');
       }
     });
 
-    // BÚSQUEDA EN TIEMPO REAL
+    // BÚSQUEDA POR NOMBRE, DESCRIPCIÓN, TIPO
     searchBtn.onclick = () => searchContainer.classList.add('active');
     [closeSearch, menuOverlay].forEach(el => el.onclick = () => searchContainer.classList.remove('active'));
 
     searchInput.oninput = async () => {
-      const q = searchInput.value.trim();
+      const q = searchInput.value.trim().toLowerCase();
       if (q.length < 2) { searchResultsContainer.style.display = 'none'; return; }
 
-      let results = [];
-      if (q.startsWith('#')) {
-        const tag = q.slice(1).toLowerCase();
-        const snap = await getDocs(query(collection(db, "productos"), where("tags", "array-contains", tag)));
-        results = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      } else {
-        const snap = await getDocs(query(collection(db, "productos"), 
-          where("nombre", ">=", q), where("nombre", "<=", q + '\uf8ff')));
-        results = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      }
+      const results = allProducts.filter(p => 
+        (p.nombre?.toLowerCase().includes(q)) ||
+        (p.descripcion?.toLowerCase().includes(q)) ||
+        (p.tipo?.toLowerCase().includes(q))
+      );
 
       searchResults.innerHTML = results.length === 0 
         ? '<div style="padding:20px;text-align:center;color:#999;">No se encontraron productos</div>'
@@ -310,6 +310,29 @@
 
       searchResultsContainer.style.display = results.length ? 'block' : 'none';
     };
+
+    // RENDER PRODUCTOS
+    function renderProducts() {
+      document.getElementById('newProductsWrapper').innerHTML = allProducts
+        .filter(p => p.type?.carrusel || p.type?.anuncio)
+        .map(p => `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
+          <img src="${p.imagen}" loading="lazy">
+        </div>`).join('');
+
+      document.getElementById('productsGrid').innerHTML = allProducts
+        .filter(p => p.type?.normal !== false && !p.type?.carrusel)
+        .map(p => `
+          <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
+            <img src="${p.imagen}" loading="lazy">
+            <div class="product-title">${p.nombre}</div>
+            <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+              ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+              <span class="price ${p.precioAntiguo?'offer-price':''}">$${p.precio.toLocaleString()}</span>
+            </div>
+            <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
+          </div>
+        `).join('');
+    }
 
     // CARRITO
     function updateCart() {
@@ -353,31 +376,6 @@
     cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
     closeCart.onclick = () => cartSidebar.classList.remove('open');
     goToPay.onclick = () => location.href = 'pago.html';
-
-    // PRODUCTOS
-    onSnapshot(collection(db, "productos"), snap => {
-      allProducts = snap.docs.map(d => ({id:d.id, ...d.data(), type:d.data().type||{normal:true}}));
-      
-      document.getElementById('newProductsWrapper').innerHTML = allProducts
-        .filter(p => p.type?.carrusel)
-        .map(p => `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
-          <img src="${p.imagen}" loading="lazy">
-        </div>`).join('');
-
-      document.getElementById('productsGrid').innerHTML = allProducts
-        .filter(p => p.type?.normal || !p.type?.carrusel)
-        .map(p => `
-          <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
-            <img src="${p.imagen}" loading="lazy">
-            <div class="product-title">${p.nombre}</div>
-            <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
-              ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
-              <span class="price ${p.precioAntiguo?'offer-price':''}">$${p.precio.toLocaleString()}</span>
-            </div>
-            <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
-          </div>
-        `).join('');
-    });
 
     updateCart();
   </script>
