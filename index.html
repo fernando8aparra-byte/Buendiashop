@@ -36,18 +36,13 @@
     }
     .icon-btn svg { width:26px; height:26px; stroke:#000; stroke-width:2.7; fill:none; }
 
-    /* BADGE CARRITO SOLO NÚMERO + ANIMACIÓN */
+    /* BADGE CARRITO */
     #cartBadge {
       position:absolute; top:-8px; right:-10px; 
       background:none; color:#000; font-size:14px; font-weight:900;
       min-width:20px; height:20px; display:flex; align-items:center; justify-content:center;
-      animation: shake 0.5s ease-in-out;
     }
-    @keyframes shake {
-      0%,100% { transform:translateX(0); }
-       20%,60% { transform:translateX(-4px); }
-      40%,80% { transform:translateX(4px); }
-    }
+    @keyframes shake { 0%,100% { transform:translateX(0); } 20%,60% { transform:translateX(-4px); } 40%,80% { transform:translateX(4px); } }
 
     body { padding-top:76px; }
 
@@ -70,8 +65,14 @@
     }
     .search-results-overlay.active { display:block; }
     .search-results-grid {
-      display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:20px;
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:14px;
     }
+    .result-item { text-align:center; cursor:pointer; }
+    .result-item img {
+      width:100%; height:130px; object-fit:contain; background:#fafafa; border-radius:10px;
+    }
+    .result-name { font-weight:600; font-size:0.82rem; margin:6px 0 3px; }
+    .result-price { font-weight:700; font-size:0.95rem; color:#e63946; }
 
     /* MENÚ HAMBURGUESA */
     .menu-overlay {
@@ -105,7 +106,7 @@
       display:flex; align-items:center; gap:14px;
     }
     .submenu-item:hover { color:#111; font-weight:600; }
-    .social-icon { width:24px; height:24px; object-fit:contain; }
+    .social-icon { width:26px; height:26px; object-fit:contain; }
 
     /* CARRITO */
     .cart-sidebar {
@@ -234,9 +235,12 @@
     <div class="submenu" id="socialList"></div>
 
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-    <div class="menu-item" id="authBtn">Inicia sesión o regístrate</div>
-    <div class="menu-item" id="adminBtn" style="display:none;">Ir a página de administrador</div>
+
+    <!-- BOTONES DE CUENTA -->
+    <div class="menu-item" id="accountBtn" style="display:none;">Mi cuenta</div>
     <div class="menu-item" id="logoutBtn" style="display:none; color:#e63946;">Cerrar sesión</div>
+    <div class="menu-item" id="adminBtn" style="display:none;">Ir a administrador</div>
+    <div class="menu-item" id="loginBtn">Inicia sesión o regístrate</div>
   </aside>
 
   <!-- CARRITO -->
@@ -277,7 +281,7 @@
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // === TÍTULO Y SUBTÍTULO ===
+    // TÍTULO Y SUBTÍTULO
     onSnapshot(doc(db, "textos", "hero"), (snap) => {
       if (snap.exists()) {
         const d = snap.data();
@@ -286,26 +290,36 @@
       }
     });
 
-    // === DETECCIÓN DE SESIÓN ===
+    // INICIO DE SESIÓN + NOMBRE EN MENÚ
     onAuthStateChanged(auth, (user) => {
-      if (user && user.email === "admin@boutique.com") {  // Cambia este correo si usas otro
-        document.getElementById('authBtn').style.display = "none";
-        document.getElementById('adminBtn').style.display = "block";
-        document.getElementById('logoutBtn').style.display = "block";
-        document.getElementById('welcomeMsg').textContent = `Hola, ${user.email}`;
+      const welcome = document.getElementById('welcomeMsg');
+      const loginBtn = document.getElementById('loginBtn');
+      const accountBtn = document.getElementById('accountBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const adminBtn = document.getElementById('adminBtn');
+
+      if (user) {
+        const nombre = user.displayName || user.email.split('@')[0];
+        welcome.textContent = `¡Bienvenido, ${nombre.charAt(0).toUpperCase() + nombre.slice(1)}!`;
+        loginBtn.style.display = "none";
+        accountBtn.style.display = "block";
+        logoutBtn.style.display = "block";
+        if (user.email === "admin@boutique.com") adminBtn.style.display = "block";
       } else {
-        document.getElementById('authBtn').style.display = "block";
-        document.getElementById('adminBtn').style.display = "none";
-        document.getElementById('logoutBtn').style.display = "none";
-        document.getElementById('welcomeMsg').textContent = "¡Bienvenido!";
+        welcome.textContent = "¡Bienvenido!";
+        loginBtn.style.display = "block";
+        accountBtn.style.display = "none";
+        logoutBtn.style.display = "none";
+        adminBtn.style.display = "none";
       }
     });
 
-    document.getElementById('authBtn').onclick = () => location.href = "login.html";
+    document.getElementById('loginBtn').onclick = () => location.href = "login.html";
+    document.getElementById('accountBtn').onclick = () => location.href = "perfil.html";
     document.getElementById('adminBtn').onclick = () => location.href = "admin.html";
-    document.getElementById('logoutBtn').onclick = () => signOut(auth);
+    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
 
-    // === REDES SOCIALES DESPLEGABLES CON TUS ICONOS ===
+    // REDES SOCIALES (iconos 100% visibles)
     onSnapshot(doc(db, "admin", "links"), (snap) => {
       if (!snap.exists()) return;
       const links = snap.data();
@@ -328,7 +342,7 @@
         `).join('');
     });
 
-    // === PRODUCTOS Y BÚSQUEDA ===
+    // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderProducts();
@@ -336,14 +350,12 @@
     });
 
     function renderProducts() {
-      // Carrusel
       const carrusel = allProducts.filter(p => p.type?.carrusel || p.type?.anuncio);
       document.getElementById('newProductsWrapper').innerHTML = carrusel.map(p => `
         <div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" loading="lazy"><div class="title">${p.nombre}</div>
         </div>`).join('');
 
-      // Productos normales
       const normales = allProducts.filter(p => p.type?.normal !== false && !p.type?.carrusel);
       document.getElementById('productsGrid').innerHTML = normales.map(p => `
         <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
@@ -366,7 +378,7 @@
       `).join('');
     }
 
-    // === CARRITO ===
+    // CARRITO
     function updateCart() {
       const qty = cart.reduce((a,b) => a + b.qty, 0);
       const total = cart.reduce((a,b) => a + b.precio * b.qty, 0);
@@ -398,7 +410,6 @@
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
 
-      // Animación badge
       const badge = document.getElementById('cartBadge');
       badge.style.animation = 'none';
       badge.offsetHeight;
@@ -416,7 +427,7 @@
       updateCart();
     };
 
-    // === BÚSQUEDA ===
+    // BÚSQUEDA
     document.getElementById('searchBtn').onclick = () => {
       document.getElementById('searchBarContainer').classList.add('active');
       document.getElementById('searchResultsOverlay').classList.add('active');
@@ -434,10 +445,7 @@
 
     document.getElementById('searchInput').oninput = () => {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      if (q.length < 2) {
-        document.getElementById('searchResults').innerHTML = '';
-        return;
-      }
+      if (q.length < 2) { document.getElementById('searchResults').innerHTML = ''; return; }
       const resultados = allProducts.filter(p =>
         p.nombre?.toLowerCase().includes(q) ||
         p.descripcion?.toLowerCase().includes(q) ||
@@ -454,7 +462,7 @@
         `).join('');
     };
 
-    // === MENÚS Y BOTONES ===
+    // MENÚS
     document.getElementById('menuBtn').onclick = () => {
       document.getElementById('menuSidebar').classList.add('open');
       document.getElementById('menuOverlay').classList.add('show');
@@ -470,11 +478,10 @@
     document.getElementById('socialToggle').onclick = () => document.getElementById('socialList').classList.toggle('show');
 
     document.getElementById('cartBtn').onclick = () => {
-      document.getElementById('cartSidebar').classList.add('open');
+      document.getElementById('CARTSidebar').classList.add('open');
       updateCart();
     };
     document.getElementById('closeCart').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
-
     document.getElementById('goToPay').onclick = () => location.href = 'pago.html';
 
     updateCart();
