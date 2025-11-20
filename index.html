@@ -15,10 +15,10 @@
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
 
-    /* HEADER FIJO - ICONOS NEGROS EN TODOS LOS DISPOSITIVOS */
+    /* HEADER FIJO */
     .header {
-      position: fixed; top:0; left:0; right:0; background:#fff; 
-      border-bottom:1px solid #eee; z-index:1000; padding:16px 20px; 
+      position:fixed; top:0; left:0; right:0; background:#fff; 
+      border-bottom:1px solid #eee; z-index:1000; padding:16px 20px;
       box-shadow:0 2px 10px rgba(0,0,0,0.03);
     }
     .header-inner {
@@ -27,13 +27,8 @@
     }
     .logo { font-weight:900; font-size:1.5rem; text-transform:uppercase; letter-spacing:1.5px; color:#000 !important; }
     .icon-btn { background:none; border:none; cursor:pointer; padding:8px; border-radius:8px; position:relative; }
-    
-    /* FORZAR NEGRO EN MÓVIL Y PC - ESTO FUNCIONA 100% */
     .icon-btn svg {
-      width:24px; height:24px; 
-      stroke:#000000 !important; 
-      fill:none !important;
-      stroke-width:2.5;
+      width:24px; height:24px; stroke:#000000 !important; fill:none !important; stroke-width:2.5;
     }
     #cartBadge {
       position:absolute; top:-6px; right:-6px; background:#000; color:#fff;
@@ -41,13 +36,13 @@
       display:flex; align-items:center; justify-content:center; display:none;
     }
 
-    /* ESPACIO PARA EL HEADER FIJO */
+    /* ESPACIO PARA HEADER FIJO */
     body { padding-top: 76px; }
 
-    /* BÚSQUEDA FIJA DEBAJO DEL HEADER */
+    /* BARRA DE BÚSQUEDA FIJA DEBAJO DEL HEADER */
     .search-container {
-      position: fixed; top: 76px; left:0; right:0; background:#fff; 
-      padding:16px 20px; z-index:900; border-bottom:1px solid #eee;
+      position:fixed; top:76px; left:0; right:0; background:#fff; 
+      padding:16px 20px; z-index:950; border-bottom:1px solid #eee;
       box-shadow:0 4px 15px rgba(0,0,0,0.05); display:none;
     }
     .search-container.active { display:block; }
@@ -60,18 +55,23 @@
     }
     #closeSearch { padding:10px 16px; font-size:28px; background:none; border:none; cursor:pointer; color:#111; }
 
-    /* RESULTADOS FIJOS DEBAJO DE LA BARRA DE BÚSQUEDA */
+    /* RESULTADOS DE BÚSQUEDA - AHORA QUEDAN PERFECTO DEBAJO */
     #searchResultsContainer {
-      position: fixed; top: 130px; left:20px; right:20px; background:#fff;
-      border:2px solid #111; border-top:none; border-radius:0 0 12px 12px;
-      max-height:300px; overflow-y:auto; z-index:899; 
-      box-shadow:0 10px 30px rgba(0,0,0,0.15); display:none;
+      position:fixed; 
+      top:130px; /* justo debajo de la barra de búsqueda */
+      left:20px; right:20px; 
+      background:#fff; border:2px solid #111; border-top:none; 
+      border-radius:0 0 12px 12px; max-height:340px; overflow-y:auto; 
+      z-index:949; box-shadow:0 10px 30px rgba(0,0,0,0.15); display:none;
     }
     .search-result-item {
-      display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid #eee; cursor:pointer;
+      display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid #eee; cursor:pointer;
     }
-    .search-result-item:hover { background:#f8f8f8; }
-    .search-result-item img { width:56px; height:56px; object-fit:contain; border-radius:8px; background:#fafafa; }
+    .search-result-item:hover { background:#f9f9f9; }
+    .search-result-item img { width:60px; height:60px; object-fit:contain; border-radius:8px; background:#fafafa; }
+    .search-result-item div { flex:1; }
+    .search-result-item div:first-line { font-weight:600; font-size:1rem; }
+    .search-result-item div:last-child { font-size:1.3rem; font-weight:800; margin-top:4px; }
 
     /* MENÚ LATERAL */
     .menu-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); opacity:0; visibility:hidden; transition:all .3s; z-index:1090; }
@@ -82,7 +82,7 @@
     .menu-item { padding:16px 0; border-bottom:1px solid #eee; font-weight:600; text-transform:uppercase; cursor:pointer; font-size:0.95rem; }
     .dropdown-toggle { display:flex; justify-content:space-between; align-items:center; }
     .dropdown-arrow { transition:transform .3s; width:16px; height:16px; }
-    .dropdown-toggle.active .dropdown-arrow {fficienza:transform:rotate(180deg); }
+    .dropdown-toggle.active .dropdown-arrow { transform:rotate(180deg); }
     .submenu { display:none; padding-left:20px; margin-top:8px; }
     .submenu.show { display:block; }
     .submenu-item {
@@ -90,17 +90,37 @@
       display:flex; align-items:center; gap:14px;
     }
     .submenu-item:hover { color:#111; font-weight:600; }
-    .social-icon { width:26px; height:26px; border-radius:6px; }
+    .social-icon { width:28px; height:28px; border-radius:6px; object-fit:contain; }
 
-    /* CARRITO FIJO Y CORRECTO */
+    /* CARRITO - PRODUCTOS BIEN ACOMODADOS */
     .cart-sidebar {
       position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh;
       background:#fff; transition:right .3s; z-index:1200; display:flex; flex-direction:column;
       box-shadow:-4px 0 20px rgba(0,0,0,0.08);
     }
     .cart-sidebar.open { right:0; }
+    .cart-header { padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
+    .cart-close { background:none; border:none; color:#000; font-size:32px; cursor:pointer; }
+    .cart-items { flex:1; overflow-y:auto; padding:10px 20px; }
+    .cart-item {
+      display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #eee;
+    }
+    .cart-item img.thumb {
+      width:60px; height:60px; object-fit:contain; background:#fafafa; border-radius:8px; padding:6px;
+    }
+    .cart-item div { flex:1; font-size:0.95rem; }
+    .cart-item div:first-line { font-weight:600; }
+    .cart-item small { display:block; margin-top:4px; color:#666; font-size:0.9rem; }
+    .cart-footer { padding:20px; border-top:1px solid #eee; background:#fff; }
+    .cart-total { text-align:right; font-weight:800; font-size:1.4rem; margin-bottom:16px; }
+    #goToPay { background:#000; color:#fff; padding:14px; border-radius:8px; font-weight:700; text-transform:uppercase; cursor:pointer; width:100%; }
 
-    /* CARRUSEL MEJORADO */
+    /* MAIN */
+    .main-container { max-width:1300px; margin:0 auto; padding:40px 20px; }
+    .hero-banner { padding:80px 20px; text-align:center; margin-bottom:60px; }
+    .tag { display:inline-block; background:#000; color:#fff; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:4px; margin-top:8px; text-transform:uppercase; }
+
+    /* CARRUSEL */
     .new-products-wrapper {
       display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
       -webkit-overflow-scrolling:touch; gap:16px; padding:20px 0 40px;
@@ -113,16 +133,11 @@
     }
     .new-product-card img { width:100%; height:320px; object-fit:contain; }
 
-    /* MAIN */
-    .main-container { max-width:1300px; margin:0 auto; padding:40px 20px; }
-    .hero-banner { padding:80px 20px; text-align:center; margin-bottom:60px; }
-    .tag { display:inline-block; background:#000; color:#fff; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:4px; margin-top:8px; text-transform:uppercase; }
-
+    /* GRID */
     .products-grid { display:grid; gap:28px; margin-top:48px; }
     @media (max-width:480px) { .products-grid { grid-template-columns:repeat(2,1fr); gap:16px; } }
     @media (min-width:481px) and (max-width:900px) { .products-grid { grid-template-columns:repeat(3,1fr); } }
     @media (min-width:901px) { .products-grid { grid-template-columns:repeat(4,1fr); } }
-
     .product-card { text-align:center; cursor:pointer; }
     .product-card img { width:100%; height:260px; object-fit:contain; }
     .product-title { font-weight:700; font-size:1.2rem; margin:12px 0 6px; }
@@ -139,7 +154,7 @@
 
   <div class="menu-overlay" id="menuOverlay"></div>
 
-  <!-- HEADER FIJO -->
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <button id="menuBtn" class="icon-btn">
@@ -159,7 +174,7 @@
       </div>
     </div>
 
-    <!-- BÚSQUEDA FIJA -->
+    <!-- BÚSQUEDA -->
     <div class="search-container" id="searchContainer">
       <div class="search-bar">
         <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
@@ -168,7 +183,7 @@
     </div>
   </header>
 
-  <!-- RESULTADOS DE BÚSQUEDA FIJOS -->
+  <!-- RESULTADOS DE BÚSQUEDA -->
   <div id="searchResultsContainer"><div id="searchResults"></div></div>
 
   <main class="main-container">
@@ -221,7 +236,7 @@
       <button class="cart-close" id="closeCart">×</button>
     </div>
     <div class="cart-items" id="cartItems">
-      <p class="empty-cart">Tu carrito está vacío</p>
+      <p style="text-align:center;color:#999;padding:60px 20px;">Tu carrito está vacío</p>
     </div>
     <div class="cart-footer">
       <div class="cart-total" id="cartTotal">Total: $0</div>
@@ -249,6 +264,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    // Elementos
     const searchBtn = document.getElementById('searchBtn');
     const searchContainer = document.getElementById('searchContainer');
     const closeSearch = document.getElementById('closeSearch');
@@ -291,7 +307,7 @@
       }
     });
 
-    // CATEGORÍAS POR TIPO
+    // CATEGORÍAS
     const tiposSet = new Set();
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -305,7 +321,7 @@
       renderProducts();
     });
 
-    // REDES SOCIALES CON ICONOS REALES
+    // REDES SOCIALES CON ICONOS
     onSnapshot(doc(db, "admin", "links"), (snap) => {
       if (snap.exists()) {
         const links = snap.data();
@@ -339,11 +355,7 @@
       if (q.length < 2) { searchResultsContainer.style.display = 'none'; return; }
 
       const results = allProducts
-        .filter(p => 
-          (p.nombre?.toLowerCase().includes(q)) ||
-          (p.descripcion?.toLowerCase().includes(q)) ||
-          (p.tipo?.toLowerCase().includes(q))
-        )
+        .filter(p => (p.nombre?.toLowerCase().includes(q)) || (p.descripcion?.toLowerCase().includes(q)) || (p.tipo?.toLowerCase().includes(q)))
         .slice(0, 5);
 
       searchResults.innerHTML = results.length === 0 
@@ -352,8 +364,8 @@
           <div class="search-result-item" onclick="location.href='product.html?id=${p.id}'">
             <img src="${p.imagen}" loading="lazy">
             <div>
-              <div style="font-weight:600;">${p.nombre}</div>
-              <div style="font-size:1.3rem;font-weight:800;">$${p.precio.toLocaleString()}</div>
+              <div>${p.nombre}</div>
+              <div>$${p.precio.toLocaleString()}</div>
             </div>
           </div>
         `).join('');
@@ -361,26 +373,23 @@
       searchResultsContainer.style.display = results.length ? 'block' : 'none';
     };
 
+    // RENDER Y CARRITO
     function renderProducts() {
-      document.getElementById('newProductsWrapper').innerHTML = allProducts
-        .filter(p => p.type?.carrusel || p.type?.anuncio)
-        .map(p => `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
-          <img src="${p.imagen}" loading="lazy">
-        </div>`).join('');
+      document.getElementById('newProductsWrapper').innerHTML = allProducts.filter(p => p.type?.carrusel).map(p => 
+        `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'"><img src="${p.imagen}" loading="lazy"></div>`
+      ).join('');
 
-      document.getElementById('productsGrid').innerHTML = allProducts
-        .filter(p => p.type?.normal !== false && !p.type?.carrusel)
-        .map(p => `
-          <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
-            <img src="${p.imagen}" loading="lazy">
-            <div class="product-title">${p.nombre}</div>
-            <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
-              ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
-              <spanura class="price ${p.precioAntiguo?'offer-price':''}">$${p.precio.toLocaleString()}</span>
-            </div>
-            <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
+      document.getElementById('productsGrid').innerHTML = allProducts.filter(p => !p.type?.carrusel).map(p => `
+        <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
+          <img src="${p.imagen}" loading="lazy">
+          <div class="product-title">${p.nombre}</div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+            ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+            <span class="price ${p.precioAntiguo?'offer-price':''}">$${p.precio.toLocaleString()}</span>
           </div>
-        `).join('');
+          <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
+        </div>
+      `).join('');
     }
 
     function updateCart() {
@@ -389,12 +398,12 @@
       cartBadge.textContent = qty;
       cartBadge.style.display = qty>0 ? 'flex' : 'none';
       cartTotal.textContent = `Total: $${total.toLocaleString()}`;
-      cartItems.innerHTML = cart.length===0 ? '<p class="empty-cart">Tu carrito está vacío</p>' :
+      cartItems.innerHTML = cart.length===0 ? '<p style="text-align:center;color:#999;padding:60px 20px;">Tu carrito está vacío</p>' :
         cart.map((item,i)=>`
           <div class="cart-item">
             <img src="${item.imagen}" class="thumb">
-            <div style="flex:1;">
-              <div style="font-weight:600;">${item.nombre}</div>
+            <div>
+              <div>${item.nombre}</div>
               <small>x${item.qty} • $${(item.precio*item.qty).toLocaleString()}</small>
             </div>
             <button onclick="removeFromCart(${i})" style="background:none;border:none;font-size:28px;cursor:pointer;color:#999;">×</button>
@@ -416,6 +425,7 @@
 
     window.removeFromCart = i => { cart.splice(i,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); };
 
+    // UI
     menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
     [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesSubmenu').classList.toggle('show');
