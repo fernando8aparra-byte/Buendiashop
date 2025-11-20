@@ -13,11 +13,9 @@
       -webkit-tap-highlight-color:transparent;
     }
     button, input, a { -webkit-tap-highlight-color:transparent; outline:none; }
-
     h1,h2 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
-
     /* HEADER FIJO */
     .header {
       position:fixed; top:0; left:0; right:0; background:#fff;
@@ -42,8 +40,7 @@
       display:flex; align-items:center; justify-content:center; display:none;
     }
     body { padding-top:76px; }
-
-    /* BARRA DE BÚSQUEDA FIJA AL TOCAR LUPA */
+    /* BARRA DE BÚSQUEDA FIJA */
     .search-bar-container {
       position:fixed; top:76px; left:0; right:0; background:#fff;
       border-bottom:2px solid #000; padding:16px 20px;
@@ -56,7 +53,6 @@
     .close-search-x {
       background:none; border:none; font-size:36px; cursor:pointer; color:#000;
     }
-
     /* RESULTADOS DE BÚSQUEDA */
     .search-results-overlay {
       position:fixed; top:140px; left:0; right:0; bottom:0; background:#fff;
@@ -74,7 +70,6 @@
     }
     .result-name { font-weight:600; font-size:0.95rem; margin:10px 0 4px; }
     .result-price { font-weight:700; font-size:1.1rem; color:#e63946; }
-
     /* MENÚ HAMBURGUESA */
     .menu-overlay {
       position:fixed; inset:0; background:rgba(0,0,0,0.4);
@@ -108,8 +103,7 @@
     }
     .submenu-item:hover { color:#111; font-weight:600; }
     .social-icon { width:28px; height:28px; object-fit:contain; }
-
-    /* CARRITO Y PRODUCTOS (igual que antes) */
+    /* CARRITO */
     .cart-sidebar { position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh; background:#fff; transition:right .3s; z-index:1200; display:flex; flex-direction:column; }
     .cart-sidebar.open { right:0; }
     .cart-header { padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; }
@@ -120,22 +114,18 @@
     .cart-footer { padding:20px; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
     .cart-total { text-align:right; font-weight:800; font-size:1.4rem; margin-bottom:16px; }
     #goToPay { background:#000; color:#fff; padding:16px; border-radius:8px; font-weight:700; text-transform:uppercase; cursor:pointer; width:100%; display:none; }
-
     .main-container { max-width:1300px; margin:0 auto; padding:40px 20px 100px; }
     .hero-banner { padding:100px 20px 60px; text-align:center; }
     .tag { display:inline-block; background:#000; color:#fff; font-size:0.85rem; font-weight:700; padding:8px 16px; border-radius:6px; margin-top:16px; text-transform:uppercase; }
-
     .new-products-wrapper { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:16px; padding:20px 0 60px; scrollbar-width:none; }
     .new-products-wrapper::-webkit-scrollbar { display:none; }
     .new-product-card { min-width:260px; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.15); cursor:pointer; scroll-snap-align:center; }
     .new-product-card img { width:100%; height:320px; object-fit:contain; background:#fafafa; }
     .new-product-card .title { padding:16px; text-align:center; font-weight:700; font-size:1rem; background:#fff; }
-
     .products-grid { display:grid; gap:28px; margin-top:48px; }
     @media (max-width:480px) { .products-grid { grid-template-columns:repeat(2,1fr); gap:16px; } }
     @media (min-width:481px) and (max-width:900px) { .products-grid { grid-template-columns:repeat(3,1fr); } }
     @media (min-width:901px) { .products-grid { grid-template-columns:repeat(4,1fr); } }
-
     .product-card { text-align:center; cursor:pointer; }
     .product-card img { width:100%; height:260px; object-fit:contain; }
     .product-title { font-weight:700; font-size:1.2rem; margin:12px 0 6px; }
@@ -143,17 +133,37 @@
     .old-price { font-size:1rem; color:#999; text-decoration:line-through; margin-right:8px; }
     .offer-price { color:#e63946; }
     .add-btn { background:#000; color:#fff; border:none; padding:14px; border-radius:8px; margin-top:12px; width:100%; font-weight:700; text-transform:uppercase; cursor:pointer; }
-
     .toast {
       position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
       background:#000; color:#fff; padding:14px 28px; border-radius:8px;
       font-weight:700; z-index:1300; opacity:0; transition:all .35s; text-transform:uppercase;
     }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(-20px); }
+
+    /* MODAL DE CONTACTO */
+    .contact-modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:1400;
+    }
+    .contact-modal.show { display:flex; }
+    .contact-box {
+      background:#fff; padding:30px; border-radius:16px; max-width:320px; width:90%; position:relative; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.2);
+    }
+    .contact-close {
+      position:absolute; top:12px; right:16px; background:none; border:none; font-size:32px; cursor:pointer; color:#000;
+    }
+    .contact-box h3 {
+      font-weight:800; text-transform:uppercase; margin-bottom:20px; font-size:1.4rem;
+    }
+    .social-grid {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+    }
+    .social-grid img {
+      width:50px; height:50px; object-fit:contain; filter: brightness(0); transition:0.3s;
+    }
+    .social-grid img:hover { transform:scale(1.15); }
   </style>
 </head>
 <body>
-
   <div class="menu-overlay" id="menuOverlay"></div>
 
   <!-- HEADER -->
@@ -177,13 +187,12 @@
     </div>
   </header>
 
-  <!-- BARRA DE BÚSQUEDA FIJA -->
+  <!-- BARRA DE BÚSQUEDA -->
   <div class="search-bar-container" id="searchBarContainer">
     <input type="text" class="search-bar-input" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
     <button class="close-search-x" id="closeSearch">×</button>
   </div>
 
-  <!-- RESULTADOS DE BÚSQUEDA -->
   <div class="search-results-overlay" id="searchResultsOverlay">
     <div class="search-results-grid" id="searchResults"></div>
   </div>
@@ -203,23 +212,20 @@
     </section>
   </main>
 
-  <!-- MENÚ HAMBURGUESA -->
+  <!-- MENÚ LATERAL -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg">¡Bienvenido!</div>
-
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
       <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
     <div class="submenu" id="categoriesList"></div>
-
     <div class="menu-item dropdown-toggle" id="socialToggle">
       Mis redes sociales
       <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
     <div class="submenu" id="socialList"></div>
-
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
     <div class="menu-item" id="authBtn">Inicia sesión o regístrate</div>
     <div class="menu-item" id="adminBtn" style="display:none;">Ir a página de administrador</div>
@@ -241,12 +247,20 @@
     </div>
   </aside>
 
+  <!-- MODAL DE CONTACTO -->
+  <div class="contact-modal" id="contactModal">
+    <div class="contact-box">
+      <button class="contact-close" id="closeContact">×</button>
+      <h3>Contáctame</h3>
+      <div class="social-grid" id="contactSocials"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
@@ -259,8 +273,67 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
 
+    let allProducts = [];
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    let socialLinks = {};
+
+    // TÍTULO Y SUBTÍTULO DESDE admin/textos
+    onSnapshot(doc(db, "admin", "textos"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data().hero || {};
+        document.getElementById('heroTitle').textContent = data.titulo || "Boutique Buendía";
+        document.getElementById('heroSubtitle').textContent = data.subtitulo || "Nueva colección";
+      }
+    });
+
+    // REDES SOCIALES (para menú y modal)
+    onSnapshot(doc(db, "admin", "links"), (snap) => {
+      if (!snap.exists()) return;
+      socialLinks = snap.data();
+
+      const icons = {
+        instagram: "https://img.icons8.com/ios-filled/50/ffffff/instagram-new--v1.png",
+        tiktok: "https://img.icons8.com/ios-filled/50/ffffff/tiktok.png",
+        facebook: "https://img.icons8.com/ios-filled/50/ffffff/facebook-new.png",
+        youtube: "https://img.icons8.com/ios-filled/50/ffffff/youtube.png",
+        whatsapp: "https://img.icons8.com/ios-filled/50/ffffff/whatsapp.png"
+      };
+
+      // Menú hamburguesa
+      document.getElementById('socialList').innerHTML = Object.keys(socialLinks)
+        .filter(k => socialLinks[k])
+        .map(k => `
+          <div class="submenu-item" onclick="window.open('${socialLinks[k]}','_blank')">
+            <img src="${icons[k] || 'https://img.icons8.com/ios-filled/50/ffffff/link.png'}" class="social-icon">
+            <span>${k.charAt(0).toUpperCase() + k.slice(1)}</span>
+          </div>
+        `).join('');
+
+      // Modal de contacto
+      document.getElementById('contactSocials').innerHTML = Object.keys(socialLinks)
+        .filter(k => socialLinks[k])
+        .map(k => `
+          <a href="${socialLinks[k]}" target="_blank">
+            <img src="${icons[k] || 'https://img.icons8.com/ios-filled/50/000000/link.png'}" alt="${k}">
+          </a>
+        `).join('');
+    });
+
+    // MODAL DE CONTACTO
+    document.getElementById('helpBtn').onclick = () => {
+      document.getElementById('contactModal').classList.add('show');
+    };
+    document.getElementById('closeContact').onclick = () => {
+      document.getElementById('contactModal').classList.remove('show');
+    };
+    document.getElementById('contactModal').onclick = (e) => {
+      if (e.target === document.getElementById('contactModal')) {
+        document.getElementById('contactModal').classList.remove('show');
+      }
+    };
+
+    // Resto del código (búsqueda, productos, carrito...) igual que antes
     const searchBtn = document.getElementById('searchBtn');
     const searchBarContainer = document.getElementById('searchBarContainer');
     const searchInput = document.getElementById('searchInput');
@@ -269,18 +342,12 @@
     const searchResults = document.getElementById('searchResults');
     const mainContent = document.getElementById('mainContent');
 
-    let allProducts = [];
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-    // ABRIR BÚSQUEDA
     searchBtn.onclick = () => {
       searchBarContainer.classList.add('active');
       searchResultsOverlay.classList.add('active');
       mainContent.style.display = 'none';
       setTimeout(() => searchInput.focus(), 300);
     };
-
-    // CERRAR BÚSQUEDA
     closeSearch.onclick = () => {
       searchBarContainer.classList.remove('active');
       searchResultsOverlay.classList.remove('active');
@@ -288,20 +355,14 @@
       searchInput.value = '';
       searchResults.innerHTML = '';
     };
-
-    // BUSCAR EN TIEMPO REAL
     searchInput.oninput = () => {
       const query = searchInput.value.toLowerCase().trim();
-      if (query.length < 2) {
-        searchResults.innerHTML = '';
-        return;
-      }
+      if (query.length < 2) { searchResults.innerHTML = ''; return; }
       const filtered = allProducts.filter(p =>
         p.nombre?.toLowerCase().includes(query) ||
         p.descripcion?.toLowerCase().includes(query) ||
         p.tipo?.toLowerCase().includes(query)
       );
-
       searchResults.innerHTML = filtered.length === 0
         ? '<div style="text-align:center;padding:80px;color:#999;">No se encontraron productos</div>'
         : filtered.map(p => `
@@ -313,11 +374,15 @@
         `).join('');
     };
 
-    // CARGAR PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderProducts();
-      loadCategoriesFromFirebase();
+      const tipos = [...new Set(allProducts.map(p => p.tipo).filter(Boolean))].sort();
+      document.getElementById('categoriesList').innerHTML = tipos.map(tipo => `
+        <div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(tipo)}'">
+          ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+        </div>
+      `).join('');
     });
 
     function renderProducts() {
@@ -340,38 +405,6 @@
         </div>`).join('');
     }
 
-    // CATEGORÍAS REALES DESDE FIREBASE
-    function loadCategoriesFromFirebase() {
-      const tipos = [...new Set(allProducts.map(p => p.tipo).filter(Boolean))].sort();
-      document.getElementById('categoriesList').innerHTML = tipos.map(tipo => `
-        <div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(tipo)}'">
-          ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-        </div>
-      `).join('');
-    }
-
-    // REDES SOCIALES CON ICONOS DESDE FIREBASE
-    onSnapshot(doc(db, "admin", "links"), (snap) => {
-      if (!snap.exists()) return;
-      const links = snap.data();
-      const icons = {
-        instagram: "https://img.icons8.com/ios-filled/100/000000/instagram-new.png",
-        tiktok: "https://img.icons8.com/ios-filled/100/000000/tiktok.png",
-        facebook: "https://img.icons8.com/ios-filled/100/000000/facebook-new.png",
-        youtube: "https://img.icons8.com/ios-filled/100/000000/youtube.png",
-        whatsapp: "https://img.icons8.com/ios-filled/100/000000/whatsapp.png"
-      };
-      document.getElementById('socialList').innerHTML = Object.keys(links)
-        .filter(key => links[key])
-        .map(key => `
-          <div class="submenu-item" onclick="window.open('${links[key]}','_blank')">
-            <img src="${icons[key] || 'https://img.icons8.com/ios-filled/100/000000/link.png'}" class="social-icon">
-            <span>${key.charAt(0).toUpperCase() + key.slice(1)}</span>
-          </div>
-        `).join('');
-    });
-
-    // CARRITO (funciona igual)
     function updateCart() {
       const qty = cart.reduce((a,b) => a + b.qty, 0);
       const total = cart.reduce((a,b) => a + b.precio * b.qty, 0);
@@ -387,19 +420,21 @@
           </div>`).join('');
       document.getElementById('goToPay').style.display = cart.length > 0 ? 'block' : 'none';
     }
+
     window.addToCart = (id) => {
       const p = allProducts.find(x => x.id === id);
       const existe = cart.find(x => x.id === id);
       existe ? existe.qty++ : cart.push({...p, qty:1});
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-      document.getElementById('toast').textContent = '¡Agregado!';
-      document.getElementById('toast').classList.add('show');
-      setTimeout(() => document.getElementById('toast').classList.remove('show'), 2500);
+      const toast = document.getElementById('toast');
+      toast.textContent = '¡Agregado!';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
     };
+
     window.removeFromCart = (i) => { cart.splice(i,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); };
 
-    // MENÚ Y UI
     document.getElementById('menuBtn').onclick = () => {
       document.getElementById('menuSidebar').classList.add('open');
       document.getElementById('menuOverlay').classList.add('show');
