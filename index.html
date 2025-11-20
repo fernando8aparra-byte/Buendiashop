@@ -16,7 +16,6 @@
     h1,h2 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
-
     /* HEADER */
     .header {
       position:fixed; top:0; left:0; right:0; background:#fff;
@@ -35,17 +34,14 @@
       position:relative;
     }
     .icon-btn svg { width:26px; height:26px; stroke:#000; stroke-width:2.7; fill:none; }
-
     /* BADGE CARRITO */
     #cartBadge {
-      position:absolute; top:-8px; right:-10px; 
+      position:absolute; top:-8px; right:-10px;
       background:none; color:#000; font-size:14px; font-weight:900;
       min-width:20px; height:20px; display:flex; align-items:center; justify-content:center;
     }
     @keyframes shake { 0%,100% { transform:translateX(0); } 20%,60% { transform:translateX(-4px); } 40%,80% { transform:translateX(4px); } }
-
     body { padding-top:76px; }
-
     /* BÚSQUEDA */
     .search-bar-container {
       position:fixed; top:76px; left:0; right:0; background:#fff;
@@ -73,7 +69,6 @@
     }
     .result-name { font-weight:600; font-size:0.82rem; margin:6px 0 3px; }
     .result-price { font-weight:700; font-size:0.95rem; color:#e63946; }
-
     /* MENÚ HAMBURGUESA */
     .menu-overlay {
       position:fixed; inset:0; background:rgba(0,0,0,0.4); opacity:0; visibility:hidden;
@@ -107,7 +102,6 @@
     }
     .submenu-item:hover { color:#111; font-weight:600; }
     .social-icon { width:26px; height:26px; object-fit:contain; }
-
     /* CARRITO */
     .cart-sidebar {
       position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh;
@@ -133,12 +127,10 @@
     .cart-total { text-align:right; font-weight:800; font-size:1.4rem; margin-bottom:16px; }
     #goToPay { background:#000; color:#fff; padding:16px; border-radius:8px; font-weight:700;
       text-transform:uppercase; cursor:pointer; width:100%; display:none; }
-
     .main-container { max-width:1300px; margin:0 auto; padding:40px 20px 100px; }
     .hero-banner { padding:100px 20px 60px; text-align:center; }
     .tag { display:inline-block; background:#000; color:#fff; font-size:0.85rem; font-weight:700;
       padding:8px 16px; border-radius:6px; margin-top:16px; text-transform:uppercase; }
-
     .new-products-wrapper { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; gap:16px;
       padding:20px 0 60px; scrollbar-width:none; }
     .new-products-wrapper::-webkit-scrollbar { display:none; }
@@ -146,12 +138,10 @@
       box-shadow:0 10px 30px rgba(0,0,0,0.15); cursor:pointer; scroll-snap-align:center; }
     .new-product-card img { width:100%; height:320px; object-fit:contain; background:#fafafa; }
     .new-product-card .title { padding:16px; text-align:center; font-weight:700; font-size:1rem; background:#fff; }
-
     .products-grid { display:grid; gap:28px; margin-top:48px; }
     @media (max-width:480px) { .products-grid { grid-template-columns:repeat(2,1fr); gap:16px; } }
     @media (min-width:481px) and (max-width:900px) { .products-grid { grid-template-columns:repeat(3,1fr); } }
     @media (min-width:901px) { .products-grid { grid-template-columns:repeat(4,1fr); } }
-
     .product-card { text-align:center; cursor:pointer; }
     .product-card img { width:100%; height:260px; object-fit:contain; }
     .product-title { font-weight:700; font-size:1.2rem; margin:12px 0 6px; }
@@ -160,7 +150,6 @@
     .offer-price { color:#e63946; }
     .add-btn { background:#000; color:#fff; border:none; padding:14px; border-radius:8px;
       margin-top:12px; width:100%; font-weight:700; text-transform:uppercase; cursor:pointer; }
-
     .toast {
       position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
       background:#000; color:#fff; padding:14px 28px; border-radius:8px;
@@ -171,7 +160,6 @@
 </head>
 <body>
   <div class="menu-overlay" id="menuOverlay"></div>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
@@ -192,7 +180,6 @@
       </div>
     </div>
   </header>
-
   <!-- BÚSQUEDA -->
   <div class="search-bar-container" id="searchBarContainer">
     <input type="text" class="search-bar-input" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
@@ -201,7 +188,6 @@
   <div class="search-results-overlay" id="searchResultsOverlay">
     <div class="search-results-grid" id="searchResults"></div>
   </div>
-
   <main class="main-container" id="mainContent">
     <section class="hero-banner">
       <h1 id="heroTitle">Cargando...</h1>
@@ -216,33 +202,27 @@
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
-
   <!-- MENÚ LATERAL -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg">¡Bienvenido!</div>
-
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
       <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
     <div class="submenu" id="categoriesList"></div>
-
     <div class="menu-item dropdown-toggle" id="socialToggle">
       Mis redes sociales
       <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
     <div class="submenu" id="socialList"></div>
-
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-
     <!-- BOTONES DE CUENTA -->
     <div class="menu-item" id="accountBtn" style="display:none;">Mi cuenta</div>
     <div class="menu-item" id="logoutBtn" style="display:none; color:#e63946;">Cerrar sesión</div>
     <div class="menu-item" id="adminBtn" style="display:none;">Ir a administrador</div>
     <div class="menu-item" id="loginBtn">Inicia sesión o regístrate</div>
   </aside>
-
   <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
@@ -257,14 +237,11 @@
       <button id="goToPay">Ir a Pago</button>
     </div>
   </aside>
-
   <div class="toast" id="toast"></div>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -273,14 +250,11 @@
       messagingSenderId: "430651152709",
       appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
     // TÍTULO Y SUBTÍTULO
     onSnapshot(doc(db, "textos", "hero"), (snap) => {
       if (snap.exists()) {
@@ -289,7 +263,6 @@
         document.getElementById('heroSubtitle').textContent = d.subtitulo || "Nueva colección";
       }
     });
-
     // INICIO DE SESIÓN + NOMBRE EN MENÚ
     onAuthStateChanged(auth, (user) => {
       const welcome = document.getElementById('welcomeMsg');
@@ -297,7 +270,6 @@
       const accountBtn = document.getElementById('accountBtn');
       const logoutBtn = document.getElementById('logoutBtn');
       const adminBtn = document.getElementById('adminBtn');
-
       if (user) {
         const nombre = user.displayName || user.email.split('@')[0];
         welcome.textContent = `¡Bienvenido, ${nombre.charAt(0).toUpperCase() + nombre.slice(1)}!`;
@@ -313,17 +285,14 @@
         adminBtn.style.display = "none";
       }
     });
-
     document.getElementById('loginBtn').onclick = () => location.href = "login.html";
     document.getElementById('accountBtn').onclick = () => location.href = "perfil.html";
     document.getElementById('adminBtn').onclick = () => location.href = "admin.html";
     document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
-
-    // REDES SOCIALES (iconos 100% visibles)
+    // REDES SOCIALES
     onSnapshot(doc(db, "admin", "links"), (snap) => {
       if (!snap.exists()) return;
       const links = snap.data();
-
       const icons = {
         facebook: "https://img.icons8.com/?size=100&id=118497&format=png&color=000000",
         instagram: "https://img.icons8.com/?size=100&id=32323&format=png&color=000000",
@@ -331,7 +300,6 @@
         twitter: "https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000",
         tiktok: "https://img.icons8.com/?size=100&id=118640&format=png&color=000000"
       };
-
       document.getElementById('socialList').innerHTML = Object.keys(links)
         .filter(k => links[k])
         .map(k => `
@@ -341,21 +309,18 @@
           </div>
         `).join('');
     });
-
     // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderProducts();
       loadCategories();
     });
-
     function renderProducts() {
       const carrusel = allProducts.filter(p => p.type?.carrusel || p.type?.anuncio);
       document.getElementById('newProductsWrapper').innerHTML = carrusel.map(p => `
         <div class="new-product-card" onclick="location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" loading="lazy"><div class="title">${p.nombre}</div>
         </div>`).join('');
-
       const normales = allProducts.filter(p => p.type?.normal !== false && !p.type?.carrusel);
       document.getElementById('productsGrid').innerHTML = normales.map(p => `
         <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
@@ -368,7 +333,6 @@
           <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
         </div>`).join('');
     }
-
     function loadCategories() {
       const tipos = [...new Set(allProducts.map(p => p.tipo).filter(Boolean))].sort();
       document.getElementById('categoriesList').innerHTML = tipos.map(t => `
@@ -377,7 +341,6 @@
         </div>
       `).join('');
     }
-
     // CARRITO
     function updateCart() {
       const qty = cart.reduce((a,b) => a + b.qty, 0);
@@ -385,7 +348,6 @@
       const badge = document.getElementById('cartBadge');
       badge.textContent = qty;
       badge.style.display = qty > 0 ? 'flex' : 'none';
-
       document.getElementById('cartTotal').textContent = `Total: $${total.toLocaleString()}`;
       document.getElementById('cartItems').innerHTML = cart.length === 0
         ? '<p style="text-align:center;color:#999;padding:60px;">Tu carrito está vacío</p>'
@@ -399,34 +361,28 @@
             <button class="cart-item-remove" onclick="removeFromCart(${i})">×</button>
           </div>
         `).join('');
-
       document.getElementById('goToPay').style.display = cart.length > 0 ? 'block' : 'none';
     }
-
     window.addToCart = (id) => {
       const p = allProducts.find(x => x.id === id);
       const existe = cart.find(x => x.id === id);
       existe ? existe.qty++ : cart.push({...p, qty:1});
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-
       const badge = document.getElementById('cartBadge');
       badge.style.animation = 'none';
       badge.offsetHeight;
       badge.style.animation = 'shake 0.5s ease-in-out';
-
       const toast = document.getElementById('toast');
       toast.textContent = '¡Agregado!';
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2500);
     };
-
     window.removeFromCart = (i) => {
       cart.splice(i, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
     };
-
     // BÚSQUEDA
     document.getElementById('searchBtn').onclick = () => {
       document.getElementById('searchBarContainer').classList.add('active');
@@ -434,7 +390,6 @@
       document.getElementById('mainContent').style.display = 'none';
       setTimeout(() => document.getElementById('searchInput').focus(), 300);
     };
-
     document.getElementById('closeSearch').onclick = () => {
       document.getElementById('searchBarContainer').classList.remove('active');
       document.getElementById('searchResultsOverlay').classList.remove('active');
@@ -442,7 +397,6 @@
       document.getElementById('searchInput').value = '';
       document.getElementById('searchResults').innerHTML = '';
     };
-
     document.getElementById('searchInput').oninput = () => {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
       if (q.length < 2) { document.getElementById('searchResults').innerHTML = ''; return; }
@@ -461,7 +415,6 @@
           </div>
         `).join('');
     };
-
     // MENÚS
     document.getElementById('menuBtn').onclick = () => {
       document.getElementById('menuSidebar').classList.add('open');
@@ -473,17 +426,16 @@
         document.getElementById('menuOverlay').classList.remove('show');
       };
     });
-
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesList').classList.toggle('show');
     document.getElementById('socialToggle').onclick = () => document.getElementById('socialList').classList.toggle('show');
 
+    // ← AQUÍ ESTABA EL ERROR (CARTSidebar → cartSidebar)
     document.getElementById('cartBtn').onclick = () => {
-      document.getElementById('CARTSidebar').classList.add('open');
+      document.getElementById('cartSidebar').classList.add('open');
       updateCart();
     };
     document.getElementById('closeCart').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
     document.getElementById('goToPay').onclick = () => location.href = 'pago.html';
-
     updateCart();
   </script>
 </body>
