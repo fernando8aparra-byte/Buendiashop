@@ -69,13 +69,6 @@
     @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
 
     /* EDITABLE TEXT */
-    [contenteditable="true"] {
-      outline: none;
-      cursor: text;
-      padding: 4px;
-      border-radius: 4px;
-      position: relative;
-    }
     [contenteditable="true"].editing {
       outline: 2px dashed #0066ff;
       background: rgba(0, 102, 255, 0.08);
@@ -95,24 +88,19 @@
     }
     .text-edit-controls button.cancel { background: #999; }
 
-    /* CANTIDAD DISPONIBLE: CUADRADO + */
-    .available-container {
-      display: flex; align-items: center; gap: 12px; margin: 15px 0;
-    }
+    /* CANTIDAD DISPONIBLE */
+    .available-container { display: flex; align-items: center; gap: 12px; margin: 15px 0; }
     #availableBox {
       width: 36px; height: 36px; border: 2px solid #000; border-radius: 8px;
       display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
       cursor: pointer; user-select: none; font-weight: bold; color: #000;
     }
-    #availableInput {
-      display: none;
-    }
-    #availableInput input {
-      width: 70px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px;
-    }
-    .available-label {
-      margin: 4px 0 0; font-size: 0.85rem; color: #555; line-height: 1.3;
-    }
+    #availableInput { display: none; }
+    #availableInput input { width: 70px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px; }
+    .available-label { margin: 4px 0 0; font-size: 0.85rem; color: #555; line-height: 1.3; }
+
+    /* PREVIEW IMAGEN */
+    #imagePreview img { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -184,7 +172,7 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- BOTONES DE EDICIÓN DE TEXTOS -->
+  <!-- CONTROLES EDICIÓN TEXTO -->
   <div class="text-edit-controls" id="textEditControls">
     <button id="saveTextChanges">Guardar Cambios</button>
     <button id="cancelTextChanges" class="cancel">No Guardar</button>
@@ -225,31 +213,33 @@
         <option value="publicidad">Estrella</option>
       </select>
 
-     <!-- CANTIDAD DISPONIBLE: CUADRADO + -->
-<div class="available-container">
-  <div id="availableBox">+</div>
-  <div>
-    <div id="availableInput">
-      <input type="number" id="addAvailableCount" min="0" max="999" value="0">
-    </div>
-    <p class="available-label">Cantidad de producto disponible</p>
-  </div>
-</div>
+      <div class="available-container">
+        <div id="availableBox">+</div>
+        <div>
+          <div id="availableInput">
+            <input type="number" id="addAvailableCount" min="0" max="999" value="0">
+          </div>
+          <p class="available-label">Cantidad de producto disponible</p>
+        </div>
+      </div>
 
       <div class="image-upload-section">
-        <label>Subir imagen:</label>
+        <label>Subir imagen desde tu celular/PC:</label>
         <input type="file" id="addImageFile" accept="image/*">
         <div id="imagePreview" style="display:none; text-align:center; margin:10px 0;">
           <img id="previewImg" style="max-width:100%; max-height:200px; border-radius:8px;">
         </div>
       </div>
+
       <div class="image-url-section">
-        <label>O URL:</label>
+        <label>O pegar URL (opcional):</label>
         <input type="text" id="addImage" placeholder="https://...">
       </div>
-      <p style="font-size:0.8rem; color:#d00; margin:10px 0 0;">
-        Usa una URL por ahora.
+
+      <p style="font-size:0.9rem; color:#080; font-weight:bold; margin:10px 0 0;">
+        Ahora puedes subir imágenes directamente
       </p>
+
       <button id="saveNewProduct">Guardar Producto</button>
       <button id="cancelAdd" style="background:#999;">Cancelar</button>
     </div>
@@ -280,6 +270,307 @@
     <p>© 2025 Efraín Shop. Admin Mode.</p>
   </footer>
 
-  <script type="module" src="js/admin.js"></script>
+  <!-- FIREBASE + JS COMPLETO -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+      getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+      onSnapshot, query, where, setDoc
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // === PROTEGER ADMIN ===
+    if (!localStorage.getItem('isAdmin')) {
+      window.location.href = 'login.html';
+    }
+
+    let textEditMode = false;
+    let textChanges = {};
+
+    // === SUBIR IMAGEN ===
+    async function uploadImageAndGetURL(file) {
+      if (!file) return null;
+      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+      const storageRef = ref(storage, `productos/${fileName}`);
+      try {
+        showToast("Subiendo imagen...");
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        showToast("¡Imagen subida!");
+        return url;
+      } catch (e) {
+        console.error(e);
+        showToast("Error al subir imagen");
+        return null;
+      }
+    }
+
+    // === VISTA PREVIA ===
+    document.getElementById('addImageFile').addEventListener('change', e => {
+      const file = e.target.files[0];
+      const preview = document.getElementById('imagePreview');
+      const img = document.getElementById('previewImg');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          img.src = ev.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+      }
+    });
+
+    // === CARGAR TEXTOS EDITABLES ===
+    function loadEditableTexts() {
+      document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        const coll = el.dataset.collection;
+        const docu = el.dataset.doc;
+        const field = el.dataset.field;
+        onSnapshot(doc(db, coll, docu), snap => {
+          if (snap.exists() && snap.data()[field] !== undefined) {
+            const value = snap.data()[field];
+            if (el.textContent.trim() !== value) el.textContent = value;
+          }
+        });
+        el.addEventListener('input', () => {
+          const key = `${coll}|${docu}|${field}`;
+          textChanges[key] = el.textContent.trim();
+        });
+      });
+    }
+
+    // === CARGAR PRODUCTOS ===
+    function loadProductsByType(typeKey, containerId) {
+      const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
+      const unsubscribe = onSnapshot(q, snapshot => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const products = [];
+        snapshot.forEach(docSnap => {
+          const data = { id: docSnap.id, ...docSnap.data() };
+          products.push(data);
+          container.appendChild(createProductCard(data, typeKey));
+        });
+        const section = container.parentElement.parentElement;
+        if (products.length >= 4) section.classList.add('auto-scroll');
+        else section.classList.add('static-display');
+        if (section.classList.contains('auto-scroll') && !container.dataset.duplicated) {
+          const clone = container.cloneNode(true);
+          clone.id += '-clone';
+          container.appendChild(clone);
+          container.dataset.duplicated = 'true';
+        }
+      });
+    }
+
+    function createProductCard(p, sectionType) {
+      const div = document.createElement('div');
+      div.className = 'product-card';
+      div.dataset.id = p.id;
+      const stockInfo = p.disponibles > 0
+        ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>`
+        : '<p style="color:#c00; font-weight:bold;">Agotado</p>';
+
+      if (sectionType === 'normal') {
+        div.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <p class="product-price">$${p.precio}</p>
+          <p class="product-desc-small">${p.descripcion || ''}</p>
+          ${stockInfo}
+          <div class="product-actions">
+            <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+            <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
+          </div>
+        `;
+      } else {
+        div.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <p>$${p.precio}</p>
+          ${stockInfo}
+          <div class="product-actions">
+            <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+            <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
+          </div>
+        `;
+      }
+      return div;
+    }
+
+    // === EDITAR / ELIMINAR ===
+    window.editProduct = id => {
+      const card = document.querySelector(`.product-card[data-id="${id}"]`);
+      document.getElementById('editName').value = card.querySelector('h3').textContent;
+      document.getElementById('editPrice').value = parseFloat(card.querySelector('.product-price')?.textContent.replace('$', '') || 0);
+      document.getElementById('editImage').value = card.querySelector('img').src;
+      document.getElementById('editProductModal').classList.add('active');
+      window.currentEditId = id;
+    };
+
+    document.getElementById('saveProduct').onclick = async () => {
+      const updated = {
+        nombre: document.getElementById('editName').value.trim(),
+        precio: parseFloat(document.getElementById('editPrice').value),
+        imagen: document.getElementById('editImage').value.trim()
+      };
+      if (!updated.nombre || !updated.precio || !updated.imagen) return showToast("Faltan datos");
+      await updateDoc(doc(db, "productos", window.currentEditId), updated);
+      showToast("Producto actualizado");
+      closeModal('editProductModal');
+    };
+
+    window.deleteProduct = async id => {
+      if (confirm("¿Eliminar este producto?")) {
+        await deleteDoc(doc(db, "productos", id));
+        showToast("Producto eliminado");
+      }
+    };
+
+    // === GUARDAR NUEVO PRODUCTO CON SUBIDA DE IMAGEN ===
+    document.getElementById('saveNewProduct').onclick = async () => {
+      const name = document.getElementById('addName').value.trim();
+      const price = parseFloat(document.getElementById('addPrice').value);
+      const file = document.getElementById('addImageFile').files[0];
+      const url = document.getElementById('addImage').value.trim();
+      const typeValue = document.getElementById('addType').value;
+
+      if (!name || isNaN(price) || !typeValue) return showToast("Faltan datos");
+
+      let imagenURL = url;
+      if (file) {
+        if (url && !confirm("Tienes URL y archivo. ¿Subir el archivo?")) return;
+        imagenURL = await uploadImageAndGetURL(file);
+        if (!imagenURL) return;
+      } else if (!url) {
+        return showToast("Sube una imagen o pega una URL");
+      }
+
+      const typeObj = { normal: false, carrusel: false, anuncio: false };
+      if (typeValue === 'carrusel') typeObj.carrusel = true;
+      else if (typeValue === 'publicidad') typeObj.anuncio = true;
+      else typeObj.normal = true;
+
+      const producto = {
+        nombre: name,
+        precio: price,
+        talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
+        descripcion: document.getElementById('addDesc').value.trim(),
+        tipo: document.getElementById('addCategory').value,
+        type: typeObj,
+        imagen: imagenURL,
+        disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
+        creado: new Date()
+      };
+
+      await addDoc(collection(db, "productos"), producto);
+      showToast("¡Producto agregado!");
+      closeModal('addProductModal');
+    };
+
+    // === CANTIDAD DISPONIBLE ===
+    document.getElementById('availableBox').onclick = () => {
+      document.getElementById('availableBox').style.display = 'none';
+      document.getElementById('availableInput').style.display = 'block';
+      document.getElementById('addAvailableCount').focus();
+    };
+    document.getElementById('addAvailableCount').addEventListener('blur', () => {
+      const val = document.getElementById('addAvailableCount').value.trim();
+      const box = document.getElementById('availableBox');
+      box.textContent = val && val !== '0' ? val : '+';
+      box.style.display = 'flex';
+      document.getElementById('availableInput').style.display = 'none';
+    });
+
+    // === REDES, MODALES, TOAST, etc. ===
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => e.target === m && closeModal(m.id)));
+    document.querySelectorAll('[id^="cancel"]').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
+
+    document.getElementById('addPostBtn').onclick = () => {
+      document.getElementById('addProductModal').classList.add('active');
+      document.querySelectorAll('#addProductModal input, #addProductModal textarea').forEach(i => i.value = '');
+      document.getElementById('addImageFile').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('addAvailableCount').value = '0';
+      document.getElementById('availableBox').textContent = '+';
+    };
+
+    // Resto de funciones (engranaje, edición de textos, redes, etc.) exactamente como las tenías...
+    document.getElementById('adminGear').onclick = e => { e.stopPropagation(); document.getElementById('adminDropdown').classList.toggle('show'); };
+    document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
+
+    document.getElementById('toggleTextEdit').onclick = () => {
+      textEditMode = !textEditMode;
+      document.getElementById('textEditControls').classList.toggle('active');
+      document.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.toggle('editing'));
+    };
+    document.getElementById('saveTextChanges').onclick = async () => {
+      for (const [key, value] of Object.entries(textChanges)) {
+        const [c, d, f] = key.split('|');
+        await setDoc(doc(db, c, d), { [f]: value }, { merge: true });
+      }
+      showToast("Cambios guardados");
+      textChanges = {};
+    };
+    document.getElementById('cancelTextChanges').onclick = () => location.reload();
+
+    document.getElementById('openSocialModal').onclick = () => {
+      document.getElementById('socialLinksModal').classList.add('active');
+      onSnapshot(doc(db, "links", "social"), snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          ['tiktok','instagram','facebook','x','whatsapp'].forEach(k => document.getElementById(k+'Input').value = d[k] || '');
+        }
+      });
+    };
+    document.getElementById('saveSocialLinks').onclick = async () => {
+      const links = {
+        tiktok: document.getElementById('tiktokInput').value.trim(),
+        instagram: document.getElementById('instagramInput').value.trim(),
+        facebook: document.getElementById('facebookInput').value.trim(),
+        x: document.getElementById('xInput').value.trim(),
+        whatsapp: document.getElementById('whatsappInput').value.trim()
+      };
+      await setDoc(doc(db, "links", "social"), links, { merge: true });
+      showToast("Redes guardadas");
+      closeModal('socialLinksModal');
+    };
+
+    onSnapshot(doc(db, "textos", "hero"), snap => {
+      if (snap.exists() && snap.data().fondo_url) {
+        document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
+      }
+    });
+
+    // INICIAR
+    loadProductsByType('carrusel', 'newCarousel');
+    loadProductsByType('anuncio', 'starCarousel');
+    loadProductsByType('normal', 'productsGrid');
+    loadEditableTexts();
+  </script>
 </body>
 </html>
