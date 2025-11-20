@@ -101,7 +101,6 @@
       display:flex; align-items:center; gap:14px;
     }
     .submenu-item:hover { color:#111; font-weight:600; }
-    .social-icon { width:26px; height:26px; object-fit:contain; }
     .social-title {
       padding:12px 0; font-weight:700; color:#000; font-size:1rem;
     }
@@ -222,6 +221,10 @@
       <div class="social-title">¡Sígueme en mis redes sociales!</div>
     </div>
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
+    <!-- BOTONES DE CUENTA -->
+    <div class="menu-item" id="accountBtn" style="display:none;">Mi cuenta</div>
+    <div class="menu-item" id="logoutBtn" style="display:none; color:#e63946;">Cerrar sesión</div>
+    <div class="menu-item" id="adminBtn" style="display:none;">Ir a administrador</div>
     <div class="menu-item" id="loginBtn">Inicia sesión o regístrate</div>
   </aside>
   <!-- CARRITO -->
@@ -257,19 +260,58 @@
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // === NOMBRE EN LOCALSTORAGE + BIENVENIDA ===
-    function updateWelcomeMessage() {
-      const savedName = localStorage.getItem('userName');
+    // === LÓGICA COMPLETA DE INICIO DE SESIÓN ===
+    function updateWelcomeAndMenu(user) {
       const welcome = document.getElementById('welcomeMsg');
-      if (savedName) {
-        welcome.textContent = `¡Bienvenido, ${savedName}!`;
+      const loginBtn = document.getElementById('loginBtn');
+      const accountBtn = document.getElementById('accountBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const adminBtn = document.getElementById('adminBtn');
+
+      if (user) {
+        const nombre = user.displayName || user.email.split('@')[0];
+        const nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+        welcome.textContent = `¡Bienvenido, ${nombreFormateado}!`;
+        localStorage.setItem('userName', nombreFormateado); // Guardar nombre
+
+        loginBtn.style.display = "none";
+        accountBtn.style.display = "block";
+        logoutBtn.style.display = "block";
+        if (user.email === "admin@boutique.com") adminBtn.style.display = "block";
       } else {
         welcome.textContent = "¡Bienvenido!";
+        localStorage.removeItem('userName');
+
+        loginBtn.style.display = "block";
+        accountBtn.style.display = "none";
+        logoutBtn.style.display = "none";
+        adminBtn.style.display = "none";
       }
     }
-    updateWelcomeMessage();
 
-    // === REDES SOCIALES EN MENÚ ===
+    // Escuchar estado de autenticación
+    onAuthStateChanged(auth, (user) => {
+      updateWelcomeAndMenu(user);
+    });
+
+    // Al cargar la página, verificar si hay nombre guardado (por si recarga)
+    const savedName = localStorage.getItem('userName');
+    if (savedName && !auth.currentUser) {
+      document.getElementById('welcomeMsg').textContent = `¡Bienvenido, ${savedName}!`;
+    }
+
+    // Botones de cuenta
+    document.getElementById('loginBtn').onclick = () => location.href = "login.html";
+    document.getElementById('accountBtn').onclick = () => location.href = "perfil.html";
+    document.getElementById('adminBtn').onclick = () => location.href = "admin.html";
+    document.getElementById('logoutBtn').onclick = () => {
+      signOut(auth).then(() => {
+        localStorage.removeItem('userName');
+        location.reload();
+      });
+    };
+
+    // === REDES SOCIALES ===
     onSnapshot(doc(db, "admin", "links"), (snap) => {
       if (!snap.exists()) return;
       const links = snap.data();
@@ -371,10 +413,9 @@
       updateCart();
     };
 
-    // IR A PAGO → VERIFICAR SESIÓN
+    // IR A PAGO → SI NO ESTÁ LOGUEADO → LOGIN
     document.getElementById('goToPay').onclick = () => {
-      const userName = localStorage.getItem('userName');
-      if (!userName) {
+      if (!auth.currentUser && !localStorage.getItem('userName')) {
         location.href = 'login.html';
       } else {
         location.href = 'pago.html';
@@ -427,14 +468,11 @@
     });
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesList').classList.toggle('show');
     document.getElementById('socialToggle').onclick = () => document.getElementById('socialList').classList.toggle('show');
-
     document.getElementById('cartBtn').onclick = () => {
       document.getElementById('cartSidebar').classList.add('open');
       updateCart();
     };
     document.getElementById('closeCart').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
-
-    document.getElementById('loginBtn').onclick = () => location.href = "login.html";
 
     updateCart();
   </script>
