@@ -204,8 +204,8 @@
 
   <main class="main-container">
     <section class="hero-banner">
-      <h1>Asegura tu Mystery Box</h1>
-      <p class="tag">Envío Gratis en compras +$1,500</p>
+      <h1 id="heroTitle">Asegura tu Mystery Box</h1> <!-- Placeholder inicial -->
+      <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p> <!-- Placeholder inicial -->
     </section>
 
     <section>
@@ -307,6 +307,8 @@
     const authBtn = document.getElementById('authBtn');
     const adminBtn = document.getElementById('adminBtn');
     const helpBtn = document.getElementById('helpBtn');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroTag = document.getElementById('heroTag');
 
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -333,9 +335,52 @@
       }
     });
 
-    // ... (el resto del código Firebase y funciones permanece igual)
+    // CATEGORÍAS
+    const tiposSet = new Set();
+    onSnapshot(collection(db, "productos"), (snap) => {
+      allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      tiposSet.clear();
+      allProducts.forEach(p => p.tipo && tiposSet.add(p.tipo.trim().toLowerCase()));
+      
+      document.getElementById('categoriesSubmenu').innerHTML = [...tiposSet].sort().map(tipo => 
+        `<div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(tipo)}'">${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</div>`
+      ).join('');
+      
+      renderProducts();
+    });
 
-    // BÚSQUEDA MEJORADA - ahora el contenedor se queda visible mientras escribes
+    // REDES SOCIALES CON ICONOS
+    onSnapshot(doc(db, "admin", "links"), (snap) => {
+      if (snap.exists()) {
+        const links = snap.data();
+        const icons = {
+          instagram: "https://img.icons8.com/ios-filled/100/000000/instagram-new.png",
+          facebook: "https://img.icons8.com/ios-filled/100/000000/facebook-new.png",
+          tiktok: "https://img.icons8.com/ios-filled/100/000000/tiktok.png",
+          youtube: "https://img.icons8.com/ios-filled/100/000000/youtube-play.png",
+          x: "https://img.icons8.com/ios-filled/100/000000/x.png"
+        };
+        document.getElementById('contactDropdown').innerHTML = Object.keys(links)
+          .filter(key => links[key])
+          .map(key => `
+            <div class="submenu-item" onclick="window.open('${links[key]}','_blank')">
+              <img src="${icons[key] || icons.x}" class="social-icon" alt="${key}">
+              <span>${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+            </div>
+          `).join('');
+      }
+    });
+
+    // HERO BANNER DESDE FIREBASE (nuevo: asumiendo documento "admin/hero" con campos "title" y "subtitle")
+    onSnapshot(doc(db, "admin", "hero"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        heroTitle.textContent = data.title || 'Asegura tu Mystery Box'; // Fallback si no existe
+        heroTag.textContent = data.subtitle || 'Envío Gratis en compras +$1,500'; // Fallback si no existe
+      }
+    });
+
+    // BÚSQUEDA
     searchBtn.onclick = () => { 
       searchContainer.classList.add('active'); 
       searchInput.focus(); 
@@ -384,10 +429,66 @@
       if (results.length) searchResultsContainer.classList.add('active');
     };
 
-    // El resto del script (categorías, carrito, etc.) sigue exactamente igual...
-    // (lo omito por brevedad, pero está intacto)
+    // RENDER Y CARRITO
+    function renderProducts() {
+      document.getElementById('newProductsWrapper').innerHTML = allProducts.filter(p => p.type?.carrusel).map(p => 
+        `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'"><img src="${p.imagen}" loading="lazy"></div>`
+      ).join('');
 
-    // ... [todo el resto de tu script original aquí] ...
+      document.getElementById('productsGrid').innerHTML = allProducts.filter(p => !p.type?.carrusel).map(p => `
+        <div class="product-card" onclick="location.href='product.html?id=${p.id}'">
+          <img src="${p.imagen}" loading="lazy">
+          <div class="product-title">${p.nombre}</div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
+            ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
+            <span class="price ${p.precioAntiguo?'offer-price':''}">$${p.precio.toLocaleString()}</span>
+          </div>
+          <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
+        </div>
+      `).join('');
+    }
+
+    function updateCart() {
+      const qty = cart.reduce((s,i)=>s+i.qty,0);
+      const total = cart.reduce((s,i)=>s+i.precio*i.qty,0);
+      cartBadge.textContent = qty;
+      cartBadge.style.display = qty>0 ? 'flex' : 'none';
+      cartTotal.textContent = `Total: $${total.toLocaleString()}`;
+      cartItems.innerHTML = cart.length===0 ? '<p style="text-align:center;color:#999;padding:60px 20px;">Tu carrito está vacío</p>' :
+        cart.map((item,i)=>`
+          <div class="cart-item">
+            <img src="${item.imagen}" class="thumb">
+            <div>
+              <div>${item.nombre}</div>
+              <small>x${item.qty} • $${(item.precio*item.qty).toLocaleString()}</small>
+            </div>
+            <button onclick="removeFromCart(${i})" style="background:none;border:none;font-size:28px;cursor:pointer;color:#999;">×</button>
+          </div>
+        `).join('');
+      goToPay.style.display = cart.length>0 ? 'block' : 'none';
+    }
+
+    window.addToCart = id => {
+      const p = allProducts.find(x=>x.id===id);
+      const e = cart.find(x=>x.id===id);
+      e ? e.qty++ : cart.push({id:p.id, nombre:p.nombre, precio:p.precio, imagen:p.imagen, qty:1});
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+      toast.textContent = '¡Agregado!';
+      toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'),3000);
+    };
+
+    window.removeFromCart = i => { cart.splice(i,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); };
+
+    // UI
+    menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
+    [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
+    document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesSubmenu').classList.toggle('show');
+    document.getElementById('contactToggle').onclick = () => document.getElementById('contactDropdown').classList.toggle('show');
+    cartBtn.onclick = () => { cartSidebar.classList.add('open'); updateCart(); };
+    closeCart.onclick = () => cartSidebar.classList.remove('open');
+    goToPay.onclick = () => location.href = 'pago.html';
 
     updateCart();
   </script>
