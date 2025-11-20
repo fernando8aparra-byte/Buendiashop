@@ -102,6 +102,9 @@
     }
     .submenu-item:hover { color:#111; font-weight:600; }
     .social-icon { width:26px; height:26px; object-fit:contain; }
+    .social-title {
+      padding:12px 0; font-weight:700; color:#000; font-size:1rem;
+    }
     /* CARRITO */
     .cart-sidebar {
       position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh;
@@ -215,12 +218,10 @@
       Mis redes sociales
       <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
     </div>
-    <div class="submenu" id="socialList"></div>
+    <div class="submenu" id="socialList">
+      <div class="social-title">¡Sígueme en mis redes sociales!</div>
+    </div>
     <div class="menu-item" id="helpBtn">Necesitas ayuda</div>
-    <!-- BOTONES DE CUENTA -->
-    <div class="menu-item" id="accountBtn" style="display:none;">Mi cuenta</div>
-    <div class="menu-item" id="logoutBtn" style="display:none; color:#e63946;">Cerrar sesión</div>
-    <div class="menu-item" id="adminBtn" style="display:none;">Ir a administrador</div>
     <div class="menu-item" id="loginBtn">Inicia sesión o regístrate</div>
   </aside>
   <!-- CARRITO -->
@@ -255,6 +256,32 @@
     const auth = getAuth(app);
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    // === NOMBRE EN LOCALSTORAGE + BIENVENIDA ===
+    function updateWelcomeMessage() {
+      const savedName = localStorage.getItem('userName');
+      const welcome = document.getElementById('welcomeMsg');
+      if (savedName) {
+        welcome.textContent = `¡Bienvenido, ${savedName}!`;
+      } else {
+        welcome.textContent = "¡Bienvenido!";
+      }
+    }
+    updateWelcomeMessage();
+
+    // === REDES SOCIALES EN MENÚ ===
+    onSnapshot(doc(db, "admin", "links"), (snap) => {
+      if (!snap.exists()) return;
+      const links = snap.data();
+      const redes = Object.keys(links).filter(k => links[k]);
+      const list = document.getElementById('socialList');
+      list.innerHTML = `<div class="social-title">¡Sígueme en mis redes sociales!</div>`;
+      redes.forEach(red => {
+        const nombreRed = red.charAt(0).toUpperCase() + red.slice(1);
+        list.innerHTML += `<div class="submenu-item" onclick="window.open('${links[red]}','_blank')">${nombreRed}</div>`;
+      });
+    });
+
     // TÍTULO Y SUBTÍTULO
     onSnapshot(doc(db, "textos", "hero"), (snap) => {
       if (snap.exists()) {
@@ -263,58 +290,14 @@
         document.getElementById('heroSubtitle').textContent = d.subtitulo || "Nueva colección";
       }
     });
-    // INICIO DE SESIÓN + NOMBRE EN MENÚ
-    onAuthStateChanged(auth, (user) => {
-      const welcome = document.getElementById('welcomeMsg');
-      const loginBtn = document.getElementById('loginBtn');
-      const accountBtn = document.getElementById('accountBtn');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const adminBtn = document.getElementById('adminBtn');
-      if (user) {
-        const nombre = user.displayName || user.email.split('@')[0];
-        welcome.textContent = `¡Bienvenido, ${nombre.charAt(0).toUpperCase() + nombre.slice(1)}!`;
-        loginBtn.style.display = "none";
-        accountBtn.style.display = "block";
-        logoutBtn.style.display = "block";
-        if (user.email === "admin@boutique.com") adminBtn.style.display = "block";
-      } else {
-        welcome.textContent = "¡Bienvenido!";
-        loginBtn.style.display = "block";
-        accountBtn.style.display = "none";
-        logoutBtn.style.display = "none";
-        adminBtn.style.display = "none";
-      }
-    });
-    document.getElementById('loginBtn').onclick = () => location.href = "login.html";
-    document.getElementById('accountBtn').onclick = () => location.href = "perfil.html";
-    document.getElementById('adminBtn').onclick = () => location.href = "admin.html";
-    document.getElementById('logoutBtn').onclick = () => signOut(auth).then(() => location.reload());
-    // REDES SOCIALES
-    onSnapshot(doc(db, "admin", "links"), (snap) => {
-      if (!snap.exists()) return;
-      const links = snap.data();
-      const icons = {
-        facebook: "https://img.icons8.com/?size=100&id=118497&format=png&color=000000",
-        instagram: "https://img.icons8.com/?size=100&id=32323&format=png&color=000000",
-        x: "https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000",
-        twitter: "https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000",
-        tiktok: "https://img.icons8.com/?size=100&id=118640&format=png&color=000000"
-      };
-      document.getElementById('socialList').innerHTML = Object.keys(links)
-        .filter(k => links[k])
-        .map(k => `
-          <div class="submenu-item" onclick="window.open('${links[k]}','_blank')">
-            <img src="${icons[k] || 'https://img.icons8.com/ios-filled/50/000000/link.png'}" class="social-icon">
-            <span>${k.charAt(0).toUpperCase() + k.slice(1)}</span>
-          </div>
-        `).join('');
-    });
+
     // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderProducts();
       loadCategories();
     });
+
     function renderProducts() {
       const carrusel = allProducts.filter(p => p.type?.carrusel || p.type?.anuncio);
       document.getElementById('newProductsWrapper').innerHTML = carrusel.map(p => `
@@ -333,6 +316,7 @@
           <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
         </div>`).join('');
     }
+
     function loadCategories() {
       const tipos = [...new Set(allProducts.map(p => p.tipo).filter(Boolean))].sort();
       document.getElementById('categoriesList').innerHTML = tipos.map(t => `
@@ -341,6 +325,7 @@
         </div>
       `).join('');
     }
+
     // CARRITO
     function updateCart() {
       const qty = cart.reduce((a,b) => a + b.qty, 0);
@@ -363,6 +348,7 @@
         `).join('');
       document.getElementById('goToPay').style.display = cart.length > 0 ? 'block' : 'none';
     }
+
     window.addToCart = (id) => {
       const p = allProducts.find(x => x.id === id);
       const existe = cart.find(x => x.id === id);
@@ -378,11 +364,23 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2500);
     };
+
     window.removeFromCart = (i) => {
       cart.splice(i, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
     };
+
+    // IR A PAGO → VERIFICAR SESIÓN
+    document.getElementById('goToPay').onclick = () => {
+      const userName = localStorage.getItem('userName');
+      if (!userName) {
+        location.href = 'login.html';
+      } else {
+        location.href = 'pago.html';
+      }
+    };
+
     // BÚSQUEDA
     document.getElementById('searchBtn').onclick = () => {
       document.getElementById('searchBarContainer').classList.add('active');
@@ -415,6 +413,7 @@
           </div>
         `).join('');
     };
+
     // MENÚS
     document.getElementById('menuBtn').onclick = () => {
       document.getElementById('menuSidebar').classList.add('open');
@@ -429,13 +428,14 @@
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesList').classList.toggle('show');
     document.getElementById('socialToggle').onclick = () => document.getElementById('socialList').classList.toggle('show');
 
-    // ← AQUÍ ESTABA EL ERROR (CARTSidebar → cartSidebar)
     document.getElementById('cartBtn').onclick = () => {
       document.getElementById('cartSidebar').classList.add('open');
       updateCart();
     };
     document.getElementById('closeCart').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
-    document.getElementById('goToPay').onclick = () => location.href = 'pago.html';
+
+    document.getElementById('loginBtn').onclick = () => location.href = "login.html";
+
     updateCart();
   </script>
 </body>
