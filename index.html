@@ -5,19 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Boutique Buendía</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     html,body { font-family:'Poppins',sans-serif; background:#fff; color:#111; overflow-x:hidden; }
-
     h1,h2 { font-weight:800; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
 
-    /* HEADER FIJO - ICONOS 100% NEGROS EN MÓVIL Y PC */
+    /* HEADER FIJO */
     .header {
-      position:fixed; top:0; left:0; right:0; background:#fff; 
+      position:fixed; top:0; left:0; right:0; background:#fff;
       border-bottom:1px solid #eee; z-index:1000; padding:16px 20px;
       box-shadow:0 2px 10px rgba(0,0,0,0.03);
     }
@@ -27,14 +25,8 @@
     }
     .logo { font-weight:900; font-size:1.5rem; text-transform:uppercase; letter-spacing:1.5px; color:#000 !important; }
     .icon-btn { background:none; border:none; cursor:pointer; padding:8px; border-radius:8px; position:relative; }
-    
-    /* FORZAR ICONOS NEGROS EN TODOS LOS DISPOSITIVOS */
-    .icon-btn svg {
-      width:24px; height:24px; 
-      stroke:#000000 !important; 
-      fill:none !important; 
-      stroke-width:2.5;
-    }
+    .icon-btn svg { width:24px; height:24px; stroke:#000 !important; fill:none !important; stroke-width:2.5; }
+
     #cartBadge {
       position:absolute; top:-6px; right:-6px; background:#000; color:#fff;
       font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%;
@@ -43,13 +35,14 @@
 
     body { padding-top: 76px; }
 
-    /* BÚSQUEDA FIJA */
+    /* BARRA DE BÚSQUEDA */
     .search-container {
-      position:fixed; top:76px; left:0; right:0; background:#fff; 
+      position:fixed; top:76px; left:0; right:0; background:#fff;
       padding:16px 20px; z-index:950; border-bottom:1px solid #eee;
       box-shadow:0 4px 15px rgba(0,0,0,0.05); display:none;
     }
     .search-container.active { display:block; }
+
     .search-bar {
       display:flex; align-items:center; border:2px solid #111; border-radius:8px; overflow:hidden;
       max-width:600px; margin:0 auto;
@@ -59,12 +52,20 @@
     }
     #closeSearch { padding:10px 16px; font-size:28px; background:none; border:none; cursor:pointer; color:#111; }
 
-    /* RESULTADOS DE BÚSQUEDA - PERFECTOS */
+    /* RESULTADOS DE BÚSQUEDA - DELANTE DEL HERO */
     #searchResultsContainer {
-      position:fixed; top:130px; left:20px; right:20px; background:#fff;
-      border:2px solid #111; border-top:none; border-radius:0 0 12px 12px;
-      max-height:340px; overflow-y:auto; z-index:949; 
-      box-shadow:0 10px 30px rgba(0,0,0,0.15); display:none;
+      position:fixed;
+      top:130px;
+      left:20px; right:20px;
+      background:#fff;
+      border:2px solid #111;
+      border-top:none;
+      border-radius:0 0 12px 12px;
+      max-height:380px;
+      overflow-y:auto;
+      z-index:999;
+      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+      display:none;
     }
     .search-result-item {
       display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid #eee; cursor:pointer;
@@ -91,7 +92,7 @@
     .submenu-item:hover { color:#111; font-weight:600; }
     .social-icon { width:28px; height:28px; border-radius:6px; object-fit:contain; }
 
-    /* CARRITO PERFECTO */
+    /* CARRITO */
     .cart-sidebar {
       position:fixed; top:0; right:-340px; width:320px; max-width:100vw; height:100vh;
       background:#fff; transition:right .3s; z-index:1200; display:flex; flex-direction:column;
@@ -115,11 +116,11 @@
     #goToPay { background:#000; color:#fff; padding:14px; border-radius:8px; font-weight:700; text-transform:uppercase; cursor:pointer; width:100%; }
 
     /* MAIN */
-    .main-container { max-width:1300px; margin:0 auto; padding:40px 20px; }
-    .hero-banner { padding:80px 20px; text-align:center; margin-bottom:60px; }
-    .tag { display:inline-block; background:#000; color:#fff; font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:4px; margin-top:8px; text-transform:uppercase; }
+    .main-container { max-width:1300px; margin:0 auto; padding:40px 20px 100px; }
+    .hero-banner { padding:100px 20px 60px; text-align:center; }
+    .tag { display:inline-block; background:#000; color:#fff; font-size:0.85rem; font-weight:700; padding:8px 16px; border-radius:6px; margin-top:16px; text-transform:uppercase; }
 
-    /* CARRUSEL */
+    /* CARRUSEL Y PRODUCTOS */
     .new-products-wrapper {
       display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
       -webkit-overflow-scrolling:touch; gap:16px; padding:20px 0 40px;
@@ -150,7 +151,6 @@
   </style>
 </head>
 <body>
-
   <div class="menu-overlay" id="menuOverlay"></div>
 
   <!-- HEADER -->
@@ -173,6 +173,7 @@
       </div>
     </div>
 
+    <!-- BARRA DE BÚSQUEDA -->
     <div class="search-container" id="searchContainer">
       <div class="search-bar">
         <input type="text" placeholder="Buscar productos..." id="searchInput" autofocus>
@@ -181,12 +182,13 @@
     </div>
   </header>
 
+  <!-- RESULTADOS DE BÚSQUEDA (delante del hero) -->
   <div id="searchResultsContainer"><div id="searchResults"></div></div>
 
   <main class="main-container">
     <section class="hero-banner">
-      <h1 id="heroTitle">Asegura tu Mystery Box</h1>
-      <p class="tag" id="heroTag">Envío Gratis en compras +$1,500</p>
+      <h1 id="heroTitle">Cargando título...</h1>
+      <p class="tag" id="heroSubtitle">Cargando subtítulo...</p>
     </section>
 
     <section>
@@ -204,7 +206,6 @@
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg">¡Hola!</div>
-
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
       <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
@@ -261,7 +262,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Elementos
+    // Elementos del DOM
     const searchBtn = document.getElementById('searchBtn');
     const searchContainer = document.getElementById('searchContainer');
     const closeSearch = document.getElementById('closeSearch');
@@ -287,12 +288,22 @@
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // TEXTOS DESDE FIREBASE (colección "textos")
+    // TEXTOS DEL HERO DESDE FIREBASE (colección textos → documento hero)
+    onSnapshot(doc(db, "textos", "hero"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById('heroTitle').textContent = data.titulo || "Asegura tu Mystery Box";
+        document.getElementById('heroSubtitle').textContent = data.subtitulo || "Envío Gratis en compras +$1,500";
+      } else {
+        document.getElementById('heroTitle').textContent = "Asegura tu Mystery Box";
+        document.getElementById('heroSubtitle').textContent = "Envío Gratis en compras +$1,500";
+      }
+    });
+
+    // Otros textos de la página (nuevos lanzamientos, etc.)
     onSnapshot(doc(db, "textos", "home"), (snap) => {
       if (snap.exists()) {
         const t = snap.data();
-        document.getElementById('heroTitle').textContent = t.titulo || "Asegura tu Mystery Box";
-        document.getElementById('heroTag').textContent = t.tag || "Envío Gratis en compras +$1,500";
         document.getElementById('newReleasesTitle').textContent = t.nuevos || "Nuevos Lanzamientos";
         document.getElementById('allProductsTitle').textContent = t.todos || "Todos los Productos";
       }
@@ -315,17 +326,17 @@
       }
     });
 
-    // PRODUCTOS Y CATEGORÍAS
+    // CATEGORÍAS Y PRODUCTOS
     const tiposSet = new Set();
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       tiposSet.clear();
       allProducts.forEach(p => p.tipo && tiposSet.add(p.tipo.trim().toLowerCase()));
-      
-      document.getElementById('categoriesSubmenu').innerHTML = [...tiposSet].sort().map(tipo => 
+
+      document.getElementById('categoriesSubmenu').innerHTML = [...tiposSet].sort().map(tipo =>
         `<div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(tipo)}'">${tipo.charAt(0).toUpperCase() + tipo.slice(1)}</div>`
       ).join('');
-      
+
       renderProducts();
     });
 
@@ -361,12 +372,11 @@
     searchInput.oninput = () => {
       const q = searchInput.value.trim().toLowerCase();
       if (q.length < 2) { searchResultsContainer.style.display = 'none'; return; }
-
       const results = allProducts
         .filter(p => (p.nombre?.toLowerCase().includes(q)) || (p.descripcion?.toLowerCase().includes(q)) || (p.tipo?.toLowerCase().includes(q)))
         .slice(0, 5);
 
-      searchResults.innerHTML = results.length === 0 
+      searchResults.innerHTML = results.length === 0
         ? '<div style="padding:20px;text-align:center;color:#999;">No se encontraron productos</div>'
         : results.map(p => `
           <div class="search-result-item" onclick="location.href='product.html?id=${p.id}'">
@@ -381,12 +391,14 @@
       searchResultsContainer.style.display = results.length ? 'block' : 'none';
     };
 
-    // RENDER Y CARRITO
+    // RENDER PRODUCTOS
     function renderProducts() {
+      // Carrusel (productos con type.carrusel o type.anuncio)
       document.getElementById('newProductsWrapper').innerHTML = allProducts
         .filter(p => p.type?.carrusel || p.type?.anuncio)
         .map(p => `<div class="new-product-card" onclick="location.href='product.html?id=${p.id}'"><img src="${p.imagen}" loading="lazy"></div>`).join('');
 
+      // Grid normal
       document.getElementById('productsGrid').innerHTML = allProducts
         .filter(p => p.type?.normal !== false && !p.type?.carrusel)
         .map(p => `
@@ -395,18 +407,19 @@
             <div class="product-title">${p.nombre}</div>
             <div style="display:flex;justify-content:center;align-items:center;gap:8px;">
               ${p.precioAntiguo ? `<span class="old-price">$${p.precioAntiguo.toLocaleString()}</span>` : ''}
-              <span class="price ${p.precioAntiguo?'offer-price':''}">$${p.precio.toLocaleString()}</span>
+              <span class="price ${p.precioAntiguo ? 'offer-price' : ''}">$${p.precio.toLocaleString()}</span>
             </div>
             <button class="add-btn" onclick="event.stopPropagation(); addToCart('${p.id}')">Agregar</button>
           </div>
         `).join('');
     }
 
+    // CARRITO
     function updateCart() {
       const qty = cart.reduce((s,i)=>s+i.qty,0);
       const total = cart.reduce((s,i)=>s+i.precio*i.qty,0);
       cartBadge.textContent = qty;
-      cartBadge.style.display = qty>0 ? 'flex' : 'none';
+      cartBadge.style.display = qty > 0 ? 'flex' : 'none';
       cartTotal.textContent = `Total: $${total.toLocaleString()}`;
       cartItems.innerHTML = cart.length===0 ? '<p style="text-align:center;color:#999;padding:60px 20px;">Tu carrito está vacío</p>' :
         cart.map((item,i)=>`
@@ -433,9 +446,13 @@
       setTimeout(()=>toast.classList.remove('show'),3000);
     };
 
-    window.removeFromCart = i => { cart.splice(i,1); localStorage.setItem('cart',JSON.stringify(cart)); updateCart(); };
+    window.removeFromCart = i => {
+      cart.splice(i,1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    };
 
-    // UI
+    // INTERACCIONES UI
     menuBtn.onclick = () => { menuSidebar.classList.add('open'); menuOverlay.classList.add('show'); };
     [menuOverlay, closeMenu].forEach(el => el.onclick = () => { menuSidebar.classList.remove('open'); menuOverlay.classList.remove('show'); });
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesSubmenu').classList.toggle('show');
@@ -444,6 +461,7 @@
     closeCart.onclick = () => cartSidebar.classList.remove('open');
     goToPay.onclick = () => location.href = 'pago.html';
 
+    // Inicializar carrito al cargar
     updateCart();
   </script>
 </body>
