@@ -4,148 +4,85 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
   <style>
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; background: #fff; }
-    .header {
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .header-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px; padding: 0 15px;
-    }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 16px; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+    body { margin:0; padding:0; padding-top:60px; font-family:Arial,sans-serif; background:#fff; }
+    .header{position:fixed;top:0;left:0;width:100%;z-index:1000;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 15px;}
+    .header-left{display:flex;align-items:center;gap:20px;}
+    .header-right{display:flex;align-items:center;gap:16px;}
+    .logo{font-size:1.5rem;font-weight:bold;color:#000;}
+    .header-btn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:all .2s;border:none;background:transparent;}
+    .header-btn:hover{background:#f0f0f0;}
+    #addPostBtn{font-size:32px;font-weight:300;color:#000;}
 
-    .header-btn {
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s ease; border: none; padding: 0;
-      background: transparent;
-    }
-    .header-btn:hover { background: #f0f0f0; }
-    #addPostBtn { font-size: 32px; font-weight: 300; color: #000; }
+    .hero-banner{text-align:center;padding:80px 20px;background:#000 center/cover no-repeat;color:#fff;min-height:300px;}
+    .hero-banner h1{font-size:2.5rem;margin:0 0 10px;text-transform:uppercase;}
+    .hero-banner .tag{font-size:1.1rem;opacity:0.9;}
 
-    .hero-banner {
-      text-align: center; padding: 80px 20px; background: #000 center/cover;
-      color: #fff; min-height: 300px;
-    }
-    .hero-banner h1 { font-size: 2.5rem; margin: 0; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1.1rem; opacity: 0.9; }
+    section h2{text-align:center;font-size:1.8rem;margin:50px 0 20px;font-weight:bold;}
 
-    /* PRODUCT CARD - BOTONES ARRIBA Y VISIBLES */
-    .product-card {
-      position: relative; background: #fff; border-radius: 16px;
-      overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-    }
-    .product-card:hover { transform: translateY(-6px); }
-    .product-actions-top {
-      position: absolute; top: 10px; right: 10px; z-index: 10;
-      display: flex; gap: 8px;
-    }
-    .admin-btn {
-      background: rgba(0,0,0,0.75); color: #fff; border: none;
-      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem;
-      cursor: pointer; backdrop-filter: blur(4px);
-    }
-    .admin-btn:hover { background: #000; }
-    .admin-delete { background: rgba(220,20,60,0.9); }
-    .admin-delete:hover { background: crimson; }
+    .infinite-carousel{overflow:hidden;padding:10px 0;}
+    .carousel-track{display:inline-flex;gap:16px;animation:scroll 40s linear infinite;}
+    .carousel-track.clone{animation:none;}
+    @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+    .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;padding:20px;}
 
-    .product-card img { width: 100%; height: 280px; object-fit: cover; }
-    .product-card h3 { margin: 12px; font-size: 1.1rem; }
-    .product-card .product-price { margin: 0 12px 8px; font-size: 1.3rem; font-weight: bold; }
-    .product-card p { margin: 0 12px 12px; font-size: 0.9rem; color: #555; }
+    .product-card{position:relative;background:#fff;border-radius:16px;overflow:hidden;
+      box-shadow:0 4px 15px rgba(0,0,0,0.1);transition:transform .3s;}
+    .product-card:hover{transform:translateY(-8px);}
+    .product-actions-top{position:absolute;top:10px;right:10px;z-index:10;display:flex;gap:8px;}
+    .admin-btn{background:rgba(0,0,0,0.75);color:#fff;border:none;padding:8px 14px;border-radius:8px;
+      font-size:0.85rem;cursor:pointer;backdrop-filter:blur(4px);}
+    .admin-btn:hover{background:#000;}
+    .admin-delete{background:rgba(220,20,60,0.9);}
+    .admin-delete:hover{background:crimson;}
+    .product-card img{width:100%;height:280px;object-fit:cover;}
+    .product-card h3{margin:12px;font-size:1.1rem;font-weight:bold;}
+    .product-card .product-price{margin:0 12px 8px;font-size:1.3rem;font-weight:bold;}
+    .product-card p{margin:0 12px 12px;font-size:0.9rem;color:#555;}
 
-    /* MODAL */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.75); z-index: 2000; justify-content: center; align-items: center;
-    }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: #fff; padding: 24px; border-radius: 16px;
-      width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto;
-    }
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);
+      z-index:2000;justify-content:center;align-items:center;}
+    .modal.active{display:flex;}
+    .modal-content{background:#fff;padding:24px;border-radius:16px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;}
+    .form-group{margin-bottom:18px;}
+    .form-group label{display:block;font-weight:600;margin-bottom:8px;color:#222;}
+    .form-group input,.form-group select,.form-group textarea{
+      width:100%;padding:14px;border:2px solid #ddd;border-radius:12px;font-size:1rem;box-sizing:border-box;}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#000;}
+    .quantity-group{display:flex;align-items:center;gap:14px;}
+    #availableDisplay,#editAvailableDisplay{width:56px;height:56px;border:2.5px solid #000;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:bold;cursor:pointer;background:#fff;}
+    #availableInput,#editAvailableInput{display:none;}
+    .upload-section{padding:20px;background:#f9f9f9;border:2px dashed #bbb;border-radius:14px;text-align:center;
+      cursor:pointer;transition:.3s;}
+    .upload-section:hover{border-color:#000;background:#f0f0f0;}
+    .upload-section label{display:flex;flex-direction:column;align-items:center;gap:10px;font-weight:600;color:#000;}
+    .upload-section input[type=file]{display:none;}
+    .modal button{background:#000;color:#fff;padding:16px;border:none;border-radius:12px;cursor:pointer;
+      width:100%;margin-top:12px;font-size:1.05rem;font-weight:600;}
+    .modal button.cancel{background:#999;}
 
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; font-weight: 600; margin-bottom: 8px; color: #222;
-    }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 14px; border: 2px solid #ddd;
-      border-radius: 12px; font-size: 1rem; box-sizing: border-box;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none; border-color: #000;
-    }
-    .form-group textarea { resize: vertical; min-height: 90px; }
+    .social-icons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0;}
+    .social-item{text-align:center;padding:16px;background:#f8f8f8;border-radius:14px;cursor:pointer;
+      transition:all .3s;border:2px solid transparent;}
+    .social-item:hover{background:#eee;}
+    .social-item.active{border-color:#000;background:#000;color:#fff;}
+    .social-item img{width:48px;height:48px;}
+    .social-item input{margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;display:none;}
 
-    .quantity-group { display: flex; align-items: center; gap: 14px; }
-    #availableDisplay, #editAvailableDisplay {
-      width: 56px; height: 56px; border: 2.5px solid #000; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: bold; cursor: pointer; background: #fff;
-    }
-    #availableInput, #editAvailableInput { display: none; }
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;color:#fff;
+      padding:14px 28px;border-radius:10px;z-index:3000;display:none;}
+    .toast.show{display:block;animation:fade 3s;}
+    @keyframes fade{0%,100%{opacity:0}10%,90%{opacity:1}}
 
-    .upload-section {
-      padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
-      border-radius: 14px; text-align: center; cursor: pointer; transition: 0.3s;
-    }
-    .upload-section:hover { border-color: #000; background: #f0f0f0; }
-    .upload-section label {
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      font-weight: 600; color: #000;
-    }
-    .upload-section input[type="file"] { display: none; }
-
-    .modal button {
-      background: #000; color: #fff; padding: 16px; border: none;
-      border-radius: 12px; cursor: pointer; width: 100%; margin-top: 12px;
-      font-size: 1.05rem; font-weight: 600;
-    }
-    .modal button.cancel { background: #999; }
-
-    /* REDES SOCIALES CON ICONOS */
-    .social-icons-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0;
-    }
-    .social-item {
-      text-align: center; padding: 16px; background: #f8f8f8; border-radius: 14px;
-      cursor: pointer; transition: all 0.3s; border: 2px solid transparent;
-    }
-    .social-item:hover { background: #eee; }
-    .social-item.active { border-color: #000; background: #000; color: #fff; }
-    .social-item img { width: 48px; height: 48px; }
-    .social-item input {
-      margin-top: 10px; width: 100%; padding: 10px; border-radius: 8px;
-      border: 1px solid #ddd; display: none;
-    }
-
-    .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #000; color: #fff; padding: 14px 28px; border-radius: 10px;
-      z-index: 3000; display: none;
-    }
-    .toast.show { display: block; animation: fade 3s; }
-    @keyframes fade { 0%,100%{opacity:0} 10%,90%{opacity:1} }
-
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 10px; background: #fff;
-      border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-      width: 220px; display: none; z-index: 1001;
-    }
-    .admin-dropdown.show { display: block; }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 16px 20px; text-align: left;
-      border: none; background: none; color: #000; text-decoration: none;
-      font-size: 0.95rem; cursor: pointer;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
+    .admin-dropdown{position:absolute;top:60px;left:10px;background:#fff;border-radius:10px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.15);width:220px;display:none;z-index:1001;}
+    .admin-dropdown.show{display:block;}
+    .admin-dropdown a,.admin-dropdown button{display:block;width:100%;padding:16px 20px;text-align:left;
+      border:none;background:none;color:#000;text-decoration:none;font-size:0.95rem;cursor:pointer;}
+    .admin-dropdown a:hover,.admin-dropdown button:hover{background:#f5f5f5;}
   </style>
 </head>
 <body>
@@ -185,19 +122,21 @@
     <p class="tag" id="heroTagDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="subtitulo">Envío Gratis en compras +$1,500</p>
   </section>
 
-  <section class="infinite-carousel-section" id="newCarouselSection">
-    <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">Nuevos Lanzamientos</h2>
-    <div class="infinite-carousel"><div class="carousel-track" id="newCarousel"></div></div>
+  <section id="newCarouselSection">
+    <h2 id="titleNewDisplay">Nuevos Lanzamientos</h2>
+    <div class="infinite-carousel">
+      <div class="carousel-track" id="newCarousel"></div>
+    </div>
   </section>
 
   <section>
-    <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">Todos los Productos</h2>
+    <h2 id="titleAllDisplay">Todos los Productos</h2>
     <div class="products-grid" id="productsGrid"></div>
   </section>
 
   <div class="toast" id="toast"></div>
 
-  <!-- MODAL AGREGAR PRODUCTO -->
+  <!-- MODAL AGREGAR -->
   <div class="modal" id="addProductModal">
     <div class="modal-content">
       <h3>Agregar Nuevo Producto</h3>
@@ -232,21 +171,21 @@
         <div class="upload-section">
           <label for="addImageFile">
             <img src="https://img.icons8.com/ios-filled/50/000000/upload.png" width="36">
-            <span>Subir imagen</span>
+            <span>Subir imagen desde celular o PC</span>
           </label>
           <input type="file" id="addImageFile" accept="image/*">
-          <div id="imagePreview" style="display:none; margin-top:16px;">
-            <img id="previewImg" style="max-width:100%; max-height:220px; border-radius:12px;">
+          <div id="imagePreview" style="display:none;margin-top:16px;">
+            <img id="previewImg" style="max-width:100%;max-height:220px;border-radius:12px;">
           </div>
         </div>
       </div>
       <div class="form-group"><label>O URL de imagen</label><input type="text" id="addImage" placeholder="https://..."></div>
-      <button id="saveNewProduct">Guardar</button>
-      <button class="cancel" id="cancelAdd">Cancelar</button>
+      <button id="saveNewProduct">Guardar Producto</button>
+      <button class="cancel">Cancelar</button>
     </div>
   </div>
 
-  <!-- MODAL EDITAR PRODUCTO COMPLETO -->
+  <!-- MODAL EDITAR -->
   <div class="modal" id="editProductModal">
     <div class="modal-content">
       <h3>Editar Producto</h3>
@@ -284,47 +223,27 @@
             <span>Subir nueva imagen</span>
           </label>
           <input type="file" id="editImageFile" accept="image/*">
-          <div id="editImagePreview" style="display:none; margin-top:16px;">
-            <img id="editPreviewImg" style="max-width:100%; max-height:220px; border-radius:12px;">
+          <div id="editImagePreview" style="display:none;margin-top:16px;">
+            <img id="editPreviewImg" style="max-width:100%;max-height:220px;border-radius:12px;">
           </div>
         </div>
       </div>
       <div class="form-group"><label>O URL de imagen</label><input type="text" id="editImageUrl"></div>
       <button id="saveEditProduct">Guardar Cambios</button>
-      <button class="cancel" id="cancelEdit">Cancelar</button>
+      <button class="cancel">Cancelar</button>
     </div>
   </div>
 
-  <!-- MODAL REDES SOCIALES CON ICONOS -->
+  <!-- MODAL REDES SOCIALES -->
   <div class="modal" id="socialLinksModal">
     <div class="modal-content">
       <h3>Redes Sociales</h3>
       <div class="social-icons-grid">
-        <div class="social-item" data-platform="tiktok">
-          <img src="https://img.icons8.com/color/100/tiktok.png" alt="TikTok">
-          <div>TikTok</div>
-          <input type="text" placeholder="https://tiktok.com/@usuario">
-        </div>
-        <div class="social-item" data-platform="instagram">
-          <img src="https://img.icons8.com/color/100/instagram-new.png" alt="Instagram">
-          <div>Instagram</div>
-          <input type="text" placeholder="https://instagram.com/usuario">
-        </div>
-        <div class="social-item" data-platform="facebook">
-          <img src="https://img.icons8.com/color/100/facebook-new.png" alt="Facebook">
-          <div>Facebook</div>
-          <input type="text" placeholder="https://facebook.com/pagina">
-        </div>
-        <div class="social-item" data-platform="x">
-          <img src="https://img.icons8.com/ios-filled/100/ffffff/x.png" alt="X">
-          <div>X</div>
-          <input type="text" placeholder="https://x.com/usuario">
-        </div>
-        <div class="social-item" data-platform="whatsapp">
-          <img src="https://img.icons8.com/color/100/whatsapp.png" alt="WhatsApp">
-          <div>WhatsApp</div>
-          <input type="text" placeholder="https://wa.me/521234567890">
-        </div>
+        <div class="social-item" data-platform="tiktok"><img src="https://img.icons8.com/color/100/tiktok.png"><div>TikTok</div><input type="text" placeholder="https://tiktok.com/@usuario"></div>
+        <div class="social-item" data-platform="instagram"><img src="https://img.icons8.com/color/100/instagram-new.png"><div>Instagram</div><input type="text" placeholder="https://instagram.com/usuario"></div>
+        <div class="social-item" data-platform="facebook"><img src="https://img.icons8.com/color/100/facebook-new.png"><div>Facebook</div><input type="text" placeholder="https://facebook.com/pagina"></div>
+        <div class="social-item" data-platform="x"><img src="https://img.icons8.com/ios-filled/100/ffffff/x.png"><div>X</div><input type="text" placeholder="https://x.com/usuario"></div>
+        <div class="social-item" data-platform="whatsapp"><img src="https://img.icons8.com/color/100/whatsapp.png"><div>WhatsApp</div><input type="text" placeholder="https://wa.me/521234567890"></div>
       </div>
       <button id="saveSocialLinks">Guardar Todo</button>
       <button class="cancel">Cancelar</button>
@@ -353,61 +272,76 @@
 
     let currentEditId = null;
 
-    // === FUNCIONES BÁSICAS ===
+    const toast = document.getElementById('toast');
     function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    // === SUBIR IMAGEN ===
-    async function uploadImageAndGetURL(file) {
+    function closeModal(id) { document.getElementById(id)?.classList.remove('active'); }
+
+    async function uploadImage(file) {
       if (!file) return null;
-      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      const storageRef = ref(storage, `productos/${fileName}`);
-      try {
-        showToast("Subiendo imagen...");
-        const snapshot = await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(snapshot.ref);
-        showToast("Imagen subida");
-        return url;
-      } catch (e) {
-        showToast("Error al subir imagen");
-        return null;
+      const name = `${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, `productos/${name}`);
+      await uploadBytes(storageRef, file);
+      return await getDownloadURL(storageRef);
+    }
+
+    // Títulos desde Firebase
+    onSnapshot(doc(db, "textos", "secciones"), snap => {
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.nuevos_lanzamientos) document.getElementById('titleNewDisplay').textContent = d.nuevos_lanzamientos;
+        if (d.todos_productos) document.getElementById('titleAllDisplay').textContent = d.todos_productos;
+      }
+    });
+
+    // Carrusel infinito
+    function duplicateTrack(container) {
+      if (container.children.length > 0 && !container.dataset.duplicated) {
+        const clone = container.cloneNode(true);
+        clone.classList.add('clone');
+        container.after(clone);
+        container.dataset.duplicated = 'true';
       }
     }
 
-    // === CANTIDAD DISPONIBLE (AGREGAR Y EDITAR) ===
-    ['availableDisplay', 'editAvailableDisplay'].forEach(id => {
-      document.getElementById(id).onclick = () => {
-        document.getElementById(id).style.display = 'none';
-        document.getElementById(id === 'availableDisplay' ? 'availableInput' : 'editAvailableInput').style.display = 'block';
-        document.getElementById(id === 'availableDisplay' ? 'addAvailableCount' : 'editAvailableCount').focus();
-      };
-    });
-    ['addAvailableCount', 'editAvailableCount'].forEach(id => {
-      document.getElementById(id).addEventListener('blur', () => {
-        const val = document.getElementById(id).value || '1';
-        const display = id === 'addAvailableCount' ? 'availableDisplay' : 'editAvailableDisplay';
-        document.getElementById(display).textContent = val;
-        document.getElementById(display).style.display = 'flex';
-        document.getElementById(id === 'addAvailableCount' ? 'availableInput' : 'editAvailableInput').style.display = 'none';
+    function createCard(p) {
+      const div = document.createElement('div');
+      div.className = 'product-card';
+      div.innerHTML = `
+        <div class="product-actions-top">
+          <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
+          <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
+        </div>
+        <img src="${p.imagen}" alt="${p.nombre}">
+        <h3>${p.nombre}</h3>
+        <p class="product-price">$${p.precio}</p>
+        <p>${p.disponibles > 0 ? p.disponibles + ' disponibles' : 'Agotado'}</p>
+      `;
+      return div;
+    }
+
+    function loadProducts(type, containerId) {
+      const q = query(collection(db, "productos"), where(`type.${type}`, "==", true));
+      onSnapshot(q, snap => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        snap.forEach(doc => {
+          const data = {id: doc.id, ...doc.data()};
+          container.appendChild(createCard(data));
+        });
+        if (type === 'carrusel') duplicateTrack(container);
       });
-    });
+    }
 
-    // === AGREGAR PRODUCTO ===
-    document.getElementById('addPostBtn').onclick = () => {
-      document.getElementById('addProductModal').classList.add('active');
-      document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => i.value = '');
-      document.getElementById('addImageFile').value = '';
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('addAvailableCount').value = '1';
-      document.getElementById('availableDisplay').textContent = '1';
-    };
+    // Abrir modal agregar
+    document.getElementById('addPostBtn').onclick = () => document.getElementById('addProductModal').classList.add('active');
 
-    document.getElementById('addImageFile').addEventListener('change', e => {
+    // Previsualizar imagen al agregar
+    document.getElementById('addImageFile').onchange = e => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -417,36 +351,38 @@
         };
         reader.readAsDataURL(file);
       }
-    });
+    };
 
+    // Guardar nuevo producto
     document.getElementById('saveNewProduct').onclick = async () => {
-      const name = document.getElementById('addName').value.trim();
-      const price = parseFloat(document.getElementById('addPrice').value);
+      const nombre = document.getElementById('addName').value.trim();
+      const precio = parseFloat(document.getElementById('addPrice').value);
       const typeVal = document.getElementById('addType').value;
-      if (!name || !price || !typeVal) return showToast("Faltan datos");
 
-      let imagenURL = document.getElementById('addImage').value.trim();
+      if (!nombre || !precio) return showToast("Faltan datos");
+
+      let imagen = document.getElementById('addImage').value.trim();
       if (document.getElementById('addImageFile').files[0]) {
-        imagenURL = await uploadImageAndGetURL(document.getElementById('addImageFile').files[0]);
-        if (!imagenURL) return;
-      } else if (!imagenURL) return showToast("Sube imagen o pega URL");
+        imagen = await uploadImage(document.getElementById('addImageFile').files[0]);
+      }
+      if (!imagen) return showToast("Falta imagen");
 
-      const typeObj = { normal: typeVal === 'normal', carrusel: typeVal === 'carrusel' };
-      const producto = {
-        nombre: name, precio: price,
-        talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
+      const type = { normal: typeVal === 'normal', carrusel: typeVal === 'carrusel' };
+
+      await addDoc(collection(db, "productos"), {
+        nombre, precio,
+        talla: document.getElementById('addSizes').value.split(',').map(s=>s.trim()).filter(Boolean),
         descripcion: document.getElementById('addDesc').value.trim(),
         tipo: document.getElementById('addCategory').value,
-        type: typeObj, imagen: imagenURL,
+        type, imagen,
         disponibles: parseInt(document.getElementById('addAvailableCount').value) || 1,
         creado: new Date()
-      };
-      await addDoc(collection(db, "productos"), producto);
+      });
       showToast("Producto agregado");
       closeModal('addProductModal');
     };
 
-    // === EDITAR PRODUCTO COMPLETO ===
+    // Editar producto
     window.editProduct = async (id) => {
       const snap = await getDoc(doc(db, "productos", id));
       if (!snap.exists()) return;
@@ -466,7 +402,7 @@
       document.getElementById('editProductModal').classList.add('active');
     };
 
-    document.getElementById('editImageFile').addEventListener('change', e => {
+    document.getElementById('editImageFile').onchange = e => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -476,19 +412,18 @@
         };
         reader.readAsDataURL(file);
       }
-    });
+    };
 
     document.getElementById('saveEditProduct').onclick = async () => {
       if (!currentEditId) return;
 
-      let imagenURL = document.getElementById('editImageUrl').value.trim();
+      let imagen = document.getElementById('editImageUrl').value.trim();
       if (document.getElementById('editImageFile').files[0]) {
-        imagenURL = await uploadImageAndGetURL(document.getElementById('editImageFile').files[0]);
-        if (!imagenURL) return;
+        imagen = await uploadImage(document.getElementById('editImageFile').files[0]);
       }
 
       const typeVal = document.getElementById('editType').value;
-      const typeObj = { normal: typeVal === 'normal', carrusel: typeVal === 'carrusel' };
+      const type = { normal: typeVal === 'normal', carrusel: typeVal === 'carrusel' };
 
       await updateDoc(doc(db, "productos", currentEditId), {
         nombre: document.getElementById('editName').value.trim(),
@@ -496,51 +431,16 @@
         talla: document.getElementById('editSizes').value.split(',').map(s=>s.trim()).filter(Boolean),
         descripcion: document.getElementById('editDesc').value.trim(),
         tipo: document.getElementById('editCategory').value,
-        type: typeObj,
-        imagen: imagenURL,
+        type, imagen,
         disponibles: parseInt(document.getElementById('editAvailableCount').value) || 1
       });
       showToast("Producto actualizado");
       closeModal('editProductModal');
     };
 
-    window.deleteProduct = async (id) => {
-      if (confirm("¿Eliminar este producto?")) {
-        await deleteDoc(doc(db, "productos", id));
-        showToast("Producto eliminado");
-      }
-    };
+    window.deleteProduct = id => confirm("¿Eliminar este producto?") && deleteDoc(doc(db, "productos", id)).then(() => showToast("Eliminado"));
 
-    // === CARGAR PRODUCTOS CON BOTONES ARRIBA ===
-    function createProductCard(p) {
-      const div = document.createElement('div');
-      div.className = 'product-card';
-      div.innerHTML = `
-        <div class="product-actions-top">
-          <button class="admin-btn admin-edit" onclick="editProduct('${p.id}')">Editar</button>
-          <button class="admin-btn admin-delete" onclick="deleteProduct('${p.id}')">Quitar</button>
-        </div>
-        <img src="${p.imagen}" alt="${p.nombre}">
-        <h3>${p.nombre}</h3>
-        <p class="product-price">$${p.precio}</p>
-        <p>${p.disponibles > 0 ? p.disponibles + ' disponibles' : 'Agotado'}</p>
-      `;
-      return div;
-    }
-
-    function loadProductsByType(typeKey, containerId) {
-      const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
-      onSnapshot(q, snapshot => {
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        snapshot.forEach(docSnap => {
-          const data = { id: docSnap.id, ...docSnap.data() };
-          container.appendChild(createProductCard(data));
-        });
-      });
-    }
-
-    // === REDES SOCIALES CON ICONOS ===
+    // Redes sociales
     document.getElementById('openSocialModal').onclick = () => {
       document.getElementById('socialLinksModal').classList.add('active');
       onSnapshot(doc(db, "links", "social"), snap => {
@@ -555,7 +455,7 @@
     };
 
     document.querySelectorAll('.social-item').forEach(item => {
-      item.onclick = (e) => {
+      item.onclick = e => {
         if (e.target.tagName === 'INPUT') return;
         item.classList.toggle('active');
         const input = item.querySelector('input');
@@ -576,20 +476,36 @@
       closeModal('socialLinksModal');
     };
 
-    // === INICIO ===
-    loadProductsByType('carrusel', 'newCarousel');
-    loadProductsByType('normal', 'productsGrid');
+    // Cantidad disponible (click para editar)
+    document.querySelectorAll('#availableDisplay, #editAvailableDisplay').forEach(el => {
+      el.onclick = () => {
+        el.style.display = 'none';
+        el.nextElementSibling.style.display = 'block';
+        el.nextElementSibling.querySelector('input').focus();
+      };
+    });
+    document.querySelectorAll('#addAvailableCount, #editAvailableCount').forEach(input => {
+      input.onblur = () => {
+        const val = input.value || '1';
+        const display = input.closest('.quantity-group').querySelector('div[id$="Display"]');
+        display.textContent = val;
+        display.style.display = 'flex';
+        input.parentElement.style.display = 'none';
+      };
+    });
 
-    // Cerrar modales al hacer clic fuera
-    document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => e.target === m && closeModal(m.id)));
+    // Cerrar modales
+    document.querySelectorAll('.modal').forEach(m => m.onclick = e => e.target === m && closeModal(m.id));
     document.querySelectorAll('.cancel').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
 
-    // Menú ajustes
-    document.getElementById('adminGear').onclick = e => {
-      e.stopPropagation();
-      document.getElementById('adminDropdown').classList.toggle('show');
-    };
-    document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
+    // Menú engranaje
+    document.getElementById('adminGear').onclick = e => { e.stopPropagation(); document.getElementById('adminDropdown').classList.toggle('show'); };
+    document.body.onclick = () => document.getElementById('adminDropdown').classList.remove('show');
+    document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('isAdmin'); location.href='login.html'; };
+
+    // Cargar productos
+    loadProducts('carrusel', 'newCarousel');
+    loadProducts('normal', 'productsGrid');
   </script>
 </body>
 </html>
