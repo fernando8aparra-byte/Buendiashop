@@ -20,7 +20,6 @@
     .main-container { margin-top: 20px; padding: 0 15px; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; }
     .footer a { color: #fff; text-decoration: underline; }
-
     /* ADMIN BUTTONS */
     .admin-btn { background: #ff4444; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; margin-left: 10px; cursor: pointer; }
     .admin-edit { background: #0066ff; }
@@ -28,14 +27,12 @@
     .product-card { position: relative; text-align: center; padding: 15px; }
     .product-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; opacity: 0; transition: opacity 0.3s; }
     .product-card:hover .product-actions { opacity: 1; }
-
     /* MODALES */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
     .modal.active { display: flex; }
     .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
     .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
     .modal button { background: #000; color: #fff; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
-
     /* ENGRANAJE */
     .admin-gear { position: relative; }
     .admin-dropdown {
@@ -49,25 +46,21 @@
       cursor: pointer; font-size: 0.95rem; font-weight: 500;
     }
     .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-
     /* BOTONES + Y LÁPIZ */
     .add-post-btn, .edit-text-btn {
       background: #000; color: #fff; width: 40px; height: 40px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer;
     }
-
     /* CARRUSEL */
     .infinite-carousel-section { overflow: hidden; position: relative; margin-bottom: 40px; }
     .infinite-carousel { display: flex; transition: transform 0.5s ease; }
     .auto-scroll .infinite-carousel { animation: scrollInfinite 20s linear infinite; }
     .static-display .infinite-carousel { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
     @keyframes scrollInfinite { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
     /* TOAST */
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 3000; display: none; }
     .toast.show { display: block; animation: fadeInOut 3s; }
     @keyframes fadeInOut { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 1; } }
-
     /* EDITABLE TEXT */
     [contenteditable="true"].editing {
       outline: 2px dashed #0066ff;
@@ -75,7 +68,6 @@
       border-radius: 6px;
       padding: 6px;
     }
-
     /* BOTONES DE EDICIÓN DE TEXTOS */
     .text-edit-controls {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -87,7 +79,6 @@
       background: #000; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
     }
     .text-edit-controls button.cancel { background: #999; }
-
     /* CANTIDAD DISPONIBLE */
     .available-container { display: flex; align-items: center; gap: 12px; margin: 15px 0; }
     #availableBox {
@@ -98,13 +89,11 @@
     #availableInput { display: none; }
     #availableInput input { width: 70px; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 6px; }
     .available-label { margin: 4px 0 0; font-size: 0.85rem; color: #555; line-height: 1.3; }
-
     /* PREVIEW IMAGEN */
     #imagePreview img { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; }
   </style>
 </head>
 <body>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
@@ -127,12 +116,20 @@
         <div class="logo">EFRAÍN</div>
       </div>
       <div class="header-right">
-        <div class="edit-text-btn" id="toggleTextEdit">Edit</div>
+        <!-- BOTÓN DE EDITAR TEXTOS CON EL NUEVO ICONO -->
+        <div class="edit-text-btn" id="toggleTextEdit" title="Editar textos">
+          <img src="https://img.icons8.com/?size=100&id=8192&format=png&color=000000" 
+               alt="Editar" 
+               width="24" 
+               height="24"
+               style="pointer-events:none;">
+        </div>
         <div class="add-post-btn" id="addPostBtn">+</div>
       </div>
     </div>
   </header>
 
+  <!-- TODO EL RESTO DE TU CÓDIGO EXACTAMENTE IGUAL -->
   <!-- HERO BANNER -->
   <section class="hero-banner" id="heroBanner">
     <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
@@ -142,7 +139,6 @@
       Envío Gratis en compras +$1,500
     </p>
   </section>
-
   <!-- SECCIONES -->
   <section class="infinite-carousel-section" id="newCarouselSection">
     <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
@@ -152,7 +148,6 @@
       <div class="carousel-track" id="newCarousel"></div>
     </div>
   </section>
-
   <section class="infinite-carousel-section" id="starCarouselSection">
     <h2 id="titleStarDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="productos_estrella">
       Productos Estrella
@@ -161,23 +156,19 @@
       <div class="carousel-track" id="starCarousel"></div>
     </div>
   </section>
-
   <section>
     <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
       Todos los Productos
     </h2>
     <div class="products-grid" id="productsGrid"></div>
   </section>
-
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
-
   <!-- CONTROLES EDICIÓN TEXTO -->
   <div class="text-edit-controls" id="textEditControls">
     <button id="saveTextChanges">Guardar Cambios</button>
     <button id="cancelTextChanges" class="cancel">No Guardar</button>
   </div>
-
   <!-- MODAL EDITAR PRODUCTO -->
   <div class="modal" id="editProductModal">
     <div class="modal-content">
@@ -189,7 +180,6 @@
       <button id="cancelEdit" style="background:#999;">Cancelar</button>
     </div>
   </div>
-
   <!-- MODAL AGREGAR PRODUCTO -->
   <div class="modal" id="addProductModal">
     <div class="modal-content">
@@ -212,7 +202,6 @@
         <option value="carrusel">Carrusel</option>
         <option value="publicidad">Estrella</option>
       </select>
-
       <div class="available-container">
         <div id="availableBox">+</div>
         <div>
@@ -222,7 +211,6 @@
           <p class="available-label">Cantidad de producto disponible</p>
         </div>
       </div>
-
       <div class="image-upload-section">
         <label>Subir imagen desde tu celular/PC:</label>
         <input type="file" id="addImageFile" accept="image/*">
@@ -230,21 +218,17 @@
           <img id="previewImg" style="max-width:100%; max-height:200px; border-radius:8px;">
         </div>
       </div>
-
       <div class="image-url-section">
         <label>O pegar URL (opcional):</label>
         <input type="text" id="addImage" placeholder="https://...">
       </div>
-
       <p style="font-size:0.9rem; color:#080; font-weight:bold; margin:10px 0 0;">
         Ahora puedes subir imágenes directamente
       </p>
-
       <button id="saveNewProduct">Guardar Producto</button>
       <button id="cancelAdd" style="background:#999;">Cancelar</button>
     </div>
   </div>
-
   <!-- MODAL REDES SOCIALES -->
   <div class="modal" id="socialLinksModal">
     <div class="modal-content">
@@ -265,12 +249,11 @@
       <button id="cancelSocial" style="background:#999;">Cancelar</button>
     </div>
   </div>
-
   <footer class="footer">
     <p>© 2025 Efraín Shop. Admin Mode.</p>
   </footer>
 
-  <!-- FIREBASE + JS COMPLETO -->
+  <!-- FIREBASE + JS COMPLETO (sin tocar nada) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -280,7 +263,6 @@
     import {
       getStorage, ref, uploadBytes, getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -289,19 +271,15 @@
       messagingSenderId: "430651152709",
       appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
-
     // === PROTEGER ADMIN ===
     if (!localStorage.getItem('isAdmin')) {
       window.location.href = 'login.html';
     }
-
     let textEditMode = false;
     let textChanges = {};
-
     // === SUBIR IMAGEN ===
     async function uploadImageAndGetURL(file) {
       if (!file) return null;
@@ -319,7 +297,6 @@
         return null;
       }
     }
-
     // === VISTA PREVIA ===
     document.getElementById('addImageFile').addEventListener('change', e => {
       const file = e.target.files[0];
@@ -336,7 +313,6 @@
         preview.style.display = 'none';
       }
     });
-
     // === CARGAR TEXTOS EDITABLES ===
     function loadEditableTexts() {
       document.querySelectorAll('[contenteditable="true"]').forEach(el => {
@@ -355,7 +331,6 @@
         });
       });
     }
-
     // === CARGAR PRODUCTOS ===
     function loadProductsByType(typeKey, containerId) {
       const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
@@ -379,7 +354,6 @@
         }
       });
     }
-
     function createProductCard(p, sectionType) {
       const div = document.createElement('div');
       div.className = 'product-card';
@@ -387,7 +361,6 @@
       const stockInfo = p.disponibles > 0
         ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>`
         : '<p style="color:#c00; font-weight:bold;">Agotado</p>';
-
       if (sectionType === 'normal') {
         div.innerHTML = `
           <img src="${p.imagen}" alt="${p.nombre}">
@@ -414,7 +387,6 @@
       }
       return div;
     }
-
     // === EDITAR / ELIMINAR ===
     window.editProduct = id => {
       const card = document.querySelector(`.product-card[data-id="${id}"]`);
@@ -424,7 +396,6 @@
       document.getElementById('editProductModal').classList.add('active');
       window.currentEditId = id;
     };
-
     document.getElementById('saveProduct').onclick = async () => {
       const updated = {
         nombre: document.getElementById('editName').value.trim(),
@@ -436,14 +407,12 @@
       showToast("Producto actualizado");
       closeModal('editProductModal');
     };
-
     window.deleteProduct = async id => {
       if (confirm("¿Eliminar este producto?")) {
         await deleteDoc(doc(db, "productos", id));
         showToast("Producto eliminado");
       }
     };
-
     // === GUARDAR NUEVO PRODUCTO CON SUBIDA DE IMAGEN ===
     document.getElementById('saveNewProduct').onclick = async () => {
       const name = document.getElementById('addName').value.trim();
@@ -451,9 +420,7 @@
       const file = document.getElementById('addImageFile').files[0];
       const url = document.getElementById('addImage').value.trim();
       const typeValue = document.getElementById('addType').value;
-
       if (!name || isNaN(price) || !typeValue) return showToast("Faltan datos");
-
       let imagenURL = url;
       if (file) {
         if (url && !confirm("Tienes URL y archivo. ¿Subir el archivo?")) return;
@@ -462,12 +429,10 @@
       } else if (!url) {
         return showToast("Sube una imagen o pega una URL");
       }
-
       const typeObj = { normal: false, carrusel: false, anuncio: false };
       if (typeValue === 'carrusel') typeObj.carrusel = true;
       else if (typeValue === 'publicidad') typeObj.anuncio = true;
       else typeObj.normal = true;
-
       const producto = {
         nombre: name,
         precio: price,
@@ -479,12 +444,10 @@
         disponibles: parseInt(document.getElementById('addAvailableCount').value) || 0,
         creado: new Date()
       };
-
       await addDoc(collection(db, "productos"), producto);
       showToast("¡Producto agregado!");
       closeModal('addProductModal');
     };
-
     // === CANTIDAD DISPONIBLE ===
     document.getElementById('availableBox').onclick = () => {
       document.getElementById('availableBox').style.display = 'none';
@@ -498,7 +461,6 @@
       box.style.display = 'flex';
       document.getElementById('availableInput').style.display = 'none';
     });
-
     // === REDES, MODALES, TOAST, etc. ===
     function showToast(msg) {
       const t = document.getElementById('toast');
@@ -509,7 +471,6 @@
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => e.target === m && closeModal(m.id)));
     document.querySelectorAll('[id^="cancel"]').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
-
     document.getElementById('addPostBtn').onclick = () => {
       document.getElementById('addProductModal').classList.add('active');
       document.querySelectorAll('#addProductModal input, #addProductModal textarea').forEach(i => i.value = '');
@@ -518,11 +479,9 @@
       document.getElementById('addAvailableCount').value = '0';
       document.getElementById('availableBox').textContent = '+';
     };
-
     // Resto de funciones (engranaje, edición de textos, redes, etc.) exactamente como las tenías...
     document.getElementById('adminGear').onclick = e => { e.stopPropagation(); document.getElementById('adminDropdown').classList.toggle('show'); };
     document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
-
     document.getElementById('toggleTextEdit').onclick = () => {
       textEditMode = !textEditMode;
       document.getElementById('textEditControls').classList.toggle('active');
@@ -537,7 +496,6 @@
       textChanges = {};
     };
     document.getElementById('cancelTextChanges').onclick = () => location.reload();
-
     document.getElementById('openSocialModal').onclick = () => {
       document.getElementById('socialLinksModal').classList.add('active');
       onSnapshot(doc(db, "links", "social"), snap => {
@@ -559,13 +517,11 @@
       showToast("Redes guardadas");
       closeModal('socialLinksModal');
     };
-
     onSnapshot(doc(db, "textos", "hero"), snap => {
       if (snap.exists() && snap.data().fondo_url) {
         document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
       }
     });
-
     // INICIAR
     loadProductsByType('carrusel', 'newCarousel');
     loadProductsByType('anuncio', 'starCarousel');
