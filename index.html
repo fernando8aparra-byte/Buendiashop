@@ -104,17 +104,10 @@
     .social-title {
       padding:12px 0; font-weight:700; color:#000; font-size:1rem;
     }
-    /* small icons row */
     .social-icons-row { display:flex; gap:8px; align-items:center; padding:8px 0; }
     .social-icons-row a { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:6px; text-decoration:none; }
     .social-icons-row svg { width:20px; height:20px; display:block; }
-    /* help flow UI inside menu */
-    .help-flow { padding:12px 0; display:flex; flex-direction:column; gap:8px; }
     .help-option { padding:10px 12px; border-radius:8px; background:#f7f7f7; cursor:pointer; font-weight:600; color:#111; border:1px solid #eee; }
-    .help-option.selected { background:#000;color:#fff; }
-    .help-footer { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
-    .help-input { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #ddd; }
-    .help-send-btn { background:#000; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; }
     .admin-return { margin-top:12px; background:none; border:none; padding:16px 0; font-weight:700; text-transform:uppercase; cursor:pointer; }
     /* CARRITO */
     .cart-sidebar {
@@ -170,13 +163,13 @@
       font-weight:700; z-index:1300; opacity:0; transition:all .35s; text-transform:uppercase;
     }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(-20px); }
-    /* simple sending overlay */
     .sending-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:1400; background:rgba(0,0,0,0.45); }
     .sending-box { background:#fff; padding:20px 28px; border-radius:12px; text-align:center; font-weight:700; }
   </style>
 </head>
 <body>
   <div class="menu-overlay" id="menuOverlay"></div>
+
   <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
@@ -197,6 +190,7 @@
       </div>
     </div>
   </header>
+
   <!-- BÚSQUEDA -->
   <div class="search-bar-container" id="searchBarContainer">
     <input type="text" class="search-bar-input" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
@@ -205,6 +199,7 @@
   <div class="search-results-overlay" id="searchResultsOverlay">
     <div class="search-results-grid" id="searchResults"></div>
   </div>
+
   <main class="main-container" id="mainContent">
     <section class="hero-banner">
       <h1 id="heroTitle">Cargando...</h1>
@@ -219,10 +214,15 @@
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
+
   <!-- MENÚ LATERAL -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
+
+    <!-- Bienvenida + botón volver admin -->
     <div class="menu-item welcome" id="welcomeMsg">¡Bienvenido!</div>
+    <div id="adminWelcomeBtn" style="display:none; padding:12px 0; font-weight:700; color:#e63946; cursor:pointer; border-bottom:1px solid #eee;" onclick="location.href='admin.html'">Volver a administración</div>
+
     <div class="menu-item dropdown-toggle" id="categoriesToggle">
       Productos
       <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
@@ -235,18 +235,14 @@
     </div>
     <div class="submenu" id="socialList">
       <div class="social-title">¡Sígueme en mis redes sociales!</div>
-      <!-- icons row will be injected here -->
     </div>
 
     <div class="menu-item" id="helpBtn">Necesitas ayuda?</div>
-    <div class="submenu" id="helpList" style="padding-left:20px; display:none;">
-      <!-- help flow UI will be injected here -->
-    </div>
+    <div class="submenu" id="helpList" style="padding-left:20px; display:none;"></div>
 
-    <!-- BOTONES DE CUENTA -->
     <div class="menu-item" id="accountBtn" style="display:none;">Mi cuenta</div>
     <div class="menu-item" id="logoutBtn" style="display:none; color:#e63946;">Cerrar sesión</div>
-    <!-- admin return button container (hidden by default) -->
+
     <div id="adminReturnWrap" style="display:none; padding-top:8px;">
       <button id="adminReturnBtn" class="menu-item admin-return" style="width:100%; text-align:left;">Regresar a menú de administrador</button>
     </div>
@@ -254,6 +250,7 @@
     <div class="menu-item" id="adminBtn" style="display:none;">Ir a administrador</div>
     <div class="menu-item" id="loginBtn">Inicia sesión o regístrate</div>
   </aside>
+
   <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
@@ -270,15 +267,11 @@
   </aside>
 
   <div class="toast" id="toast"></div>
-
-  <!-- sending overlay -->
   <div class="sending-overlay" id="sendingOverlay"><div class="sending-box" id="sendingBox">Enviando...</div></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot, doc, addDoc
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -296,7 +289,6 @@
     let allProducts = [];
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    // ---------- UTIL: mostrar toast ----------
     function showToast(msg, t = 2500) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -304,146 +296,98 @@
       setTimeout(() => toast.classList.remove('show'), t);
     }
 
-    // ---------- WELCOME + MENU + ADMIN detection ----------
     function isLocalAdminFlag() {
-      // check several possible localStorage keys for the admin handle @addmin08213ddv
       const keysToCheck = ['userHandle','user','username','userName','handle','user_tag'];
       for (const k of keysToCheck) {
-        const v = localStorage.getItem(k);
-        if (v === '@addmin08213ddv') return true;
+        if (localStorage.getItem(k) === '@addmin08213ddv') return true;
       }
-      // also check a generic 'admin' key
       if (localStorage.getItem('admin') === '@addmin08213ddv') return true;
       return false;
     }
 
     function updateWelcomeAndMenu(user) {
       const welcome = document.getElementById('welcomeMsg');
+      const adminWelcomeBtn = document.getElementById('adminWelcomeBtn');
       const loginBtn = document.getElementById('loginBtn');
       const accountBtn = document.getElementById('accountBtn');
       const logoutBtn = document.getElementById('logoutBtn');
       const adminBtn = document.getElementById('adminBtn');
 
-      if (user) {
-        const nombre = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
-        const nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-        welcome.textContent = `¡Bienvenido, ${nombreFormateado}!`;
-        localStorage.setItem('userName', nombreFormateado); // Guardar nombre
-        // also save email & phone if available
-        if (user.email) localStorage.setItem('userEmail', user.email);
+      const esAdmin = isLocalAdminFlag() || user?.displayName === '@addmin08213ddv' || user?.email === '@addmin08213ddv';
 
-        loginBtn.style.display = "none";
-        accountBtn.style.display = "block";
-        logoutBtn.style.display = "block";
-        // keep adminBtn visibility controlled by localStorage admin handle or auth displayName
-        if (isLocalAdminFlag() || user.displayName === '@addmin08213ddv' || user.email === '@addmin08213ddv') {
-          adminBtn.style.display = "block";
-          // show admin return button at bottom as requested
-          document.getElementById('adminReturnWrap').style.display = 'block';
-        } else {
-          adminBtn.style.display = "none";
-          document.getElementById('adminReturnWrap').style.display = 'none';
-        }
+      if (esAdmin) {
+        welcome.textContent = "¡Bienvenido, Administrador!";
+        adminWelcomeBtn.style.display = "block";
+      } else if (user) {
+        const nombre = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+        welcome.textContent = `¡Bienvenido, ${nombre.charAt(0).toUpperCase() + nombre.slice(1)}!`;
+        adminWelcomeBtn.style.display = "none";
       } else {
         welcome.textContent = "¡Bienvenido!";
-        localStorage.removeItem('userName');
-
-        loginBtn.style.display = "block";
-        accountBtn.style.display = "none";
-        logoutBtn.style.display = "none";
-        adminBtn.style.display = "none";
-        // also check purely local admin flag (storage only) to show admin return
-        if (isLocalAdminFlag()) {
-          document.getElementById('adminReturnWrap').style.display = 'block';
-        } else {
-          document.getElementById('adminReturnWrap').style.display = 'none';
-        }
+        adminWelcomeBtn.style.display = "none";
       }
+
+      localStorage.setItem('userName', welcome.textContent.replace('¡Bienvenido, ', '').replace('!', '').replace(' Administrador', ''));
+      if (user?.email) localStorage.setItem('userEmail', user.email);
+
+      loginBtn.style.display = user || esAdmin ? "none" : "block";
+      accountBtn.style.display = user || esAdmin ? "block" : "none";
+      logoutBtn.style.display = user || esAdmin ? "block" : "none";
+      adminBtn.style.display = esAdmin ? "block" : "none";
+      document.getElementById('adminReturnWrap').style.display = esAdmin ? 'block' : 'none';
     }
 
-    onAuthStateChanged(auth, (user) => {
-      updateWelcomeAndMenu(user);
-    });
+    onAuthStateChanged(auth, (user) => updateWelcomeAndMenu(user));
+    if (isLocalAdminFlag()) updateWelcomeAndMenu(null);
 
-    // on load, if localStorage indicates admin show button
-    if (isLocalAdminFlag()) {
-      document.getElementById('adminReturnWrap').style.display = 'block';
-    }
-
-    // admin return click
-    document.getElementById('adminReturnBtn').onclick = () => {
-      location.href = 'admin.html';
-    };
-
-    // standard buttons
     document.getElementById('loginBtn').onclick = () => location.href = "login.html";
     document.getElementById('accountBtn').onclick = () => location.href = "perfil.html";
     document.getElementById('adminBtn').onclick = () => location.href = "admin.html";
+    document.getElementById('adminReturnBtn').onclick = () => location.href = "admin.html";
+
+    // CERRAR SESIÓN CON CONFIRMACIÓN
     document.getElementById('logoutBtn').onclick = () => {
-      signOut(auth).then(() => {
-        // also remove any user-identifying local keys except admin handle if present
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
-        location.reload();
-      }).catch(() => {
-        // if signOut fails (not logged in via firebase) still clear local session info
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
-        location.reload();
-      });
+      if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+        signOut(auth).then(() => {
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userEmail');
+          location.reload();
+        }).catch(() => {
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userEmail');
+          location.reload();
+        });
+      }
     };
 
-    // ---------- REDES SOCIALES (colección links, documento links) ----------
-    // Option 1: collection 'links' and doc 'links' with fields instagram, facebook, tiktok, whatsapp, youtube
+    // REDES SOCIALES
     onSnapshot(doc(db, "links", "links"), (snap) => {
       const list = document.getElementById('socialList');
-      // reset content but keep title
       list.innerHTML = `<div class="social-title">¡Sígueme en mis redes sociales!</div>`;
       if (!snap.exists()) {
-        // nothing saved yet
         list.innerHTML += `<div style="color:#999;padding:8px 0;">No hay links disponibles</div>`;
         return;
       }
       const links = snap.data();
-      // build icons row
       const row = document.createElement('div');
       row.className = 'social-icons-row';
-      // helper to create anchor with svg icon
       const makeIcon = (url, name) => {
         if (!url) return null;
         const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.title = name;
-        // set small svg icons (simple brand icons)
+        a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.title = name;
         let svg = '';
-        if (name === 'instagram') {
-          svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>`;
-        } else if (name === 'facebook') {
-          svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 3h3v4h-3v14h-4V7H9V3h3V1.5C12 1 12.5 1 13.6 1h2.8V3z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>`;
-        } else if (name === 'whatsapp') {
-          svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12a9 9 0 1 0-2.6 6.1L21 21l-2.9-0.8A9 9 0 0 0 21 12z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>`;
-        } else if (name === 'tiktok') {
-          svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 8v8a4 4 0 1 0 4-4V5h3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
-        } else if (name === 'youtube') {
-          svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 8l6 4-6 4V8z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>`;
-        } else {
-          svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`;
-        }
+        if (name === 'instagram') svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>`;
+        else if (name === 'facebook') svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 3h3v4h-3v14h-4V7H9V3h3V1.5C12 1 12.5 1 13.6 1h2.8V3z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>`;
+        else if (name === 'whatsapp') svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12a9 9 0 1 0-2.6 6.1L21 21l-2.9-0.8A9 9 0 0 0 21 12z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>`;
+        else if (name === 'tiktok') svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 8v8a4 4 0 1 0 4-4V5h3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
+        else if (name === 'youtube') svg = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10 8l6 4-6 4V8z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>`;
+        else svg = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`;
         a.innerHTML = svg;
         return a;
       };
-
-      // ensure order: instagram, facebook, whatsapp, tiktok, youtube
       const order = ['instagram','facebook','whatsapp','tiktok','youtube'];
-      order.forEach(k => {
-        const a = makeIcon(links[k], k);
-        if (a) row.appendChild(a);
-      });
+      order.forEach(k => { const a = makeIcon(links[k], k); if (a) row.appendChild(a); });
       list.appendChild(row);
-
-      // also append textual items (for accessibility)
       const textWrap = document.createElement('div');
       textWrap.style.marginTop = '8px';
       order.forEach(k => {
@@ -458,11 +402,9 @@
         }
       });
       list.appendChild(textWrap);
-    }, (err) => {
-      console.error('Error cargando links:', err);
     });
 
-    // ---------- TITULO Y SUBTITULO ----------
+    // HERO
     onSnapshot(doc(db, "textos", "hero"), (snap) => {
       if (snap.exists()) {
         const d = snap.data();
@@ -471,8 +413,7 @@
       }
     });
 
-    // ---------- PRODUCTOS ----------
-    import { collection as collectionRef } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    // PRODUCTOS
     onSnapshot(collection(db, "productos"), (snap) => {
       allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderProducts();
@@ -507,7 +448,7 @@
       `).join('');
     }
 
-    // ---------- CARRITO ----------
+    // CARRITO
     function updateCart() {
       const qty = cart.reduce((a,b) => a + b.qty, 0);
       const total = cart.reduce((a,b) => a + b.precio * b.qty, 0);
@@ -558,7 +499,7 @@
       }
     };
 
-    // ---------- BÚSQUEDA ----------
+    // BÚSQUEDA
     document.getElementById('searchBtn').onclick = () => {
       document.getElementById('searchBarContainer').classList.add('active');
       document.getElementById('searchResultsOverlay').classList.add('active');
@@ -591,7 +532,7 @@
         `).join('');
     };
 
-    // ---------- MENÚS ----------
+    // MENÚS
     document.getElementById('menuBtn').onclick = () => {
       document.getElementById('menuSidebar').classList.add('open');
       document.getElementById('menuOverlay').classList.add('show');
@@ -604,229 +545,33 @@
     });
     document.getElementById('categoriesToggle').onclick = () => document.getElementById('categoriesList').classList.toggle('show');
     document.getElementById('socialToggle').onclick = () => document.getElementById('socialList').classList.toggle('show');
-    document.getElementById('cartBtn').onclick = () => {
-      document.getElementById('cartSidebar').classList.add('open');
-      updateCart();
-    };
+    document.getElementById('cartBtn').onclick = () => { document.getElementById('cartSidebar').classList.add('open'); updateCart(); };
     document.getElementById('closeCart').onclick = () => document.getElementById('cartSidebar').classList.remove('open');
 
-    updateCart();
-
-    // ---------- AYUDA FLOW (localStorage + UI + envío a Firestore) ----------
-    const helpBtn = document.getElementById('helpBtn');
-    const helpList = document.getElementById('helpList');
-
-    const HELP_KEY = 'help_flow_v1'; // localStorage key to keep flow
-    function getHelpFlow() {
-      return JSON.parse(localStorage.getItem(HELP_KEY) || '[]');
-    }
-    function setHelpFlow(arr) {
-      localStorage.setItem(HELP_KEY, JSON.stringify(arr));
-    }
-    function clearHelpFlow() {
-      localStorage.removeItem(HELP_KEY);
-    }
-
-    // render initial help menu UI
-    function renderHelpMenu() {
+    // AYUDA - ahora redirige a ayuda.html guardando motivo
+    document.getElementById('helpBtn').onclick = () => {
+      const helpList = document.getElementById('helpList');
       helpList.innerHTML = '';
-      const container = document.createElement('div');
-      container.className = 'help-flow';
-
-      const options = [
-        { id: 'pago', label: 'Necesito ayuda con mi pago' },
-        { id: 'usuario', label: 'Necesito ayuda con mi usuario y correo' },
-        { id: 'pedido', label: 'Necesito ayuda con mi pedido' },
-        { id: 'otro', label: 'Otro problema' }
+      const opciones = [
+        {id: 'pago', label: 'Necesito ayuda con mi pago'},
+        {id: 'usuario', label: 'Necesito ayuda con mi usuario y correo'},
+        {id: 'pedido', label: 'Necesito ayuda con mi pedido'},
+        {id: 'otro', label: 'Otro problema'}
       ];
-
-      const flow = getHelpFlow();
-      // if empty show main options
-      if (flow.length === 0) {
-        options.forEach(o => {
-          const b = document.createElement('div');
-          b.className = 'help-option';
-          b.textContent = o.label;
-          b.onclick = () => {
-            const newFlow = [...flow, o.id];
-            setHelpFlow(newFlow);
-            renderHelpMenu();
-          };
-          container.appendChild(b);
-        });
-        helpList.appendChild(container);
-        helpList.style.display = 'block';
-        return;
-      }
-
-      // if user chose 'pedido' show frequent problems
-      const last = flow[flow.length - 1];
-      if (last === 'pedido' && flow.length === 1) {
-        const title = document.createElement('div');
-        title.style.fontWeight = '700';
-        title.style.padding = '6px 0';
-        title.textContent = 'Problemas frecuentes (Pedido)';
-        container.appendChild(title);
-        const problemas = [
-          { id: 'direccion', label: 'Dirección mal colocada' },
-          { id: 'nombre', label: 'Nombre de persona incorrecto' },
-          { id: 'estado', label: 'Estado del pedido' },
-          { id: 'otro_pedido', label: 'Otro problema con mi pedido' }
-        ];
-        problemas.forEach(p => {
-          const b = document.createElement('div');
-          b.className = 'help-option';
-          b.textContent = p.label;
-          b.onclick = () => {
-            const newFlow = [...flow, p.id];
-            setHelpFlow(newFlow);
-            renderHelpMenu();
-          };
-          container.appendChild(b);
-        });
-        // go back button
-        const back = document.createElement('div');
-        back.className = 'help-option';
-        back.style.background = '#fff';
-        back.style.border = '1px solid #ccc';
-        back.textContent = 'Volver';
-        back.onclick = () => {
-          clearHelpFlow();
-          renderHelpMenu();
+      opciones.forEach(op => {
+        const div = document.createElement('div');
+        div.className = 'help-option';
+        div.textContent = op.label;
+        div.onclick = () => {
+          localStorage.setItem('help_motivo', op.id);
+          location.href = 'ayuda.html';
         };
-        container.appendChild(back);
-        helpList.appendChild(container);
-        helpList.style.display = 'block';
-        return;
-      }
-
-      // if flow length >=2 -> show comment input + send button
-      if (flow.length >= 1) {
-        const summary = document.createElement('div');
-        summary.style.padding = '6px 0';
-        summary.style.fontSize = '0.95rem';
-        summary.style.color = '#333';
-        summary.style.fontWeight = '700';
-        summary.textContent = 'Resumen: ' + flow.map(s => {
-          if (s === 'pago') return 'Pago';
-          if (s === 'usuario') return 'Usuario/Correo';
-          if (s === 'pedido') return 'Pedido';
-          if (s === 'otro') return 'Otro';
-          if (s === 'direccion') return 'Dirección';
-          if (s === 'nombre') return 'Nombre incorrecto';
-          if (s === 'estado') return 'Estado del pedido';
-          if (s === 'otro_pedido') return 'Otro (pedido)';
-          return s;
-        }).join(' • ');
-        container.appendChild(summary);
-
-        const textarea = document.createElement('textarea');
-        textarea.placeholder = 'Agrega un comentario opcional...';
-        textarea.className = 'help-input';
-        textarea.style.minHeight = '80px';
-        container.appendChild(textarea);
-
-        // Show user data (attempt to get from auth or localStorage)
-        const datosDiv = document.createElement('div');
-        datosDiv.style.fontSize = '0.9rem';
-        datosDiv.style.color = '#555';
-        datosDiv.style.padding = '6px 0';
-        const datos = getUserDataForHelp();
-        datosDiv.innerHTML = `<div><strong>Nombre:</strong> ${datos.nombre || 'No disponible'}</div>
-                              <div><strong>Email:</strong> ${datos.email || 'No disponible'}</div>
-                              <div><strong>Teléfono:</strong> ${datos.telefono || 'No disponible'}</div>`;
-        container.appendChild(datosDiv);
-
-        const footer = document.createElement('div');
-        footer.className = 'help-footer';
-
-        const sendBtn = document.createElement('button');
-        sendBtn.className = 'help-send-btn';
-        sendBtn.textContent = 'Pedir ayuda';
-        sendBtn.onclick = async () => {
-          // prepare payload
-          const problema = flow[0] || '';
-          const problema2 = flow[1] || '';
-          const comentario = textarea.value.trim();
-          const datosObj = datos;
-          // show sending overlay
-          document.getElementById('sendingOverlay').style.display = 'flex';
-          // add to Firestore
-          try {
-            await addDoc(collection(db, 'ayudaadmin'), {
-              problema, problema2, comentario,
-              datos: datosObj,
-              creado: new Date()
-            });
-            // success state
-            document.getElementById('sendingOverlay').style.display = 'none';
-            showToast('Enviado');
-            // final message inside menu
-            container.innerHTML = `<div style="padding:12px 0; font-weight:700;">Hemos notificado a los administradores. En unos momentos resolvemos tu inconveniente. Te contactaremos por WhatsApp.</div>`;
-            clearHelpFlow();
-          } catch (e) {
-            console.error('Error enviando ayuda:', e);
-            document.getElementById('sendingOverlay').style.display = 'none';
-            showToast('Error al enviar. Intenta nuevamente.');
-          }
-        };
-
-        const backBtn = document.createElement('div');
-        backBtn.className = 'help-option';
-        backBtn.textContent = 'Volver';
-        backBtn.onclick = () => {
-          // pop last selection and re-render
-          const f = getHelpFlow();
-          f.pop();
-          setHelpFlow(f);
-          renderHelpMenu();
-        };
-
-        footer.appendChild(sendBtn);
-        footer.appendChild(backBtn);
-        container.appendChild(footer);
-
-        helpList.appendChild(container);
-        helpList.style.display = 'block';
-        return;
-      }
-
-      helpList.appendChild(container);
+        helpList.appendChild(div);
+      });
       helpList.style.display = 'block';
-    }
-
-    function getUserDataForHelp() {
-      // prefer auth.currentUser fields
-      const u = auth.currentUser;
-      const datos = { nombre: null, email: null, telefono: null };
-      if (u) {
-        datos.email = u.email || null;
-        datos.nombre = u.displayName || u.email?.split('@')[0] || null;
-        // phone may be in providerData
-        datos.telefono = u.phoneNumber || null;
-      }
-      // fallback to localStorage
-      if (!datos.nombre) datos.nombre = localStorage.getItem('userName') || localStorage.getItem('username') || null;
-      if (!datos.email) datos.email = localStorage.getItem('userEmail') || null;
-      if (!datos.telefono) datos.telefono = localStorage.getItem('userPhone') || localStorage.getItem('userTel') || null;
-      return datos;
-    }
-
-    // open/close help
-    helpBtn.onclick = () => {
-      const visible = helpList.style.display === 'block';
-      if (visible) {
-        helpList.style.display = 'none';
-        // clear flow if closed
-        //clearHelpFlow();
-      } else {
-        renderHelpMenu();
-      }
     };
 
-    // ---------- inicial render for help if previous flow exists ----------
-    if (getHelpFlow().length > 0) renderHelpMenu();
-
+    updateCart();
   </script>
 </body>
 </html>
