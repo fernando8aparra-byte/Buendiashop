@@ -19,7 +19,7 @@
     h1 { font-size:3.75rem; line-height:1.1; }
     h2 { font-size:2.25rem; margin:40px 0 20px; }
 
-    /* ANIMACIÓN DE INICIO (SPLASH) */
+    /* ANIMACIÓN DE INICIO (SPLASH) - AÑADIDO */
     #splashScreen {
       position: fixed;
       top: 0;
@@ -54,8 +54,7 @@
       display:flex; align-items:center; justify-content:center;
       position:relative;
     }
-    
-    /* STYLES PARA ICONOS EN NEGRO PURO (MODIFICADO) */
+    /* ESTILO DE ICONOS EN NEGRO PURO - MODIFICADO */
     .icon-btn svg { 
       width:26px; 
       height:26px; 
@@ -63,19 +62,18 @@
       stroke-width:2.7; 
       fill:none; 
     }
-    /* Corrección específica para el carrito y otros íconos con relleno si aplica, asegurando el color negro */
-    .icon-btn svg path[fill] {
-      fill: #000; 
-    }
-    /* Excepción para el carrito donde el path de la cesta principal es trazo y los círculos son relleno */
-    #cartBtn svg path:first-child { 
-      fill: #000; /* Puntos de las ruedas/pies */
-      stroke: none;
-    }
-    #cartBtn svg path:last-child {
-      stroke: #000; /* Trazado de la cesta */
-      fill: none;
-    }
+    /* Aseguramos que los elementos con 'fill' dentro del SVG sean negros también, como los puntos del carrito */
+    .icon-btn svg path[fill="none"] {
+        fill: none;
+    }
+    .icon-btn svg path:not([fill="none"]),
+    .icon-btn svg circle:not([fill="none"]) {
+        fill: #000;
+    }
+    .icon-btn svg * {
+        color: inherit;
+    }
+
 
     /* BADGE CARRITO */
     #cartBadge {
@@ -331,7 +329,7 @@
       <div class="social-grid" id="socialLinksGrid">
         <p style="grid-column:1/-1; color:#999;">Cargando redes...</p>
       </div>
-    </div>
+      </div>
   </div>
 
     <footer>
@@ -370,7 +368,7 @@
       const splashScreen = document.getElementById('splashScreen');
       setTimeout(() => {
         splashScreen.classList.add('fade-out');
-      }, 2500); // 2.5 segundos de pantalla blanca (puedes ajustar este valor)
+      }, 2500); // 2.5 segundos de pantalla blanca
     });
     // FIN CONTROL DE ANIMACIÓN DE INICIO
     
