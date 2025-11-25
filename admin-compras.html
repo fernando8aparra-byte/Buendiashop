@@ -3,342 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compras • Efraín Shop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  
+  <title>Ventas - Boutique Buendía</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root {
-      --bg: #ffffff;
-      --text: #1a1a1a;
-      --border: #e2e2e2;
-      --card-bg: #ffffff;
-      --accent: #000000;
-      --accent-light: #f8f8f8;
-      --shadow: 0 8px 30px rgba(0,0,0,0.07);
-      --radius: 18px;
-      --transition: all 0.35s ease;
-      --green: #10b981;
-      --red: #ef4444;
-      --blue: #3b82f6;
-      --yellow: #f59e0b;
-      --purple: #8b5cf6;
-    }
-
-    [data-theme="dark"] {
-      --bg: #000000;
-      --text: #f5f5f5;
-      --border: #333;
-      --card-bg: #111;
-      --accent-light: #1a1a1a;
-      --shadow: 0 8px 30px rgba(0,0,0,0.5);
-    }
-
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: var(--transition);
-    }
-
+    body { margin: 0; padding: 0; background: #f8f8f8; font-family: 'Poppins', sans-serif; }
     .header {
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      z-index: 1000;
-      padding: 16px 20px;
-      backdrop-filter: blur(12px);
+      background: #000; color: #fff; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 1000; font-weight: 800; font-size: 1.4rem; text-transform: uppercase;
     }
-    .header-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 20px;
-    }
-    .logo {
-      font-weight: 800;
-      font-size: 1.8rem;
-      letter-spacing: -0.8px;
-      color: var(--accent);
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .back-btn, .theme-toggle, .toggle-stats-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 12px;
-      color: var(--text);
-      transition: var(--transition);
-    }
-    .back-btn:hover, .theme-toggle:hover, .toggle-stats-btn:hover {
-      background: var(--accent-light);
-      transform: translateY(-2px);
-    }
-    .total-ventas {
-      background: var(--green);
-      color: white;
-      padding: 12px 28px;
-      border-radius: 50px;
-      font-weight: 800;
-      font-size: 1.5rem;
-      box-shadow: 0 6px 20px rgba(16,185,129,0.3);
-      min-width: 150px;
-      text-align: center;
-    }
-    .total-ventas.negative { background: var(--red); box-shadow: 0 6px 20px rgba(239,68,68,0.3); }
+    .header .left { display: flex; align-items: center; gap: 12px; }
+    .header .back { font-size: 1.7rem; cursor: pointer; }
+    .header .brand { font-size: 1.05rem; font-weight: 800; letter-spacing: 1px; }
+    .header .title { flex: 1; text-align: center; margin-right: -50px; }
+    .header .settings { font-size: 1.6rem; cursor: pointer; position: relative; }
 
-    .main-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
+    .settings-menu {
+      display: none; position: absolute; right: 0; top: 60px; background: #000; color: #fff;
+      border-radius: 10px; width: 220px; z-index: 999; box-shadow: 0 5px 15px rgba(0,0,0,0.6);
     }
-    .page-title {
-      font-size: 2.4rem;
-      font-weight: 800;
-      margin-bottom: 32px;
-      letter-spacing: -1px;
+    .settings-menu.show { display: block; }
+    .settings-menu button {
+      width: 100%; padding: 14px 16px; text-align: left; background: none; border: none;
+      color: #fff; font-family: 'Poppins', sans-serif; font-size: 0.95rem; cursor: pointer;
+      border-bottom: 1px solid #333;
     }
+    .settings-menu button:hover { background: #222; }
+    .settings-menu button:last-child { border-bottom: none; }
 
-    .search-bar { margin-bottom: 40px; }
-    .search-input {
-      width: 100%;
-      padding: 18px 24px;
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      font-size: 1.1rem;
-      background: var(--card-bg);
-      color: var(--text);
-    }
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 5px rgba(0,0,0,0.06);
-    }
+    .controls { padding: 15px 20px; background: #fff; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .search-box, .sort-box { padding: 10px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 0.95rem; }
+    .search-box { flex: 1; min-width: 200px; }
+    .sort-box { width: 160px; }
 
-    .orders-grid { display: grid; gap: 28px; }
+    .orders-container { padding: 20px; overflow-y: auto; max-height: calc(100vh - 180px); }
     .order-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
+      background: #fff; border-radius: 12px; padding: 18px; margin-bottom: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08); position: relative;
     }
-    .order-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-      border-color: var(--accent);
+    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .order-id { font-weight: 800; font-size: 1.3rem; color: #000; }
+    .order-date { font-size: 0.9rem; color: #666; }
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; font-size: 0.95rem; line-height: 1.5;
     }
-    .order-header {
-      background: var(--accent);
-      color: white;
-      padding: 20px 28px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .info-grid strong { color: #000; }
+    .total { font-size: 1.3rem; font-weight: 800; color: #000; margin-top: 10px; text-align: right; }
+    .print-btn {
+      position: absolute; top: 18px; right: 18px; background: #000; color: #fff;
+      border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: bold;
     }
-    .order-body { padding: 28px; }
-    .order-total {
-      font-size: 2.6rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-      color: var(--accent);
-    }
-    .order-id { font-size: 0.95rem; color: #666; margin-bottom: 12px; }
-    .order-date {
-      font-size: 0.95rem;
-      color: #888;
-      margin-top: 20px;
-      font-weight: 500;
-    }
-    .order-products, .order-address {
-      background: var(--accent-light);
-      padding: 20px;
-      border-radius: 12px;
-      margin: 20px 0;
-      line-height: 1.8;
-    }
-    .order-product {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .order-product:last-child { border: none; }
+    .print-btn i { margin-right: 6px; }
 
-    .empty-state {
-      text-align: center;
-      padding: 120px 20px;
-      color: #999;
-      font-size: 1.3rem;
-    }
-    .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.4; }
-
-    /* Panel Estadísticas (lateral deslizable) */
-    .stats-panel {
-      position: fixed;
-      top: 0;
-      right: -400px;
-      width: 380px;
-      height: 100vh;
-      background: var(--card-bg);
-      border-left: 1.5px solid var(--border);
-      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-      z-index: 999;
-      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 24px;
-      overflow-y: auto;
-    }
-    .stats-panel.open { right: 0; }
-    .stats-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .stats-header h2 {
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-    .close-stats {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      cursor: pointer;
-      color: #999;
-    }
-    .stats-grid {
-      display: grid;
-      gap: 20px;
-    }
-    .stat-card {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 20px;
-      background: var(--accent-light);
-      border-radius: 14px;
-    }
-    .stat-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      color: white;
-    }
-    .stat-icon.green { background: var(--green); }
-    .stat-icon.blue { background: var(--blue); }
-    .stat-icon.yellow { background: var(--yellow); }
-    .stat-icon.purple { background: var(--purple); }
-    .stat-info h3 {
-      font-size: 0.9rem;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    .stat-info p {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-top: 4px;
-    }
-
-    @media (max-width: 768px) {
-      .stats-panel { width: 100%; right: -100%; }
-      .stats-panel.open { right: 0; }
-    }
+    .empty { text-align: center; padding: 60px 20px; color: #666; font-size: 1.1rem; }
   </style>
 </head>
-<body data-theme="light">
+<body>
 
+  <!-- HEADER -->
   <div class="header">
-    <div class="header-inner">
-      <button class="back-btn" onclick="location.href='admin.html'">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <div class="logo">EFRAÍN SHOP</div>
-      <div class="header-right">
-        <div class="total-ventas" id="totalVentas">$0</div>
-        <button class="toggle-stats-btn" id="toggleStats">
-          <i class="fas fa-chart-bar"></i>
-        </button>
-        <button class="theme-toggle" id="themeToggle">
-          <i class="fas fa-moon"></i>
-        </button>
+    <div class="left">
+      <div class="back" onclick="window.location.href='admin.html'">←</div>
+      <div class="brand">BOUTIQUE BUENDÍA</div>
+    </div>
+    <div class="title">VENTAS</div>
+    <div class="settings" id="settingsBtn">⚙️
+      <div class="settings-menu" id="settingsMenu">
+        <button onclick="filterOrders('paid')">Pedidos Pagados</button>
+        <button onclick="filterOrders('pending')">Pedidos Pendientes</button>
+        <button onclick="filterOrders('all')">Todos los Pedidos</button>
+        <button onclick="showCourierMap()">Encontrar Paquetería</button>
       </div>
     </div>
   </div>
 
-  <!-- Panel Estadísticas (oculto por defecto) -->
-  <div class="stats-panel" id="statsPanel">
-    <div class="stats-header">
-      <h2>Estadísticas</h2>
-      <button class="close-stats" id="closeStats">×</button>
-    </div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-box"></i></div>
-        <div class="stat-info">
-          <h3>Productos Vendidos</h3>
-          <p id="totalItems">0</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon blue"><i class="fas fa-shopping-cart"></i></div>
-        <div class="stat-info">
-          <h3>Total Órdenes</h3>
-          <p id="totalOrders">0</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
-        <div class="stat-info">
-          <h3>Pendientes</h3>
-          <p id="pendingOrders">0</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple"><i class="fas fa-calendar-check"></i></div>
-        <div class="stat-info">
-          <h3>Hoy</h3>
-          <p id="todayOrders">0</p>
-        </div>
-      </div>
+  <!-- CONTROLES -->
+  <div class="controls">
+    <input type="text" class="search-box" id="searchInput" placeholder="Buscar por nombre, teléfono, CP, orden...">
+    <select class="sort-box" id="sortSelect">
+      <option value="date-desc">Más reciente</option>
+      <option value="date-asc">Más antiguo</option>
+      <option value="total-desc">Mayor total</option>
+      <option value="total-asc">Menor total</option>
+    </select>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div class="orders-container" id="ordersContainer">
+    <div class="empty">Cargando pedidos pagados...</div>
+  </div>
+
+  <!-- MODAL MAPA -->
+  <div class="modal" id="courierModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:#fff;padding:20px;border-radius:12px;max-width:90%;text-align:center;">
+      <h3>Paqueterías en Navojoa, Sonora</h3>
+      <div id="map" style="height:400px;width:100%;margin:15px 0;border-radius:10px;"></div>
+      <button style="padding:12px 24px;background:#000;color:#fff;border:none;border-radius:8px;cursor:pointer;" 
+              onclick="document.getElementById('courierModal').style.display='none'">Cerrar</button>
     </div>
   </div>
 
-  <div class="main-container">
-    <h1 class="page-title">Historial de Compras</h1>
+  <!-- Firebase + Lógica -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-    <div class="search-bar">
-      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, teléfono, colonia, ID de orden...">
-    </div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    <div class="orders-grid" id="ordersContainer">
-      <div class="empty-state">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Cargando compras...</p>
-      </div>
-    </div>
-  </div>
+    const ordersContainer = document.getElementById('ordersContainer');
+    let allOrders = [];
+    let currentFilter = 'paid'; // Por defecto solo pagados
 
-  <!-- JavaScript separado -->
-  <script type="module" src="js/compras.js"></script>
+    async function loadOrders() {
+      ordersContainer.innerHTML = '<div class="empty">Cargando pedidos pagados...</div>';
+      const q = query(collection(db, "orders"), orderBy("date", "desc"));
+      const snapshot = await getDocs(q);
+      allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      filterOrders(currentFilter);
+    }
+
+    function renderOrders(orders) {
+      if (orders.length === 0) {
+        ordersContainer.innerHTML = `<div class="empty">No hay pedidos ${currentFilter === 'paid' ? 'pagados' : currentFilter === 'pending' ? 'pendientes' : ''}.</div>`;
+        return;
+      }
+
+      ordersContainer.innerHTML = orders.map(order => {
+        const date = order.date?.toDate?.() || new Date(order.date);
+        const formattedDate = date.toLocaleDateString('es-MX') + ' ' + date.toLocaleTimeString('es-MX', {hour: '2-digit', minute: '2-digit'});
+        const a = order.address || {};
+        const orderId = order.paymentId || order.id;
+
+        return `
+          <div class="order-card">
+            <div class="order-header">
+              <div class="order-id">#${orderId}</div>
+              <div class="order-date">${formattedDate}</div>
+            </div>
+            <div class="info-grid">
+              <div><strong>Nombre:</strong> ${a.name || 'Sin nombre'}</div>
+              <div><strong>Teléfono:</strong> ${a.phone || 'Sin teléfono'}</div>
+              <div><strong>Domicilio:</strong> ${a.street || ''}, ${a.colonia || ''}</div>
+              <div><strong>C.P.:</strong> ${a.cp || '00000'}</div>
+              <div><strong>Estado:</strong> ${a.state || 'Sonora'}</div>
+              <div><strong>Total:</strong> $${(order.total || 0).toLocaleString()} MXN</div>
+            </div>
+            <div class="total">TOTAL: $${(order.total || 0).toLocaleString()} MXN</div>
+            <button class="print-btn" onclick="printLabel('${order.id}')">
+              <i class="fas fa-print"></i> Imprimir Etiqueta
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Etiqueta de envío profesional (4x6 in)
+    window.printLabel = function(orderId) {
+      const order = allOrders.find(o => o.id === orderId);
+      if (!order) return alert("Error: pedido no encontrado");
+
+      const a = order.address || {};
+      const orderNum = order.paymentId || order.id;
+
+      const win = window.open('', '', 'width=600,height=900');
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Etiqueta #${orderNum}</title>
+          <style>
+            body { font-family: 'Arial', sans-serif; margin: 0; padding: 15px; }
+            .label { width: 4in; height: 6in; border: 5px solid #000; padding: 20px; box-sizing: border-box; background: white; }
+            .header { font-size: 32px; font-weight: bold; text-align: center; margin-bottom: 20px; }
+            .order-num { font-size: 48px; font-weight: bold; text-align: center; background: #000; color: white; padding: 15px; margin: 20px 0; }
+            .section { margin: 25px 0; font-size: 22px; line-height: 1.6; }
+            .title { font-weight: bold; text-decoration: underline; margin-bottom: 10px; font-size: 24px; }
+            .barcode { font-size: 50px; text-align: center; margin: 30px 0; letter-spacing: 10px; font-weight: bold; }
+            @media print { body { margin:0; padding:10px; } .no-print { display:none; } }
+          </style>
+        </head>
+        <body>
+          <div class="label">
+            <div class="header">BOUTIQUE BUENDÍA</div>
+            <div class="order-num">#${orderNum}</div>
+            <div class="section">
+              <div class="title">ENVIAR A:</div>
+              <strong>${a.name || 'N/A'}</strong><br>
+              ${a.phone || 'Sin teléfono'}<br><br>
+              ${a.street || ''}<br>
+              ${a.colonia || ''}<br>
+              C.P. ${a.cp || '00000'}, ${a.state || 'Sonora'}<br>
+              Navojoa, Sonora, México
+            </div>
+            <div class="section">
+              <div class="title">DETALLES:</div>
+              Total: <strong>$${(order.total || 0).toLocaleString()} MXN</strong><br>
+              Fecha: ${new Date(order.date?.toDate() || order.date).toLocaleDateString('es-MX')}
+            </div>
+            <div class="barcode">${orderNum}</div>
+          </div>
+          <button class="no-print" onclick="window.print()" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:15px 30px;font-size:18px;background:#000;color:white;border:none;border-radius:8px;cursor:pointer;">
+            Imprimir Etiqueta
+          </button>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    };
+
+    // Filtros
+    window.filterOrders = function(status) {
+      currentFilter = status;
+      document.getElementById('settingsMenu').classList.remove('show');
+      let filtered = allOrders;
+
+      if (status === 'paid') filtered = allOrders.filter(o => o.status === 'paid');
+      else if (status === 'pending') filtered = allOrders.filter(o => o.status !== 'paid');
+      // 'all' muestra todos
+
+      // Aplicar búsqueda
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      if (search) {
+        filtered = filtered.filter(o => {
+          const a = o.address || {};
+          return `${o.paymentId || o.id} ${a.name} ${a.phone} ${a.cp} ${a.street}`.toLowerCase().includes(search);
+        });
+      }
+
+      // Ordenar
+      const sort = document.getElementById('sortSelect').value;
+      filtered.sort((a, b) => {
+        const da = a.date?.toDate?.() || a.date;
+        const db = b.date?.toDate?.() || b.date;
+        if (sort === 'date-desc') return db - da;
+        if (sort === 'date-asc') return da - db;
+        if (sort === 'total-desc') return (b.total || 0) - (a.total || 0);
+        if (sort === 'total-asc') return (a.total || 0) - (b.total || 0);
+        return 0;
+      });
+
+      renderOrders(filtered);
+    };
+
+    // Búsqueda en tiempo real
+    document.getElementById('searchInput').addEventListener('input', () => filterOrders(currentFilter));
+    document.getElementById('sortSelect').addEventListener('change', () => filterOrders(currentFilter));
+
+    // Menú
+    document.getElementById('settingsBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('settingsMenu').classList.toggle('show');
+    });
+    document.addEventListener('click', () => {
+      document.getElementById('settingsMenu').classList.remove('show');
+    });
+
+    // Mapa
+    window.showCourierMap = () => {
+      document.getElementById('courierModal').style.display = 'flex';
+      if (!window.mapLoaded) {
+        window.mapLoaded = true;
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=TU_API_KEY_AQUI&libraries=places&callback=initMap';
+        document.body.appendChild(script);
+      } else if (window.initMap) initMap();
+    };
+
+    window.initMap = function() {
+      const navojoa = { lat: 27.0727, lng: -109.4437 };
+      const map = new google.maps.Map(document.getElementById("map"), { zoom: 14, center: navojoa });
+      const service = new google.maps.places.PlacesService(map);
+      service.textSearch({ location: navojoa, radius: 10000, query: "paquetería DHL FedEx Estafeta Navojoa" }, (results, status) => {
+        if (status === 'OK') results.forEach(r => r.geometry && new google.maps.Marker({ map, position: r.geometry.location, title: r.name }));
+      });
+    };
+
+    // Cargar al iniciar
+    loadOrders();
+  </script>
 </body>
 </html>
