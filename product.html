@@ -70,7 +70,7 @@
     #closeSearchHeader, #closeCart { position: absolute; top: 15px; right: 15px; background: none !important; border: none !important; color: #000 !important; font-size: 2.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 30; }
     .cart-item { position: relative; padding-right: 40px; padding: 15px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; }
     .cart-item button { position: absolute; top: 8px; right: 8px; background: none !important; border: none !important; color: #000 !important; font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
-    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0.3); z-index: 15; }
+    .header-overlay { display: none; position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); background: rgba(0,0,0,0,0.3); z-index: 15; }
     .header-overlay.show { display: block; }
     .main-container { margin-top: 20px; padding: 0 20px; }
     .search-results { padding: 20px; background: #fff; border-radius: 12px; margin: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -81,11 +81,90 @@
 
     /* === PRODUCTO PRINCIPAL === */
     .product-main { text-align: center; padding: 40px 20px; background: #f8f8f8; }
-    .product-image-container { position: relative; display: inline-block; max-width: 100%; }
-    .product-image-container img { max-width: 100%; max-height: 450px; object-fit: contain; border-radius: 12px; }
-    .zoom-btn {
-      position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+
+    /* NUEVO CARRUSEL */
+    .carousel-container {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
     }
+    .carousel {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      width: 100%;
+    }
+    .carousel-slide {
+      min-width: 100%;
+      box-sizing: border-box;
+    }
+    .carousel-slide img {
+      width: 100%;
+      height: auto;
+      max-height: 500px;
+      object-fit: contain;
+      display: block;
+    }
+    .carousel-prev, .carousel-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .carousel-prev { left: 12px; }
+    .carousel-next { right: 12px; }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 0;
+      background: #fff;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      transition: background 0.3s;
+    }
+    .dot.active {
+      background: #fff;
+      box-shadow: 0 0 0 2px #000;
+    }
+
+    .zoom-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      z-index: 5;
+    }
+
     .product-info { max-width: 600px; margin: 30px auto 0; }
     .product-info h1 { font-size: 2rem; margin: 10px 0; }
     .product-info .desc { color: #555; font-size: 1rem; margin: 15px 0; line-height: 1.6; }
@@ -407,7 +486,7 @@
       window.location.href = 'pago.html';
     };
 
-    // === CARGAR PRODUCTO ===
+    // === CARGAR PRODUCTO CON CARRUSEL ===
     async function loadProduct() {
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get('id');
@@ -425,11 +504,35 @@
         const p = { id: docSnap.id, ...docSnap.data() };
         window.currentProduct = p;
 
-        productMain.innerHTML = `
-          <div class="product-image-container">
-            <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-            <button class="zoom-btn" onclick="openLightbox('${p.imagen}')">Zoom</button>
+        // Preparar array de imágenes: principal + extras (si existe el campo "imagenes")
+        const allImages = [p.imagen];
+        if (Array.isArray(p.imagenes) && p.imagenes.length > 0) {
+          allImages.push(...p.imagenes);
+        }
+
+        // HTML del carrusel
+        let carouselHTML = `
+          <div class="carousel-container">
+            <div class="carousel" id="carousel">
+        `;
+        allImages.forEach(src => {
+          carouselHTML += `
+            <div class="carousel-slide">
+              <img src="${src}" alt="${p.nombre}" loading="lazy">
+              <button class="zoom-btn" onclick="openLightbox('${src}')">Zoom</button>
+            </div>
+          `;
+        });
+        carouselHTML += `
+            </div>
+            <button class="carousel-prev" id="prevBtn">‹</button>
+            <button class="carousel-next" id="nextBtn">›</button>
+            <div class="carousel-dots" id="dotsContainer"></div>
           </div>
+        `;
+
+        productMain.innerHTML = `
+          ${carouselHTML}
           <div class="product-info">
             <h1>${p.nombre}</h1>
             <p class="desc">${p.descripcion || 'Sin descripción'}</p>
@@ -451,6 +554,41 @@
           </div>
         `;
 
+        // === INICIALIZAR CARRUSEL ===
+        const carousel = document.getElementById('carousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('dotsContainer');
+        let currentIndex = 0;
+
+        function updateDots() {
+          dotsContainer.innerHTML = '';
+          allImages.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+          });
+        }
+
+        function goToSlide(index) {
+          currentIndex = index;
+          carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+          updateDots();
+        }
+
+        prevBtn.onclick = () => {
+          currentIndex = (currentIndex - 1 + allImages.length) % allImages.length;
+          goToSlide(currentIndex);
+        };
+        nextBtn.onclick = () => {
+          currentIndex = (currentIndex + 1) % allImages.length;
+          goToSlide(currentIndex);
+        };
+
+        // Crear puntos
+        updateDots();
+
         loadRelatedProducts(p);
       } catch (err) {
         console.error(err);
@@ -460,6 +598,8 @@
 
     // === PRODUCTOS RELACIONADOS ===
     async function loadRelatedProducts(mainProduct) {
+      // ... (sin cambios, igual que tenías)
+      // (código original copiado tal cual)
       relatedGrid.innerHTML = '<p>Cargando relacionados...</p>';
       const nameWords = (mainProduct.nombre || '').toLowerCase().split(' ').filter(w => w.length > 2);
       const descWords = (mainProduct.descripcion || '').toLowerCase().split(' ').filter(w => w.length > 2);
@@ -513,6 +653,7 @@
     lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); };
 
     // === BÚSQUEDA, MENÚ, AUTH, TOAST ===
+    // (todo el resto del código original sin tocar)
     let searchTimeout;
     searchInput.addEventListener('input', () => {
       clearTimeout(searchTimeout);
@@ -591,7 +732,6 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // === BOTÓN "INICIO" O "ADMIN" - MISMO ESTILO ===
     function updateHomeButton() {
       const isProductPage = window.location.pathname.includes('product.html');
       const isAdminPage = window.location.pathname.includes('admin.html');
