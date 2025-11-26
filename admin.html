@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -61,33 +60,18 @@
     .form-group select:focus,
     .form-group textarea:focus { outline: none; border-color: #000; }
     .form-group textarea { resize: vertical; min-height: 90px; }
-    /* VARIANTS / TALLAS */
-    .variants-btn {
-      width: 100%; padding: 14px; border: 2px solid #ddd;
-      border-radius: 12px; background: #fff; cursor: pointer; font-size: 1rem;
-      text-align: left; color: #555;
+    /* CANTIDAD DISPONIBLE */
+    .quantity-group { display: flex; align-items: center; gap: 14px; }
+    #availableDisplay {
+      width: 56px; height: 56px; border: 2.5px solid #000;
+      border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.5rem; font-weight: bold;
+      cursor: pointer; user-select: none; background: #fff;
     }
-    .variants-menu {
-      display: none; position: absolute; top: 100%; left: 0; width: 100%;
-      background: #fff; border: 2px solid #ddd; border-radius: 12px;
-      padding: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 10;
-    }
-    .variants-menu.active { display: block; }
-    .variant-item {
-      position: relative; margin: 8px; width: 60px; height: 60px;
-      border: 2px solid #ddd; border-radius: 8px; display: flex;
-      align-items: center; justify-content: center; cursor: pointer;
-      font-weight: bold;
-    }
-    .variant-qty {
-      position: absolute; top: -8px; right: -8px; background: #000;
-      color: #fff; border-radius: 50%; width: 24px; height: 24px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem;
-    }
-    .variants-close {
-      position: absolute; top: 8px; right: 8px; background: none;
-      border: none; font-size: 1.2rem; cursor: pointer;
+    #availableInput { display: none; }
+    #availableInput input {
+      width: 90px; padding: 10px; text-align: center;
+      border: 2px solid #000; border-radius: 12px; font-size: 1.1rem;
     }
     /* SUBIR IMAGEN */
     .upload-section {
@@ -182,6 +166,7 @@
             <a href="admin-map.html">Mapa de Compras</a>
             <a href="admin-compras.html">Compras</a>
             <a href="admin-estadisticas.html">Estadísticas</a>
+            <a href="inventario.html">Inventario</a>
             <button id="openSocialModal">Agregar Redes Sociales</button>
             <button id="logoutBtn">Cerrar Sesión</button>
           </div>
@@ -255,9 +240,8 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Cantidad disponible por talla</label>
-        <button class="variants-btn" id="addVariantsBtn">Seleccionar variantes</button>
-        <div class="variants-menu" id="addVariantsMenu"></div>
+        <label>Tallas</label>
+        <button class="variants-btn" id="addVariantsBtn">Seleccionar tallas</button>
       </div>
       <div class="form-group">
         <label>Ubicación en la tienda</label>
@@ -303,9 +287,8 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Cantidad disponible por talla</label>
-        <button class="variants-btn" id="editVariantsBtn">Seleccionar variantes</button>
-        <div class="variants-menu" id="editVariantsMenu"></div>
+        <label>Tallas</label>
+        <button class="variants-btn" id="editVariantsBtn">Seleccionar tallas</button>
       </div>
       <div class="form-group"><label>Ubicación en la tienda</label>
         <select id="editType">
@@ -345,6 +328,15 @@
       <button id="cancelSocial" style="background:#999;">Cancelar</button>
     </div>
   </div>
+  <!-- CONTENEDOR BLANCO PARA TALLAS -->
+  <div class="tallas-modal" id="addTallasModal">
+    <button class="tallas-close" id="addTallasClose">✕</button>
+    <div id="addTallasContainer" style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;"></div>
+  </div>
+  <div class="tallas-modal" id="editTallasModal">
+    <button class="tallas-close" id="editTallasClose">✕</button>
+    <div id="editTallasContainer" style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;"></div>
+  </div>
   <footer class="footer">
     <p>© 2025 Efraín Shop. Admin Mode.</p>
   </footer>
@@ -374,15 +366,6 @@
     }
     let textEditMode = false;
     let textChanges = {};
-    const variantsByCategory = {
-      gorra: ['S/M', 'L/XL'],
-      camiseta: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-      pantalon: ['28', '30', '32', '34', '36', '38', '40'],
-      cinto: ['30', '32', '34', '36', '38', '40', '42'],
-      tenis: ['25', '26', '27', '28', '29', '30'],
-      perfume: ['75', '100', '125', '200'],
-      sudadera: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-    };
     async function uploadImageAndGetURL(file) {
       if (!file) return null;
       const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
@@ -469,9 +452,8 @@
       div.className = 'product-card';
       div.dataset.id = p.id;
       const mainImg = (p.imagenes && p.imagenes.length) ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/300');
-      const totalDisp = p.disponibles || (p.variantesDisponibles ? Object.values(p.variantesDisponibles).reduce((a, b) => a + b, 0) : 0);
-      const stockInfo = totalDisp > 0
-        ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${totalDisp} disponibles</p>`
+      const stockInfo = p.disponibles > 0
+        ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>`
         : '<p style="color:#c00; font-weight:bold;">Agotado</p>';
       // compact action buttons in top-right
       const actions = `
@@ -500,52 +482,6 @@
       }
       return div;
     }
-    function openVariantsMenu(mode) {
-      const cat = document.getElementById(mode + 'Category').value;
-      const menu = document.getElementById(mode + 'VariantsMenu');
-      menu.innerHTML = '';
-      const closeBtn = document.createElement('button');
-      closeBtn.className = 'variants-close';
-      closeBtn.textContent = '✕';
-      closeBtn.onclick = () => menu.classList.remove('active');
-      menu.appendChild(closeBtn);
-      const vars = variantsByCategory[cat] || [];
-      vars.forEach(v => {
-        const item = document.createElement('div');
-        item.className = 'variant-item';
-        item.textContent = v;
-        const qty = document.createElement('span');
-        qty.className = 'variant-qty';
-        qty.textContent = window[mode + 'Variants'][v] || 0;
-        item.appendChild(qty);
-        item.onclick = () => {
-          window[mode + 'Variants'][v] = (window[mode + 'Variants'][v] || 0) + 1;
-          qty.textContent = window[mode + 'Variants'][v];
-        };
-        qty.onclick = (e) => {
-          e.stopPropagation();
-          const input = document.createElement('input');
-          input.type = 'number';
-          input.min = 0;
-          input.value = window[mode + 'Variants'][v] || 0;
-          input.style.width = '30px';
-          input.style.textAlign = 'center';
-          input.style.borderRadius = '50%';
-          qty.parentNode.replaceChild(input, qty);
-          input.focus();
-          input.onblur = () => {
-            const val = parseInt(input.value) || 0;
-            window[mode + 'Variants'][v] = val;
-            qty.textContent = val;
-            input.parentNode.replaceChild(qty, input);
-          };
-        };
-        menu.appendChild(item);
-      });
-      menu.classList.add('active');
-    }
-    document.getElementById('addVariantsBtn').onclick = () => openVariantsMenu('add');
-    document.getElementById('editVariantsBtn').onclick = () => openVariantsMenu('edit');
     // ------- EDIT & DELETE (enhanced) -------
     window.editProduct = async id => {
       window.currentEditId = id;
@@ -558,7 +494,7 @@
       document.getElementById('editDesc').value = data.descripcion || '';
       document.getElementById('editCategory').value = data.tipo || 'camiseta';
       document.getElementById('editType').value = (data.type && data.type.carrusel) ? 'carrusel' : 'normal';
-      window.editVariants = data.variantesDisponibles || {};
+      document.getElementById('editAvailableDisplay').textContent = data.disponibles || 1;
       // populate images gallery
       const gallery = document.getElementById('editImagesGallery');
       gallery.innerHTML = '';
@@ -568,10 +504,13 @@
         const img = document.createElement('img'); img.src = u;
         const btn = document.createElement('button'); btn.className = 'remove-img'; btn.textContent = '✕';
         btn.onclick = () => {
+          // remove locally from gallery UI and mark removed on save
           wrap.remove();
+          // mark using dataset
           wrap.dataset.removed = 'true';
         };
         wrap.appendChild(img); wrap.appendChild(btn);
+        // store url on wrap for later
         wrap.dataset.url = u;
         gallery.appendChild(wrap);
       });
@@ -586,21 +525,24 @@
         descripcion: document.getElementById('editDesc').value.trim(),
         tipo: document.getElementById('editCategory').value,
         type: { normal: document.getElementById('editType').value === 'normal', carrusel: document.getElementById('editType').value === 'carrusel' },
-        variantesDisponibles: window.editVariants,
-        disponibles: Object.values(window.editVariants).reduce((a, b) => a + b, 0),
+        disponibles: parseInt(document.getElementById('editAvailableCount').value) || 0,
       };
-      // handle images
+      // handle images: start with remaining gallery images
       const gallery = document.getElementById('editImagesGallery');
       const remaining = [];
       gallery.querySelectorAll('.img-wrap').forEach(w => { if (!w.dataset.removed) remaining.push(w.dataset.url); });
+      // handle newly added files
       const newFiles = Array.from(document.getElementById('editImageFiles').files || []);
       for (const f of newFiles) {
         const url = await uploadImageAndGetURL(f);
         if (url) remaining.push(url);
       }
+      // handle additional pasted URLs
       const extraUrls = document.getElementById('editImageUrls').value.split(',').map(u => u.trim()).filter(Boolean);
       extraUrls.forEach(u => remaining.push(u));
-      if (remaining.length > 0) {
+      if (remaining.length === 0) {
+        // keep existing imagen field if any
+      } else {
         updated.imagenes = remaining;
         updated.imagen = remaining[0];
       }
@@ -614,7 +556,7 @@
         showToast('Producto eliminado');
       }
     };
-    // Save new product
+    // Save new product (support multiple images)
     document.getElementById('saveNewProduct').onclick = async () => {
       const name = document.getElementById('addName').value.trim();
       const price = parseFloat(document.getElementById('addPrice').value);
@@ -639,15 +581,14 @@
         type: typeObj,
         imagenes: allImages,
         imagen: allImages[0],
-        variantesDisponibles: window.addVariants,
-        disponibles: Object.values(window.addVariants).reduce((a, b) => a + b, 0),
+        disponibles: parseInt(document.getElementById('addAvailableCount').value) || 1,
         creado: new Date()
       };
       await addDoc(collection(db, 'productos'), producto);
       showToast('¡Producto agregado!');
       closeModal('addProductModal');
     };
-    // edit modal image previews
+    // edit modal image previews for newly selected files
     document.getElementById('editImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
       const wrap = document.getElementById('editNewPreview');
@@ -660,6 +601,28 @@
         wrap.appendChild(dv);
       });
     });
+    document.getElementById('availableDisplay').onclick = () => {
+      document.getElementById('availableDisplay').style.display = 'none';
+      document.getElementById('availableInput').style.display = 'block';
+      document.getElementById('addAvailableCount').focus();
+    };
+    document.getElementById('editAvailableDisplay').onclick = () => {
+      document.getElementById('editAvailableDisplay').style.display = 'none';
+      document.getElementById('editAvailableInput').style.display = 'block';
+      document.getElementById('editAvailableCount').focus();
+    };
+    document.getElementById('addAvailableCount').addEventListener('blur', () => {
+      let val = document.getElementById('addAvailableCount').value.trim() || '1';
+      document.getElementById('availableDisplay').textContent = val;
+      document.getElementById('availableDisplay').style.display = 'flex';
+      document.getElementById('availableInput').style.display = 'none';
+    });
+    document.getElementById('editAvailableCount').addEventListener('blur', () => {
+      let val = document.getElementById('editAvailableCount').value.trim() || '1';
+      document.getElementById('editAvailableDisplay').textContent = val;
+      document.getElementById('editAvailableDisplay').style.display = 'flex';
+      document.getElementById('editAvailableInput').style.display = 'none';
+    });
     document.getElementById('addPostBtn').onclick = () => {
       document.getElementById('addProductModal').classList.add('active');
       document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => {
@@ -667,7 +630,10 @@
       });
       document.getElementById('addImageFiles').value = '';
       document.getElementById('addImagesPreview').style.display = 'none';
-      window.addVariants = {};
+      document.getElementById('addAvailableCount').value = '1';
+      document.getElementById('availableDisplay').textContent = '1';
+      document.getElementById('availableDisplay').style.display = 'flex';
+      document.getElementById('availableInput').style.display = 'none';
     };
     function showToast(msg) {
       const t = document.getElementById('toast');
