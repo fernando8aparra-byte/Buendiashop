@@ -86,6 +86,8 @@
     .main-container { max-width:1300px; margin:0 auto; padding:40px 20px 100px; }
     .product-main { text-align:center; padding:40px 20px; background:#f8f8f8; }
     .carousel-container { position:relative; max-width:500px; margin:0 auto; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 8px 25px rgba(0,0,0,0.12); }
+    .single-image { position:relative; display:inline-block; }
+    .single-image img { width:100%; height:auto; max-height:500px; object-fit:contain; display:block; border-radius:16px; }
     .carousel { display:flex; transition:transform 0.5s ease-in-out; width:100%; }
     .carousel-slide { min-width:100%; box-sizing:border-box; }
     .carousel-slide img { width:100%; height:auto; max-height:500px; object-fit:contain; display:block; }
@@ -185,7 +187,7 @@
     <img id="lightboxImage" src="" alt="">
   </div>
 
-  <!-- MENÚ LATERAL -->
+  <!-- MENÚ LATERAL, REDES, CARRITO Y FOOTER (igual que antes) -->
   <aside class="menu-sidebar" id="menuSidebar">
     <button class="menu-close" id="closeMenu">×</button>
     <div class="menu-item welcome" id="welcomeMsg">¡Bienvenido!</div>
@@ -202,7 +204,6 @@
     <div class="menu-item" id="loginBtn">Inicia sesión o regístrate</div>
   </aside>
 
-  <!-- POPUP REDES SOCIALES -->
   <div class="social-popup-overlay" id="socialPopupOverlay">
     <div class="social-popup">
       <button class="social-close" id="closeSocialPopup">×</button>
@@ -211,7 +212,6 @@
     </div>
   </div>
 
-  <!-- CARRITO -->
   <aside class="cart-sidebar" id="cartSidebar">
     <div class="cart-header">
       <h3>Tu Carrito</h3>
@@ -228,7 +228,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
       <div class="footer-left">
@@ -267,7 +266,6 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // CARRITO
     function updateCart() {
       const qty = cart.reduce((a,b) => a + b.qty, 0);
       const total = cart.reduce((a,b) => a + b.precio * b.qty, 0);
@@ -309,7 +307,7 @@
 
     document.getElementById('goToPay').onclick = () => location.href = 'pago.html';
 
-    // CARGAR PRODUCTO
+    // CARGAR PRODUCTO - AHORA CON IMAGEN ÚNICA CORRECTA
     async function loadProduct() {
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get('id');
@@ -317,22 +315,37 @@
 
       const docRef = doc(db, "productos", productId);
       const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) return document.getBody().innerHTML = '<p>Producto no encontrado.</p>';
+      if (!docSnap.exists()) return document.getElementById('productMain').innerHTML = '<p>Producto no encontrado.</p>';
 
       const p = { id: docSnap.id, ...docSnap.data() };
       currentProduct = p;
 
-      const allImages = [p.imagen];
-      if (Array.isArray(p.imagenes) && p.imagenes.length > 0) allImages.push(...p.imagenes);
+      const mainImage = p.imagen;
+      const extraImages = Array.isArray(p.imagenes) ? p.imagenes.filter(img => img && img.trim() !== "") : [];
+      const allImages = [mainImage, ...extraImages];
+      const hasMultipleImages = allImages.length > 1;
 
-      let carouselHTML = '';
-      if (allImages.length === 1) {
-        carouselHTML = `<div class="carousel-container"><div class="carousel-slide"><img src="${allImages[0]}" alt="${p.nombre}" loading="lazy"><button class="zoom-btn" onclick="openLightbox('${allImages[0]}')">Zoom</button></div></div>`;
+      let imageHTML = '';
+
+      if (!hasMultipleImages) {
+        // SOLO UNA IMAGEN → sin carrusel, sin flechas, sin puntitos, sin zoom
+        imageHTML = `
+          <div class="carousel-container">
+            <div class="single-image">
+              <img src="${mainImage}" alt="${p.nombre}" loading="lazy">
+            </div>
+          </div>`;
       } else {
-        carouselHTML = `
+        // MÁS DE UNA IMAGEN → carrusel completo
+        imageHTML = `
           <div class="carousel-container">
             <div class="carousel" id="carousel">
-              ${allImages.map(src => `<div class="carousel-slide"><img src="${src}" alt="${p.nombre}" loading="lazy"><button class="zoom-btn" onclick="openLightbox('${src}')">Zoom</button></div>`).join('')}
+              ${allImages.map(src => `
+                <div class="carousel-slide">
+                  <img src="${src}" alt="${p.nombre}" loading="lazy">
+                  <button class="zoom-btn" onclick="openLightbox('${src}')">Zoom</button>
+                </div>
+              `).join('')}
             </div>
             <button class="carousel-prev" id="prevBtn">‹</button>
             <button class="carousel-next" id="nextBtn">›</button>
@@ -356,7 +369,7 @@
         : '';
 
       document.getElementById('productMain').innerHTML = `
-        ${carouselHTML}
+        ${imageHTML}
         <div class="product-info">
           <h1>${p.nombre}</h1>
           ${descHTML}
@@ -375,12 +388,14 @@
         </div>
       `;
 
-      if (allImages.length > 1) {
+      // Solo activar carrusel si hay más de una imagen
+      if (hasMultipleImages) {
         const carousel = document.getElementById('carousel');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const dotsContainer = document.getElementById('dotsContainer');
         let currentIndex = 0;
+
         function updateDots() {
           dotsContainer.innerHTML = '';
           allImages.forEach((_, i) => {
@@ -390,6 +405,7 @@
             dotsContainer.appendChild(dot);
           });
         }
+
         prevBtn.onclick = () => { currentIndex = (currentIndex - 1 + allImages.length) % allImages.length; carousel.style.transform = `translateX(-${currentIndex * 100}%)`; updateDots(); };
         nextBtn.onclick = () => { currentIndex = (currentIndex + 1) % allImages.length; carousel.style.transform = `translateX(-${currentIndex * 100}%)`; updateDots(); };
         updateDots();
@@ -430,7 +446,7 @@
     document.getElementById('lightboxClose').onclick = () => document.getElementById('lightbox').classList.remove('active');
     document.getElementById('lightbox').onclick = e => { if (e.target === document.getElementById('lightbox')) document.getElementById('lightbox').classList.remove('active'); };
 
-    // BÚSQUEDA, MENÚ, REDES, LOGIN (igual que antes)
+    // Resto del código (búsqueda, menú, login, etc.) igual que antes...
     document.getElementById('searchBtn').onclick = () => {
       document.getElementById('searchBarContainer').classList.add('active');
       document.getElementById('searchResultsOverlay').classList.add('active');
@@ -503,7 +519,6 @@
       });
     });
 
-    // LOGIN DETECTION
     const userName = localStorage.getItem('userName');
     if (userName) {
       document.getElementById('welcomeMsg').textContent = `¡Hola, ${userName}!`;
