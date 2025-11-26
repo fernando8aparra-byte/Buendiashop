@@ -60,37 +60,19 @@
     .form-group select:focus,
     .form-group textarea:focus { outline: none; border-color: #000; }
     .form-group textarea { resize: vertical; min-height: 90px; }
-
-    /* BOTÓN DE TALLAS */
-    .tallas-btn {
-      width: 100%; padding: 16px; background: #000; color: #fff;
-      border: none; border-radius: 12px; font-size: 1rem; font-weight: 600;
-      cursor: pointer; text-align: center;
+    /* CANTIDAD DISPONIBLE */
+    .quantity-group { display: flex; align-items: center; gap: 14px; }
+    #availableDisplay {
+      width: 56px; height: 56px; border: 2.5px solid #000;
+      border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.5rem; font-weight: bold;
+      cursor: pointer; user-select: none; background: #fff;
     }
-    .tallas-menu {
-      position: absolute; top: 100%; left: 0; right: 0; background: #fff;
-      border: 2px solid #000; border-radius: 12px; padding: 16px; margin-top: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10;
-      display: none; flex-wrap: wrap; gap: 12px;
+    #availableInput { display: none; }
+    #availableInput input {
+      width: 90px; padding: 10px; text-align: center;
+      border: 2px solid #000; border-radius: 12px; font-size: 1.1rem;
     }
-    .tallas-menu.active { display: flex; }
-    .talla-item {
-      position: relative; width: 64px; height: 64px; background: #f9f9f9;
-      border: 2px solid #ddd; border-radius: 12px; display: flex;
-      align-items: center; justify-content: center; font-weight: bold; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .talla-item:hover { border-color: #000; background: #000; color: #fff; }
-    .talla-qty {
-      position: absolute; top: -8px; right: -8px; background: #000; color: #fff;
-      width: 26px; height: 26px; border-radius: 50%; display: flex;
-      align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold;
-    }
-    .tallas-close {
-      position: absolute; top: 8px; right: 12px; background: none; border: none;
-      font-size: 24px; cursor: pointer; color: #999;
-    }
-
     /* SUBIR IMAGEN */
     .upload-section {
       padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
@@ -146,20 +128,23 @@
     }
     .text-edit-controls button.cancel { background: #999; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
-    /* PRODUCT GRID & CARD */
+    /* PRODUCT GRID & CARD (kept minimal to preserve original look) */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
     .product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
     .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
     .product-card h3 { margin: 8px 0 4px; font-size: 1rem; }
     .product-price { font-weight: 700; margin: 0 0 6px; }
     .product-desc-small { font-size: 0.9rem; color: #555; margin-bottom: 8px; }
+    /* Action buttons moved to top-right in a distinct container */
     .card-actions-compact { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
     .card-actions-compact button { background: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-weight: 700; }
     .card-actions-compact button:hover { transform: translateY(-2px); }
+    /* Image gallery inside edit modal */
     .image-gallery { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .image-gallery .img-wrap { position:relative; border-radius:8px; overflow:hidden; }
     .image-gallery img { width:96px; height:96px; object-fit:cover; display:block; border-radius:8px; }
     .image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
+    /* carousel area minimal tweaks */
     .infinite-carousel-section { padding: 20px; }
     .carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
   </style>
@@ -195,7 +180,6 @@
       </div>
     </div>
   </header>
-
   <!-- HERO -->
   <section class="hero-banner" id="heroBanner">
     <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
@@ -205,7 +189,6 @@
       Envío Gratis en compras +$1,500
     </p>
   </section>
-
   <!-- NUEVOS LANZAMIENTOS -->
   <section class="infinite-carousel-section" id="newCarouselSection">
     <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
@@ -215,7 +198,6 @@
       <div class="carousel-track" id="newCarousel"></div>
     </div>
   </section>
-
   <!-- TODOS LOS PRODUCTOS -->
   <section>
     <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
@@ -223,13 +205,11 @@
     </h2>
     <div class="products-grid" id="productsGrid"></div>
   </section>
-
   <div class="toast" id="toast"></div>
   <div class="text-edit-controls" id="textEditControls">
     <button id="saveTextChanges">Guardar Cambios</button>
     <button id="cancelTextChanges" class="cancel">No Guardar</button>
   </div>
-
   <!-- MODAL AGREGAR PRODUCTO -->
   <div class="modal" id="addProductModal">
     <div class="modal-content">
@@ -241,6 +221,10 @@
       <div class="form-group">
         <label>Precio</label>
         <input type="number" id="addPrice" placeholder="1500">
+      </div>
+      <div class="form-group">
+        <label>Tallas (separadas por coma)</label>
+        <input type="text" id="addSizes" placeholder="S, M, L, XL">
       </div>
       <div class="form-group">
         <label>Descripción</label>
@@ -258,18 +242,21 @@
           <option value="sudadera">Sudadera</option>
         </select>
       </div>
-      <div class="form-group" style="position:relative;">
-        <button type="button" class="tallas-btn" id="addTallasBtn">Seleccionar tallas / variantes</button>
-        <div class="tallas-menu" id="addTallasMenu">
-          <button class="tallas-close" id="addTallasClose">×</button>
-        </div>
-      </div>
       <div class="form-group">
         <label>Ubicación en la tienda</label>
         <select id="addType">
           <option value="normal">Productos normales</option>
           <option value="carrusel">Carrusel - Nuevos Lanzamientos</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label>Cantidad disponible</label>
+        <div class="quantity-group">
+          <div id="availableDisplay">1</div>
+          <div id="availableInput">
+            <input type="number" id="addAvailableCount" min="0" value="1">
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <div class="upload-section">
@@ -289,13 +276,13 @@
       <button id="cancelAdd" class="cancel">Cancelar</button>
     </div>
   </div>
-
-  <!-- MODAL EDITAR PRODUCTO -->
+  <!-- MODAL EDITAR PRODUCTO (ampliado) -->
   <div class="modal" id="editProductModal">
     <div class="modal-content">
       <h3>Editar Producto</h3>
-      <div class="form-group"><label>Nombre</label><input type="text" id="editName"></div>
-      <div class="form-group"><label>Precio</label><input type="number" id="editPrice"></div>
+      <div class="form-group"><label>Nombre</label><input type="text" id="editName" placeholder="Nombre"></div>
+      <div class="form-group"><label>Precio</label><input type="number" id="editPrice" placeholder="Precio"></div>
+      <div class="form-group"><label>Tallas (separadas por coma)</label><input type="text" id="editSizes"></div>
       <div class="form-group"><label>Descripción</label><textarea id="editDesc"></textarea></div>
       <div class="form-group"><label>Categoría</label>
         <select id="editCategory">
@@ -308,36 +295,35 @@
           <option value="sudadera">Sudadera</option>
         </select>
       </div>
-      <div class="form-group" style="position:relative;">
-        <button type="button" class="tallas-btn" id="editTallasBtn">Seleccionar tallas / variantes</button>
-        <div class="tallas-menu" id="editTallasMenu">
-          <button class="tallas-close" id="editTallasClose">×</button>
-        </div>
-      </div>
       <div class="form-group"><label>Ubicación en la tienda</label>
         <select id="editType">
           <option value="normal">Productos normales</option>
           <option value="carrusel">Carrusel - Nuevos Lanzamientos</option>
         </select>
       </div>
+      <div class="form-group"><label>Cantidad disponible</label>
+        <div class="quantity-group">
+          <div id="editAvailableDisplay">1</div>
+          <div id="editAvailableInput" style="display:none;"><input type="number" id="editAvailableCount" min="0"></div>
+        </div>
+      </div>
       <div class="form-group">
         <label>Imágenes actuales</label>
         <div class="image-gallery" id="editImagesGallery"></div>
       </div>
       <div class="form-group">
-        <label>Añadir nuevas imágenes</label>
+        <label>Añadir nuevas imágenes (puedes seleccionar varias)</label>
         <input type="file" id="editImageFiles" accept="image/*" multiple>
         <div id="editNewPreview" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
       </div>
       <div class="form-group">
-        <label>O pegar URLs adicionales</label>
+        <label>O pegar URLs adicionales (separadas por coma)</label>
         <input type="text" id="editImageUrls" placeholder="https://..., https://...">
       </div>
       <button id="saveProduct">Guardar</button>
       <button id="cancelEdit" class="cancel">Cancelar</button>
     </div>
   </div>
-
   <!-- MODAL REDES SOCIALES -->
   <div class="modal" id="socialLinksModal">
     <div class="modal-content">
@@ -353,11 +339,10 @@
       <button id="cancelSocial" style="background:#999;">Cancelar</button>
     </div>
   </div>
-
   <footer class="footer">
     <p>© 2025 Efraín Shop. Admin Mode.</p>
   </footer>
-
+  <!-- FIREBASE + JS 100% COMPLETO Y FUNCIONAL (modificado para multimages y edición completa) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -367,7 +352,6 @@
     import {
       getStorage, ref, uploadBytes, getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -376,87 +360,14 @@
       messagingSenderId: "430651152709",
       appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
-
     if (!localStorage.getItem('isAdmin')) {
       window.location.href = 'login.html';
     }
-
-    const variantesPorCategoria = {
-      gorra: ['S/M', 'M/L', 'L/XL'],
-      camiseta: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-      sudadera: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-      pantalon: ['28', '30', '32', '34', '36', '38', '40'],
-      cinto: ['30', '32', '34', '36', '38', '40', '42'],
-      tenis: ['25', '25.5', '26', '26.5', '27', '27.5', '28', '28.5', '29', '29.5', '30'],
-      perfume: ['75ml', '100ml', '125ml', '150ml', '200ml']
-    };
-
-    window.addVariants = {};
-    window.editVariants = {};
-
-    function abrirMenuTallas(mode) {
-      const cat = document.getElementById(mode + 'Category').value;
-      const menu = document.getElementById(mode + 'TallasMenu');
-      const vars = variantesPorCategoria[cat] || [];
-      menu.innerHTML = '<button class="tallas-close" id="' + mode + 'TallasClose">×</button>';
-
-      window[mode + 'Variants'] = window[mode + 'Variants'] || {};
-      vars.forEach(v => {
-        if (!(v in window[mode + 'Variants'])) window[mode + 'Variants'][v] = 0;
-
-        const item = document.createElement('div');
-        item.className = 'talla-item';
-        item.textContent = v;
-
-        const qty = document.createElement('span');
-        qty.className = 'talla-qty';
-        qty.textContent = window[mode + 'Variants'][v];
-        item.appendChild(qty);
-
-        item.onclick = () => {
-          window[mode + 'Variants'][v]++;
-          qty.textContent = window[mode + 'Variants'][v];
-        };
-
-        qty.onclick = (e) => {
-          e.stopPropagation();
-          const input = document.createElement('input');
-          input.type = 'number';
-          input.min = 0;
-          input.value = window[mode + 'Variants'][v];
-          input.style.width = '40px';
-          input.style.position = 'absolute';
-          input.style.top = '-10px';
-          input.style.right = '-10px';
-          input.style.textAlign = 'center';
-          input.style.borderRadius = '50%';
-          item.replaceChild(input, qty);
-          input.focus();
-          input.onblur = () => {
-            const val = parseInt(input.value) || 0;
-            window[mode + 'Variants'][v] = val;
-            qty.textContent = val;
-            item.replaceChild(qty, input);
-          };
-        };
-
-        menu.appendChild(item);
-      });
-
-      menu.classList.add('active');
-      document.getElementById(mode + 'TallasClose').onclick = () => menu.classList.remove('active');
-    }
-
-    document.getElementById('addTallasBtn').onclick = () => abrirMenuTallas('add');
-    document.getElementById('editTallasBtn').onclick = () => abrirMenuTallas('edit');
-    document.getElementById('addCategory').onchange = () => { window.addVariants = {}; };
-    document.getElementById('editCategory').onchange = () => { window.editVariants = {}; };
-
-    // === RESTO DEL CÓDIGO SIN CAMBIOS (solo la parte crítica fue mejorada) ===
+    let textEditMode = false;
+    let textChanges = {};
     async function uploadImageAndGetURL(file) {
       if (!file) return null;
       const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
@@ -473,7 +384,7 @@
         return null;
       }
     }
-
+    // Previews for add modal
     document.getElementById('addImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
       const previewWrap = document.getElementById('addImagesPreview');
@@ -485,7 +396,7 @@
           div.style.width = '96px'; div.style.height = '96px'; div.style.overflow='hidden'; div.style.borderRadius='8px';
           reader.onload = ev => {
             const img = document.createElement('img');
-            img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover';
+            img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover'; img.style.display='block';
             div.appendChild(img);
           };
           reader.readAsDataURL(file);
@@ -494,134 +405,230 @@
         previewWrap.style.display = 'flex';
       } else previewWrap.style.display = 'none';
     });
-
+    function loadEditableTexts() {
+      document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        const coll = el.dataset.collection;
+        const docu = el.dataset.doc;
+        const field = el.dataset.field;
+        onSnapshot(doc(db, coll, docu), snap => {
+          if (snap.exists() && snap.data()[field] !== undefined) {
+            const value = snap.data()[field];
+            if (el.textContent.trim() !== value) el.textContent = value;
+          }
+        });
+        el.addEventListener('input', () => {
+          const key = `${coll}|${docu}|${field}`;
+          textChanges[key] = el.textContent.trim();
+        });
+      });
+    }
     function loadProductsByType(typeKey, containerId) {
       const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
-      onSnapshot(q, snapshot => {
+      const unsubscribe = onSnapshot(q, snapshot => {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
+        const products = [];
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
+          products.push(data);
           container.appendChild(createProductCard(data, typeKey));
         });
-        if (containerId === 'newCarousel' && snapshot.size >= 4 && !container.dataset.duplicated) {
-          const clone = container.cloneNode(true);
-          clone.id += '-clone';
-          container.appendChild(clone);
-          container.dataset.duplicated = 'true';
+        if (containerId === 'newCarousel') {
+          const section = container.parentElement.parentElement;
+          if (products.length >= 4) {
+            section.classList.add('auto-scroll');
+            if (!container.dataset.duplicated) {
+              const clone = container.cloneNode(true);
+              clone.id += '-clone';
+              container.appendChild(clone);
+              container.dataset.duplicated = 'true';
+            }
+          } else {
+            section.classList.add('static-display');
+          }
         }
       });
     }
-
     function createProductCard(p, sectionType) {
       const div = document.createElement('div');
       div.className = 'product-card';
       div.dataset.id = p.id;
       const mainImg = (p.imagenes && p.imagenes.length) ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/300');
-      const total = p.disponibles || (p.variantesDisponibles ? Object.values(p.variantesDisponibles).reduce((a,b)=>a+b,0) : 0);
-      const stockInfo = total > 0
-        ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${total} disponibles</p>`
+      const stockInfo = p.disponibles > 0
+        ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${p.disponibles} disponibles</p>`
         : '<p style="color:#c00; font-weight:bold;">Agotado</p>';
-
-      const actions = `<div class="card-actions-compact">
-        <button title="Editar" onclick="editProduct('${p.id}')">Edit</button>
-        <button title="Eliminar" onclick="deleteProduct('${p.id}')">Delete</button>
-      </div>`;
-
-      div.innerHTML = sectionType === 'normal'
-        ? `${actions}<img src="${mainImg}" alt="${p.nombre}"><h3>${p.nombre}</h3><p class="product-price">$${p.precio}</p><p class="product-desc-small">${p.descripcion || ''}</p>${stockInfo}`
-        : `${actions}<img src="${mainImg}" alt="${p.nombre}"><h3>${p.nombre}</h3><p>$${p.precio}</p>${stockInfo}`;
+      // compact action buttons in top-right
+      const actions = `
+        <div class="card-actions-compact">
+          <button title="Editar" onclick="editProduct('${p.id}')">✏️</button>
+          <button title="Eliminar" onclick="deleteProduct('${p.id}')">🗑️</button>
+        </div>
+      `;
+      if (sectionType === 'normal') {
+        div.innerHTML = `
+          ${actions}
+          <img src="${mainImg}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <p class="product-price">$${p.precio}</p>
+          <p class="product-desc-small">${p.descripcion || ''}</p>
+          ${stockInfo}
+        `;
+      } else {
+        div.innerHTML = `
+          ${actions}
+          <img src="${mainImg}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <p>$${p.precio}</p>
+          ${stockInfo}
+        `;
+      }
       return div;
     }
-
+    // ------- EDIT & DELETE (enhanced) -------
     window.editProduct = async id => {
       window.currentEditId = id;
-      const snap = await getDoc(doc(db, 'productos', id));
-      if (!snap.exists()) return showToast('No encontrado');
+      const docRef = doc(db, 'productos', id);
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) return showToast('Producto no encontrado');
       const data = snap.data();
       document.getElementById('editName').value = data.nombre || '';
       document.getElementById('editPrice').value = data.precio || '';
+      document.getElementById('editSizes').value = (data.talla || []).join(', ');
       document.getElementById('editDesc').value = data.descripcion || '';
       document.getElementById('editCategory').value = data.tipo || 'camiseta';
-      document.getElementById('editType').value = (data.type?.carrusel) ? 'carrusel' : 'normal';
-      window.editVariants = { ...data.variantesDisponibles } || {};
+      document.getElementById('editType').value = (data.type && data.type.carrusel) ? 'carrusel' : 'normal';
+      document.getElementById('editAvailableCount').value = data.disponibles || 1;
+      document.getElementById('editAvailableDisplay').textContent = (data.disponibles || 1);
+      // populate images gallery
       const gallery = document.getElementById('editImagesGallery');
       gallery.innerHTML = '';
-      const imgs = data.imagenes || (data.imagen ? [data.imagen] : []);
-      imgs.forEach(u => {
+      const imgs = (data.imagenes && data.imagenes.length) ? data.imagenes.slice() : (data.imagen ? [data.imagen] : []);
+      imgs.forEach((u, idx) => {
         const wrap = document.createElement('div'); wrap.className = 'img-wrap';
         const img = document.createElement('img'); img.src = u;
-        const btn = document.createElement('button'); btn.className = 'remove-img'; btn.textContent = '×';
-        btn.onclick = () => { wrap.dataset.removed = 'true'; wrap.remove(); };
-        wrap.appendChild(img); wrap.appendChild(btn); wrap.dataset.url = u;
+        const btn = document.createElement('button'); btn.className = 'remove-img'; btn.textContent = '✕';
+        btn.onclick = () => {
+          // remove locally from gallery UI and mark removed on save
+          wrap.remove();
+          // mark using dataset
+          wrap.dataset.removed = 'true';
+        };
+        wrap.appendChild(img); wrap.appendChild(btn);
+        // store url on wrap for later
+        wrap.dataset.url = u;
         gallery.appendChild(wrap);
       });
+      document.getElementById('editNewPreview').innerHTML = '';
       document.getElementById('editProductModal').classList.add('active');
     };
-
     document.getElementById('saveProduct').onclick = async () => {
+      if (!window.currentEditId) return showToast('No hay producto seleccionado');
       const updated = {
         nombre: document.getElementById('editName').value.trim(),
         precio: parseFloat(document.getElementById('editPrice').value) || 0,
+        talla: document.getElementById('editSizes').value.split(',').map(s => s.trim()).filter(Boolean),
         descripcion: document.getElementById('editDesc').value.trim(),
         tipo: document.getElementById('editCategory').value,
         type: { normal: document.getElementById('editType').value === 'normal', carrusel: document.getElementById('editType').value === 'carrusel' },
-        variantesDisponibles: window.editVariants,
-        disponibles: Object.values(window.editVariants).reduce((a,b)=>a+b,0),
-        talla: Object.keys(window.editVariants).filter(k => window.editVariants[k] > 0)
+        disponibles: parseInt(document.getElementById('editAvailableCount').value) || 0,
       };
+      // handle images: start with remaining gallery images
       const gallery = document.getElementById('editImagesGallery');
       const remaining = [];
       gallery.querySelectorAll('.img-wrap').forEach(w => { if (!w.dataset.removed) remaining.push(w.dataset.url); });
+      // handle newly added files
       const newFiles = Array.from(document.getElementById('editImageFiles').files || []);
       for (const f of newFiles) {
         const url = await uploadImageAndGetURL(f);
         if (url) remaining.push(url);
       }
-      const extra = document.getElementById('editImageUrls').value.split(',').map(u=>u.trim()).filter(Boolean);
-      extra.forEach(u => remaining.push(u));
-      if (remaining.length > 0) {
+      // handle additional pasted URLs
+      const extraUrls = document.getElementById('editImageUrls').value.split(',').map(u => u.trim()).filter(Boolean);
+      extraUrls.forEach(u => remaining.push(u));
+      if (remaining.length === 0) {
+        // keep existing imagen field if any
+      } else {
         updated.imagenes = remaining;
         updated.imagen = remaining[0];
       }
       await updateDoc(doc(db, 'productos', window.currentEditId), updated);
-      showToast('Actualizado');
+      showToast('Producto actualizado');
       closeModal('editProductModal');
     };
-
+    window.deleteProduct = async id => {
+      if (confirm('¿Eliminar este producto?')) {
+        await deleteDoc(doc(db, 'productos', id));
+        showToast('Producto eliminado');
+      }
+    };
+    // Save new product (support multiple images)
     document.getElementById('saveNewProduct').onclick = async () => {
       const name = document.getElementById('addName').value.trim();
       const price = parseFloat(document.getElementById('addPrice').value);
-      if (!name || isNaN(price)) return showToast("Faltan datos");
       const files = Array.from(document.getElementById('addImageFiles').files || []);
-      const urls = document.getElementById('addImage').value.trim().split(',').map(u=>u.trim()).filter(Boolean);
-      const uploaded = [];
+      const urlsInput = document.getElementById('addImage').value.trim();
+      const urlList = urlsInput ? urlsInput.split(',').map(u => u.trim()).filter(Boolean) : [];
+      const typeValue = document.getElementById('addType').value;
+      if (!name || isNaN(price) || !typeValue) return showToast("Faltan datos");
+      const uploadedUrls = [];
       for (const f of files) {
         const u = await uploadImageAndGetURL(f);
-        if (u) uploaded.push(u);
+        if (u) uploadedUrls.push(u);
       }
-      const allImages = [...uploaded, ...urls];
-      if (allImages.length === 0) return showToast('Sube al menos una imagen');
+      const allImages = [...uploadedUrls, ...urlList];
+      if (allImages.length === 0) return showToast('Sube al menos una imagen o pega una URL');
+      const typeObj = { normal: typeValue === 'normal', carrusel: typeValue === 'carrusel' };
       const producto = {
         nombre: name,
         precio: price,
+        talla: document.getElementById('addSizes').value.split(',').map(s => s.trim()).filter(Boolean),
         descripcion: document.getElementById('addDesc').value.trim(),
         tipo: document.getElementById('addCategory').value,
-        type: { normal: document.getElementById('addType').value === 'normal', carrusel: document.getElementById('addType').value === 'carrusel' },
+        type: typeObj,
         imagenes: allImages,
         imagen: allImages[0],
-        variantesDisponibles: window.addVariants,
-        disponibles: Object.values(window.addVariants).reduce((a,b)=>a+b,0),
-        talla: Object.keys(window.addVariants).filter(k => window.addVariants[k] > 0),
+        disponibles: parseInt(document.getElementById('addAvailableCount').value) || 1,
         creado: new Date()
       };
       await addDoc(collection(db, 'productos'), producto);
       showToast('¡Producto agregado!');
       closeModal('addProductModal');
     };
-
-    window.deleteProduct = id => confirm('¿Eliminar?') && deleteDoc(doc(db, 'productos', id)).then(() => showToast('Eliminado'));
-
+    // edit modal image previews for newly selected files
+    document.getElementById('editImageFiles').addEventListener('change', e => {
+      const files = Array.from(e.target.files || []);
+      const wrap = document.getElementById('editNewPreview');
+      wrap.innerHTML = '';
+      files.forEach(file => {
+        const reader = new FileReader();
+        const dv = document.createElement('div'); dv.style.width='96px'; dv.style.height='96px'; dv.style.overflow='hidden'; dv.style.borderRadius='8px';
+        reader.onload = ev => { const img = document.createElement('img'); img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover'; dv.appendChild(img); };
+        reader.readAsDataURL(file);
+        wrap.appendChild(dv);
+      });
+    });
+    document.getElementById('availableDisplay').onclick = () => {
+      document.getElementById('availableDisplay').style.display = 'none';
+      document.getElementById('availableInput').style.display = 'block';
+      document.getElementById('addAvailableCount').focus();
+    };
+    document.getElementById('editAvailableDisplay').onclick = () => {
+      document.getElementById('editAvailableDisplay').style.display = 'none';
+      document.getElementById('editAvailableInput').style.display = 'block';
+      document.getElementById('editAvailableCount').focus();
+    };
+    document.getElementById('addAvailableCount').addEventListener('blur', () => {
+      let val = document.getElementById('addAvailableCount').value.trim() || '1';
+      document.getElementById('availableDisplay').textContent = val;
+      document.getElementById('availableDisplay').style.display = 'flex';
+      document.getElementById('availableInput').style.display = 'none';
+    });
+    document.getElementById('editAvailableCount').addEventListener('blur', () => {
+      let val = document.getElementById('editAvailableCount').value.trim() || '1';
+      document.getElementById('editAvailableDisplay').textContent = val;
+      document.getElementById('editAvailableDisplay').style.display = 'flex';
+      document.getElementById('editAvailableInput').style.display = 'none';
+    });
     document.getElementById('addPostBtn').onclick = () => {
       document.getElementById('addProductModal').classList.add('active');
       document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => {
@@ -629,9 +636,11 @@
       });
       document.getElementById('addImageFiles').value = '';
       document.getElementById('addImagesPreview').style.display = 'none';
-      window.addVariants = {};
+      document.getElementById('addAvailableCount').value = '1';
+      document.getElementById('availableDisplay').textContent = '1';
+      document.getElementById('availableDisplay').style.display = 'flex';
+      document.getElementById('availableInput').style.display = 'none';
     };
-
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -639,14 +648,61 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    document.querySelectorAll('.modal').forEach(m => m.onclick = e => e.target === m && closeModal(m.id));
+    document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => e.target === m && closeModal(m.id)));
     document.querySelectorAll('[id^="cancel"]').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
     document.getElementById('adminGear').onclick = e => { e.stopPropagation(); document.getElementById('adminDropdown').classList.toggle('show'); };
-    document.onclick = () => document.getElementById('adminDropdown').classList.remove('show');
-
+    document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
+    document.getElementById('toggleTextEdit').onclick = () => {
+      textEditMode = !textEditMode;
+      document.getElementById('textEditControls').classList.toggle('active');
+      document.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.toggle('editing'));
+    };
+    document.getElementById('saveTextChanges').onclick = async () => {
+      for (const [key, value] of Object.entries(textChanges)) {
+        const [c, d, f] = key.split('|');
+        await setDoc(doc(db, c, d), { [f]: value }, { merge: true });
+      }
+      showToast("Cambios guardados");
+      textChanges = {};
+    };
+    document.getElementById('cancelTextChanges').onclick = () => location.reload();
+    document.getElementById('openSocialModal').onclick = () => {
+      document.getElementById('socialLinksModal').classList.add('active');
+      onSnapshot(doc(db, "links", "social"), snap => {
+        if (snap.exists()) {
+          const d = snap.data();
+          ['tiktok','instagram','facebook','x','whatsapp'].forEach(k => document.getElementById(k+'Input').value = d[k] || '');
+        }
+      });
+    };
+    document.getElementById('saveSocialLinks').onclick = async () => {
+      const links = {
+        tiktok: document.getElementById('tiktokInput').value.trim(),
+        instagram: document.getElementById('instagramInput').value.trim(),
+        facebook: document.getElementById('facebookInput').value.trim(),
+        x: document.getElementById('xInput').value.trim(),
+        whatsapp: document.getElementById('whatsappInput').value.trim()
+      };
+      await setDoc(doc(db, "links", "social"), links, { merge: true });
+      showToast("Redes guardadas");
+      closeModal('socialLinksModal');
+    };
+    // Logout confirmation (native confirm with Sí/No options)
+    document.getElementById('logoutBtn').onclick = () => {
+      const ok = confirm('¿Quieres cerrar sesión?\n\nSelecciona Aceptar para cerrar sesión o Cancelar para quedarte.');
+      if (ok) {
+        localStorage.removeItem('isAdmin');
+        window.location.href = 'login.html';
+      }
+    };
+    onSnapshot(doc(db, "textos", "hero"), snap => {
+      if (snap.exists() && snap.data().fondo_url) {
+        document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
+      }
+    });
     loadProductsByType('carrusel', 'newCarousel');
     loadProductsByType('normal', 'productsGrid');
+    loadEditableTexts();
   </script>
 </body>
 </html>
