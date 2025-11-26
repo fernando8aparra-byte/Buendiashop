@@ -70,12 +70,12 @@
     .cart-item-info small { color:#666; font-size:0.9rem; }
     .cart-item-remove { position:absolute; right:0; top:50%; transform:translateY(-50%); background:none; border:none; font-size:28px; color:#999; cursor:pointer; padding:10px; }
     .cart-footer { padding:20px; border-top:1px solid #eee; background:#fff; position:sticky; bottom:0; }
-    .cart-total { text-align:right; font-weight:800290; font-size:1.4rem; margin-bottom:16px; }
+    .cart-total { text-align:right; font-weight:800; font-size:1.4rem; margin-bottom:16px; }
     #goToPay { background:#000; color:#fff; padding:16px; border-radius:8px; font-weight:700; text-transform:uppercase; cursor:pointer; width:100%; display:none; }
 
     /* FOOTER */
     footer { background:#000; color:#fff; padding:28px 20px; text-align:center; font-size:0.9rem; margin-top:80px; }
-    .footer-inner { max-width:1300px; margin:0 auto; display:flex; justify-content:spacen-between; align-items:center; flex-wrap:wrap; gap:16px; }
+    .footer-inner { max-width:1300px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
     .footer-left a, .footer-right a { color:#fff; text-decoration:none; border-bottom:1px solid #fff; padding-bottom:2px; }
     @media (max-width:600px) { .footer-inner { flex-direction:column; gap:12px; } }
 
@@ -103,19 +103,19 @@
     .desc-short { max-height:100px; overflow:hidden; transition:max-height 0.4s ease; }
     .desc-full { max-height:none; }
     .ver-mas { color:#000; font-weight:600; cursor:pointer; margin-top:10px; display:inline-block; }
-    .price { font-size:1.8rem; font-weight:600; color:#000; margin:20px 0; } /* más delgado */
+    .price { font-size:1.8rem; font-weight:600; color:#000; margin:20px 0; }
+
     .action-buttons { display:flex; gap:12px; justify-content:center; margin-top:25px; flex-wrap:wrap; }
     .btn-outline { flex:1; min-width:160px; padding:14px 20px; background:#fff; color:#000; border:2px solid #000; border-radius:8px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-size:1rem; transition:all 0.2s ease; }
     .btn-outline:hover { background:#000; color:#fff; }
-    .btn-outline svg { width:18px; height:18px; } /* carrito pequeño */
-    .btn-ir-pagar { background:#000; color:#fff; border:none; }
+    .btn-outline svg { width:20px; height:20px; stroke:currentColor; stroke-width:2.2; fill:none; }
 
-    /* SELECTOR DE TALLAS (solo camisetas/sudaderas) */
+    /* SELECTOR DE TALLAS */
     .size-selector { margin:20px 0; text-align:center; }
     .size-btn { padding:10px 16px; margin:6px; border:2px solid #000; background:#fff; border-radius:8px; cursor:pointer; font-weight:600; min-width:60px; }
     .size-btn.selected { background:#000; color:#fff; }
     .size-btn.disabled { opacity:0.4; cursor:not-allowed; border-color:#ccc; }
-    .size-stock { font-size:0.85rem; color:#666; margin-top:4px; }
+    .size-stock { font-size:0.85rem; color:#666; margin-top:4px; display:block; }
 
     .related-section { margin-top:60px; padding:0 20px; }
     .related-section h2 { text-align:center; margin-bottom:30px; font-size:1.8rem; }
@@ -257,7 +257,6 @@
     const db = getFirestore(app);
 
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    let allProducts = [];
     let currentProduct = null;
     let selectedSize = null;
 
@@ -318,18 +317,17 @@
 
       const docRef = doc(db, "productos", productId);
       const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) return document.getElementById('productMain').innerHTML = '<p>Producto no encontrado.</p>';
+      if (!docSnap.exists()) return document.getBody().innerHTML = '<p>Producto no encontrado.</p>';
 
       const p = { id: docSnap.id, ...docSnap.data() };
       currentProduct = p;
-      window.currentProduct = p;
 
       const allImages = [p.imagen];
       if (Array.isArray(p.imagenes) && p.imagenes.length > 0) allImages.push(...p.imagenes);
 
       let carouselHTML = '';
       if (allImages.length === 1) {
-        carouselHTML = `<div class="carousel-container"><div class="carousel-slide"><img src="${allImages[0]}" alt="${p.nombre}" loading="lazy"></div></div>`;
+        carouselHTML = `<div class="carousel-container"><div class="carousel-slide"><img src="${allImages[0]}" alt="${p.nombre}" loading="lazy"><button class="zoom-btn" onclick="openLightbox('${allImages[0]}')">Zoom</button></div></div>`;
       } else {
         carouselHTML = `
           <div class="carousel-container">
@@ -366,12 +364,13 @@
           ${sizeSelector}
           <div class="action-buttons">
             <button class="btn-outline" onclick="addToCart()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"/>
-              </svg>
+              <svg viewBox="0 0 24 24"><path d="M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
               Añadir al carrito
             </button>
-            <button class="btn-outline btn-ir-pagar" onclick="document.getElementById('goToPay').click()">Ir a Pagar</button>
+            <button class="btn-outline" onclick="document.getElementById('goToPay').click()">
+              Ir a Pagar
+            </button>
           </div>
         </div>
       `;
@@ -413,8 +412,7 @@
         if (p.id !== mainProduct.id) related.push(p);
       });
       related = related.slice(0, 8);
-      const grid = document.getElementById('relatedGrid');
-      grid.innerHTML = related.map(p => `
+      document.getElementById('relatedGrid').innerHTML = related.map(p => `
         <div class="related-card" onclick="location.href='product.html?id=${p.id}'">
           <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
           <div class="related-info">
@@ -432,7 +430,7 @@
     document.getElementById('lightboxClose').onclick = () => document.getElementById('lightbox').classList.remove('active');
     document.getElementById('lightbox').onclick = e => { if (e.target === document.getElementById('lightbox')) document.getElementById('lightbox').classList.remove('active'); };
 
-    // BÚSQUEDA, MENÚ, REDES, LOGIN
+    // BÚSQUEDA, MENÚ, REDES, LOGIN (igual que antes)
     document.getElementById('searchBtn').onclick = () => {
       document.getElementById('searchBarContainer').classList.add('active');
       document.getElementById('searchResultsOverlay').classList.add('active');
@@ -450,13 +448,14 @@
       const snapshot = await getDocs(collection(db, "productos"));
       const results = snapshot.docs.map(d => ({id: d.id, ...d.data()}))
         .filter(p => p.nombre?.toLowerCase().includes(q) || p.descripcion?.toLowerCase().includes(q));
-      document.getElementById('searchResults').innerHTML = results.map(p => `
-        <div class="result-item" onclick="location.href='product.html?id=${p.id}'">
-          <img src="${p.imagen}" loading="lazy">
-          <div class="result-name">${p.nombre}</div>
-          <div class="result-price">$${p.precio.toLocaleString()}</div>
-        </div>
-      `).join('');
+      document.getElementById('searchResults').innerHTML = results.length === 0 ? '<p style="text-align:center;color:#999;padding:40px;">No se encontraron productos</p>' :
+        results.map(p => `
+          <div class="result-item" onclick="location.href='product.html?id=${p.id}'">
+            <img src="${p.imagen}" loading="lazy">
+            <div class="result-name">${p.nombre}</div>
+            <div class="result-price">$${p.precio.toLocaleString()}</div>
+          </div>
+        `).join('');
     };
 
     document.getElementById('menuBtn').onclick = () => {
@@ -480,7 +479,6 @@
 
     onSnapshot(doc(db, "links", "redes"), snap => {
       const grid = document.getElementById('socialLinksGrid');
-      grid.innerHTML = '<p style="grid-column:1/-1;color:#999;">Cargando redes...</p>';
       if (!snap.exists()) return;
       const data = snap.data();
       const redes = [
@@ -521,8 +519,7 @@
     }
 
     onSnapshot(collection(db, "productos"), snap => {
-      allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      const tipos = [...new Set(allProducts.map(p => p.tipo).filter(Boolean))].sort();
+      const tipos = [...new Set(snap.docs.map(d => d.data().tipo).filter(Boolean))].sort();
       document.getElementById('categoriesList').innerHTML = tipos.map(t => `
         <div class="submenu-item" onclick="location.href='categoria.html?tipo=${encodeURIComponent(t)}'">
           ${t.charAt(0).toUpperCase() + t.slice(1)}
