@@ -128,7 +128,6 @@
     }
     .text-edit-controls button.cancel { background: #999; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
-
     /* PRODUCT GRID & CARD (kept minimal to preserve original look) */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
     .product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
@@ -136,18 +135,15 @@
     .product-card h3 { margin: 8px 0 4px; font-size: 1rem; }
     .product-price { font-weight: 700; margin: 0 0 6px; }
     .product-desc-small { font-size: 0.9rem; color: #555; margin-bottom: 8px; }
-
     /* Action buttons moved to top-right in a distinct container */
     .card-actions-compact { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
     .card-actions-compact button { background: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-weight: 700; }
     .card-actions-compact button:hover { transform: translateY(-2px); }
-
     /* Image gallery inside edit modal */
     .image-gallery { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .image-gallery .img-wrap { position:relative; border-radius:8px; overflow:hidden; }
     .image-gallery img { width:96px; height:96px; object-fit:cover; display:block; border-radius:8px; }
     .image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
-
     /* carousel area minimal tweaks */
     .infinite-carousel-section { padding: 20px; }
     .carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
@@ -372,7 +368,6 @@
     }
     let textEditMode = false;
     let textChanges = {};
-
     async function uploadImageAndGetURL(file) {
       if (!file) return null;
       const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
@@ -389,7 +384,6 @@
         return null;
       }
     }
-
     // Previews for add modal
     document.getElementById('addImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
@@ -411,7 +405,6 @@
         previewWrap.style.display = 'flex';
       } else previewWrap.style.display = 'none';
     });
-
     function loadEditableTexts() {
       document.querySelectorAll('[contenteditable="true"]').forEach(el => {
         const coll = el.dataset.collection;
@@ -429,7 +422,6 @@
         });
       });
     }
-
     function loadProductsByType(typeKey, containerId) {
       const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
       const unsubscribe = onSnapshot(q, snapshot => {
@@ -441,18 +433,22 @@
           products.push(data);
           container.appendChild(createProductCard(data, typeKey));
         });
-        const section = container.parentElement.parentElement;
-        if (products.length >= 4) section.classList.add('auto-scroll');
-        else section.classList.add('static-display');
-        if (section.classList.contains('auto-scroll') && !container.dataset.duplicated) {
-          const clone = container.cloneNode(true);
-          clone.id += '-clone';
-          container.appendChild(clone);
-          container.dataset.duplicated = 'true';
+        if (containerId === 'newCarousel') {
+          const section = container.parentElement.parentElement;
+          if (products.length >= 4) {
+            section.classList.add('auto-scroll');
+            if (!container.dataset.duplicated) {
+              const clone = container.cloneNode(true);
+              clone.id += '-clone';
+              container.appendChild(clone);
+              container.dataset.duplicated = 'true';
+            }
+          } else {
+            section.classList.add('static-display');
+          }
         }
       });
     }
-
     function createProductCard(p, sectionType) {
       const div = document.createElement('div');
       div.className = 'product-card';
@@ -488,7 +484,6 @@
       }
       return div;
     }
-
     // ------- EDIT & DELETE (enhanced) -------
     window.editProduct = async id => {
       window.currentEditId = id;
@@ -504,7 +499,6 @@
       document.getElementById('editType').value = (data.type && data.type.carrusel) ? 'carrusel' : 'normal';
       document.getElementById('editAvailableCount').value = data.disponibles || 1;
       document.getElementById('editAvailableDisplay').textContent = (data.disponibles || 1);
-
       // populate images gallery
       const gallery = document.getElementById('editImagesGallery');
       gallery.innerHTML = '';
@@ -524,11 +518,9 @@
         wrap.dataset.url = u;
         gallery.appendChild(wrap);
       });
-
       document.getElementById('editNewPreview').innerHTML = '';
       document.getElementById('editProductModal').classList.add('active');
     };
-
     document.getElementById('saveProduct').onclick = async () => {
       if (!window.currentEditId) return showToast('No hay producto seleccionado');
       const updated = {
@@ -544,7 +536,6 @@
       const gallery = document.getElementById('editImagesGallery');
       const remaining = [];
       gallery.querySelectorAll('.img-wrap').forEach(w => { if (!w.dataset.removed) remaining.push(w.dataset.url); });
-
       // handle newly added files
       const newFiles = Array.from(document.getElementById('editImageFiles').files || []);
       for (const f of newFiles) {
@@ -554,26 +545,22 @@
       // handle additional pasted URLs
       const extraUrls = document.getElementById('editImageUrls').value.split(',').map(u => u.trim()).filter(Boolean);
       extraUrls.forEach(u => remaining.push(u));
-
       if (remaining.length === 0) {
         // keep existing imagen field if any
       } else {
         updated.imagenes = remaining;
         updated.imagen = remaining[0];
       }
-
       await updateDoc(doc(db, 'productos', window.currentEditId), updated);
       showToast('Producto actualizado');
       closeModal('editProductModal');
     };
-
     window.deleteProduct = async id => {
       if (confirm('¿Eliminar este producto?')) {
         await deleteDoc(doc(db, 'productos', id));
         showToast('Producto eliminado');
       }
     };
-
     // Save new product (support multiple images)
     document.getElementById('saveNewProduct').onclick = async () => {
       const name = document.getElementById('addName').value.trim();
@@ -607,7 +594,6 @@
       showToast('¡Producto agregado!');
       closeModal('addProductModal');
     };
-
     // edit modal image previews for newly selected files
     document.getElementById('editImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
@@ -621,7 +607,6 @@
         wrap.appendChild(dv);
       });
     });
-
     document.getElementById('availableDisplay').onclick = () => {
       document.getElementById('availableDisplay').style.display = 'none';
       document.getElementById('availableInput').style.display = 'block';
@@ -644,7 +629,6 @@
       document.getElementById('editAvailableDisplay').style.display = 'flex';
       document.getElementById('editAvailableInput').style.display = 'none';
     });
-
     document.getElementById('addPostBtn').onclick = () => {
       document.getElementById('addProductModal').classList.add('active');
       document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => {
@@ -657,7 +641,6 @@
       document.getElementById('availableDisplay').style.display = 'flex';
       document.getElementById('availableInput').style.display = 'none';
     };
-
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -704,7 +687,6 @@
       showToast("Redes guardadas");
       closeModal('socialLinksModal');
     };
-
     // Logout confirmation (native confirm with Sí/No options)
     document.getElementById('logoutBtn').onclick = () => {
       const ok = confirm('¿Quieres cerrar sesión?\n\nSelecciona Aceptar para cerrar sesión o Cancelar para quedarte.');
@@ -713,7 +695,6 @@
         window.location.href = 'login.html';
       }
     };
-
     onSnapshot(doc(db, "textos", "hero"), snap => {
       if (snap.exists() && snap.data().fondo_url) {
         document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
