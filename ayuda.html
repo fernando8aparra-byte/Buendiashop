@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ayuda - Boutique Buendía</title>
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+    
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { 
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fafafa;
+      color: #111;
+      min-height: 100vh;
+      padding-top: 80px;
+      background: linear-gradient(to bottom, #ffffff 0%, #f8f8f8 100%);
+    }
+
+    /* HEADER MINIMALISTA */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #fff;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border-bottom: 1px solid #eee;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .back-btn:hover {
+      background: #f0f0f0;
+      transform: translateX(-4px);
+    }
+    .back-btn svg {
+      width: 28px;
+      height: 28px;
+      stroke: #000;
+      stroke-width: 2.8;
+    }
+    .page-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 800;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #000;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .container {
+      max-width: 560px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: 
+        0 20px 60px rgba(0,0,0,0.08),
+        0 8px 25px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+      overflow: hidden;
+      position: relative;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #000, #333);
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    /* LOGIN REQUIRED */
+    .login-required {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .login-required h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    .login-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 18px 40px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 20px;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+
+    /* FORMULARIO */
+    .form-group {
+      margin-bottom: 28px;
+    }
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      color: #000;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 18px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 1.05rem;
+      transition: all 0.3s ease;
+      background: #fff;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #000;
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.08);
+    }
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 20px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .submit-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+    .submit-btn:disabled {
+      background: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* TOAST & LOADING */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-20px);
+    }
+    .sending-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(8px);
+    }
+    .sending-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    footer {
+      text-align: center;
+      padding: 60px 20px 40px;
+      color: #999;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER MINIMALISTA -->
+  <header class="header">
+    <button class="back-btn" onclick="location.href='index.html'">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="page-title">Centro de Ayuda</div>
+  </header>
+
+  <div class="container">
+
+    <!-- SI NO ESTÁ LOGUEADO -->
+    <div id="loginRequired" class="card login-required">
+      <h2>Necesitas iniciar sesión</h2>
+      <p>Para poder enviarnos tu consulta, primero debes tener una cuenta.</p>
+      <button class="login-btn" onclick="location.href='login.html'">Iniciar Sesión</button>
+    </div>
+
+    <!-- FORMULARIO (solo visible si está logueado) -->
+    <div id="helpFormContainer" class="card" style="display:none;">
+      <h1>¿En qué te ayudamos?</h1>
+      <p class="subtitle">Responde en menos de 24 horas · 100% confidencial</p>
+
+      <form id="helpForm">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="nombre" required>
+        </div>
+
+        <div class="form-group">
+          <label>Correo o WhatsApp</label>
+          <input type="text" id="contacto" required placeholder="ej: juan@gmail.com o +54 9 11 1234-5678">
+        </div>
+
+        <div class="form-group">
+          <label>Motivo</label>
+          <select id="motivo" required>
+            <option value="">Selecciona una opción</option>
+            <option value="pago">Problema con el pago</option>
+            <option value="usuario">Mi cuenta / correo</option>
+            <option value="pedido">Estado de mi pedido</option>
+            <option value="otro">Otro problema</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Descríbenos tu problema</label>
+          <textarea id="mensaje" required placeholder="Cuéntanos con detalle qué está pasando..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Enviar mensaje</button>
+      </form>
+    </div>
+
+  </div>
+
+  <footer>
+    © 2025 Boutique Buendía • Todos los derechos reservados
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <div class="sending-overlay" id="sendingOverlay">
+    <div class="sending-box">Enviando tu mensaje...</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const loginRequired = document.getElementById('loginRequired');
+    const helpFormContainer = document.getElementById('helpFormContainer');
+    const nombreInput = document.getElementById('nombre');
+    const motivoSelect = document.getElementById('motivo');
+
+    function showToast(msg, time = 3000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), time);
+    }
+
+    // Verificar autenticación
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // MOSTRAR FORMULARIO
+        loginRequired.style.display = 'none';
+        helpFormContainer.style.display = 'block';
+
+        // Autocompletar nombre
+        const displayName = user.displayName || user.email.split('@')[0];
+        nombreInput.value = displayName || '';
+
+        // Recuperar motivo previo (del menú)
+        const motivoGuardado = localStorage.getItem('help_motivo');
+        if (motivoGuardado) {
+          motivoSelect.value = motivoGuardado;
+          localStorage.removeItem('help_motivo');
+        }
+
+      } else {
+        // MOSTRAR LOGIN REQUIRED
+        loginRequired.style.display = 'block';
+        helpFormContainer.style.display = 'none';
+      }
+    });
+
+    // Enviar formulario
+    document.getElementById('helpForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      document.getElementById('sendingOverlay').style.display = 'flex';
+
+      try {
+        await addDoc(collection(db, "ayudas"), {
+          nombre: nombreInput.value.trim(),
+          contacto: document.getElementById('contacto').value.trim(),
+          motivo: motivoSelect.value,
+          mensaje: document.getElementById('mensaje').value.trim(),
+          uid: auth.currentUser?.uid || 'invitado',
+          email: auth.currentUser?.email || 'sin correo',
+          fecha: new Date(),
+          leido: false
+        });
+
+        showToast('¡Mensaje enviado con éxito!');
+        setTimeout(() => location.href = 'index.html', 2500);
+
+      } catch (err) {
+        console.error(err);
+        showToast('Error al enviar. Inténtalo de nuevo');
+        btn.disabled = false;
+      } finally {
+        document.getElementById('sendingOverlay').style.display = 'none';
+      }
+    };
+  </script>
+</body>
+</html>
