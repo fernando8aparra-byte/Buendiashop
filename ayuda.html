@@ -7,9 +7,9 @@
   <meta name="theme-color" content="#ffffff">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
-    
+   
     * { margin:0; padding:0; box-sizing:border-box; }
-    html { 
+    html {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
@@ -22,7 +22,6 @@
       padding-top: 80px;
       background: linear-gradient(to bottom, #ffffff 0%, #f8f8f8 100%);
     }
-
     /* HEADER MINIMALISTA */
     .header {
       position: fixed;
@@ -67,7 +66,6 @@
       letter-spacing: 1.5px;
       color: #000;
     }
-
     /* CONTENEDOR PRINCIPAL */
     .container {
       max-width: 560px;
@@ -78,7 +76,7 @@
       background: #fff;
       border-radius: 24px;
       padding: 48px 40px;
-      box-shadow: 
+      box-shadow:
         0 20px 60px rgba(0,0,0,0.08),
         0 8px 25px rgba(0,0,0,0.05);
       border: 1px solid #eee;
@@ -92,7 +90,6 @@
       height: 5px;
       background: linear-gradient(90deg, #000, #333);
     }
-
     h1 {
       font-size: 2.8rem;
       font-weight: 900;
@@ -111,7 +108,6 @@
       margin-bottom: 40px;
       line-height: 1.6;
     }
-
     /* LOGIN REQUIRED */
     .login-required {
       text-align: center;
@@ -141,7 +137,6 @@
       transform: translateY(-3px);
       box-shadow: 0 12px 30px rgba(0,0,0,0.3);
     }
-
     /* FORMULARIO */
     .form-group {
       margin-bottom: 28px;
@@ -174,7 +169,6 @@
       min-height: 160px;
       resize: vertical;
     }
-
     .submit-btn {
       background: #000;
       color: #fff;
@@ -199,6 +193,56 @@
       background: #999;
       cursor: not-allowed;
       transform: none;
+    }
+
+    /* PANTALLA DE CONFIRMACIÓN */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      padding: 20px;
+      text-align: center;
+    }
+    .success-box {
+      max-width: 500px;
+      padding: 50px 30px;
+    }
+    .success-box h2 {
+      font-size: 2.4rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #000 0%, #333 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .success-box p {
+      font-size: 1.25rem;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    .home-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 20px 50px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .home-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
     }
 
     /* TOAST & LOADING */
@@ -240,7 +284,6 @@
       font-size: 1.3rem;
       box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
-
     footer {
       text-align: center;
       padding: 60px 20px 40px;
@@ -250,7 +293,6 @@
   </style>
 </head>
 <body>
-
   <!-- HEADER MINIMALISTA -->
   <header class="header">
     <button class="back-btn" onclick="location.href='index.html'">
@@ -260,7 +302,6 @@
   </header>
 
   <div class="container">
-
     <!-- SI NO ESTÁ LOGUEADO -->
     <div id="loginRequired" class="card login-required">
       <h2>Necesitas iniciar sesión</h2>
@@ -272,18 +313,15 @@
     <div id="helpFormContainer" class="card" style="display:none;">
       <h1>¿En qué te ayudamos?</h1>
       <p class="subtitle">Responde en menos de 24 horas · 100% confidencial</p>
-
       <form id="helpForm">
         <div class="form-group">
           <label>Nombre completo</label>
           <input type="text" id="nombre" required>
         </div>
-
         <div class="form-group">
           <label>Correo o WhatsApp</label>
           <input type="text" id="contacto" required placeholder="ej: juan@gmail.com o +54 9 11 1234-5678">
         </div>
-
         <div class="form-group">
           <label>Motivo</label>
           <select id="motivo" required>
@@ -294,16 +332,22 @@
             <option value="otro">Otro problema</option>
           </select>
         </div>
-
         <div class="form-group">
           <label>Descríbenos tu problema</label>
           <textarea id="mensaje" required placeholder="Cuéntanos con detalle qué está pasando..."></textarea>
         </div>
-
         <button type="submit" class="submit-btn" id="submitBtn">Enviar mensaje</button>
       </form>
     </div>
+  </div>
 
+  <!-- PANTALLA DE ÉXITO -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <h2>¡Notificamos a nuestro equipo!</h2>
+      <p>En breve estaremos trabajando en tu caso y tendrás respuesta en menos de 24 hrs</p>
+      <button class="home-btn" onclick="location.href='index.html'">Ir a Inicio</button>
+    </div>
   </div>
 
   <footer>
@@ -337,6 +381,7 @@
     const helpFormContainer = document.getElementById('helpFormContainer');
     const nombreInput = document.getElementById('nombre');
     const motivoSelect = document.getElementById('motivo');
+    const successOverlay = document.getElementById('successOverlay');
 
     function showToast(msg, time = 3000) {
       const toast = document.getElementById('toast');
@@ -348,23 +393,17 @@
     // Verificar autenticación
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // MOSTRAR FORMULARIO
         loginRequired.style.display = 'none';
         helpFormContainer.style.display = 'block';
-
-        // Autocompletar nombre
         const displayName = user.displayName || user.email.split('@')[0];
         nombreInput.value = displayName || '';
 
-        // Recuperar motivo previo (del menú)
         const motivoGuardado = localStorage.getItem('help_motivo');
         if (motivoGuardado) {
           motivoSelect.value = motivoGuardado;
           localStorage.removeItem('help_motivo');
         }
-
       } else {
-        // MOSTRAR LOGIN REQUIRED
         loginRequired.style.display = 'block';
         helpFormContainer.style.display = 'none';
       }
@@ -389,14 +428,14 @@
           leido: false
         });
 
-        showToast('¡Mensaje enviado con éxito!');
-        setTimeout(() => location.href = 'index.html', 2500);
+        // MOSTRAR PANTALLA DE ÉXITO
+        document.getElementById('sendingOverlay').style.display = 'none';
+        successOverlay.style.display = 'flex';
 
       } catch (err) {
         console.error(err);
         showToast('Error al enviar. Inténtalo de nuevo');
         btn.disabled = false;
-      } finally {
         document.getElementById('sendingOverlay').style.display = 'none';
       }
     };
