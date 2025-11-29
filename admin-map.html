@@ -1,293 +1,170 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mapa de Ventas Global - Boutique Buendía</title>
 
-  <!-- Leaflet + Globe -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Leaflet.globe (esto hace el efecto planeta) -->
-  <script src="https://unpkg.com/leaflet.globe@0.3.0/dist/leaflet.globe.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.globe@0.3.0/dist/leaflet.globe.css" />
-
-  <!-- Leaflet Heat (opcional, para efecto calor 3D) -->
-  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <!-- Globe.gl + Three.js -->
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
 
   <style>
-    :root {
-      --bg: #f9f9fb;
-      --text: #222;
-      --accent: #4a6cf7;
-      --panel-bg: rgba(255,255,255,0.95);
-      --shadow: 0 8px 32px rgba(0,0,0,0.12);
-      --radius: 16px;
-    }
-    [data-theme="dark"] {
-      --bg: #0d1117;
-      --text: #e0e0e0;
-      --accent: #58a6ff;
-      --panel-bg: rgba(13,17,23,0.95);
-    }
     body {
-      margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg); color: var(--text); height: 100vh;
-      overflow: hidden;
+      margin: 0; padding: 0; overflow: hidden; background: #000; color: #fff;
+      font-family: 'Segoe UI', sans-serif; height: 100vh;
     }
-    .admin-bar {
-      position: fixed; top: 0; left: 0; width: 100%; height: 64px;
-      background: var(--panel-bg); backdrop-filter: blur(12px);
-      box-shadow: var(--shadow); z-index: 2000;
-      display: flex; align-items: center; padding: 0 20px; gap: 16px;
-      transition: all 0.3s ease;
-    }
-    .title { flex: 1; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; }
-    .btn {
-      background: none; border: none; padding: 10px; border-radius: 50%; cursor: pointer;
-      font-size: 1.4rem; color: #666; transition: 0.3s;
-    }
-    [data-theme="dark"] .btn { color: #aaa; }
-    .btn:hover { background: rgba(0,0,0,0.1); }
-    [data-theme="dark"] .btn:hover { background: rgba(255,255,255,0.1); }
-
-    #map { width: 100%; height: 100vh; }
-
-    /* Paneles flotantes */
+    #globeViz { width: 100%; height: 100%; }
     .panel {
-      position: absolute; background: var(--panel-bg); backdrop-filter: blur(16px);
-      border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px;
-      border: 1px solid rgba(255,255,255,0.2); z-index: 1000; transition: all 0.4s ease;
+      position: absolute; background: rgba(15,20,40,0.92); backdrop-filter: blur(16px);
+      border-radius: 16px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      border: 1px solid rgba(88,166,255,0.3); z-index: 10;
     }
-    .legend { bottom: 20px; left: 20px; min-width: 200px; }
-    .stats-panel { top: 80px; right: 20px; width: 320px; }
-    .hidden { opacity: 0; transform: translateY(30px); pointer-events: none; }
-
-    .stat-value { font-size: 2rem; font-weight: 800; }
-    .top-region { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.9rem; }
+    .legend { bottom: 20px; left: 20px; min-width: 220px; }
+    .stats { top: 20px; right: 20px; width: 340px; }
+    .title-bar {
+      position: absolute; top: 0; left: 0; width: 100%; height: 70px;
+      background: rgba(10,15,35,0.9); backdrop-filter: blur(12px); z-index: 100;
+      display: flex; align-items: center; padding: 0 24px; gap: 16px;
+      border-bottom: 1px solid #333;
+    }
+    .title { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.8px; }
+    .btn {
+      background: none; border: none; color: #aaa; font-size: 1.5rem;
+      cursor: pointer; padding: 10px; border-radius: 50%; transition: 0.3s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); color: #58a6ff; }
+    .stat-big { font-size: 2.2rem; font-weight: 800; color: #58a6ff; }
+    .tooltip {
+      position: absolute; background: rgba(0,0,0,0.9); color: white;
+      padding: 10px 14px; border-radius: 10px; font-size: 0.95rem;
+      pointer-events: none; z-index: 1000; transform: translate(-50%, -130%);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+    .hidden { display: none; }
   </style>
 </head>
-<body data-theme="light">
+<body>
 
-  <div class="admin-bar">
-    <button class="btn" id="backBtn">←</button>
-    <div class="title">Mapa de Ventas Global</div>
-    <button class="btn" id="toggleView"><i class="fa-solid fa-globe"></i></button>
-    <button class="btn" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
-    <button class="btn" id="statsBtn"><i class="fa-solid fa-chart-pie"></i></button>
-    <button class="btn" id="exportBtn"><i class="fa-solid fa-download"></i></button>
-    <button class="btn" id="logoutBtn"><i class="fa-solid fa-sign-out-alt"></i></button>
+  <div class="title-bar">
+    <button class="btn" onclick="history.back()">Back</button>
+    <div class="title">Mapa de Ventas Global - Boutique Buendía</div>
+    <button class="btn" id="themeBtn">Moon</button>
   </div>
 
-  <div id="map"></div>
+  <div id="globeViz"></div>
 
   <!-- Leyenda -->
-  <div class="panel legend" id="legendPanel">
-    <h4 style="margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;">
-      Leyenda <button class="btn" id="closeLegend" style="font-size:1rem;">×</button>
-    </h4>
-    <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><div style="width:14px;height:14px;border-radius:50%;background:#2ecc71;"></div> 1 compra</div>
-    <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><div style="width:14px;height:14px;border-radius:50%;background:#f1c40f;"></div> 2–5 compras</div>
-    <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><div style="width:14px;height:14px;border-radius:50%;background:#e67e22;"></div> 6–10 compras</div>
-    <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><div style="width:14px;height:14px;border-radius:50%;background:#e74c3c;"></div> 11–20 compras</div>
-    <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><div style="width:14px;height:14px;border-radius:50%;background:#c0392b;"></div> 20+ compras</div>
+  <div class="panel legend">
+    <h4>Leyenda de Ventas</h4>
+    <div style="margin:8px 0"><i class="fas fa-circle" style="color:#2ecc71"></i> 1 venta</div>
+    <div style="margin:8px 0"><i class="fas fa-circle" style="color:#f1c40f"></i> 2–20 ventas</div>
+    <div style="margin:8px 0"><i class="fas fa-circle" style="color:#e67e22"></i> 21–100 ventas</div>
+    <div style="margin:8px 0"><i class="fas fa-circle" style="color:#e74c3c"></i> 101–300 ventas</div>
+    <div style="margin:8px 0"><i class="fas fa-circle" style="color:#c0392b"></i> 300+ ventas</div>
   </div>
 
   <!-- Estadísticas -->
-  <div class="panel stats-panel hidden" id="statsPanel">
-    <h3 style="margin:0 0 16px;display:flex;justify-content:space-between;">
-      Insights Globales <button class="btn" id="closeStats">×</button>
-    </h3>
-    <div><div style="font-size:0.8rem;color:#888;">Total Órdenes</div><div class="stat-value" id="totalOrders">0</div></div>
-    <div style="margin-top:12px;"><div style="font-size:0.8rem;color:#888;">Ingresos Totales</div><div class="stat-value" id="totalRevenue">$0</div></div>
-    <div style="margin-top:12px;"><div style="font-size:0.8rem;color:#888;">Estado Líder</div><div class="stat-value" id="topState">-</div></div>
-    <div style="margin-top:20px;">
-      <strong>Top 5 Estados</strong>
-      <div id="topRegionsList" style="margin-top:8px;"></div>
+  <div class="panel stats">
+    <h3>Insights Globales</h3>
+    <div style="margin:12px 0">
+      <div style="color:#888; font-size:0.9rem">Total Órdenes</div>
+      <div class="stat-big" id="totalOrders">0</div>
     </div>
+    <div style="margin:12px 0">
+      <div style="color:#888; font-size:0.9rem">Ingresos Totales</div>
+      <div class="stat-big" id="totalRevenue">$0</div>
+    </div>
+    <div style="margin:20px 0 8px 0; font-weight:600">Top Sucursales</div>
+    <div id="topBranches"></div>
   </div>
 
-  <!-- Firebase + Script -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <!-- Tooltip -->
+  <div id="tooltip" class="tooltip hidden"></div>
 
   <script>
-    // === TU CONFIG DE FIREBASE (sin cambios) ===
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c",
-      measurementId: "G-9KJ2330RN7"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    // Datos de ejemplo (puedes reemplazar con tu Firebase más adelante)
+    const salesData = [
+      { branch: "CDMX Centro", lat: 19.4326, lng: -99.1332, sales: 34200, orders: 389 },
+      { branch: "Guadalajara", lat: 20.6597, lng: -103.3496, sales: 28900, orders: 312 },
+      { branch: "Monterrey", lat: 25.6866, lng: -100.3161, sales: 26700, orders: 298 },
+      { branch: "Tijuana", lat: 32.5251, lng: -117.0336, sales: 12500, orders: 142 },
+      { branch: "Cancún", lat: 21.1619, lng: -86.8515, sales: 18900, orders: 201 },
+      { branch: "Madrid", lat: 40.4168, lng: -3.7038, sales: 45200, orders: 498 },
+      { branch: "Bogotá", lat: 4.7110, lng: -74.0721, sales: 9800, orders: 89 },
+      { branch: "Lima", lat: -12.0464, lng: -77.0428, sales: 11200, orders: 105 },
+      { branch: "Mérida", lat: 20.9674, lng: -89.5926, sales: 8700, orders: 94 },
+      { branch: "Puebla", lat: 19.0414, lng: -98.2063, sales: 15600, orders: 178 },
+    ];
 
-    if (localStorage.getItem('isAdmin') !== 'true') {
-      alert('Acceso denegado');
-      window.location.href = 'index.html';
-    }
+    // Cálculo de estadísticas
+    const totalOrders = salesData.reduce((a,b) => a + b.orders, 0);
+    const totalRevenue = salesData.reduce((a,b) => a + b.sales, 0);
+    document.getElementById('totalOrders').textContent = totalOrders.toLocaleString();
+    document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toLocaleString();
 
-    // === MAPA TIPO PLANETA ===
-    const map = L.map('map', {
-      center: [20, -100],
-      zoom: 2,
-      globe: true,                    // ← ESTO ACTIVA EL MODO PLANETA
-      minZoom: 1.5,
-      maxZoom: 10,
-      zoomControl: false,
-      attributionControl: false
-    });
+    const top5 = [...salesData].sort((a,b) => b.sales - a.sales).slice(0,5);
+    document.getElementById('topBranches').innerHTML = top5.map(p => 
+      `<div style="margin:6px 0; display:flex; justify-content:space-between">
+         <span>${p.branch}</span>
+         <strong>$${p.sales.toLocaleString()}</strong>
+       </div>`
+    ).join('');
 
-    // Tiles especiales para modo globo (se ven perfectos en 3D)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Esri World Imagery'
-    }).addTo(map);
+    // Globe.gl
+    const globe = Globe()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+      .pointOfView({ altitude: 1.8 })
+      .pointsData(salesData)
+      .pointLat('lat')
+      .pointLng('lng')
+      .pointAltitude(d => Math.max(0.02, d.sales / 200000))
+      .pointRadius(d => Math.sqrt(d.orders) / 5)
+      .pointColor(d => {
+        if (d.orders <= 1) return '#2ecc71';
+        if (d.orders <= 20) return '#f1c40f';
+        if (d.orders <= 100) return '#e67e22';
+        if (d.orders <= 300) return '#e74c3c';
+        return '#c0392b';
+      })
+      .pointLabel(d => `
+        <b>${d.branch}</b><br/>
+        Ventas: <b>$${d.sales.toLocaleString()}</b><br/>
+        Órdenes: <b>${d.orders}</b>
+      `)
+      .onPointHover((point, prevPoint) => {
+        const tooltip = document.getElementById('tooltip');
+        if (point) {
+          tooltip.classList.remove('hidden');
+          tooltip.innerHTML = point.pointLabel;
+          tooltip.style.left = event.clientX + 'px';
+          tooltip.style.top = event.clientY + 'px';
+        } else {
+          tooltip.classList.add('hidden');
+        }
+      })
+      (document.getElementById('globeViz'));
 
-    // Capas
-    const markersLayer = L.layerGroup().addTo(map);
-    let heatmapLayer = null;
-
-    // Coordenadas y nombres de estados México
-    const stateCoords = { /* ... mismo que tenías antes ... */
-      AGS: [21.88, -102.29], BC: [30.0, -115.0], BCS: [26.0, -111.5], CAM: [18.6, -90.7],
-      CHIS: [16.5, -92.5], CHIH: [28.6, -106.0], CDMX: [19.43, -99.13], COAH: [27.0, -102.0],
-      COL: [19.2, -103.7], DGO: [24.0, -104.6], GTO: [21.0, -101.0], GRO: [17.5, -99.5],
-      HGO: [20.5, -98.5], JAL: [20.6, -103.3], MEX: [19.3, -99.6], MICH: [19.0, -101.5],
-      MOR: [18.9, -99.0], NAY: [21.5, -104.8], NL: [25.6, -100.3], OAX: [17.0, -96.7],
-      PUE: [19.0, -98.0], QRO: [20.6, -100.3], QROO: [19.2, -88.5], SLP: [22.1, -100.9],
-      SIN: [24.5, -107.5], SON: [29.0, -110.9], TAB: [17.9, -92.9], TAM: [24.0, -98.5],
-      TLAX: [19.4, -98.2], VER: [19.2, -96.1], YUC: [20.7, -89.1], ZAC: [22.7, -102.5]
-    };
-
-    const stateNames = {
-      AGS: 'Aguascalientes', BC: 'Baja California', BCS: 'Baja California Sur', CAM: 'Campeche',
-      CHIS: 'Chiapas', CHIH: 'Chihuahua', CDMX: 'Ciudad de México', COAH: 'Coahuila',
-      COL: 'Colima', DGO: 'Durango', GTO: 'Guanajuato', GRO: 'Guerrero',
-      HGO: 'Hidalgo', JAL: 'Jalisco', MEX: 'Estado de México', MICH: 'Michoacán',
-      MOR: 'Morelos', NAY: 'Nayarit', NL: 'Nuevo León', OAX: 'Oaxaca',
-      PUE: 'Puebla', QRO: 'Querétaro', QROO: 'Quintana Roo', SLP: 'San Luis Potosí',
-      SIN: 'Sinaloa', SON: 'Sonora', TAB: 'Tabasco', TAM: 'Tamaulipas',
-      TLAX: 'Tlaxcala', VER: 'Veracruz', YUC: 'Yucatán', ZAC: 'Zacatecas'
-    };
-
-    function getColor(count) {
-      if (count === 1) return '#2ecc71';
-      if (count <= 5) return '#f1c40f';
-      if (count <= 10) return '#e67e22';
-      if (count <= 20) return '#e74c3c';
-      return '#c0392b';
-    }
-
-    let allOrders = [];
-    const stateCount = {};
-    const stateRevenue = {};
-
-    function loadData() {
-      markersLayer.clearLayers();
-      if (heatmapLayer) map.removeLayer(heatmapLayer);
-
-      db.collection('orders').get().then(snapshot => {
-        allOrders = [];
-        Object.keys(stateCount).forEach(k => delete stateCount[k]);
-        Object.keys(stateRevenue).forEach(k => delete stateRevenue[k]);
-
-        let totalOrders = 0;
-        let totalRev = 0;
-        const heatPoints = [];
-
-        snapshot.forEach(doc => {
-          const o = doc.data();
-          if (o.address?.stateCode && stateCoords[o.address.stateCode]) {
-            allOrders.push({id: doc.id, ...o});
-            const code = o.address.stateCode;
-            stateCount[code] = (stateCount[code] || 0) + 1;
-            stateRevenue[code] = (stateRevenue[code] || 0) + (o.total || 0);
-            totalOrders++;
-            totalRev += (o.total || 0);
-
-            const coords = stateCoords[code];
-            heatPoints.push([coords[0], coords[1], (o.total || 1000) / 1000]);
-          }
-        });
-
-        // Marcadores 3D
-        Object.entries(stateCount).forEach(([code, count]) => {
-          const coords = stateCoords[code];
-          const radius = Math.min(8 + count * 1.8, 50);
-          const color = getColor(count);
-
-          L.circleMarker(coords, {
-            radius: radius,
-            fillColor: color,
-            color: color,
-            weight: 3,
-            opacity: 0.9,
-            fillOpacity: 0.7
-          }).addTo(markersLayer)
-            .bindPopup(`
-              <b style="font-size:1.1em;">${stateNames[code]}</b><br>
-              Compras: <b>${count}</b><br>
-              Ingresos: <b>$${stateRevenue[code].toLocaleString()}</b>
-            `);
-        });
-
-        // Heatmap 3D (opcional, se ve increíble)
-        heatmapLayer = L.heatLayer(heatPoints, {
-          radius: 30, blur: 20, maxZoom: 6,
-          gradient: {0.4: '#2ecc71', 0.65: '#f1c40f', 1.0: '#e74c3c'}
-        }).addTo(map);
-
-        // Stats
-        document.getElementById('totalOrders').textContent = totalOrders;
-        document.getElementById('totalRevenue').textContent = '$' + totalRev.toLocaleString();
-        const top = Object.entries(stateCount).sort((a,b)=>b[1]-a[1])[0];
-        document.getElementById('topState').textContent = top ? `${stateNames[top[0]]} (${top[1]})` : '-';
-
-        const top5 = Object.entries(stateCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        document.getElementById('topRegionsList').innerHTML = top5.map(([code,count]) =>
-          `<div class="top-region"><span>${stateNames[code]}</span><span><b>${count}</b> ventas</span></div>`
-        ).join('');
-      });
-    }
-
-    loadData();
-
-    // Controles
-    document.getElementById('statsBtn').onclick = () => {
-      document.getElementById('statsPanel').classList.toggle('hidden');
-      document.getElementById('legendPanel').classList.toggle('hidden');
-    };
-    document.getElementById('closeStats').onclick = () => document.getElementById('statsPanel').classList.add('hidden');
-    document.getElementById('closeLegend').onclick = () => document.getElementById('legendPanel').classList.add('hidden');
-
-    // Tema oscuro
-    const themeToggle = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', saved);
-    themeToggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    themeToggle.onclick = () => {
-      const isDark = document.body.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    // Tema oscuro/claro
+    document.getElementById('themeBtn').onclick = () => {
+      document.body.style.background = document.body.style.background === 'black' ? '#f0f0f0' : 'black';
+      document.body.style.color = document.body.style.color === 'white' ? '#222' : 'white';
+      globe.backgroundImageUrl(document.body.style.background === 'black' 
+        ? '//unpkg.com/three-globe/example/img/night-sky.png'
+        : '//unpkg.com/three-globe/example/img/day-sky.png');
     };
 
-    // Botones navegación
-    document.getElementById('backBtn').onclick = () => location.href = 'admin.html';
-    document.getElementById('logoutBtn').onclick = () => {
-      localStorage.removeItem('isAdmin');
-      location.href = 'index.html';
-    };
-    document.getElementById('exportBtn').onclick = () => {
-      alert('Funcionalidad de exportar CSV disponible en versión anterior');
-    };
+    // Rotación automática suave
+    (function rotate() {
+      const pov = globe.pointOfView();
+      globe.pointOfView({ ...pov, lng: pov.lng + 0.15 }, 100);
+      requestAnimationFrame(rotate);
+    })();
   </script>
 </body>
 </html>
