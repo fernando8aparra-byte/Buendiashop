@@ -75,7 +75,7 @@
     .back-link { display: block; margin-top: 18px; color: #000; text-decoration: none; font-weight: bold; }
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
     .toast.show { opacity: 1; }
-    .error { color: #ff4444; background: #ffebee; }
+    .error { background: #ff4444; }
     .hidden { display: none; }
     .small-note { font-size: 0.9rem; color: #666; margin-top: 8px; }
   </style>
@@ -85,9 +85,7 @@
     <div class="header-inner">
       <div style="display:flex; align-items:center; gap:20px;">
         <button onclick="window.location.href='index.html'" class="icon-btn" aria-label="Volver">
-          <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
-          </svg>
+          <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/></svg>
         </button>
         <div class="logo">BOUTIQUE BUENDÍA</div>
       </div>
@@ -100,12 +98,12 @@
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" autocomplete="username">
     <div class="password-wrap">
       <input type="password" id="password" class="login-input" placeholder="Contraseña" autocomplete="current-password">
-      <button id="togglePassword" class="toggle-pass-btn" type="button" aria-label="Mostrar contraseña">Eye</button>
+      <button id="togglePassword" class="toggle-pass-btn" type="button">👁</button>
     </div>
     <button class="login-btn" id="mainBtn">Entrar</button>
 
-    <button class="google-btn" id="googleBtn" type="button">
-      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <button class="google-btn" id="googleBtn">
+      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
         <path d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h146.9c-6.3 34-25 62.9-53.6 82.3v68.6h86.6c50.7-46.7 81.6-115.6 81.6-195.9z" fill="#4285F4"/>
         <path d="M272 544.3c72.6 0 133.6-24 178.1-65.1l-86.6-68.6c-24.1 16.2-55 25.8-91.5 25.8-70.3 0-129.9-47.5-151.3-111.6H33.2v70.2C77.9 482.8 168.8 544.3 272 544.3z" fill="#34A853"/>
         <path d="M120.7 327.4c-4.9-14.6-7.7-30.1-7.7-46s2.8-31.4 7.7-46.1V164.1H33.2C11.9 206.4 0 254.6 0 302.3s11.9 95.9 33.2 138.2l87.5-113.1z" fill="#FBBC05"/>
@@ -113,11 +111,11 @@
       </svg>
       <span id="googleBtnText">Iniciar sesión con Google</span>
     </button>
-    <p class="small-note" id="modeNote">¿No tienes cuenta? <a href="#" id="toggleLink" style>Regístrate aquí</a></p>
-    <a href="index.html" class="back-link">Volver a la tienda</a>
+    <p class="small-note" id="modeNote">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
+    <a href="index.html" class="back-link">← Volver a la tienda</a>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -154,7 +152,6 @@
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // Elementos del DOM
     const formTitle = document.getElementById('formTitle');
     const mainBtn = document.getElementById('mainBtn');
     const toggleLink = document.getElementById('toggleLink');
@@ -168,7 +165,6 @@
     const togglePassword = document.getElementById('togglePassword');
     let isLogin = true;
 
-    // Toast
     function showToast(msg, isError = false) {
       toast.textContent = msg;
       toast.className = 'toast' + (isError ? ' error' : '');
@@ -176,7 +172,6 @@
       setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // Redirección inteligente
     function getRedirectTarget() {
       const params = new URLSearchParams(window.location.search);
       const paramRedirect = params.get('redirect');
@@ -188,16 +183,12 @@
 
     (function recordReferrer() {
       try {
-        if (document.referrer) {
-          const refUrl = new URL(document.referrer);
-          if (refUrl.origin === window.location.origin) {
-            sessionStorage.setItem('returnTo', refUrl.pathname + refUrl.search);
-          }
+        if (document.referrer && new URL(document.referrer).origin === location.origin) {
+          sessionStorage.setItem('returnTo', new URL(document.referrer).pathname + new URL(document.referrer).search);
         }
-      } catch (err) {}
+      } catch(e) {}
     })();
 
-    // Toggle Login / Registro
     function updateModeUI() {
       if (isLogin) {
         formTitle.textContent = 'Iniciar Sesión';
@@ -216,114 +207,109 @@
         googleBtnText.textContent = 'Regístrate con Google';
         modeNote.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Iniciar sesión</a>';
       }
-      document.querySelectorAll('#toggleLink').forEach(el => el.addEventListener('click', handleToggleClick));
+      document.querySelectorAll('#toggleLink').forEach(el => el.addEventListener('click', e => { e.preventDefault(); isLogin = !isLogin; updateModeUI(); }));
     }
+    toggleLink.addEventListener('click', e => { e.preventDefault(); isLogin = !isLogin; updateModeUI(); });
 
-    function handleToggleClick(e) {
-      e.preventDefault();
-      isLogin = !isLogin;
-      updateModeUI();
-    }
-    toggleLink.addEventListener('click', handleToggleClick);
-
-    // Mostrar/ocultar contraseña
     togglePassword.addEventListener('click', () => {
       const type = passwordInput.type === 'password' ? 'text' : 'password';
       passwordInput.type = type;
-      togglePassword.textContent = type === 'text' ? 'Blind' : 'Eye';
+      togglePassword.textContent = type === 'text' ? '🙈' : '👁';
     });
 
-    // FUNCIÓN CLAVE: Guardar datos seguros del usuario (incluido admin)
+    // NUEVA FUNCIÓN: guardar datos seguros (incluido admin con custom claim)
     async function guardarDatosUsuario(user) {
-      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+      const tokenResult = await user.getIdTokenResult();
+      const esAdmin = !!(tokenResult.claims.admin);
+
       let nombre = 'Usuario';
+      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+      if (userDoc.exists()) nombre = userDoc.data().nombre || user.displayName || user.email?.split('@')[0];
+      else if (user.displayName) nombre = user.displayName;
+      else if (user.email) nombre = user.email.split('@')[0];
 
-      if (userDoc.exists()) {
-        nombre = userDoc.data().nombre;
-      } else if (user.displayName) {
-        nombre = user.displayName;
-      } else if (user.email) {
-        nombre = user.email.split('@')[0];
-      }
-
-      // Obtener token para ver si es admin (Custom Claim)
-      const idTokenResult = await user.getIdTokenResult();
-      const esAdmin = !!idTokenResult.claims.admin;
-
-      // Guardamos datos
       localStorage.setItem('loggedIn', 'true');
       localStorage.setItem('userName', esAdmin ? 'Admin' : nombre);
       localStorage.setItem('isAdmin', esAdmin ? 'true' : 'false');
-
-      // CLAVE SECRETA 2025 — NUNCA aparece en el código fuente
-      if (esAdmin) {
-        localStorage.setItem('__admin2025', 'yes');
-      }
-
-      return { nombre, esAdmin };
+      if (esAdmin) localStorage.setItem('__admin2025', 'yes');
     }
 
-    // Login principal
+    // LOGIN PRINCIPAL
     mainBtn.onclick = async () => {
       const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
-      const nombre = nameInput.value.trim();
+      const nombreRegistro = nameInput.value.trim();
 
-      if (!identifier || !password || (!isLogin && !nombre)) {
+      if (!identifier || !password || (!isLogin && !nombreRegistro)) {
         showToast('Completa todos los campos', true);
         return;
       }
 
       try {
-        let userCredential;
         let email = identifier;
 
-        if (isLogin) {
-          // Buscar por nombre si no es correo
-          if (!identifier.includes('@')) {
-            const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) {
-              showToast('Nombre o correo no encontrado', true);
-              return;
-            }
-            email = snapshot.docs[0].data().correo;
-          }
+        if (isLogin && !identifier.includes('@')) {
+          // BUSCAR EN AMBAS COLECCIONES: usuarios y admins
+          const nombreBuscado = identifier.trim();
 
-          userCredential = await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          if (!identifier.includes('@')) {
-            showToast('Ingresa un correo válido', true);
+          const promesas = [
+            getDocs(query(collection(db, "usuarios"), where("nombre", "==", nombreBuscado))),
+            getDocs(query(collection(db, "admins"), where("nombre", "==", nombreBuscado)))
+          ];
+
+          const [snapUsuarios, snapAdmins] = await Promise.all(promesas);
+
+          let encontrado = null;
+          if (!snapUsuarios.empty) encontrado = snapUsuarios.docs[0].data();
+          else if (!snapAdmins.empty) encontrado = snapAdmins.docs[0].data();
+
+          if (!encontrado) {
+            showToast('Nombre o correo no encontrado', true);
             return;
           }
+
+          email = encontrado.correo || encontrado.email || encontrado.correoElectronico;
+          if (!email) {
+            showToast('Error: usuario sin correo asociado', true);
+            return;
+          }
+        }
+
+        let userCredential;
+        if (isLogin) {
+          userCredential = await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          if (!identifier.includes('@')) { showToast('Ingresa un correo válido', true); return; }
           userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
           await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-            nombre: nombre,
+            nombre: nombreRegistro,
             correo: identifier
           });
         }
 
-        const { esAdmin } = await guardarDatosUsuario(userCredential.user);
+        await guardarDatosUsuario(userCredential.user);
 
-        showToast(esAdmin ? 'Acceso de administrador' : '¡Bienvenido!');
-        const target = esAdmin ? 'admin.html' : getRedirectTarget();
-        setTimeout(() => window.location.href = target, 900);
+        const tokenResult = await userCredential.user.getIdTokenResult();
+        const esAdmin = !!tokenResult.claims.admin;
 
-      } catch (error) {
+        showToast(esAdmin ? '¡Bienvenido Admin!' : '¡Bienvenido!');
+        setTimeout(() => window.location.href = esAdmin ? 'admin.html' : getRedirectTarget(), 900);
+
+      } catch (err) {
         let msg = 'Error desconocido';
-        switch (error.code) {
-          case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
-          case 'auth/invalid-email': msg = 'Correo inválido'; break;
-          case 'auth/weak-password': msg = 'Contraseña muy débil'; break;
+        switch (err.code) {
           case 'auth/user-not-found':
-          case 'auth/wrong-password': msg = 'Datos incorrectos'; break;
-          default: msg = error.message;
+          case 'auth/wrong-password': msg = 'Correo/nombre o contraseña incorrectos'; break;
+          case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
+          case 'auth/weak-password': msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
+          case 'auth/invalid-email': msg = 'Correo inválido'; break;
+          default: msg = err.message;
         }
         showToast('Error: ' + msg, true);
       }
     };
 
-    // Google Sign In
+    // GOOGLE
     googleBtn.addEventListener('click', async () => {
       try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -338,11 +324,11 @@
           });
         }
 
-        const { esAdmin } = await guardarDatosUsuario(user);
-        showToast(esAdmin ? 'Admin con Google' : 'Sesión con Google');
+        await guardarDatosUsuario(user);
+        const esAdmin = !!(await user.getIdTokenResult()).claims.admin;
         setTimeout(() => window.location.href = esAdmin ? 'admin.html' : getRedirectTarget(), 800);
       } catch (err) {
-        showToast('Error con Google: ' + (err.message || ''), true);
+        showToast('Error con Google', true);
       }
     });
 
