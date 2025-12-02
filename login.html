@@ -12,6 +12,7 @@
     .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
     .icon-btn { background: none; border: none; cursor: pointer; }
     .icon-btn svg { stroke: #000; fill: none; }
+
     .login-container {
       max-width: 420px;
       margin: 60px auto;
@@ -57,6 +58,7 @@
       transition: 0.3s;
     }
     .login-btn:hover { background: #333; }
+
     .google-btn {
       display: flex;
       align-items: center;
@@ -72,38 +74,53 @@
       font-weight: 600;
     }
     .google-btn svg { width: 18px; height: 18px; }
+
     .back-link { display: block; margin-top: 18px; color: #000; text-decoration: none; font-weight: bold; }
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
     .toast.show { opacity: 1; }
-    .error { background: #ff4444; }
+    .error { color: #ff4444; }
     .hidden { display: none; }
     .small-note { font-size: 0.9rem; color: #666; margin-top: 8px; }
   </style>
 </head>
 <body>
+
+  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div style="display:flex; align-items:center; gap:20px;">
         <button onclick="window.location.href='index.html'" class="icon-btn" aria-label="Volver">
-          <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/></svg>
+          <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
+          </svg>
         </button>
         <div class="logo">BOUTIQUE BUENDÍA</div>
       </div>
     </div>
   </header>
 
+  <!-- LOGIN / REGISTRO -->
   <div class="login-container" role="main">
     <h1 id="formTitle">Iniciar Sesión</h1>
+
+    <!-- Campo nombre (solo en registro, aparece primero) -->
     <input type="text" id="name" class="login-input hidden" placeholder="Nombre" autocomplete="name">
+
+    <!-- Campo identificador: nombre o correo -->
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" autocomplete="username">
+
+    <!-- Contraseña -->
     <div class="password-wrap">
       <input type="password" id="password" class="login-input" placeholder="Contraseña" autocomplete="current-password">
-      <button id="togglePassword" class="toggle-pass-btn" type="button">👁</button>
+      <button id="togglePassword" class="toggle-pass-btn" type="button" aria-label="Mostrar contraseña">👁</button>
     </div>
+
     <button class="login-btn" id="mainBtn">Entrar</button>
 
-    <button class="google-btn" id="googleBtn">
-      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+    <!-- Botón Google -->
+    <button class="google-btn" id="googleBtn" type="button" aria-label="Iniciar sesión con Google">
+      <!-- Icono oficial Google (SVG) -->
+      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h146.9c-6.3 34-25 62.9-53.6 82.3v68.6h86.6c50.7-46.7 81.6-115.6 81.6-195.9z" fill="#4285F4"/>
         <path d="M272 544.3c72.6 0 133.6-24 178.1-65.1l-86.6-68.6c-24.1 16.2-55 25.8-91.5 25.8-70.3 0-129.9-47.5-151.3-111.6H33.2v70.2C77.9 482.8 168.8 544.3 272 544.3z" fill="#34A853"/>
         <path d="M120.7 327.4c-4.9-14.6-7.7-30.1-7.7-46s2.8-31.4 7.7-46.1V164.1H33.2C11.9 206.4 0 254.6 0 302.3s11.9 95.9 33.2 138.2l87.5-113.1z" fill="#FBBC05"/>
@@ -111,12 +128,15 @@
       </svg>
       <span id="googleBtnText">Iniciar sesión con Google</span>
     </button>
+
     <p class="small-note" id="modeNote">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
     <a href="index.html" class="back-link">← Volver a la tienda</a>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <!-- FIREBASE SDK v9+ MODULAR -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -137,6 +157,7 @@
       getDocs
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+    // ========== TU FIREBASE CONFIG (mantén la tuya) ==========
     const firebaseConfig = {
       apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -147,11 +168,13 @@
       measurementId: "G-9KJ2330RN7"
     };
 
+    // INICIALIZAR
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
 
+    // ELEMENTOS
     const formTitle = document.getElementById('formTitle');
     const mainBtn = document.getElementById('mainBtn');
     const toggleLink = document.getElementById('toggleLink');
@@ -163,8 +186,15 @@
     const googleBtnText = document.getElementById('googleBtnText');
     const modeNote = document.getElementById('modeNote');
     const togglePassword = document.getElementById('togglePassword');
+
     let isLogin = true;
 
+    // USUARIO ADMIN ESPECIAL (los mantengo pero la clave de almacenamiento será la que pediste)
+    const ADMIN_NAME = "Buendia*]?~?£u837jwhwi";
+    const ADMIN_PASS = "&2)3)8:&?3828&/82$:!";
+    const ADMIN_LOCAL_KEY = "@addmin08213ddv"; // <-- clave EXACTA que pediste
+
+    // TOAST
     function showToast(msg, isError = false) {
       toast.textContent = msg;
       toast.className = 'toast' + (isError ? ' error' : '');
@@ -172,27 +202,43 @@
       setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
+    // UTIL: obtener redirect (prioridad: ?redirect=..., sessionStorage.returnTo (referrer), document.referrer, fallback index.html)
     function getRedirectTarget() {
       const params = new URLSearchParams(window.location.search);
       const paramRedirect = params.get('redirect');
       if (paramRedirect) return paramRedirect;
       const session = sessionStorage.getItem('returnTo');
       if (session) return session;
+      try {
+        const ref = document.referrer;
+        if (ref) {
+          const refUrl = new URL(ref);
+          const sameOrigin = refUrl.origin === window.location.origin;
+          if (sameOrigin) return refUrl.pathname + refUrl.search;
+        }
+      } catch (err) { /* ignore */ }
       return 'index.html';
     }
 
+    // WHEN LOADING: guardar referrer en sessionStorage si viene de la misma web (para navegar desde otra parte)
     (function recordReferrer() {
       try {
-        if (document.referrer && new URL(document.referrer).origin === location.origin) {
-          sessionStorage.setItem('returnTo', new URL(document.referrer).pathname + new URL(document.referrer).search);
+        if (document.referrer) {
+          const refUrl = new URL(document.referrer);
+          if (refUrl.origin === window.location.origin) {
+            // guarda sólo la parte después del host para redirigir internamente
+            sessionStorage.setItem('returnTo', refUrl.pathname + refUrl.search);
+          }
         }
-      } catch(e) {}
+      } catch (err) { /* ignore */ }
     })();
 
+    // TOGGLE LOGIN / REGISTRO
     function updateModeUI() {
       if (isLogin) {
         formTitle.textContent = 'Iniciar Sesión';
         mainBtn.textContent = 'Entrar';
+        toggleLink.textContent = 'Regístrate aquí';
         identifierInput.placeholder = 'Nombre o correo electrónico';
         nameInput.classList.add('hidden');
         nameInput.removeAttribute('required');
@@ -201,138 +247,164 @@
       } else {
         formTitle.textContent = 'Crear Cuenta';
         mainBtn.textContent = 'Registrarme';
+        toggleLink.textContent = 'Iniciar sesión';
         identifierInput.placeholder = 'Correo electrónico';
         nameInput.classList.remove('hidden');
         nameInput.setAttribute('required', '');
         googleBtnText.textContent = 'Regístrate con Google';
         modeNote.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Iniciar sesión</a>';
       }
-      document.querySelectorAll('#toggleLink').forEach(el => el.addEventListener('click', e => { e.preventDefault(); isLogin = !isLogin; updateModeUI(); }));
+      // reattach toggleLink since we replaced innerHTML for modeNote
+      document.querySelectorAll('#toggleLink').forEach(el => el.addEventListener('click', handleToggleClick));
     }
-    toggleLink.addEventListener('click', e => { e.preventDefault(); isLogin = !isLogin; updateModeUI(); });
 
+    function handleToggleClick(e) {
+      e.preventDefault();
+      isLogin = !isLogin;
+      updateModeUI();
+    }
+
+    toggleLink.addEventListener('click', handleToggleClick);
+
+    // Show/hide password
     togglePassword.addEventListener('click', () => {
       const type = passwordInput.type === 'password' ? 'text' : 'password';
       passwordInput.type = type;
       togglePassword.textContent = type === 'text' ? '🙈' : '👁';
+      togglePassword.setAttribute('aria-label', type === 'text' ? 'Ocultar contraseña' : 'Mostrar contraseña');
     });
 
-    // NUEVA FUNCIÓN: guardar datos seguros (incluido admin con custom claim)
-    async function guardarDatosUsuario(user) {
-      const tokenResult = await user.getIdTokenResult();
-      const esAdmin = !!(tokenResult.claims.admin);
-
-      let nombre = 'Usuario';
-      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-      if (userDoc.exists()) nombre = userDoc.data().nombre || user.displayName || user.email?.split('@')[0];
-      else if (user.displayName) nombre = user.displayName;
-      else if (user.email) nombre = user.email.split('@')[0];
-
-      localStorage.setItem('loggedIn', 'true');
-      localStorage.setItem('userName', esAdmin ? 'Admin' : nombre);
-      localStorage.setItem('isAdmin', esAdmin ? 'true' : 'false');
-      if (esAdmin) localStorage.setItem('__admin2025', 'yes');
-    }
-
-    // LOGIN PRINCIPAL
+    // MAIN ACTION
     mainBtn.onclick = async () => {
       const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
-      const nombreRegistro = nameInput.value.trim();
+      const nombre = nameInput.value.trim();
 
-      if (!identifier || !password || (!isLogin && !nombreRegistro)) {
+      if (!identifier || !password || (!isLogin && !nombre)) {
         showToast('Completa todos los campos', true);
         return;
       }
 
       try {
-        let email = identifier;
-
-        if (isLogin && !identifier.includes('@')) {
-          // BUSCAR EN AMBAS COLECCIONES: usuarios y admins
-          const nombreBuscado = identifier.trim();
-
-          const promesas = [
-            getDocs(query(collection(db, "usuarios"), where("nombre", "==", nombreBuscado))),
-            getDocs(query(collection(db, "admins"), where("nombre", "==", nombreBuscado)))
-          ];
-
-          const [snapUsuarios, snapAdmins] = await Promise.all(promesas);
-
-          let encontrado = null;
-          if (!snapUsuarios.empty) encontrado = snapUsuarios.docs[0].data();
-          else if (!snapAdmins.empty) encontrado = snapAdmins.docs[0].data();
-
-          if (!encontrado) {
-            showToast('Nombre o correo no encontrado', true);
-            return;
-          }
-
-          email = encontrado.correo || encontrado.email || encontrado.correoElectronico;
-          if (!email) {
-            showToast('Error: usuario sin correo asociado', true);
-            return;
-          }
-        }
-
-        let userCredential;
         if (isLogin) {
-          userCredential = await signInWithEmailAndPassword(auth, email, password);
+          // === INICIAR SESIÓN ===
+
+          // Verificar si es el ADMIN ESPECIAL (comprobación literal)
+          if (identifier === ADMIN_NAME && password === ADMIN_PASS) {
+            // Guarda la clave EXACTA que pediste en localStorage
+            localStorage.setItem(ADMIN_LOCAL_KEY, 'Admin');
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('userName', 'Admin');
+            localStorage.setItem('isAdmin', 'true');
+            showToast('Acceso de administrador');
+            // admin va a admin.html
+            setTimeout(() => window.location.href = 'admin.html', 800);
+            return;
+          }
+
+          // si no parece correo, buscar por nombre en Firestore
+          let email = identifier;
+          if (!identifier.includes('@')) {
+            const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+              showToast('Nombre o correo no encontrado', true);
+              return;
+            }
+            email = querySnapshot.docs[0].data().correo;
+          }
+
+          // Iniciar sesión con correo
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+          if (!userDoc.exists()) {
+            // Si no hay doc, aún así guardamos nombre desde auth o email localpart
+            const fallbackName = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+            await setDoc(doc(db, "usuarios", user.uid), { nombre: fallbackName, correo: user.email });
+            localStorage.setItem('userName', fallbackName);
+          } else {
+            const data = userDoc.data();
+            localStorage.setItem('userName', data.nombre);
+          }
+
+          localStorage.setItem('loggedIn', 'true');
+          showToast(`¡Bienvenido!`);
+          // redirigir al origen o al index
+          const target = getRedirectTarget();
+          setTimeout(() => window.location.href = target, 900);
+
         } else {
-          if (!identifier.includes('@')) { showToast('Ingresa un correo válido', true); return; }
-          userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
-          await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-            nombre: nombreRegistro,
+          // === REGISTRO ===
+          if (!identifier.includes('@')) {
+            showToast('Ingresa un correo válido', true);
+            return;
+          }
+
+          const userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
+          const user = userCredential.user;
+
+          // Guardar en Firestore
+          await setDoc(doc(db, "usuarios", user.uid), {
+            nombre: nombre,
             correo: identifier
           });
+
+          localStorage.setItem('loggedIn', 'true');
+          localStorage.setItem('userName', nombre);
+          showToast('¡Cuenta creada con éxito!');
+          const target = getRedirectTarget();
+          setTimeout(() => window.location.href = target, 900);
         }
-
-        await guardarDatosUsuario(userCredential.user);
-
-        const tokenResult = await userCredential.user.getIdTokenResult();
-        const esAdmin = !!tokenResult.claims.admin;
-
-        showToast(esAdmin ? '¡Bienvenido Admin!' : '¡Bienvenido!');
-        setTimeout(() => window.location.href = esAdmin ? 'admin.html' : getRedirectTarget(), 900);
-
-      } catch (err) {
+      } catch (error) {
         let msg = 'Error desconocido';
-        switch (err.code) {
-          case 'auth/user-not-found':
-          case 'auth/wrong-password': msg = 'Correo/nombre o contraseña incorrectos'; break;
+        switch (error.code) {
           case 'auth/email-already-in-use': msg = 'Este correo ya está registrado'; break;
-          case 'auth/weak-password': msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
           case 'auth/invalid-email': msg = 'Correo inválido'; break;
-          default: msg = err.message;
+          case 'auth/weak-password': msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
+          case 'auth/user-not-found':
+          case 'auth/wrong-password': msg = 'Correo, nombre o contraseña incorrectos'; break;
+          default: msg = error.message;
         }
         showToast('Error: ' + msg, true);
       }
     };
 
-    // GOOGLE
+    // ENTER = CLICK
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') mainBtn.click();
+    });
+
+    // ========== GOOGLE SIGN-IN ==========
     googleBtn.addEventListener('click', async () => {
       try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
-
+        // comprobar si ya existe doc en Firestore
         const userRef = doc(db, "usuarios", user.uid);
-        const snap = await getDoc(userRef);
-        if (!snap.exists()) {
-          await setDoc(userRef, {
-            nombre: user.displayName || user.email.split('@')[0],
-            correo: user.email
-          });
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          // obtener nombre y correo
+          const nombre = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+          const correo = user.email || '';
+          await setDoc(userRef, { nombre, correo });
         }
+        // guardar en localStorage
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userName', user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario'));
 
-        await guardarDatosUsuario(user);
-        const esAdmin = !!(await user.getIdTokenResult()).claims.admin;
-        setTimeout(() => window.location.href = esAdmin ? 'admin.html' : getRedirectTarget(), 800);
+        // Si el email coincide con admin? (opcional) — No lo usamos para admin por seguridad
+        showToast(isLogin ? 'Sesión iniciada con Google' : 'Registrado con Google');
+        const target = getRedirectTarget();
+        setTimeout(() => window.location.href = target, 800);
       } catch (err) {
-        showToast('Error con Google', true);
+        console.error(err);
+        showToast('No se pudo iniciar sesión con Google: ' + (err.message || err), true);
       }
     });
 
-    document.addEventListener('keypress', e => e.key === 'Enter' && mainBtn.click());
+    // Inicializar UI (por si venimos con ?redirect=...)
     updateModeUI();
   </script>
 </body>
