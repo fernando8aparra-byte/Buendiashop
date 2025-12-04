@@ -42,6 +42,7 @@
       cursor: pointer;
       font-size: 0.95rem;
       padding: 6px;
+      color: #666;
     }
     .login-btn {
       width: 100%;
@@ -75,7 +76,7 @@
     .back-link { display: block; margin-top: 18px; color: #000; text-decoration: none; font-weight:bold; }
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
     .toast.show { opacity: 1; }
-    .error { color: #ff4444; }
+    .error { background: #d32f2f; }
     .hidden { display: none; }
     .small-note { font-size: 0.9rem; color: #666; margin-top: 8px; }
   </style>
@@ -98,19 +99,16 @@
   <!-- LOGIN / REGISTRO -->
   <div class="login-container" role="main">
     <h1 id="formTitle">Iniciar Sesión</h1>
-
-    <input type="text" id="name" class="login-input hidden" placeholder="Nombre" autocomplete="name">
-
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" autocomplete="name">
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" autocomplete="username">
-
     <div class="password-wrap">
       <input type="password" id="password" class="login-input" placeholder="Contraseña" autocomplete="current-password">
-      <button id="togglePassword" class="toggle-pass-btn" type="button" aria-label="Mostrar contraseña">Show</button>
+      <button id="togglePassword" class="toggle-pass-btn" type="button">Show</button>
     </div>
 
     <button class="login-btn" id="mainBtn">Entrar</button>
 
-    <button class="google-btn" id="googleBtn" type="button" aria-label="Iniciar sesión con Google">
+    <button class="google-btn" id="googleBtn" type="button">
       <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h146.9c-6.3 34-25 62.9-53.6 82.3v68.6h86.6c50.7-46.7 81.6-115.6 81.6-195.9z" fill="#4285F4"/>
         <path d="M272 544.3c72.6 0 133.6-24 178.1-65.1l-86.6-68.6c-24.1 16.2-55 25.8-91.5 25.8-70.3 0-129.9-47.5-151.3-111.6H33.2v70.2C77.9 482.8 168.8 544.3 272 544.3z" fill="#34A853"/>
@@ -121,12 +119,12 @@
     </button>
 
     <p class="small-note" id="modeNote">¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a></p>
-    <a href="index.html" class="back-link">← Volver a la tienda</a>
+    <a href="index.html" class="back-link">Volver a la tienda</a>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- FIREBASE SDK v10+ -->
+  <!-- FIREBASE SDK v10+ (versión actualizada) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -162,15 +160,9 @@
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // Dominios autorizados para Google Sign-In (añade más si usas dominio propio)
-    googleProvider.setCustomParameters({
-      login_hint: 'user@example.com'
-    });
-
-    // ELEMENTOS DOM
+    // Elementos del DOM
     const formTitle = document.getElementById('formTitle');
     const mainBtn = document.getElementById('mainBtn');
-    const toggleLink = document.getElementById('toggleLink');
     const nameInput = document.getElementById('name');
     const identifierInput = document.getElementById('identifier');
     const passwordInput = document.getElementById('password');
@@ -189,70 +181,67 @@
       setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    // Obtener página a la que redirigir después del login
+    // Redirección después del login
     function getRedirectTarget() {
       const params = new URLSearchParams(window.location.search);
-      const param = params.get('redirect');
-      if (param) return param;
-
+      const redirect = params.get('redirect');
+      if (redirect) return redirect;
       const saved = sessionStorage.getItem('returnTo');
       if (saved) return saved;
-
       return 'index.html';
     }
 
-    // Guardar referrer cuando se llega al login
+    // Guardar página de origen
     (function() {
       try {
-        if (document.referrer) {
-          const ref = new URL(document.referrer);
-          if (ref.origin === window.location.origin) {
-            sessionStorage.setItem('returnTo', ref.pathname + ref.search);
-          }
+        if (document.referrer && new URL(document.referrer).origin === location.origin) {
+          sessionStorage.setItem('returnTo', new URL(document.referrer).pathname + new URL(document.referrer).search);
         }
       } catch(e) {}
     })();
 
-    // FUNCIÓN CLAVE: comprobar si el usuario es admin
-    async function isUserAdmin(uid, email) {
-      // Opción 1: buscar por UID en la colección "admins"
-      const byUid = await getDoc(doc(db, "admins", uid));
-      if (byUid.exists()) return true;
-
-      // Opción 2: buscar por correo en la colección "admins"
-      const q = query(collection(db, "admins"), where("correo", "==", email));
-      const snap = await getDocs(q);
-      return !snap.empty;
+    // NUEVA FUNCIÓN: obtener rol del usuario desde su documento en "usuarios"
+    async function getUserRole(uid) {
+      try {
+        const userDoc = await getDoc(doc(db, "usuarios", uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          return data.rol || "user"; // si no tiene campo rol → es user normal
+        }
+        return "user";
+      } catch (error) {
+        console.error("Error al obtener rol:", error);
+        return "user";
+      }
     }
 
     // Redirigir según rol
     async function redirectAfterLogin(user) {
       const target = getRedirectTarget();
-
-      const admin = await isUserAdmin(user.uid, user.email);
+      const rol = await getUserRole(user.uid);
 
       localStorage.setItem('loggedIn', 'true');
       localStorage.setItem('userName', user.displayName || user.email.split('@')[0] || 'Usuario');
-      localStorage.setItem('isAdmin', admin ? 'true' : 'false');
+      localStorage.setItem('userRole', rol); // guardamos el rol para usarlo en otras páginas
 
-      if (admin) {
+      if (rol === "admin") {
         showToast('Bienvenido Administrador');
         setTimeout(() => window.location.href = 'admin.html', 800);
       } else {
-        showToast('¡Bienvenido!');
+        showToast('Bienvenido de vuelta');
         setTimeout(() => window.location.href = target, 800);
       }
     }
 
-    // Toggle mostrar contraseña
+    // Mostrar/ocultar contraseña
     togglePassword.addEventListener('click', () => {
-      const type = passwordInput.type === 'password' ? 'text' : 'password';
-      passwordInput.type = type;
-      togglePassword.textContent = type === 'text' ? 'Hide' : 'Show';
+      const tipo = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = tipo;
+      togglePassword.textContent = tipo === 'text' ? 'Hide' : 'Show';
     });
 
-    // Cambiar entre login y registro
-    function updateModeUI() {
+    // Cambiar entre Login y Registro
+    function updateFormMode() {
       if (isLogin) {
         formTitle.textContent = 'Iniciar Sesión';
         mainBtn.textContent = 'Entrar';
@@ -270,77 +259,84 @@
         googleBtnText.textContent = 'Regístrate con Google';
         modeNote.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Iniciar sesión</a>';
       }
-      // Re-asignar evento porque innerHTML lo borra
-      document.querySelectorAll('#toggleLink').forEach(el => el.onclick = (e) => {
-        e.preventDefault();
-        isLogin = !isLogin;
-        updateModeUI();
+
+      // Reasignar evento al enlace (se pierde con innerHTML)
+      document.querySelectorAll('#toggleLink').forEach(link => {
+        link.onclick = (e) => {
+          e.preventDefault();
+          isLogin = !isLogin;
+          updateFormMode();
+        };
       });
     }
-    updateModeUI();
+    updateFormMode();
 
-    // LOGIN / REGISTRO MANUAL
+    // LOGIN / REGISTRO CON EMAIL
     mainBtn.onclick = async () => {
       const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
       const nombre = nameInput.value.trim();
 
       if (!identifier || !password || (!isLogin && !nombre)) {
-        showToast('Completa todos los campos', true);
+        showToast('Por favor completa todos los campos', true);
         return;
       }
 
       try {
         let userCredential;
+
         if (isLogin) {
-          // INICIO DE SESIÓN
+          // INICIAR SESIÓN
           let email = identifier;
 
-          // Si no escribió @, buscar por nombre de usuario
+          // Si no tiene @, buscar por nombre de usuario en Firestore
           if (!identifier.includes('@')) {
             const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
-            const snap = await getDocs(q);
-            if (snap.empty) {
-              showToast('Usuario o correo no encontrado', true);
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) {
+              showToast('Nombre o correo no encontrado', true);
               return;
             }
-            email = snap.docs[0].data().correo;
+            email = snapshot.docs[0].data().correo;
           }
 
           userCredential = await signInWithEmailAndPassword(auth, email, password);
         } else {
           // REGISTRO
           if (!identifier.includes('@')) {
-            showToast('Debe ser un correo válido', true);
+            showToast('Ingresa un correo electrónico válido', true);
             return;
           }
+
           userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
 
-          // Guardar datos básicos del nuevo usuario
+          // Guardar usuario con rol "user" por defecto
           await setDoc(doc(db, "usuarios", userCredential.user.uid), {
             nombre: nombre,
-            correo: identifier
+            correo: identifier,
+            rol: "user",           // <-- AQUÍ SE DEFINE EL ROL
+            creadoEn: new Date()
           });
         }
 
         await redirectAfterLogin(userCredential.user);
 
       } catch (err) {
-        let msg = 'Error desconocido';
+        let mensaje = 'Error inesperado';
         switch (err.code) {
           case 'auth/user-not-found':
           case 'auth/wrong-password':
-            msg = 'Correo/nombre o contraseña incorrectos'; break;
+            mensaje = 'Correo/nombre o contraseña incorrectos'; break;
           case 'auth/email-already-in-use':
-            msg = 'Este correo ya está registrado'; break;
+            mensaje = 'Este correo ya está registrado'; break;
           case 'auth/weak-password':
-            msg = 'Contraseña demasiado débil'; break;
+            mensaje = 'La contraseña debe tener al menos 6 caracteres'; break;
           case 'auth/invalid-email':
-            msg = 'Correo inválido'; break;
+            mensaje = 'Correo inválido'; break;
           default:
-            msg = err.message;
+            mensaje = err.message;
         }
-        showToast(msg, true);
+        showToast(mensaje, true);
       }
     };
 
@@ -350,26 +346,32 @@
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
 
-        // Si es la primera vez, crear documento en usuarios
+        // Si es nuevo, crear documento con rol "user"
         const userRef = doc(db, "usuarios", user.uid);
         const snap = await getDoc(userRef);
+
         if (!snap.exists()) {
           await setDoc(userRef, {
             nombre: user.displayName || user.email.split('@')[0],
-            correo: user.email
+            correo: user.email,
+            rol: "user",           // <-- Rol por defecto
+            creadoEn: new Date()
           });
         }
 
         await redirectAfterLogin(user);
       } catch (err) {
         console.error(err);
-        showToast('Error con Google: ' + (err.message || ''), true);
+        showToast('Error con Google: ' + (err.message || 'Inténtalo de nuevo'), true);
       }
     });
 
-    // Enter = click en botón principal
+    // Presionar Enter = click en botón principal
     document.addEventListener('keypress', e => {
-      if (e.key === 'Enter') mainBtn.click();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        mainBtn.click();
+      }
     });
   </script>
 </body>
