@@ -20,7 +20,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       text-align: center;
     }
-    .login-container h1 { margin-bottom: 20px; font-size: 2rem; color: #000; }
     .login-input {
       width: 100%;
       padding: 15px;
@@ -39,8 +38,6 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 0.95rem;
-      padding: 6px;
       color: #666;
     }
     .login-btn {
@@ -54,7 +51,6 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 12px;
-      transition: 0.3s;
     }
     .login-btn:hover { background: #333; }
     .google-btn {
@@ -65,26 +61,40 @@
       width: 100%;
       padding: 12px;
       margin-top: 12px;
-      border-radius: 8px;
       border: 1px solid #ddd;
       background: #fff;
       cursor: pointer;
       font-weight: 600;
+      border-radius: 8px;
     }
-    .google-btn svg { width: 18px; height: 18px; }
     .back-link { display: block; margin-top: 18px; color: #000; text-decoration: none; font-weight:bold; }
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 14px 24px; border-radius: 8px; opacity: 0; transition: opacity 0.4s; z-index: 9999; font-weight: bold; font-size: 1rem; }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.4s;
+      z-index: 9999;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
     .toast.show { opacity: 1; }
-    .error { background: #d32f2f !important; }
+    .toast.error { background: #d32f2f; }
     .hidden { display: none; }
     .small-note { font-size: 0.9rem; color: #666; margin-top: 8px; }
   </style>
 </head>
 <body>
+
   <header class="header">
     <div class="header-inner">
       <div style="display:flex; align-items:center; gap:20px;">
-        <button onclick="window.location.href='index.html'" class="icon-btn" aria-label="Volver">
+        <button onclick="window.location.href='index.html'" class="icon-btn">
           <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/></svg>
         </button>
         <div class="logo">BOUTIQUE BUENDÍA</div>
@@ -92,9 +102,9 @@
     </div>
   </header>
 
-  <div class="login-container" role="main">
+  <div class="login-container">
     <h1 id="formTitle">Iniciar Sesión</h1>
-    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" autocomplete="name" required>
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" autocomplete="name">
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" autocomplete="username">
     <div class="password-wrap">
       <input type="password" id="password" class="login-input" placeholder="Contraseña" autocomplete="current-password">
@@ -103,8 +113,8 @@
 
     <button class="login-btn" id="mainBtn">Entrar</button>
 
-    <button class="google-btn" id="googleBtn" type="button">
-      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+    <button class="google-btn" id="googleBtn">
+      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
         <path d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h146.9c-6.3 34-25 62.9-53.6 82.3v68.6h86.6c50.7-46.7 81.6-115.6 81.6-195.9z" fill="#4285F4"/>
         <path d="M272 544.3c72.6 0 133.6-24 178.1-65.1l-86.6-68.6c-24.1 16.2-55 25.8-91.5 25.8-70.3 0-129.9-47.5-151.3-111.6H33.2v70.2C77.9 482.8 168.8 544.3 272 544.3z" fill="#34A853"/>
         <path d="M120.7 327.4c-4.9-14.6-7.7-30.1-7.7-46s2.8-31.4 7.7-46.1V164.1H33.2C11.9 206.4 0 254.6 0 302.3s11.9 95.9 33.2 138.2l87.5-113.1z" fill="#FBBC05"/>
@@ -117,7 +127,7 @@
     <a href="index.html" class="back-link">Volver a la tienda</a>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -155,94 +165,93 @@
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // DOM
-    const formTitle = document.getElementById('formTitle');
+    // Elementos
+    const toast = document.getElementById('toast');
     const mainBtn = document.getElementById('mainBtn');
-    const nameInput = document.getElementById('name');
     const identifierInput = document.getElementById('identifier');
     const passwordInput = document.getElementById('password');
-    const toast = document.getElementById('toast');
+    const nameInput = document.getElementById('name');
+    const formTitle = document.getElementById('formTitle');
     const googleBtnText = document.getElementById('googleBtnText');
     const modeNote = document.getElementById('modeNote');
     const togglePassword = document.getElementById('togglePassword');
 
     let isLogin = true;
 
-    function showToast(msg, isError = false) {
+    function showToast(msg, error = false) {
       toast.textContent = msg;
-      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.className = 'toast' + (error ? ' error' : '');
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 5000);
     }
 
-    // Obtiene nombre bonito del usuario
-    function getDisplayName(user) {
-      return user.displayName || 
-             (user.email ? user.email.split('@')[0] : 'Usuario') ||
-             'Usuario';
-    }
+    // Obtiene nombre bonito
+    const getDisplayName = (user) => user.displayName || user.email.split('@')[0] || 'Usuario';
 
-    // Obtiene el rol del usuario desde Firestore
+    // OBTENER ROL DESDE FIRESTORE (lo más importante)
     async function getUserRole(uid) {
       const docSnap = await getDoc(doc(db, "usuarios", uid));
       if (docSnap.exists()) {
-        return docSnap.data().rol || "user";
+        const data = docSnap.data();
+        return data.rol === "admin" ? "admin" : "user";
       }
-      return "user";
+      return "user"; // por seguridad
     }
 
-    // Redirección final según rol
-    async function redirectAfterAuth(user, isNewUser = false) {
-      const rol = await getUserRole(user.uid);
+    // REDIRECCIÓN FINAL
+    async function goToDashboard(user, isNewUser = false) {
       const nombre = getDisplayName(user);
+      const rol = await getUserRole(user.uid);
 
+      // Guardar datos en localStorage
       localStorage.setItem('loggedIn', 'true');
       localStorage.setItem('userName', nombre);
       localStorage.setItem('userRole', rol);
       localStorage.setItem('userEmail', user.email);
 
+      // Mensaje personalizado
       if (isNewUser) {
-        showToast(`¡Bienvenido a Boutique Buendía, ${nombre}!`, false);
+        showToast(`¡Bienvenido a Boutique Buendía, ${nombre}!`);
       } else {
-        showToast(`¡Bienvenido de nuevo, ${nombre}!`, false);
+        if (rol === "admin") {
+          showToast(`Bienvenido Administrador ${nombre}`);
+        } else {
+          showToast(`¡Hola de nuevo, ${nombre}!`);
+        }
       }
 
+      // REDIRECCIÓN SEGÚN ROL
       setTimeout(() => {
         if (rol === "admin") {
-          window.location.href = 'admin.html';
+          window.location.href = "admin.html";
         } else {
           const redirect = new URLSearchParams(window.location.search).get('redirect') ||
-                          sessionStorage.getItem('returnTo') ||
-                          'index.html';
+                           sessionStorage.getItem('returnTo') ||
+                           'index.html';
           window.location.href = redirect;
         }
       }, 1200);
     }
 
     // Guardar página anterior
-    (function() {
-      try {
-        if (document.referrer && new URL(document.referrer).origin === location.origin) {
-          sessionStorage.setItem('returnTo', new URL(document.referrer).pathname + new URL(document.referrer).search);
-        }
-      } catch(e) {}
-    })();
+    if (document.referrer && new URL(document.referrer).origin === location.origin) {
+      sessionStorage.setItem('returnTo', new URL(document.referrer).pathname + new URL(document.referrer).search);
+    }
 
-    // Toggle contraseña
+    // Toggle mostrar contraseña
     togglePassword.addEventListener('click', () => {
-      const tipo = passwordInput.type === 'password' ? 'text' : 'password';
-      passwordInput.type = tipo;
-      togglePassword.textContent = tipo === 'text' ? 'Hide' : 'Show';
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      togglePassword.textContent = type === 'text' ? 'Hide' : 'Show';
     });
 
-    // Cambiar modo login/registro
-    function updateFormMode() {
+    // Cambiar entre login/registro
+    function updateMode() {
       if (isLogin) {
         formTitle.textContent = 'Iniciar Sesión';
         mainBtn.textContent = 'Entrar';
         identifierInput.placeholder = 'Nombre o correo electrónico';
         nameInput.classList.add('hidden');
-        nameInput.removeAttribute('required');
         googleBtnText.textContent = 'Iniciar sesión con Google';
         modeNote.innerHTML = '¿No tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Regístrate aquí</a>';
       } else {
@@ -250,119 +259,89 @@
         mainBtn.textContent = 'Registrarme';
         identifierInput.placeholder = 'Correo electrónico';
         nameInput.classList.remove('hidden');
-        nameInput.setAttribute('required', '');
         googleBtnText.textContent = 'Regístrate con Google';
         modeNote.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Iniciar sesión</a>';
       }
-
-      document.querySelectorAll('#toggleLink').forEach(link => {
-        link.onclick = e => {
-          e.preventDefault();
-          isLogin = !isLogin;
-          updateFormMode();
-        };
+      document.querySelectorAll('#toggleLink').forEach(l => l.onclick = e => {
+        e.preventDefault();
+        isLogin = !isLogin;
+        updateMode();
       });
     }
-    updateFormMode();
+    updateMode();
 
     // LOGIN / REGISTRO MANUAL
     mainBtn.onclick = async () => {
-      const identifier = identifierInput.value.trim();
-      const password = passwordInput.value;
+      const id = identifierInput.value.trim();
+      const pass = passwordInput.value;
       const nombre = nameInput.value.trim();
 
-      if (!identifier || !password || (!isLogin && !nombre)) {
-        showToast('Completa todos los campos', true);
-        return;
-      }
+      if (!id || !pass || (!isLogin && !nombre)) return showToast('Completa todos los campos', true);
 
-      if (!isLogin && !identifier.includes('@')) {
-        showToast('Ingresa un correo válido', true);
-        return;
-      }
+      try {
+        let userCred;
 
-      (async () => {
-        try {
-          let userCredential;
-
-          if (isLogin) {
-            // LOGIN
-            let email = identifier;
-            if (!identifier.includes('@')) {
-              const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
-              const snap = await getDocs(q);
-              if (snap.empty) {
-                showToast('Nombre o correo no encontrado', true);
-                return;
-              }
-              email = snap.docs[0].data().correo;
-            }
-            userCredential = await signInWithEmailAndPassword(auth, email, password);
-            await redirectAfterAuth(userCredential.user, false);
-          } else {
-            // REGISTRO
-            userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
-
-            await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-              nombre: nombre,
-              correo: identifier,
-              rol: "user",
-              creadoEn: serverTimestamp()  // Fecha y hora exactas del servidor
-            });
-
-            await redirectAfterAuth(userCredential.user, true);
+        if (isLogin) {
+          let email = id;
+          if (!id.includes('@')) {
+            const q = query(collection(db, "usuarios"), where("nombre", "==", id));
+            const snap = await getDocs(q);
+            if (snap.empty) return showToast('Usuario no encontrado', true);
+            email = snap.docs[0].data().correo;
           }
-        } catch (err) {
-          let msg = 'Error';
-          switch (err.code) {
-            case 'auth/user-not-found':
-            case 'auth/wrong-password':
-              msg = 'Correo/nombre o contraseña incorrectos'; break;
-            case 'auth/email-already-in-use':
-              msg = 'Este correo ya está registrado'; break;
-            case 'auth/weak-password':
-              msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
-            case 'auth/invalid-email':
-              msg = 'Correo inválido'; break;
-            default:
-              msg = err.message;
-          }
-          showToast(msg, true);
+          userCred = await signInWithEmailAndPassword(auth, email, pass);
+          await goToDashboard(userCred.user, false);
+        } else {
+          if (!id.includes('@')) return showToast('Correo inválido', true);
+          userCred = await createUserWithEmailAndPassword(auth, id, pass);
+          await setDoc(doc(db, "usuarios", userCred.user.uid), {
+            nombre,
+            correo: id,
+            rol: "user",
+            creadoEn: serverTimestamp()
+          });
+          await goToDashboard(userCred.user, true);
         }
-      })();
+      } catch (e) {
+        const msg = {
+          'auth/user-not-found': 'Usuario no encontrado',
+          'auth/wrong-password': 'Contraseña incorrecta',
+          'auth/email-already-in-use': 'Este correo ya está registrado',
+          'auth/weak-password': 'Contraseña muy débil',
+          'auth/invalid-email': 'Correo inválido'
+        }[e.code] || 'Error al autenticar';
+        showToast(msg, true);
+      }
     };
 
-    // GOOGLE SIGN IN
-    document.getElementById('googleBtn').addEventListener('click', async () => {
+    // GOOGLE
+    document.getElementById('googleBtn').onclick = async () => {
       try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
-        const isNew = result._tokenResponse?.isNewUser || false;
+        const isNew = result._tokenResponse?.isNewUser;
 
-        const userRef = doc(db, "usuarios", user.uid);
-        const snap = await getDoc(userRef);
+        const ref = doc(db, "usuarios", user.uid);
+        const snap = await getDoc(ref);
 
         if (!snap.exists()) {
-          await setDoc(userRef, {
+          await setDoc(ref, {
             nombre: user.displayName || user.email.split('@')[0],
             correo: user.email,
             rol: "user",
             creadoEn: serverTimestamp()
-          }, { merge: true });
+          });
         }
 
-        await redirectAfterAuth(user, isNewUser);
-      } catch (err) {
-        showToast('Error con Google: inténtalo de nuevo', true);
+        await goToDashboard(user, isNew);
+      } catch (e) {
+        showToast('Error con Google', true);
       }
-    });
+    };
 
     // Enter = enviar
     document.addEventListener('keypress', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        mainBtn.click();
-      }
+      if (e.key === 'Enter') mainBtn.click();
     });
   </script>
 </body>
