@@ -11,7 +11,6 @@
     .header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 15px; box-sizing: border-box; }
     .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
     .icon-btn { background: none; border: none; cursor: pointer; }
-    .icon-btn svg { stroke: #000; fill: none; }
     .login-container {
       max-width: 420px;
       margin: 60px auto;
@@ -74,32 +73,28 @@
     }
     .google-btn svg { width: 18px; height: 18px; }
     .back-link { display: block; margin-top: 18px; color: #000; text-decoration: none; font-weight:bold; }
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 9999; font-weight: bold; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 14px 24px; border-radius: 8px; opacity: 0; transition: opacity 0.4s; z-index: 9999; font-weight: bold; font-size: 1rem; }
     .toast.show { opacity: 1; }
-    .error { background: #d32f2f; }
+    .error { background: #d32f2f !important; }
     .hidden { display: none; }
     .small-note { font-size: 0.9rem; color: #666; margin-top: 8px; }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
   <header class="header">
     <div class="header-inner">
       <div style="display:flex; align-items:center; gap:20px;">
         <button onclick="window.location.href='index.html'" class="icon-btn" aria-label="Volver">
-          <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/>
-          </svg>
+          <svg viewBox="0 0 24 24" width="28" height="28"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#000"/></svg>
         </button>
         <div class="logo">BOUTIQUE BUENDÍA</div>
       </div>
     </div>
   </header>
 
-  <!-- LOGIN / REGISTRO -->
   <div class="login-container" role="main">
     <h1 id="formTitle">Iniciar Sesión</h1>
-    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" autocomplete="name">
+    <input type="text" id="name" class="login-input hidden" placeholder="Nombre completo" autocomplete="name" required>
     <input type="text" id="identifier" class="login-input" placeholder="Nombre o correo electrónico" autocomplete="username">
     <div class="password-wrap">
       <input type="password" id="password" class="login-input" placeholder="Contraseña" autocomplete="current-password">
@@ -109,7 +104,7 @@
     <button class="login-btn" id="mainBtn">Entrar</button>
 
     <button class="google-btn" id="googleBtn" type="button">
-      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
         <path d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h146.9c-6.3 34-25 62.9-53.6 82.3v68.6h86.6c50.7-46.7 81.6-115.6 81.6-195.9z" fill="#4285F4"/>
         <path d="M272 544.3c72.6 0 133.6-24 178.1-65.1l-86.6-68.6c-24.1 16.2-55 25.8-91.5 25.8-70.3 0-129.9-47.5-151.3-111.6H33.2v70.2C77.9 482.8 168.8 544.3 272 544.3z" fill="#34A853"/>
         <path d="M120.7 327.4c-4.9-14.6-7.7-30.1-7.7-46s2.8-31.4 7.7-46.1V164.1H33.2C11.9 206.4 0 254.6 0 302.3s11.9 95.9 33.2 138.2l87.5-113.1z" fill="#FBBC05"/>
@@ -124,7 +119,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- FIREBASE SDK v10+ (versión actualizada) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -142,7 +136,8 @@
       collection,
       query,
       where,
-      getDocs
+      getDocs,
+      serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -160,7 +155,7 @@
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // Elementos del DOM
+    // DOM
     const formTitle = document.getElementById('formTitle');
     const mainBtn = document.getElementById('mainBtn');
     const nameInput = document.getElementById('name');
@@ -173,25 +168,58 @@
 
     let isLogin = true;
 
-    // Toast
     function showToast(msg, isError = false) {
       toast.textContent = msg;
       toast.className = 'toast' + (isError ? ' error' : '');
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 4000);
+      setTimeout(() => toast.classList.remove('show'), 5000);
     }
 
-    // Redirección después del login
-    function getRedirectTarget() {
-      const params = new URLSearchParams(window.location.search);
-      const redirect = params.get('redirect');
-      if (redirect) return redirect;
-      const saved = sessionStorage.getItem('returnTo');
-      if (saved) return saved;
-      return 'index.html';
+    // Obtiene nombre bonito del usuario
+    function getDisplayName(user) {
+      return user.displayName || 
+             (user.email ? user.email.split('@')[0] : 'Usuario') ||
+             'Usuario';
     }
 
-    // Guardar página de origen
+    // Obtiene el rol del usuario desde Firestore
+    async function getUserRole(uid) {
+      const docSnap = await getDoc(doc(db, "usuarios", uid));
+      if (docSnap.exists()) {
+        return docSnap.data().rol || "user";
+      }
+      return "user";
+    }
+
+    // Redirección final según rol
+    async function redirectAfterAuth(user, isNewUser = false) {
+      const rol = await getUserRole(user.uid);
+      const nombre = getDisplayName(user);
+
+      localStorage.setItem('loggedIn', 'true');
+      localStorage.setItem('userName', nombre);
+      localStorage.setItem('userRole', rol);
+      localStorage.setItem('userEmail', user.email);
+
+      if (isNewUser) {
+        showToast(`¡Bienvenido a Boutique Buendía, ${nombre}!`, false);
+      } else {
+        showToast(`¡Bienvenido de nuevo, ${nombre}!`, false);
+      }
+
+      setTimeout(() => {
+        if (rol === "admin") {
+          window.location.href = 'admin.html';
+        } else {
+          const redirect = new URLSearchParams(window.location.search).get('redirect') ||
+                          sessionStorage.getItem('returnTo') ||
+                          'index.html';
+          window.location.href = redirect;
+        }
+      }, 1200);
+    }
+
+    // Guardar página anterior
     (function() {
       try {
         if (document.referrer && new URL(document.referrer).origin === location.origin) {
@@ -200,47 +228,14 @@
       } catch(e) {}
     })();
 
-    // NUEVA FUNCIÓN: obtener rol del usuario desde su documento en "usuarios"
-    async function getUserRole(uid) {
-      try {
-        const userDoc = await getDoc(doc(db, "usuarios", uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          return data.rol || "user"; // si no tiene campo rol → es user normal
-        }
-        return "user";
-      } catch (error) {
-        console.error("Error al obtener rol:", error);
-        return "user";
-      }
-    }
-
-    // Redirigir según rol
-    async function redirectAfterLogin(user) {
-      const target = getRedirectTarget();
-      const rol = await getUserRole(user.uid);
-
-      localStorage.setItem('loggedIn', 'true');
-      localStorage.setItem('userName', user.displayName || user.email.split('@')[0] || 'Usuario');
-      localStorage.setItem('userRole', rol); // guardamos el rol para usarlo en otras páginas
-
-      if (rol === "admin") {
-        showToast('Bienvenido Administrador');
-        setTimeout(() => window.location.href = 'admin.html', 800);
-      } else {
-        showToast('Bienvenido de vuelta');
-        setTimeout(() => window.location.href = target, 800);
-      }
-    }
-
-    // Mostrar/ocultar contraseña
+    // Toggle contraseña
     togglePassword.addEventListener('click', () => {
       const tipo = passwordInput.type === 'password' ? 'text' : 'password';
       passwordInput.type = tipo;
       togglePassword.textContent = tipo === 'text' ? 'Hide' : 'Show';
     });
 
-    // Cambiar entre Login y Registro
+    // Cambiar modo login/registro
     function updateFormMode() {
       if (isLogin) {
         formTitle.textContent = 'Iniciar Sesión';
@@ -260,9 +255,8 @@
         modeNote.innerHTML = '¿Ya tienes cuenta? <a href="#" id="toggleLink" style="color:#000;font-weight:bold;">Iniciar sesión</a>';
       }
 
-      // Reasignar evento al enlace (se pierde con innerHTML)
       document.querySelectorAll('#toggleLink').forEach(link => {
-        link.onclick = (e) => {
+        link.onclick = e => {
           e.preventDefault();
           isLogin = !isLogin;
           updateFormMode();
@@ -271,73 +265,71 @@
     }
     updateFormMode();
 
-    // LOGIN / REGISTRO CON EMAIL
+    // LOGIN / REGISTRO MANUAL
     mainBtn.onclick = async () => {
       const identifier = identifierInput.value.trim();
       const password = passwordInput.value;
       const nombre = nameInput.value.trim();
 
       if (!identifier || !password || (!isLogin && !nombre)) {
-        showToast('Por favor completa todos los campos', true);
+        showToast('Completa todos los campos', true);
         return;
       }
 
-      try {
-        let userCredential;
-
-        if (isLogin) {
-          // INICIAR SESIÓN
-          let email = identifier;
-
-          // Si no tiene @, buscar por nombre de usuario en Firestore
-          if (!identifier.includes('@')) {
-            const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) {
-              showToast('Nombre o correo no encontrado', true);
-              return;
-            }
-            email = snapshot.docs[0].data().correo;
-          }
-
-          userCredential = await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          // REGISTRO
-          if (!identifier.includes('@')) {
-            showToast('Ingresa un correo electrónico válido', true);
-            return;
-          }
-
-          userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
-
-          // Guardar usuario con rol "user" por defecto
-          await setDoc(doc(db, "usuarios", userCredential.user.uid), {
-            nombre: nombre,
-            correo: identifier,
-            rol: "user",           // <-- AQUÍ SE DEFINE EL ROL
-            creadoEn: new Date()
-          });
-        }
-
-        await redirectAfterLogin(userCredential.user);
-
-      } catch (err) {
-        let mensaje = 'Error inesperado';
-        switch (err.code) {
-          case 'auth/user-not-found':
-          case 'auth/wrong-password':
-            mensaje = 'Correo/nombre o contraseña incorrectos'; break;
-          case 'auth/email-already-in-use':
-            mensaje = 'Este correo ya está registrado'; break;
-          case 'auth/weak-password':
-            mensaje = 'La contraseña debe tener al menos 6 caracteres'; break;
-          case 'auth/invalid-email':
-            mensaje = 'Correo inválido'; break;
-          default:
-            mensaje = err.message;
-        }
-        showToast(mensaje, true);
+      if (!isLogin && !identifier.includes('@')) {
+        showToast('Ingresa un correo válido', true);
+        return;
       }
+
+      (async () => {
+        try {
+          let userCredential;
+
+          if (isLogin) {
+            // LOGIN
+            let email = identifier;
+            if (!identifier.includes('@')) {
+              const q = query(collection(db, "usuarios"), where("nombre", "==", identifier));
+              const snap = await getDocs(q);
+              if (snap.empty) {
+                showToast('Nombre o correo no encontrado', true);
+                return;
+              }
+              email = snap.docs[0].data().correo;
+            }
+            userCredential = await signInWithEmailAndPassword(auth, email, password);
+            await redirectAfterAuth(userCredential.user, false);
+          } else {
+            // REGISTRO
+            userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
+
+            await setDoc(doc(db, "usuarios", userCredential.user.uid), {
+              nombre: nombre,
+              correo: identifier,
+              rol: "user",
+              creadoEn: serverTimestamp()  // Fecha y hora exactas del servidor
+            });
+
+            await redirectAfterAuth(userCredential.user, true);
+          }
+        } catch (err) {
+          let msg = 'Error';
+          switch (err.code) {
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+              msg = 'Correo/nombre o contraseña incorrectos'; break;
+            case 'auth/email-already-in-use':
+              msg = 'Este correo ya está registrado'; break;
+            case 'auth/weak-password':
+              msg = 'Contraseña muy débil (mínimo 6 caracteres)'; break;
+            case 'auth/invalid-email':
+              msg = 'Correo inválido'; break;
+            default:
+              msg = err.message;
+          }
+          showToast(msg, true);
+        }
+      })();
     };
 
     // GOOGLE SIGN IN
@@ -345,8 +337,8 @@
       try {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
+        const isNew = result._tokenResponse?.isNewUser || false;
 
-        // Si es nuevo, crear documento con rol "user"
         const userRef = doc(db, "usuarios", user.uid);
         const snap = await getDoc(userRef);
 
@@ -354,19 +346,18 @@
           await setDoc(userRef, {
             nombre: user.displayName || user.email.split('@')[0],
             correo: user.email,
-            rol: "user",           // <-- Rol por defecto
-            creadoEn: new Date()
-          });
+            rol: "user",
+            creadoEn: serverTimestamp()
+          }, { merge: true });
         }
 
-        await redirectAfterLogin(user);
+        await redirectAfterAuth(user, isNewUser);
       } catch (err) {
-        console.error(err);
-        showToast('Error con Google: ' + (err.message || 'Inténtalo de nuevo'), true);
+        showToast('Error con Google: inténtalo de nuevo', true);
       }
     });
 
-    // Presionar Enter = click en botón principal
+    // Enter = enviar
     document.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
