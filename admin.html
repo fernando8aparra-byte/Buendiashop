@@ -18,7 +18,6 @@
     .header-left { display: flex; align-items: center; gap: 20px; }
     .header-right { display: flex; align-items: center; gap: 16px; }
     .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-    /* BOTONES HEADER MINIMALISTAS */
     .header-btn {
       width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -34,7 +33,6 @@
     }
     .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
     .hero-banner .tag { font-size: 1rem; color: #fff; }
-    /* MODAL GENERAL */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
@@ -44,7 +42,6 @@
       background: #fff; padding: 24px; border-radius: 16px;
       width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto;
     }
-    /* FORM AGREGAR PRODUCTO - NUEVO DISEÑO */
     .form-group { margin-bottom: 18px; }
     .form-group label {
       display: block; font-size: 0.95rem; margin-bottom: 8px; color: #222; font-weight: 600;
@@ -60,7 +57,6 @@
     .form-group select:focus,
     .form-group textarea:focus { outline: none; border-color: #000; }
     .form-group textarea { resize: vertical; min-height: 90px; }
-    /* VARIANTS / TALLAS */
     .variants-btn {
       width: 100%; padding: 14px; border: 2px solid #ddd;
       border-radius: 12px; background: #fff; cursor: pointer; font-size: 1rem;
@@ -88,7 +84,6 @@
       position: absolute; top: 8px; right: 8px; background: none;
       border: none; font-size: 1.2rem; cursor: pointer;
     }
-    /* SUBIR IMAGEN */
     .upload-section {
       padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
       border-radius: 14px; text-align: center; cursor: pointer;
@@ -106,7 +101,6 @@
       font-size: 1.05rem; font-weight: 600;
     }
     .modal button.cancel { background: #999; }
-    /* MENÚ AJUSTES */
     .admin-dropdown {
       position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
       border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -119,7 +113,6 @@
       cursor: pointer; font-size: 0.95rem; font-weight: 500;
     }
     .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-    /* TOAST Y EDITAR TEXTO */
     .toast {
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
       background: #000; color: #fff; padding: 14px 28px; border-radius: 10px;
@@ -143,7 +136,6 @@
     }
     .text-edit-controls button.cancel { background: #999; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
-    /* PRODUCT GRID & CARD */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
     .product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
     .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
@@ -159,10 +151,15 @@
     .image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
     .infinite-carousel-section { padding: 20px; }
     .carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
+    #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    #loading p { font-size: 1.2rem; }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
+  <div id="loading">
+    <p>Cargando panel admin...</p>
+  </div>
+
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
@@ -192,7 +189,7 @@
       </div>
     </div>
   </header>
-  <!-- HERO -->
+
   <section class="hero-banner" id="heroBanner">
     <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
       Asegura tu Mystery Box
@@ -201,7 +198,7 @@
       Envío Gratis en compras +$1,500
     </p>
   </section>
-  <!-- NUEVOS LANZAMIENTOS -->
+
   <section class="infinite-carousel-section" id="newCarouselSection">
     <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
       Nuevos Lanzamientos
@@ -210,18 +207,20 @@
       <div class="carousel-track" id="newCarousel"></div>
     </div>
   </section>
-  <!-- TODOS LOS PRODUCTOS -->
+
   <section>
     <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
       Todos los Productos
     </h2>
     <div class="products-grid" id="productsGrid"></div>
   </section>
+
   <div class="toast" id="toast"></div>
   <div class="text-edit-controls" id="textEditControls">
     <button id="saveTextChanges">Guardar Cambios</button>
     <button id="cancelTextChanges" class="cancel">No Guardar</button>
   </div>
+
   <!-- MODAL AGREGAR PRODUCTO -->
   <div class="modal" id="addProductModal">
     <div class="modal-content">
@@ -280,12 +279,13 @@
       <button id="cancelAdd" class="cancel">Cancelar</button>
     </div>
   </div>
+
   <!-- MODAL EDITAR PRODUCTO -->
   <div class="modal" id="editProductModal">
     <div class="modal-content">
       <h3>Editar Producto</h3>
-      <div class="form-group"><label>Nombre</label><input type="text" id="editName" placeholder="Nombre"></div>
-      <div class="form-group"><label>Precio</label><input type="number" id="editPrice" placeholder="Precio"></div>
+      <div class="form-group"><label>Nombre</label><input type="text" id="editName"></div>
+      <div class="form-group"><label>Precio</label><input type="number" id="editPrice"></div>
       <div class="form-group"><label>Descripción</label><textarea id="editDesc"></textarea></div>
       <div class="form-group"><label>Categoría</label>
         <select id="editCategory">
@@ -314,18 +314,19 @@
         <div class="image-gallery" id="editImagesGallery"></div>
       </div>
       <div class="form-group">
-        <label>Añadir nuevas imágenes (puedes seleccionar varias)</label>
+        <label>Añadir nuevas imágenes</label>
         <input type="file" id="editImageFiles" accept="image/*" multiple>
         <div id="editNewPreview" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
       </div>
       <div class="form-group">
-        <label>O pegar URLs adicionales (separadas por coma)</label>
+        <label>O pegar URLs adicionales</label>
         <input type="text" id="editImageUrls" placeholder="https://..., https://...">
       </div>
       <button id="saveProduct">Guardar</button>
       <button id="cancelEdit" class="cancel">Cancelar</button>
     </div>
   </div>
+
   <!-- MODAL REDES SOCIALES -->
   <div class="modal" id="socialLinksModal">
     <div class="modal-content">
@@ -341,12 +342,14 @@
       <button id="cancelSocial" style="background:#999;">Cancelar</button>
     </div>
   </div>
+
   <footer class="footer">
     <p>© 2025 Efraín Shop. Admin Mode.</p>
   </footer>
-  <!-- FIREBASE + JS -->
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import {
       getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
       onSnapshot, query, where, setDoc, getDoc
@@ -354,6 +357,7 @@
     import {
       getStorage, ref, uploadBytes, getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -362,11 +366,21 @@
       messagingSenderId: "430651152709",
       appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
     };
+
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Todos pueden acceder (sin verificación de login)
+    onAuthStateChanged(auth, (user) => {
+      if (user && (user.email === "fernando8aparra@gmail.com" || user.email === "luisatondo28@gmail.com")) {
+        document.getElementById('loading').style.display = 'none';
+      } else {
+        if (user) signOut(auth);
+        window.location.href = 'login.html';
+      }
+    });
+
     let textEditMode = false;
     let textChanges = {};
     const variantsByCategory = {
@@ -396,7 +410,6 @@
       }
     }
 
-    // Previews para agregar
     document.getElementById('addImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
       const previewWrap = document.getElementById('addImagesPreview');
@@ -441,25 +454,16 @@
       onSnapshot(q, snapshot => {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
-        const products = [];
         snapshot.forEach(docSnap => {
           const data = { id: docSnap.id, ...docSnap.data() };
-          products.push(data);
           container.appendChild(createProductCard(data, typeKey));
         });
-        if (containerId === 'newCarousel') {
-          const section = container.parentElement.parentElement;
-          if (products.length >= 4) {
-            section.classList.add('auto-scroll');
-            if (!container.dataset.duplicated) {
-              const clone = container.cloneNode(true);
-              clone.id += '-clone';
-              container.appendChild(clone);
-              container.dataset.duplicated = 'true';
-            }
-          } else {
-            section.classList.add('static-display');
-          }
+        if (containerId === 'newCarousel' && snapshot.size >= 4 && !container.dataset.duplicated) {
+          const clone = container.cloneNode(true);
+          clone.id += '-clone';
+          container.appendChild(clone);
+          container.dataset.duplicated = 'true';
+          container.parentElement.parentElement.classList.add('auto-scroll');
         }
       });
     }
@@ -480,22 +484,9 @@
         </div>
       `;
       if (sectionType === 'normal') {
-        div.innerHTML = `
-          ${actions}
-          <img src="${mainImg}" alt="${p.nombre}">
-          <h3>${p.nombre}</h3>
-          <p class="product-price">$${p.precio}</p>
-          <p class="product-desc-small">${p.descripcion || ''}</p>
-          ${stockInfo}
-        `;
+        div.innerHTML = `${actions}<img src="${mainImg}" alt="${p.nombre}"><h3>${p.nombre}</h3><p class="product-price">$${p.precio}</p><p class="product-desc-small">${p.descripcion || ''}</p>${stockInfo}`;
       } else {
-        div.innerHTML = `
-          ${actions}
-          <img src="${mainImg}" alt="${p.nombre}">
-          <h3>${p.nombre}</h3>
-          <p>$${p.precio}</p>
-          ${stockInfo}
-        `;
+        div.innerHTML = `${actions}<img src="${mainImg}" alt="${p.nombre}"><h3>${p.nombre}</h3><p>$${p.precio}</p>${stockInfo}`;
       }
       return div;
     }
@@ -548,22 +539,18 @@
     document.getElementById('addVariantsBtn').onclick = () => openVariantsMenu('add');
     document.getElementById('editVariantsBtn').onclick = () => openVariantsMenu('edit');
 
-    // FIX PRINCIPAL: Reset de variantes al cambiar categoría (evita que queden tallas de categoría anterior)
-    function resetAddVariants() {
+    document.getElementById('addCategory').addEventListener('change', () => {
       window.addVariants = {};
       document.getElementById('addVariantsMenu').classList.remove('active');
-    }
-    function resetEditVariants() {
+    });
+    document.getElementById('editCategory').addEventListener('change', () => {
       window.editVariants = {};
       document.getElementById('editVariantsMenu').classList.remove('active');
-    }
-    document.getElementById('addCategory').addEventListener('change', resetAddVariants);
-    document.getElementById('editCategory').addEventListener('change', resetEditVariants);
+    });
 
     window.editProduct = async id => {
       window.currentEditId = id;
-      const docRef = doc(db, 'productos', id);
-      const snap = await getDoc(docRef);
+      const snap = await getDoc(doc(db, 'productos', id));
       if (!snap.exists()) return showToast('Producto no encontrado');
       const data = snap.data();
       document.getElementById('editName').value = data.nombre || '';
@@ -574,15 +561,12 @@
       window.editVariants = data.variantesDisponibles || {};
       const gallery = document.getElementById('editImagesGallery');
       gallery.innerHTML = '';
-      const imgs = (data.imagenes && data.imagenes.length) ? data.imagenes.slice() : (data.imagen ? [data.imagen] : []);
-      imgs.forEach((u, idx) => {
+      const imgs = (data.imagenes && data.imagenes.length) ? data.imagenes : (data.imagen ? [data.imagen] : []);
+      imgs.forEach(u => {
         const wrap = document.createElement('div'); wrap.className = 'img-wrap';
         const img = document.createElement('img'); img.src = u;
         const btn = document.createElement('button'); btn.className = 'remove-img'; btn.textContent = '✕';
-        btn.onclick = () => {
-          wrap.remove();
-          wrap.dataset.removed = 'true';
-        };
+        btn.onclick = () => { wrap.remove(); wrap.dataset.removed = 'true'; };
         wrap.appendChild(img); wrap.appendChild(btn);
         wrap.dataset.url = u;
         gallery.appendChild(wrap);
@@ -592,7 +576,7 @@
     };
 
     document.getElementById('saveProduct').onclick = async () => {
-      if (!window.currentEditId) return showToast('No hay producto seleccionado');
+      if (!window.currentEditId) return;
       const updated = {
         nombre: document.getElementById('editName').value.trim(),
         precio: parseFloat(document.getElementById('editPrice').value) || 0,
@@ -681,7 +665,7 @@
       });
       document.getElementById('addImageFiles').value = '';
       document.getElementById('addImagesPreview').style.display = 'none';
-      window.addVariants = {}; // Reinicio explícito
+      window.addVariants = {};
     };
 
     function showToast(msg) {
@@ -731,10 +715,8 @@
       closeModal('socialLinksModal');
     };
     document.getElementById('logoutBtn').onclick = () => {
-      const ok = confirm('¿Quieres cerrar sesión?\n\nSelecciona Aceptar para cerrar sesión o Cancelar para quedarte.');
-      if (ok) {
-        localStorage.removeItem('isAdmin');
-        window.location.href = 'login.html';
+      if (confirm('¿Quieres cerrar sesión?')) {
+        signOut(auth).then(() => window.location.href = 'login.html');
       }
     };
     onSnapshot(doc(db, "textos", "hero"), snap => {
