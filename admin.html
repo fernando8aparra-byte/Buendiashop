@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -89,7 +88,6 @@
       position: absolute; top: 8px; right: 8px; background: none;
       border: none; font-size: 1.2rem; cursor: pointer;
     }
-    .variants-container { position: relative; }
     /* SUBIR IMAGEN */
     .upload-section {
       padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
@@ -145,23 +143,20 @@
     }
     .text-edit-controls button.cancel { background: #999; }
     .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
-    /* PRODUCT GRID & CARD (kept minimal to preserve original look) */
+    /* PRODUCT GRID & CARD */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
     .product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
     .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
     .product-card h3 { margin: 8px 0 4px; font-size: 1rem; }
     .product-price { font-weight: 700; margin: 0 0 6px; }
     .product-desc-small { font-size: 0.9rem; color: #555; margin-bottom: 8px; }
-    /* Action buttons moved to top-right in a distinct container */
     .card-actions-compact { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
     .card-actions-compact button { background: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-weight: 700; }
     .card-actions-compact button:hover { transform: translateY(-2px); }
-    /* Image gallery inside edit modal */
     .image-gallery { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .image-gallery .img-wrap { position:relative; border-radius:8px; overflow:hidden; }
     .image-gallery img { width:96px; height:96px; object-fit:cover; display:block; border-radius:8px; }
     .image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
-    /* carousel area minimal tweaks */
     .infinite-carousel-section { padding: 20px; }
     .carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
   </style>
@@ -257,10 +252,8 @@
       </div>
       <div class="form-group">
         <label>Cantidad disponible por talla</label>
-        <div class="variants-container">
-          <button class="variants-btn" id="addVariantsBtn">Seleccionar variantes</button>
-          <div class="variants-menu" id="addVariantsMenu"></div>
-        </div>
+        <button class="variants-btn" id="addVariantsBtn">Seleccionar variantes</button>
+        <div class="variants-menu" id="addVariantsMenu"></div>
       </div>
       <div class="form-group">
         <label>Ubicación en la tienda</label>
@@ -287,7 +280,7 @@
       <button id="cancelAdd" class="cancel">Cancelar</button>
     </div>
   </div>
-  <!-- MODAL EDITAR PRODUCTO (ampliado) -->
+  <!-- MODAL EDITAR PRODUCTO -->
   <div class="modal" id="editProductModal">
     <div class="modal-content">
       <h3>Editar Producto</h3>
@@ -307,10 +300,8 @@
       </div>
       <div class="form-group">
         <label>Cantidad disponible por talla</label>
-        <div class="variants-container">
-          <button class="variants-btn" id="editVariantsBtn">Seleccionar variantes</button>
-          <div class="variants-menu" id="editVariantsMenu"></div>
-        </div>
+        <button class="variants-btn" id="editVariantsBtn">Seleccionar variantes</button>
+        <div class="variants-menu" id="editVariantsMenu"></div>
       </div>
       <div class="form-group"><label>Ubicación en la tienda</label>
         <select id="editType">
@@ -353,7 +344,7 @@
   <footer class="footer">
     <p>© 2025 Efraín Shop. Admin Mode.</p>
   </footer>
-  <!-- FIREBASE + JS 100% COMPLETO Y FUNCIONAL (modificado para multimages y edición completa) -->
+  <!-- FIREBASE + JS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import {
@@ -363,7 +354,6 @@
     import {
       getStorage, ref, uploadBytes, getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     const firebaseConfig = {
       apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
       authDomain: "boutique-buendia.firebaseapp.com",
@@ -375,10 +365,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
-    const auth = getAuth(app);
-    if (!localStorage.getItem('isAdmin') || !auth.currentUser) {
-      window.location.href = 'login.html';
-    }
+
+    // Todos pueden acceder (sin verificación de login)
     let textEditMode = false;
     let textChanges = {};
     const variantsByCategory = {
@@ -390,6 +378,7 @@
       perfume: ['75', '100', '125', '200'],
       sudadera: ['ch', 'm', 'x', 'xl', 'l']
     };
+
     async function uploadImageAndGetURL(file) {
       if (!file) return null;
       const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
@@ -406,7 +395,8 @@
         return null;
       }
     }
-    // Previews for add modal
+
+    // Previews para agregar
     document.getElementById('addImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
       const previewWrap = document.getElementById('addImagesPreview');
@@ -427,6 +417,7 @@
         previewWrap.style.display = 'flex';
       } else previewWrap.style.display = 'none';
     });
+
     function loadEditableTexts() {
       document.querySelectorAll('[contenteditable="true"]').forEach(el => {
         const coll = el.dataset.collection;
@@ -444,9 +435,10 @@
         });
       });
     }
+
     function loadProductsByType(typeKey, containerId) {
       const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
-      const unsubscribe = onSnapshot(q, snapshot => {
+      onSnapshot(q, snapshot => {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
         const products = [];
@@ -471,6 +463,7 @@
         }
       });
     }
+
     function createProductCard(p, sectionType) {
       const div = document.createElement('div');
       div.className = 'product-card';
@@ -480,7 +473,6 @@
       const stockInfo = totalDisp > 0
         ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${totalDisp} disponibles</p>`
         : '<p style="color:#c00; font-weight:bold;">Agotado</p>';
-      // compact action buttons in top-right
       const actions = `
         <div class="card-actions-compact">
           <button title="Editar" onclick="editProduct('${p.id}')">✏️</button>
@@ -507,6 +499,7 @@
       }
       return div;
     }
+
     function openVariantsMenu(mode) {
       const cat = document.getElementById(mode + 'Category').value;
       const menu = document.getElementById(mode + 'VariantsMenu');
@@ -551,9 +544,22 @@
       });
       menu.classList.add('active');
     }
+
     document.getElementById('addVariantsBtn').onclick = () => openVariantsMenu('add');
     document.getElementById('editVariantsBtn').onclick = () => openVariantsMenu('edit');
-    // ------- EDIT & DELETE (enhanced) -------
+
+    // FIX PRINCIPAL: Reset de variantes al cambiar categoría (evita que queden tallas de categoría anterior)
+    function resetAddVariants() {
+      window.addVariants = {};
+      document.getElementById('addVariantsMenu').classList.remove('active');
+    }
+    function resetEditVariants() {
+      window.editVariants = {};
+      document.getElementById('editVariantsMenu').classList.remove('active');
+    }
+    document.getElementById('addCategory').addEventListener('change', resetAddVariants);
+    document.getElementById('editCategory').addEventListener('change', resetEditVariants);
+
     window.editProduct = async id => {
       window.currentEditId = id;
       const docRef = doc(db, 'productos', id);
@@ -566,7 +572,6 @@
       document.getElementById('editCategory').value = data.tipo || 'camiseta';
       document.getElementById('editType').value = (data.type && data.type.carrusel) ? 'carrusel' : 'normal';
       window.editVariants = data.variantesDisponibles || {};
-      // populate images gallery
       const gallery = document.getElementById('editImagesGallery');
       gallery.innerHTML = '';
       const imgs = (data.imagenes && data.imagenes.length) ? data.imagenes.slice() : (data.imagen ? [data.imagen] : []);
@@ -585,6 +590,7 @@
       document.getElementById('editNewPreview').innerHTML = '';
       document.getElementById('editProductModal').classList.add('active');
     };
+
     document.getElementById('saveProduct').onclick = async () => {
       if (!window.currentEditId) return showToast('No hay producto seleccionado');
       const updated = {
@@ -596,7 +602,6 @@
         variantesDisponibles: window.editVariants,
         disponibles: Object.values(window.editVariants).reduce((a, b) => a + b, 0),
       };
-      // handle images
       const gallery = document.getElementById('editImagesGallery');
       const remaining = [];
       gallery.querySelectorAll('.img-wrap').forEach(w => { if (!w.dataset.removed) remaining.push(w.dataset.url); });
@@ -615,13 +620,14 @@
       showToast('Producto actualizado');
       closeModal('editProductModal');
     };
+
     window.deleteProduct = async id => {
       if (confirm('¿Eliminar este producto?')) {
         await deleteDoc(doc(db, 'productos', id));
         showToast('Producto eliminado');
       }
     };
-    // Save new product
+
     document.getElementById('saveNewProduct').onclick = async () => {
       const name = document.getElementById('addName').value.trim();
       const price = parseFloat(document.getElementById('addPrice').value);
@@ -646,15 +652,15 @@
         type: typeObj,
         imagenes: allImages,
         imagen: allImages[0],
-        variantesDisponibles: window.addVariants,
-        disponibles: Object.values(window.addVariants).reduce((a, b) => a + b, 0),
+        variantesDisponibles: window.addVariants || {},
+        disponibles: Object.values(window.addVariants || {}).reduce((a, b) => a + b, 0),
         creado: new Date()
       };
       await addDoc(collection(db, 'productos'), producto);
       showToast('¡Producto agregado!');
       closeModal('addProductModal');
     };
-    // edit modal image previews
+
     document.getElementById('editImageFiles').addEventListener('change', e => {
       const files = Array.from(e.target.files || []);
       const wrap = document.getElementById('editNewPreview');
@@ -667,6 +673,7 @@
         wrap.appendChild(dv);
       });
     });
+
     document.getElementById('addPostBtn').onclick = () => {
       document.getElementById('addProductModal').classList.add('active');
       document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => {
@@ -674,8 +681,9 @@
       });
       document.getElementById('addImageFiles').value = '';
       document.getElementById('addImagesPreview').style.display = 'none';
-      window.addVariants = {};
+      window.addVariants = {}; // Reinicio explícito
     };
+
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -722,14 +730,11 @@
       showToast("Redes guardadas");
       closeModal('socialLinksModal');
     };
-    // Logout confirmation (native confirm with Sí/No options)
     document.getElementById('logoutBtn').onclick = () => {
       const ok = confirm('¿Quieres cerrar sesión?\n\nSelecciona Aceptar para cerrar sesión o Cancelar para quedarte.');
       if (ok) {
-        auth.signOut().then(() => {
-          localStorage.removeItem('isAdmin');
-          window.location.href = 'login.html';
-        }).catch(e => console.error(e));
+        localStorage.removeItem('isAdmin');
+        window.location.href = 'login.html';
       }
     };
     onSnapshot(doc(db, "textos", "hero"), snap => {
@@ -743,4 +748,3 @@
   </script>
 </body>
 </html>
-```
