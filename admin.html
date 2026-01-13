@@ -368,9 +368,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
-    if (!localStorage.getItem('isAdmin')) {
-      window.location.href = 'login.html';
-    }
+
+    // LÍNEA ELIMINADA: ya no redirige al login, todos entran directamente
+    // if (!localStorage.getItem('isAdmin')) {
+    //   window.location.href = 'login.html';
+    // }
+
     let textEditMode = false;
     let textChanges = {};
     const variantsByCategory = {
