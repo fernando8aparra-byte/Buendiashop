@@ -3,234 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Login Admin - Efraín Shop</title>
   <style>
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; background: #fff; }
-    .header {
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    body { 
+      font-family: Arial, sans-serif; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      height: 100vh; 
+      margin: 0; 
+      background: #f8f8f8; 
     }
-    .header-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px; padding: 0 15px;
+    .login-box { 
+      background: #fff; 
+      padding: 40px; 
+      border-radius: 16px; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+      text-align: center; 
+      max-width: 400px; 
+      width: 90%; 
     }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 16px; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-    .header-btn {
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s ease; border: none; padding: 0;
-      background: transparent;
+    h1 { margin-bottom: 10px; }
+    p { margin-bottom: 30px; color: #555; }
+    button { 
+      background: #000; 
+      color: #fff; 
+      padding: 16px 32px; 
+      border: none; 
+      border-radius: 12px; 
+      font-size: 1.1rem; 
+      cursor: pointer; 
+      width: 100%; 
     }
-    .header-btn:hover { background: #f0f0f0; }
-    #addPostBtn { font-size: 32px; font-weight: 300; color: #000; }
-    .hero-banner {
-      text-align: center; padding: 60px 20px; background: #f8f8f8;
-      position: relative; min-height: 200px; background-size: cover;
-      background-position: center; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.6);
-    }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #fff; }
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
-    }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: #fff; padding: 24px; border-radius: 16px;
-      width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto;
-    }
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; font-size: 0.95rem; margin-bottom: 8px; color: #222; font-weight: 600;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%; padding: 14px; border: 2px solid #ddd;
-      border-radius: 12px; font-size: 1rem; box-sizing: border-box;
-      transition: border 0.2s;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus { outline: none; border-color: #000; }
-    .form-group textarea { resize: vertical; min-height: 90px; }
-    .variants-btn {
-      width: 100%; padding: 14px; border: 2px solid #ddd;
-      border-radius: 12px; background: #fff; cursor: pointer; font-size: 1rem;
-      text-align: left; color: #555;
-    }
-    .variants-menu {
-      display: none; position: absolute; top: 100%; left: 0; width: 100%;
-      background: #fff; border: 2px solid #ddd; border-radius: 12px;
-      padding: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 10;
-    }
-    .variants-menu.active { display: block; }
-    .variant-item {
-      position: relative; margin: 8px; width: 60px; height: 60px;
-      border: 2px solid #ddd; border-radius: 8px; display: flex;
-      align-items: center; justify-content: center; cursor: pointer;
-      font-weight: bold;
-    }
-    .variant-qty {
-      position: absolute; top: -8px; right: -8px; background: #000;
-      color: #fff; border-radius: 50%; width: 24px; height: 24px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem;
-    }
-    .variants-close {
-      position: absolute; top: 8px; right: 8px; background: none;
-      border: none; font-size: 1.2rem; cursor: pointer;
-    }
-    .upload-section {
-      padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
-      border-radius: 14px; text-align: center; cursor: pointer;
-      transition: all 0.3s;
-    }
-    .upload-section:hover { border-color: #000; background: #f0f0f0; }
-    .upload-section label {
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      font-weight: 600; color: #000;
-    }
-    .upload-section input[type="file"] { display: none; }
-    .modal button {
-      background: #000; color: #fff; padding: 16px; border: none;
-      border-radius: 12px; cursor: pointer; width: 100%; margin-top: 12px;
-      font-size: 1.05rem; font-weight: 600;
-    }
-    .modal button.cancel { background: #999; }
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
-      border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      display: none; z-index: 1001; width: 220px;
-    }
-    .admin-dropdown.show { display: block; }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 16px 20px; color: #000;
-      text-decoration: none; background: none; border: none; text-align: left;
-      cursor: pointer; font-size: 0.95rem; font-weight: 500;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-    .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #000; color: #fff; padding: 14px 28px; border-radius: 10px;
-      z-index: 3000; display: none;
-    }
-    .toast.show { display: block; animation: fadeInOut 3s; }
-    @keyframes fadeInOut { 0%,100%{opacity:0} 10%,90%{opacity:1} }
-    [contenteditable="true"].editing {
-      outline: 2px dashed #0066ff; background: rgba(0,102,255,0.08);
-      border-radius: 6px; padding: 6px;
-    }
-    .text-edit-controls {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #fff; padding: 14px 24px; border-radius: 14px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: none; z-index: 2500; gap: 12px;
-    }
-    .text-edit-controls.active { display: flex; }
-    .text-edit-controls button {
-      background: #000; color: #fff; border: none; padding: 12px 20px;
-      border-radius: 10px; cursor: pointer; font-weight: 600;
-    }
-    .text-edit-controls button.cancel { background: #999; }
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
-    .product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
-    .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
-    .product-card h3 { margin: 8px 0 4px; font-size: 1rem; }
-    .product-price { font-weight: 700; margin: 0 0 6px; }
-    .product-desc-small { font-size: 0.9rem; color: #555; margin-bottom: 8px; }
-    .card-actions-compact { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
-    .card-actions-compact button { background: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-weight: 700; }
-    .card-actions-compact button:hover { transform: translateY(-2px); }
-    .image-gallery { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .image-gallery .img-wrap { position:relative; border-radius:8px; overflow:hidden; }
-    .image-gallery img { width:96px; height:96px; object-fit:cover; display:block; border-radius:8px; }
-    .image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
-    .infinite-carousel-section { padding: 20px; }
-    .carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
-    #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-    #loading p { font-size: 1.2rem; }
+    button:hover { background: #333; }
+    #error { color: red; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <div id="loading">
-    <p>Cargando panel admin...</p>
+  <div class="login-box">
+    <h1>Admin Efraín Shop</h1>
+    <p>Inicia sesión con tu cuenta de Google autorizada</p>
+    <button id="googleSignIn">Iniciar sesión con Google</button>
+    <p id="error"></p>
   </div>
-
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn">
-            <svg viewBox="0 0 24 24" width="26" height="26">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </button>
-          <div class="admin-dropdown" id="adminDropdown">
-            <a href="index.html" target="_blank">Ir a Tienda</a>
-            <a href="admin-map.html">Mapa de Compras</a>
-            <a href="admin-compras.html">Compras</a>
-            <a href="admin-estadisticas.html">Estadísticas</a>
-            <button id="openSocialModal">Agregar Redes Sociales</button>
-            <button id="logoutBtn">Cerrar Sesión</button>
-          </div>
-        </div>
-        <div class="logo">EFRAÍN</div>
-      </div>
-      <div class="header-right">
-        <button class="header-btn" id="toggleTextEdit" title="Editar textos">
-          <img src="https://img.icons8.com/ios-filled/50/000000/pencil.png" alt="Editar" width="22" height="22">
-        </button>
-        <button class="header-btn" id="addPostBtn">+</button>
-      </div>
-    </div>
-  </header>
-
-  <section class="hero-banner" id="heroBanner">
-    <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
-      Asegura tu Mystery Box
-    </h1>
-    <p class="tag" id="heroTagDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="subtitulo">
-      Envío Gratis en compras +$1,500
-    </p>
-  </section>
-
-  <section class="infinite-carousel-section" id="newCarouselSection">
-    <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
-      Nuevos Lanzamientos
-    </h2>
-    <div class="infinite-carousel">
-      <div class="carousel-track" id="newCarousel"></div>
-    </div>
-  </section>
-
-  <section>
-    <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
-      Todos los Productos
-    </h2>
-    <div class="products-grid" id="productsGrid"></div>
-  </section>
-
-  <div class="toast" id="toast"></div>
-  <div class="text-edit-controls" id="textEditControls">
-    <button id="saveTextChanges">Guardar Cambios</button>
-    <button id="cancelTextChanges" class="cancel">No Guardar</button>
-  </div>
-
-  <!-- MODALES (agregar, editar, redes) -->
-  <!-- (Todo el HTML de los modales que tenías antes, exactamente igual) -->
-
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Admin Mode.</p>
-  </footer>
 
   <script type="module">
-    // Todo el JavaScript con autenticación y fixes (exactamente el que te di en la respuesta anterior)
-    // Incluye la verificación onAuthStateChanged, reset de variantes, etc.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
+      authDomain: "boutique-buendia.firebaseapp.com",
+      projectId: "boutique-buendia",
+      storageBucket: "boutique-buendia.firebasestorage.app",
+      messagingSenderId: "430651152709",
+      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    document.getElementById('googleSignIn').onclick = () => {
+      signInWithPopup(auth, provider)
+        .then(() => {
+          // Delay pequeño para que Firebase sincronice el estado antes de redirigir
+          setTimeout(() => {
+            window.location.href = 'admin.html'; // Cambia si tu panel tiene otro nombre
+          }, 1500);
+        })
+        .catch((error) => {
+          document.getElementById('error').textContent = 'Error: ' + error.message;
+        });
+    };
   </script>
 </body>
 </html>
