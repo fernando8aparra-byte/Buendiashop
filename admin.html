@@ -1,738 +1,739 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; background: #fff; }
-    .header {
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .header-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px; padding: 0 15px;
-    }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .header-right { display: flex; align-items: center; gap: 16px; }
-    .logo { font-size: 1.5rem; font-weight: bold; color: #000; }
-    /* BOTONES HEADER MINIMALISTAS */
-    .header-btn {
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.2s ease; border: none; padding: 0;
-      background: transparent;
-    }
-    .header-btn:hover { background: #f0f0f0; }
-    #addPostBtn { font-size: 32px; font-weight: 300; color: #000; }
-    .hero-banner {
-      text-align: center; padding: 60px 20px; background: #f8f8f8;
-      position: relative; min-height: 200px; background-size: cover;
-      background-position: center; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.6);
-    }
-    .hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
-    .hero-banner .tag { font-size: 1rem; color: #fff; }
-    /* MODAL GENERAL */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
-    }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: #fff; padding: 24px; border-radius: 16px;
-      width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto;
-    }
-    /* FORM AGREGAR PRODUCTO - NUEVO DISEÑO */
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; font-size: 0.95rem; margin-bottom: 8px; color: #222; font-weight: 600;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%; padding: 14px; border: 2px solid #ddd;
-      border-radius: 12px; font-size: 1rem; box-sizing: border-box;
-      transition: border 0.2s;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus { outline: none; border-color: #000; }
-    .form-group textarea { resize: vertical; min-height: 90px; }
-    /* VARIANTS / TALLAS */
-    .variants-btn {
-      width: 100%; padding: 14px; border: 2px solid #ddd;
-      border-radius: 12px; background: #fff; cursor: pointer; font-size: 1rem;
-      text-align: left; color: #555;
-    }
-    .variants-menu {
-      display: none; position: absolute; top: 100%; left: 0; width: 100%;
-      background: #fff; border: 2px solid #ddd; border-radius: 12px;
-      padding: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 10;
-    }
-    .variants-menu.active { display: block; }
-    .variant-item {
-      position: relative; margin: 8px; width: 60px; height: 60px;
-      border: 2px solid #ddd; border-radius: 8px; display: flex;
-      align-items: center; justify-content: center; cursor: pointer;
-      font-weight: bold;
-    }
-    .variant-qty {
-      position: absolute; top: -8px; right: -8px; background: #000;
-      color: #fff; border-radius: 50%; width: 24px; height: 24px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem;
-    }
-    .variants-close {
-      position: absolute; top: 8px; right: 8px; background: none;
-      border: none; font-size: 1.2rem; cursor: pointer;
-    }
-    /* SUBIR IMAGEN */
-    .upload-section {
-      padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
-      border-radius: 14px; text-align: center; cursor: pointer;
-      transition: all 0.3s;
-    }
-    .upload-section:hover { border-color: #000; background: #f0f0f0; }
-    .upload-section label {
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      font-weight: 600; color: #000;
-    }
-    .upload-section input[type="file"] { display: none; }
-    .modal button {
-      background: #000; color: #fff; padding: 16px; border: none;
-      border-radius: 12px; cursor: pointer; width: 100%; margin-top: 12px;
-      font-size: 1.05rem; font-weight: 600;
-    }
-    .modal button.cancel { background: #999; }
-    /* MENÚ AJUSTES */
-    .admin-dropdown {
-      position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
-      border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      display: none; z-index: 1001; width: 220px;
-    }
-    .admin-dropdown.show { display: block; }
-    .admin-dropdown a, .admin-dropdown button {
-      display: block; width: 100%; padding: 16px 20px; color: #000;
-      text-decoration: none; background: none; border: none; text-align: left;
-      cursor: pointer; font-size: 0.95rem; font-weight: 500;
-    }
-    .admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
-    /* TOAST Y EDITAR TEXTO */
-    .toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #000; color: #fff; padding: 14px 28px; border-radius: 10px;
-      z-index: 3000; display: none;
-    }
-    .toast.show { display: block; animation: fadeInOut 3s; }
-    @keyframes fadeInOut { 0%,100%{opacity:0} 10%,90%{opacity:1} }
-    [contenteditable="true"].editing {
-      outline: 2px dashed #0066ff; background: rgba(0,102,255,0.08);
-      border-radius: 6px; padding: 6px;
-    }
-    .text-edit-controls {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #fff; padding: 14px 24px; border-radius: 14px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: none; z-index: 2500; gap: 12px;
-    }
-    .text-edit-controls.active { display: flex; }
-    .text-edit-controls button {
-      background: #000; color: #fff; border: none; padding: 12px 20px;
-      border-radius: 10px; cursor: pointer; font-weight: 600;
-    }
-    .text-edit-controls button.cancel { background: #999; }
-    .footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
-    /* PRODUCT GRID & CARD (kept minimal to preserve original look) */
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
-    .product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
-    .product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
-    .product-card h3 { margin: 8px 0 4px; font-size: 1rem; }
-    .product-price { font-weight: 700; margin: 0 0 6px; }
-    .product-desc-small { font-size: 0.9rem; color: #555; margin-bottom: 8px; }
-    /* Action buttons moved to top-right in a distinct container */
-    .card-actions-compact { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
-    .card-actions-compact button { background: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-weight: 700; }
-    .card-actions-compact button:hover { transform: translateY(-2px); }
-    /* Image gallery inside edit modal */
-    .image-gallery { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .image-gallery .img-wrap { position:relative; border-radius:8px; overflow:hidden; }
-    .image-gallery img { width:96px; height:96px; object-fit:cover; display:block; border-radius:8px; }
-    .image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
-    /* carousel area minimal tweaks */
-    .infinite-carousel-section { padding: 20px; }
-    .carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Efraín Shop</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+body { margin: 0; padding: 0; padding-top: 60px; font-family: Arial, sans-serif; background: #fff; }
+.header {
+position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.header-inner {
+display: flex; align-items: center; justify-content: space-between;
+height: 60px; padding: 0 15px;
+}
+.header-left { display: flex; align-items: center; gap: 20px; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.logo { font-size: 1.5rem; font-weight: bold; color: #000; }
+/* BOTONES HEADER MINIMALISTAS */
+.header-btn {
+width: 44px; height: 44px; border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all 0.2s ease; border: none; padding: 0;
+background: transparent;
+}
+.header-btn:hover { background: #f0f0f0; }
+#addPostBtn { font-size: 32px; font-weight: 300; color: #000; }
+.hero-banner {
+text-align: center; padding: 60px 20px; background: #f8f8f8;
+position: relative; min-height: 200px; background-size: cover;
+background-position: center; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+.hero-banner h1 { font-size: 2.2rem; margin: 0 0 10px; text-transform: uppercase; }
+.hero-banner .tag { font-size: 1rem; color: #fff; }
+/* MODAL GENERAL */
+.modal {
+display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
+}
+.modal.active { display: flex; }
+.modal-content {
+background: #fff; padding: 24px; border-radius: 16px;
+width: 90%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+}
+/* FORM AGREGAR PRODUCTO - NUEVO DISEÑO */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+display: block; font-size: 0.95rem; margin-bottom: 8px; color: #222; font-weight: 600;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+width: 100%; padding: 14px; border: 2px solid #ddd;
+border-radius: 12px; font-size: 1rem; box-sizing: border-box;
+transition: border 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { outline: none; border-color: #000; }
+.form-group textarea { resize: vertical; min-height: 90px; }
+/* VARIANTS / TALLAS */
+.variants-btn {
+width: 100%; padding: 14px; border: 2px solid #ddd;
+border-radius: 12px; background: #fff; cursor: pointer; font-size: 1rem;
+text-align: left; color: #555;
+}
+.variants-menu {
+display: none; position: absolute; top: 100%; left: 0; width: 100%;
+background: #fff; border: 2px solid #ddd; border-radius: 12px;
+padding: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 10;
+}
+.variants-menu.active { display: block; }
+.variant-item {
+position: relative; margin: 8px; width: 60px; height: 60px;
+border: 2px solid #ddd; border-radius: 8px; display: flex;
+align-items: center; justify-content: center; cursor: pointer;
+font-weight: bold;
+}
+.variant-qty {
+position: absolute; top: -8px; right: -8px; background: #000;
+color: #fff; border-radius: 50%; width: 24px; height: 24px;
+display: flex; align-items: center; justify-content: center;
+font-size: 0.8rem;
+}
+.variants-close {
+position: absolute; top: 8px; right: 8px; background: none;
+border: none; font-size: 1.2rem; cursor: pointer;
+}
+.variants-container { position: relative; }
+/* SUBIR IMAGEN */
+.upload-section {
+padding: 20px; background: #f9f9f9; border: 2px dashed #bbb;
+border-radius: 14px; text-align: center; cursor: pointer;
+transition: all 0.3s;
+}
+.upload-section:hover { border-color: #000; background: #f0f0f0; }
+.upload-section label {
+display: flex; flex-direction: column; align-items: center; gap: 10px;
+font-weight: 600; color: #000;
+}
+.upload-section input[type="file"] { display: none; }
+.modal button {
+background: #000; color: #fff; padding: 16px; border: none;
+border-radius: 12px; cursor: pointer; width: 100%; margin-top: 12px;
+font-size: 1.05rem; font-weight: 600;
+}
+.modal button.cancel { background: #999; }
+/* MENÚ AJUSTES */
+.admin-dropdown {
+position: absolute; top: 60px; left: 0; background: #fff; border: 1px solid #eee;
+border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+display: none; z-index: 1001; width: 220px;
+}
+.admin-dropdown.show { display: block; }
+.admin-dropdown a, .admin-dropdown button {
+display: block; width: 100%; padding: 16px 20px; color: #000;
+text-decoration: none; background: none; border: none; text-align: left;
+cursor: pointer; font-size: 0.95rem; font-weight: 500;
+}
+.admin-dropdown a:hover, .admin-dropdown button:hover { background: #f5f5f5; }
+/* TOAST Y EDITAR TEXTO */
+.toast {
+position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+background: #000; color: #fff; padding: 14px 28px; border-radius: 10px;
+z-index: 3000; display: none;
+}
+.toast.show { display: block; animation: fadeInOut 3s; }
+@keyframes fadeInOut { 0%,100%{opacity:0} 10%,90%{opacity:1} }
+[contenteditable="true"].editing {
+outline: 2px dashed #0066ff; background: rgba(0,102,255,0.08);
+border-radius: 6px; padding: 6px;
+}
+.text-edit-controls {
+position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+background: #fff; padding: 14px 24px; border-radius: 14px;
+box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: none; z-index: 2500; gap: 12px;
+}
+.text-edit-controls.active { display: flex; }
+.text-edit-controls button {
+background: #000; color: #fff; border: none; padding: 12px 20px;
+border-radius: 10px; cursor: pointer; font-weight: 600;
+}
+.text-edit-controls button.cancel { background: #999; }
+.footer { padding: 40px 20px; background: #000; color: #fff; text-align: center; }
+/* PRODUCT GRID & CARD (kept minimal to preserve original look) */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; padding: 20px; }
+.product-card { position: relative; background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+.product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+.product-card h3 { margin: 8px 0 4px; font-size: 1rem; }
+.product-price { font-weight: 700; margin: 0 0 6px; }
+.product-desc-small { font-size: 0.9rem; color: #555; margin-bottom: 8px; }
+/* Action buttons moved to top-right in a distinct container */
+.card-actions-compact { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 5; }
+.card-actions-compact button { background: rgba(255,255,255,0.95); border: 1px solid #ddd; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-weight: 700; }
+.card-actions-compact button:hover { transform: translateY(-2px); }
+/* Image gallery inside edit modal */
+.image-gallery { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.image-gallery .img-wrap { position:relative; border-radius:8px; overflow:hidden; }
+.image-gallery img { width:96px; height:96px; object-fit:cover; display:block; border-radius:8px; }
+.image-gallery .remove-img { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:4px 6px; cursor:pointer; }
+/* carousel area minimal tweaks */
+.infinite-carousel-section { padding: 20px; }
+.carousel-track { display:flex; gap:12px; padding:8px; overflow:hidden; }
+</style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <div class="admin-gear" id="adminGear">
-          <button class="icon-btn">
-            <svg viewBox="0 0 24 24" width="26" height="26">
-              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </button>
-          <div class="admin-dropdown" id="adminDropdown">
-            <a href="index.html" target="_blank">Ir a Tienda</a>
-            <a href="admin-map.html">Mapa de Compras</a>
-            <a href="admin-compras.html">Compras</a>
-            <a href="admin-estadisticas.html">Estadísticas</a>
-            <button id="openSocialModal">Agregar Redes Sociales</button>
-            <button id="logoutBtn">Cerrar Sesión</button>
-          </div>
-        </div>
-        <div class="logo">EFRAÍN</div>
-      </div>
-      <div class="header-right">
-        <button class="header-btn" id="toggleTextEdit" title="Editar textos">
-          <img src="https://img.icons8.com/ios-filled/50/000000/pencil.png" alt="Editar" width="22" height="22">
-        </button>
-        <button class="header-btn" id="addPostBtn">+</button>
-      </div>
-    </div>
-  </header>
-  <!-- HERO -->
-  <section class="hero-banner" id="heroBanner">
-    <h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
-      Asegura tu Mystery Box
-    </h1>
-    <p class="tag" id="heroTagDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="subtitulo">
-      Envío Gratis en compras +$1,500
-    </p>
-  </section>
-  <!-- NUEVOS LANZAMIENTOS -->
-  <section class="infinite-carousel-section" id="newCarouselSection">
-    <h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
-      Nuevos Lanzamientos
-    </h2>
-    <div class="infinite-carousel">
-      <div class="carousel-track" id="newCarousel"></div>
-    </div>
-  </section>
-  <!-- TODOS LOS PRODUCTOS -->
-  <section>
-    <h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
-      Todos los Productos
-    </h2>
-    <div class="products-grid" id="productsGrid"></div>
-  </section>
-  <div class="toast" id="toast"></div>
-  <div class="text-edit-controls" id="textEditControls">
-    <button id="saveTextChanges">Guardar Cambios</button>
-    <button id="cancelTextChanges" class="cancel">No Guardar</button>
-  </div>
-  <!-- MODAL AGREGAR PRODUCTO -->
-  <div class="modal" id="addProductModal">
-    <div class="modal-content">
-      <h3 style="margin-top:0;">Agregar Nuevo Producto</h3>
-      <div class="form-group">
-        <label>Nombre del producto</label>
-        <input type="text" id="addName" placeholder="Ej: Camiseta Oversize Negra">
-      </div>
-      <div class="form-group">
-        <label>Precio</label>
-        <input type="number" id="addPrice" placeholder="1500">
-      </div>
-      <div class="form-group">
-        <label>Descripción</label>
-        <textarea id="addDesc" placeholder="Describe el producto..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>Categoría</label>
-        <select id="addCategory">
-          <option value="gorra">Gorra</option>
-          <option value="camiseta">Camiseta</option>
-          <option value="pantalon">Pantalón</option>
-          <option value="cinto">Cinto</option>
-          <option value="tenis">Tenis</option>
-          <option value="perfume">Perfume</option>
-          <option value="sudadera">Sudadera</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Cantidad disponible por talla</label>
-        <button class="variants-btn" id="addVariantsBtn">Seleccionar variantes</button>
-        <div class="variants-menu" id="addVariantsMenu"></div>
-      </div>
-      <div class="form-group">
-        <label>Ubicación en la tienda</label>
-        <select id="addType">
-          <option value="normal">Productos normales</option>
-          <option value="carrusel">Carrusel - Nuevos Lanzamientos</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <div class="upload-section">
-          <label for="addImageFiles">
-            <img src="https://img.icons8.com/ios-filled/50/000000/upload.png" width="36" alt="Subir">
-            <span>Subir imágenes desde celular o PC (puedes seleccionar varias)</span>
-          </label>
-          <input type="file" id="addImageFiles" accept="image/*" multiple>
-          <div id="addImagesPreview" style="display:none; margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;"></div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>O pegar URLs de imágenes (separadas por coma, opcional)</label>
-        <input type="text" id="addImage" placeholder="https://..., https://...">
-      </div>
-      <button id="saveNewProduct">Guardar Producto</button>
-      <button id="cancelAdd" class="cancel">Cancelar</button>
-    </div>
-  </div>
-  <!-- MODAL EDITAR PRODUCTO (ampliado) -->
-  <div class="modal" id="editProductModal">
-    <div class="modal-content">
-      <h3>Editar Producto</h3>
-      <div class="form-group"><label>Nombre</label><input type="text" id="editName" placeholder="Nombre"></div>
-      <div class="form-group"><label>Precio</label><input type="number" id="editPrice" placeholder="Precio"></div>
-      <div class="form-group"><label>Descripción</label><textarea id="editDesc"></textarea></div>
-      <div class="form-group"><label>Categoría</label>
-        <select id="editCategory">
-          <option value="gorra">Gorra</option>
-          <option value="camiseta">Camiseta</option>
-          <option value="pantalon">Pantalón</option>
-          <option value="cinto">Cinto</option>
-          <option value="tenis">Tenis</option>
-          <option value="perfume">Perfume</option>
-          <option value="sudadera">Sudadera</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Cantidad disponible por talla</label>
-        <button class="variants-btn" id="editVariantsBtn">Seleccionar variantes</button>
-        <div class="variants-menu" id="editVariantsMenu"></div>
-      </div>
-      <div class="form-group"><label>Ubicación en la tienda</label>
-        <select id="editType">
-          <option value="normal">Productos normales</option>
-          <option value="carrusel">Carrusel - Nuevos Lanzamientos</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Imágenes actuales</label>
-        <div class="image-gallery" id="editImagesGallery"></div>
-      </div>
-      <div class="form-group">
-        <label>Añadir nuevas imágenes (puedes seleccionar varias)</label>
-        <input type="file" id="editImageFiles" accept="image/*" multiple>
-        <div id="editNewPreview" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
-      </div>
-      <div class="form-group">
-        <label>O pegar URLs adicionales (separadas por coma)</label>
-        <input type="text" id="editImageUrls" placeholder="https://..., https://...">
-      </div>
-      <button id="saveProduct">Guardar</button>
-      <button id="cancelEdit" class="cancel">Cancelar</button>
-    </div>
-  </div>
-  <!-- MODAL REDES SOCIALES -->
-  <div class="modal" id="socialLinksModal">
-    <div class="modal-content">
-      <h3>Agregar Redes Sociales</h3>
-      <div class="social-links-inputs">
-        <label>TikTok</label><input type="text" id="tiktokInput" placeholder="https://tiktok.com/@usuario">
-        <label>Instagram</label><input type="text" id="instagramInput" placeholder="https://instagram.com/usuario">
-        <label>Facebook</label><input type="text" id="facebookInput" placeholder="https://facebook.com/usuario">
-        <label>X (Twitter)</label><input type="text" id="xInput" placeholder="https://x.com/usuario">
-        <label>WhatsApp</label><input type="text" id="whatsappInput" placeholder="https://wa.me/521234567890">
-      </div>
-      <button id="saveSocialLinks">Guardar</button>
-      <button id="cancelSocial" style="background:#999;">Cancelar</button>
-    </div>
-  </div>
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Admin Mode.</p>
-  </footer>
-  <!-- FIREBASE + JS 100% COMPLETO Y FUNCIONAL (modificado para multimages y edición completa) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import {
-      getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
-      onSnapshot, query, where, setDoc, getDoc
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-
-    // LÍNEA ELIMINADA: ya no redirige al login, todos entran directamente
-    // if (!localStorage.getItem('isAdmin')) {
-    //   window.location.href = 'login.html';
-    // }
-
-    let textEditMode = false;
-    let textChanges = {};
-    const variantsByCategory = {
-      gorra: ['S/M', 'L/XL'],
-      camiseta: ['ch', 'm', 'x', 'xl', 'l'],
-      pantalon: ['28', '30', '32', '34', '36', '38', '40'],
-      cinto: ['30', '32', '34', '36', '38', '40', '42'],
-      tenis: ['25', '26', '27', '28', '29', '30'],
-      perfume: ['75', '100', '125', '200'],
-      sudadera: ['ch', 'm', 'x', 'xl', 'l']
-    };
-    async function uploadImageAndGetURL(file) {
-      if (!file) return null;
-      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      const storageRef = ref(storage, `productos/${fileName}`);
-      try {
-        showToast("Subiendo imagen...");
-        const snapshot = await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(snapshot.ref);
-        showToast("¡Imagen subida!");
-        return url;
-      } catch (e) {
-        console.error(e);
-        showToast("Error al subir imagen");
-        return null;
-      }
-    }
-    // Previews for add modal
-    document.getElementById('addImageFiles').addEventListener('change', e => {
-      const files = Array.from(e.target.files || []);
-      const previewWrap = document.getElementById('addImagesPreview');
-      previewWrap.innerHTML = '';
-      if (files.length) {
-        files.forEach(file => {
-          const reader = new FileReader();
-          const div = document.createElement('div');
-          div.style.width = '96px'; div.style.height = '96px'; div.style.overflow='hidden'; div.style.borderRadius='8px';
-          reader.onload = ev => {
-            const img = document.createElement('img');
-            img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover'; img.style.display='block';
-            div.appendChild(img);
-          };
-          reader.readAsDataURL(file);
-          previewWrap.appendChild(div);
-        });
-        previewWrap.style.display = 'flex';
-      } else previewWrap.style.display = 'none';
-    });
-    function loadEditableTexts() {
-      document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-        const coll = el.dataset.collection;
-        const docu = el.dataset.doc;
-        const field = el.dataset.field;
-        onSnapshot(doc(db, coll, docu), snap => {
-          if (snap.exists() && snap.data()[field] !== undefined) {
-            const value = snap.data()[field];
-            if (el.textContent.trim() !== value) el.textContent = value;
-          }
-        });
-        el.addEventListener('input', () => {
-          const key = `${coll}|${docu}|${field}`;
-          textChanges[key] = el.textContent.trim();
-        });
-      });
-    }
-    function loadProductsByType(typeKey, containerId) {
-      const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
-      const unsubscribe = onSnapshot(q, snapshot => {
-        const container = document.getElementById(containerId);
-        container.innerHTML = '';
-        const products = [];
-        snapshot.forEach(docSnap => {
-          const data = { id: docSnap.id, ...docSnap.data() };
-          products.push(data);
-          container.appendChild(createProductCard(data, typeKey));
-        });
-        if (containerId === 'newCarousel') {
-          const section = container.parentElement.parentElement;
-          if (products.length >= 4) {
-            section.classList.add('auto-scroll');
-            if (!container.dataset.duplicated) {
-              const clone = container.cloneNode(true);
-              clone.id += '-clone';
-              container.appendChild(clone);
-              container.dataset.duplicated = 'true';
-            }
-          } else {
-            section.classList.add('static-display');
-          }
-        }
-      });
-    }
-    function createProductCard(p, sectionType) {
-      const div = document.createElement('div');
-      div.className = 'product-card';
-      div.dataset.id = p.id;
-      const mainImg = (p.imagenes && p.imagenes.length) ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/300');
-      const totalDisp = p.disponibles || (p.variantesDisponibles ? Object.values(p.variantesDisponibles).reduce((a, b) => a + b, 0) : 0);
-      const stockInfo = totalDisp > 0
-        ? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${totalDisp} disponibles</p>`
-        : '<p style="color:#c00; font-weight:bold;">Agotado</p>';
-      // compact action buttons in top-right
-      const actions = `
-        <div class="card-actions-compact">
-          <button title="Editar" onclick="editProduct('${p.id}')">✏️</button>
-          <button title="Eliminar" onclick="deleteProduct('${p.id}')">🗑️</button>
-        </div>
-      `;
-      if (sectionType === 'normal') {
-        div.innerHTML = `
-          ${actions}
-          <img src="${mainImg}" alt="${p.nombre}">
-          <h3>${p.nombre}</h3>
-          <p class="product-price">$${p.precio}</p>
-          <p class="product-desc-small">${p.descripcion || ''}</p>
-          ${stockInfo}
-        `;
-      } else {
-        div.innerHTML = `
-          ${actions}
-          <img src="${mainImg}" alt="${p.nombre}">
-          <h3>${p.nombre}</h3>
-          <p>$${p.precio}</p>
-          ${stockInfo}
-        `;
-      }
-      return div;
-    }
-    function openVariantsMenu(mode) {
-      const cat = document.getElementById(mode + 'Category').value;
-      const menu = document.getElementById(mode + 'VariantsMenu');
-      menu.innerHTML = '';
-      const closeBtn = document.createElement('button');
-      closeBtn.className = 'variants-close';
-      closeBtn.textContent = '✕';
-      closeBtn.onclick = () => menu.classList.remove('active');
-      menu.appendChild(closeBtn);
-      const vars = variantsByCategory[cat] || [];
-      vars.forEach(v => {
-        const item = document.createElement('div');
-        item.className = 'variant-item';
-        item.textContent = v;
-        const qty = document.createElement('span');
-        qty.className = 'variant-qty';
-        qty.textContent = window[mode + 'Variants'][v] || 0;
-        item.appendChild(qty);
-        item.onclick = () => {
-          window[mode + 'Variants'][v] = (window[mode + 'Variants'][v] || 0) + 1;
-          qty.textContent = window[mode + 'Variants'][v];
-        };
-        qty.onclick = (e) => {
-          e.stopPropagation();
-          const input = document.createElement('input');
-          input.type = 'number';
-          input.min = 0;
-          input.value = window[mode + 'Variants'][v] || 0;
-          input.style.width = '30px';
-          input.style.textAlign = 'center';
-          input.style.borderRadius = '50%';
-          qty.parentNode.replaceChild(input, qty);
-          input.focus();
-          input.onblur = () => {
-            const val = parseInt(input.value) || 0;
-            window[mode + 'Variants'][v] = val;
-            qty.textContent = val;
-            input.parentNode.replaceChild(qty, input);
-          };
-        };
-        menu.appendChild(item);
-      });
-      menu.classList.add('active');
-    }
-    document.getElementById('addVariantsBtn').onclick = () => openVariantsMenu('add');
-    document.getElementById('editVariantsBtn').onclick = () => openVariantsMenu('edit');
-    // ------- EDIT & DELETE (enhanced) -------
-    window.editProduct = async id => {
-      window.currentEditId = id;
-      const docRef = doc(db, 'productos', id);
-      const snap = await getDoc(docRef);
-      if (!snap.exists()) return showToast('Producto no encontrado');
-      const data = snap.data();
-      document.getElementById('editName').value = data.nombre || '';
-      document.getElementById('editPrice').value = data.precio || '';
-      document.getElementById('editDesc').value = data.descripcion || '';
-      document.getElementById('editCategory').value = data.tipo || 'camiseta';
-      document.getElementById('editType').value = (data.type && data.type.carrusel) ? 'carrusel' : 'normal';
-      window.editVariants = data.variantesDisponibles || {};
-      // populate images gallery
-      const gallery = document.getElementById('editImagesGallery');
-      gallery.innerHTML = '';
-      const imgs = (data.imagenes && data.imagenes.length) ? data.imagenes.slice() : (data.imagen ? [data.imagen] : []);
-      imgs.forEach((u, idx) => {
-        const wrap = document.createElement('div'); wrap.className = 'img-wrap';
-        const img = document.createElement('img'); img.src = u;
-        const btn = document.createElement('button'); btn.className = 'remove-img'; btn.textContent = '✕';
-        btn.onclick = () => {
-          wrap.remove();
-          wrap.dataset.removed = 'true';
-        };
-        wrap.appendChild(img); wrap.appendChild(btn);
-        wrap.dataset.url = u;
-        gallery.appendChild(wrap);
-      });
-      document.getElementById('editNewPreview').innerHTML = '';
-      document.getElementById('editProductModal').classList.add('active');
-    };
-    document.getElementById('saveProduct').onclick = async () => {
-      if (!window.currentEditId) return showToast('No hay producto seleccionado');
-      const updated = {
-        nombre: document.getElementById('editName').value.trim(),
-        precio: parseFloat(document.getElementById('editPrice').value) || 0,
-        descripcion: document.getElementById('editDesc').value.trim(),
-        tipo: document.getElementById('editCategory').value,
-        type: { normal: document.getElementById('editType').value === 'normal', carrusel: document.getElementById('editType').value === 'carrusel' },
-        variantesDisponibles: window.editVariants,
-        disponibles: Object.values(window.editVariants).reduce((a, b) => a + b, 0),
-      };
-      // handle images
-      const gallery = document.getElementById('editImagesGallery');
-      const remaining = [];
-      gallery.querySelectorAll('.img-wrap').forEach(w => { if (!w.dataset.removed) remaining.push(w.dataset.url); });
-      const newFiles = Array.from(document.getElementById('editImageFiles').files || []);
-      for (const f of newFiles) {
-        const url = await uploadImageAndGetURL(f);
-        if (url) remaining.push(url);
-      }
-      const extraUrls = document.getElementById('editImageUrls').value.split(',').map(u => u.trim()).filter(Boolean);
-      extraUrls.forEach(u => remaining.push(u));
-      if (remaining.length > 0) {
-        updated.imagenes = remaining;
-        updated.imagen = remaining[0];
-      }
-      await updateDoc(doc(db, 'productos', window.currentEditId), updated);
-      showToast('Producto actualizado');
-      closeModal('editProductModal');
-    };
-    window.deleteProduct = async id => {
-      if (confirm('¿Eliminar este producto?')) {
-        await deleteDoc(doc(db, 'productos', id));
-        showToast('Producto eliminado');
-      }
-    };
-    // Save new product
-    document.getElementById('saveNewProduct').onclick = async () => {
-      const name = document.getElementById('addName').value.trim();
-      const price = parseFloat(document.getElementById('addPrice').value);
-      const files = Array.from(document.getElementById('addImageFiles').files || []);
-      const urlsInput = document.getElementById('addImage').value.trim();
-      const urlList = urlsInput ? urlsInput.split(',').map(u => u.trim()).filter(Boolean) : [];
-      const typeValue = document.getElementById('addType').value;
-      if (!name || isNaN(price) || !typeValue) return showToast("Faltan datos");
-      const uploadedUrls = [];
-      for (const f of files) {
-        const u = await uploadImageAndGetURL(f);
-        if (u) uploadedUrls.push(u);
-      }
-      const allImages = [...uploadedUrls, ...urlList];
-      if (allImages.length === 0) return showToast('Sube al menos una imagen o pega una URL');
-      const typeObj = { normal: typeValue === 'normal', carrusel: typeValue === 'carrusel' };
-      const producto = {
-        nombre: name,
-        precio: price,
-        descripcion: document.getElementById('addDesc').value.trim(),
-        tipo: document.getElementById('addCategory').value,
-        type: typeObj,
-        imagenes: allImages,
-        imagen: allImages[0],
-        variantesDisponibles: window.addVariants,
-        disponibles: Object.values(window.addVariants).reduce((a, b) => a + b, 0),
-        creado: new Date()
-      };
-      await addDoc(collection(db, 'productos'), producto);
-      showToast('¡Producto agregado!');
-      closeModal('addProductModal');
-    };
-    // edit modal image previews
-    document.getElementById('editImageFiles').addEventListener('change', e => {
-      const files = Array.from(e.target.files || []);
-      const wrap = document.getElementById('editNewPreview');
-      wrap.innerHTML = '';
-      files.forEach(file => {
-        const reader = new FileReader();
-        const dv = document.createElement('div'); dv.style.width='96px'; dv.style.height='96px'; dv.style.overflow='hidden'; dv.style.borderRadius='8px';
-        reader.onload = ev => { const img = document.createElement('img'); img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover'; dv.appendChild(img); };
-        reader.readAsDataURL(file);
-        wrap.appendChild(dv);
-      });
-    });
-    document.getElementById('addPostBtn').onclick = () => {
-      document.getElementById('addProductModal').classList.add('active');
-      document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => {
-        if (i.type !== 'file') i.value = '';
-      });
-      document.getElementById('addImageFiles').value = '';
-      document.getElementById('addImagesPreview').style.display = 'none';
-      window.addVariants = {};
-    };
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => e.target === m && closeModal(m.id)));
-    document.querySelectorAll('[id^="cancel"]').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
-    document.getElementById('adminGear').onclick = e => { e.stopPropagation(); document.getElementById('adminDropdown').classList.toggle('show'); };
-    document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
-    document.getElementById('toggleTextEdit').onclick = () => {
-      textEditMode = !textEditMode;
-      document.getElementById('textEditControls').classList.toggle('active');
-      document.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.toggle('editing'));
-    };
-    document.getElementById('saveTextChanges').onclick = async () => {
-      for (const [key, value] of Object.entries(textChanges)) {
-        const [c, d, f] = key.split('|');
-        await setDoc(doc(db, c, d), { [f]: value }, { merge: true });
-      }
-      showToast("Cambios guardados");
-      textChanges = {};
-    };
-    document.getElementById('cancelTextChanges').onclick = () => location.reload();
-    document.getElementById('openSocialModal').onclick = () => {
-      document.getElementById('socialLinksModal').classList.add('active');
-      onSnapshot(doc(db, "links", "social"), snap => {
-        if (snap.exists()) {
-          const d = snap.data();
-          ['tiktok','instagram','facebook','x','whatsapp'].forEach(k => document.getElementById(k+'Input').value = d[k] || '');
-        }
-      });
-    };
-    document.getElementById('saveSocialLinks').onclick = async () => {
-      const links = {
-        tiktok: document.getElementById('tiktokInput').value.trim(),
-        instagram: document.getElementById('instagramInput').value.trim(),
-        facebook: document.getElementById('facebookInput').value.trim(),
-        x: document.getElementById('xInput').value.trim(),
-        whatsapp: document.getElementById('whatsappInput').value.trim()
-      };
-      await setDoc(doc(db, "links", "social"), links, { merge: true });
-      showToast("Redes guardadas");
-      closeModal('socialLinksModal');
-    };
-    // Logout confirmation (native confirm with Sí/No options)
-    document.getElementById('logoutBtn').onclick = () => {
-      const ok = confirm('¿Quieres cerrar sesión?\n\nSelecciona Aceptar para cerrar sesión o Cancelar para quedarte.');
-      if (ok) {
-        localStorage.removeItem('isAdmin');
-        window.location.href = 'login.html';
-      }
-    };
-    onSnapshot(doc(db, "textos", "hero"), snap => {
-      if (snap.exists() && snap.data().fondo_url) {
-        document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
-      }
-    });
-    loadProductsByType('carrusel', 'newCarousel');
-    loadProductsByType('normal', 'productsGrid');
-    loadEditableTexts();
-  </script>
+<!-- HEADER -->
+<header class="header">
+<div class="header-inner">
+<div class="header-left">
+<div class="admin-gear" id="adminGear">
+<button class="icon-btn">
+<svg viewBox="0 0 24 24" width="26" height="26">
+<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/>
+</svg>
+</button>
+<div class="admin-dropdown" id="adminDropdown">
+<a href="index.html" target="_blank">Ir a Tienda</a>
+<a href="admin-map.html">Mapa de Compras</a>
+<a href="admin-compras.html">Compras</a>
+<a href="admin-estadisticas.html">Estadísticas</a>
+<button id="openSocialModal">Agregar Redes Sociales</button>
+<button id="logoutBtn">Cerrar Sesión</button>
+</div>
+</div>
+<div class="logo">EFRAÍN</div>
+</div>
+<div class="header-right">
+<button class="header-btn" id="toggleTextEdit" title="Editar textos">
+<img src="https://img.icons8.com/ios-filled/50/000000/pencil.png" alt="Editar" width="22" height="22">
+</button>
+<button class="header-btn" id="addPostBtn">+</button>
+</div>
+</div>
+</header>
+<!-- HERO -->
+<section class="hero-banner" id="heroBanner">
+<h1 id="heroTitleDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="titulo">
+Asegura tu Mystery Box
+</h1>
+<p class="tag" id="heroTagDisplay" contenteditable="true" data-collection="textos" data-doc="hero" data-field="subtitulo">
+Envío Gratis en compras +$1,500
+</p>
+</section>
+<!-- NUEVOS LANZAMIENTOS -->
+<section class="infinite-carousel-section" id="newCarouselSection">
+<h2 id="titleNewDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="nuevos_lanzamientos">
+Nuevos Lanzamientos
+</h2>
+<div class="infinite-carousel">
+<div class="carousel-track" id="newCarousel"></div>
+</div>
+</section>
+<!-- TODOS LOS PRODUCTOS -->
+<section>
+<h2 id="titleAllDisplay" contenteditable="true" data-collection="textos" data-doc="secciones" data-field="todos_productos">
+Todos los Productos
+</h2>
+<div class="products-grid" id="productsGrid"></div>
+</section>
+<div class="toast" id="toast"></div>
+<div class="text-edit-controls" id="textEditControls">
+<button id="saveTextChanges">Guardar Cambios</button>
+<button id="cancelTextChanges" class="cancel">No Guardar</button>
+</div>
+<!-- MODAL AGREGAR PRODUCTO -->
+<div class="modal" id="addProductModal">
+<div class="modal-content">
+<h3 style="margin-top:0;">Agregar Nuevo Producto</h3>
+<div class="form-group">
+<label>Nombre del producto</label>
+<input type="text" id="addName" placeholder="Ej: Camiseta Oversize Negra">
+</div>
+<div class="form-group">
+<label>Precio</label>
+<input type="number" id="addPrice" placeholder="1500">
+</div>
+<div class="form-group">
+<label>Descripción</label>
+<textarea id="addDesc" placeholder="Describe el producto..."></textarea>
+</div>
+<div class="form-group">
+<label>Categoría</label>
+<select id="addCategory">
+<option value="gorra">Gorra</option>
+<option value="camiseta">Camiseta</option>
+<option value="pantalon">Pantalón</option>
+<option value="cinto">Cinto</option>
+<option value="tenis">Tenis</option>
+<option value="perfume">Perfume</option>
+<option value="sudadera">Sudadera</option>
+</select>
+</div>
+<div class="form-group">
+<label>Cantidad disponible por talla</label>
+<div class="variants-container">
+<button class="variants-btn" id="addVariantsBtn">Seleccionar variantes</button>
+<div class="variants-menu" id="addVariantsMenu"></div>
+</div>
+</div>
+<div class="form-group">
+<label>Ubicación en la tienda</label>
+<select id="addType">
+<option value="normal">Productos normales</option>
+<option value="carrusel">Carrusel - Nuevos Lanzamientos</option>
+</select>
+</div>
+<div class="form-group">
+<div class="upload-section">
+<label for="addImageFiles">
+<img src="https://img.icons8.com/ios-filled/50/000000/upload.png" width="36" alt="Subir">
+<span>Subir imágenes desde celular o PC (puedes seleccionar varias)</span>
+</label>
+<input type="file" id="addImageFiles" accept="image/*" multiple>
+<div id="addImagesPreview" style="display:none; margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+</div>
+</div>
+<div class="form-group">
+<label>O pegar URLs de imágenes (separadas por coma, opcional)</label>
+<input type="text" id="addImage" placeholder="https://..., https://...">
+</div>
+<button id="saveNewProduct">Guardar Producto</button>
+<button id="cancelAdd" class="cancel">Cancelar</button>
+</div>
+</div>
+<!-- MODAL EDITAR PRODUCTO (ampliado) -->
+<div class="modal" id="editProductModal">
+<div class="modal-content">
+<h3>Editar Producto</h3>
+<div class="form-group"><label>Nombre</label><input type="text" id="editName" placeholder="Nombre"></div>
+<div class="form-group"><label>Precio</label><input type="number" id="editPrice" placeholder="Precio"></div>
+<div class="form-group"><label>Descripción</label><textarea id="editDesc"></textarea></div>
+<div class="form-group"><label>Categoría</label>
+<select id="editCategory">
+<option value="gorra">Gorra</option>
+<option value="camiseta">Camiseta</option>
+<option value="pantalon">Pantalón</option>
+<option value="cinto">Cinto</option>
+<option value="tenis">Tenis</option>
+<option value="perfume">Perfume</option>
+<option value="sudadera">Sudadera</option>
+</select>
+</div>
+<div class="form-group">
+<label>Cantidad disponible por talla</label>
+<div class="variants-container">
+<button class="variants-btn" id="editVariantsBtn">Seleccionar variantes</button>
+<div class="variants-menu" id="editVariantsMenu"></div>
+</div>
+</div>
+<div class="form-group"><label>Ubicación en la tienda</label>
+<select id="editType">
+<option value="normal">Productos normales</option>
+<option value="carrusel">Carrusel - Nuevos Lanzamientos</option>
+</select>
+</div>
+<div class="form-group">
+<label>Imágenes actuales</label>
+<div class="image-gallery" id="editImagesGallery"></div>
+</div>
+<div class="form-group">
+<label>Añadir nuevas imágenes (puedes seleccionar varias)</label>
+<input type="file" id="editImageFiles" accept="image/*" multiple>
+<div id="editNewPreview" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+</div>
+<div class="form-group">
+<label>O pegar URLs adicionales (separadas por coma)</label>
+<input type="text" id="editImageUrls" placeholder="https://..., https://...">
+</div>
+<button id="saveProduct">Guardar</button>
+<button id="cancelEdit" class="cancel">Cancelar</button>
+</div>
+</div>
+<!-- MODAL REDES SOCIALES -->
+<div class="modal" id="socialLinksModal">
+<div class="modal-content">
+<h3>Agregar Redes Sociales</h3>
+<div class="social-links-inputs">
+<label>TikTok</label><input type="text" id="tiktokInput" placeholder="https://tiktok.com/@usuario">
+<label>Instagram</label><input type="text" id="instagramInput" placeholder="https://instagram.com/usuario">
+<label>Facebook</label><input type="text" id="facebookInput" placeholder="https://facebook.com/usuario">
+<label>X (Twitter)</label><input type="text" id="xInput" placeholder="https://x.com/usuario">
+<label>WhatsApp</label><input type="text" id="whatsappInput" placeholder="https://wa.me/521234567890">
+</div>
+<button id="saveSocialLinks">Guardar</button>
+<button id="cancelSocial" style="background:#999;">Cancelar</button>
+</div>
+</div>
+<footer class="footer">
+<p>© 2025 Efraín Shop. Admin Mode.</p>
+</footer>
+<!-- FIREBASE + JS 100% COMPLETO Y FUNCIONAL (modificado para multimages y edición completa) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+onSnapshot, query, where, setDoc, getDoc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {
+getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+const firebaseConfig = {
+apiKey: "AIzaSyD8oV5v8vK9v3v8K9v3v8K9v3v8K9v3v8K",
+authDomain: "boutique-buendia.firebaseapp.com",
+projectId: "boutique-buendia",
+storageBucket: "boutique-buendia.firebasestorage.app",
+messagingSenderId: "430651152709",
+appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+if (!localStorage.getItem('isAdmin')) {
+window.location.href = 'login.html';
+}
+let textEditMode = false;
+let textChanges = {};
+const variantsByCategory = {
+gorra: ['S/M', 'L/XL'],
+camiseta: ['ch', 'm', 'x', 'xl', 'l'],
+pantalon: ['28', '30', '32', '34', '36', '38', '40'],
+cinto: ['30', '32', '34', '36', '38', '40', '42'],
+tenis: ['25', '26', '27', '28', '29', '30'],
+perfume: ['75', '100', '125', '200'],
+sudadera: ['ch', 'm', 'x', 'xl', 'l']
+};
+async function uploadImageAndGetURL(file) {
+if (!file) return null;
+const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+const storageRef = ref(storage, `productos/${fileName}`);
+try {
+showToast("Subiendo imagen...");
+const snapshot = await uploadBytes(storageRef, file);
+const url = await getDownloadURL(snapshot.ref);
+showToast("¡Imagen subida!");
+return url;
+} catch (e) {
+console.error(e);
+showToast("Error al subir imagen");
+return null;
+}
+}
+// Previews for add modal
+document.getElementById('addImageFiles').addEventListener('change', e => {
+const files = Array.from(e.target.files || []);
+const previewWrap = document.getElementById('addImagesPreview');
+previewWrap.innerHTML = '';
+if (files.length) {
+files.forEach(file => {
+const reader = new FileReader();
+const div = document.createElement('div');
+div.style.width = '96px'; div.style.height = '96px'; div.style.overflow='hidden'; div.style.borderRadius='8px';
+reader.onload = ev => {
+const img = document.createElement('img');
+img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover'; img.style.display='block';
+div.appendChild(img);
+};
+reader.readAsDataURL(file);
+previewWrap.appendChild(div);
+});
+previewWrap.style.display = 'flex';
+} else previewWrap.style.display = 'none';
+});
+function loadEditableTexts() {
+document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+const coll = el.dataset.collection;
+const docu = el.dataset.doc;
+const field = el.dataset.field;
+onSnapshot(doc(db, coll, docu), snap => {
+if (snap.exists() && snap.data()[field] !== undefined) {
+const value = snap.data()[field];
+if (el.textContent.trim() !== value) el.textContent = value;
+}
+});
+el.addEventListener('input', () => {
+const key = `${coll}|${docu}|${field}`;
+textChanges[key] = el.textContent.trim();
+});
+});
+}
+function loadProductsByType(typeKey, containerId) {
+const q = query(collection(db, "productos"), where(`type.${typeKey}`, "==", true));
+const unsubscribe = onSnapshot(q, snapshot => {
+const container = document.getElementById(containerId);
+container.innerHTML = '';
+const products = [];
+snapshot.forEach(docSnap => {
+const data = { id: docSnap.id, ...docSnap.data() };
+products.push(data);
+container.appendChild(createProductCard(data, typeKey));
+});
+if (containerId === 'newCarousel') {
+const section = container.parentElement.parentElement;
+if (products.length >= 4) {
+section.classList.add('auto-scroll');
+if (!container.dataset.duplicated) {
+const clone = container.cloneNode(true);
+clone.id += '-clone';
+container.appendChild(clone);
+container.dataset.duplicated = 'true';
+}
+} else {
+section.classList.add('static-display');
+}
+}
+});
+}
+function createProductCard(p, sectionType) {
+const div = document.createElement('div');
+div.className = 'product-card';
+div.dataset.id = p.id;
+const mainImg = (p.imagenes && p.imagenes.length) ? p.imagenes[0] : (p.imagen || 'https://via.placeholder.com/300');
+const totalDisp = p.disponibles || (p.variantesDisponibles ? Object.values(p.variantesDisponibles).reduce((a, b) => a + b, 0) : 0);
+const stockInfo = totalDisp > 0
+? `<p style="color:#0a0; font-weight:bold; margin:5px 0;">${totalDisp} disponibles</p>`
+: '<p style="color:#c00; font-weight:bold;">Agotado</p>';
+// compact action buttons in top-right
+const actions = `
+<div class="card-actions-compact">
+<button title="Editar" onclick="editProduct('${p.id}')">✏️</button>
+<button title="Eliminar" onclick="deleteProduct('${p.id}')">🗑️</button>
+</div>
+`;
+if (sectionType === 'normal') {
+div.innerHTML = `
+${actions}
+<img src="$$   {mainImg}" alt="   $${p.nombre}">
+<h3>${p.nombre}</h3>
+<p class="product-price">$$    {p.precio}</p>
+<p class="product-desc-small">${p.descripcion || ''}</p>
+${stockInfo}
+`;
+} else {
+div.innerHTML = `
+${actions}
+<img src="\( {mainImg}" alt=" \){p.nombre}">
+<h3>${p.nombre}</h3>
+<p>    $${p.precio}</p>
+${stockInfo}
+`;
+}
+return div;
+}
+function openVariantsMenu(mode) {
+const cat = document.getElementById(mode + 'Category').value;
+const menu = document.getElementById(mode + 'VariantsMenu');
+menu.innerHTML = '';
+const closeBtn = document.createElement('button');
+closeBtn.className = 'variants-close';
+closeBtn.textContent = '✕';
+closeBtn.onclick = () => menu.classList.remove('active');
+menu.appendChild(closeBtn);
+const vars = variantsByCategory[cat] || [];
+vars.forEach(v => {
+const item = document.createElement('div');
+item.className = 'variant-item';
+item.textContent = v;
+const qty = document.createElement('span');
+qty.className = 'variant-qty';
+qty.textContent = window[mode + 'Variants'][v] || 0;
+item.appendChild(qty);
+item.onclick = () => {
+window[mode + 'Variants'][v] = (window[mode + 'Variants'][v] || 0) + 1;
+qty.textContent = window[mode + 'Variants'][v];
+};
+qty.onclick = (e) => {
+e.stopPropagation();
+const input = document.createElement('input');
+input.type = 'number';
+input.min = 0;
+input.value = window[mode + 'Variants'][v] || 0;
+input.style.width = '30px';
+input.style.textAlign = 'center';
+input.style.borderRadius = '50%';
+qty.parentNode.replaceChild(input, qty);
+input.focus();
+input.onblur = () => {
+const val = parseInt(input.value) || 0;
+window[mode + 'Variants'][v] = val;
+qty.textContent = val;
+input.parentNode.replaceChild(qty, input);
+};
+};
+menu.appendChild(item);
+});
+menu.classList.add('active');
+}
+document.getElementById('addVariantsBtn').onclick = () => openVariantsMenu('add');
+document.getElementById('editVariantsBtn').onclick = () => openVariantsMenu('edit');
+// ------- EDIT & DELETE (enhanced) -------
+window.editProduct = async id => {
+window.currentEditId = id;
+const docRef = doc(db, 'productos', id);
+const snap = await getDoc(docRef);
+if (!snap.exists()) return showToast('Producto no encontrado');
+const data = snap.data();
+document.getElementById('editName').value = data.nombre || '';
+document.getElementById('editPrice').value = data.precio || '';
+document.getElementById('editDesc').value = data.descripcion || '';
+document.getElementById('editCategory').value = data.tipo || 'camiseta';
+document.getElementById('editType').value = (data.type && data.type.carrusel) ? 'carrusel' : 'normal';
+window.editVariants = data.variantesDisponibles || {};
+// populate images gallery
+const gallery = document.getElementById('editImagesGallery');
+gallery.innerHTML = '';
+const imgs = (data.imagenes && data.imagenes.length) ? data.imagenes.slice() : (data.imagen ? [data.imagen] : []);
+imgs.forEach((u, idx) => {
+const wrap = document.createElement('div'); wrap.className = 'img-wrap';
+const img = document.createElement('img'); img.src = u;
+const btn = document.createElement('button'); btn.className = 'remove-img'; btn.textContent = '✕';
+btn.onclick = () => {
+wrap.remove();
+wrap.dataset.removed = 'true';
+};
+wrap.appendChild(img); wrap.appendChild(btn);
+wrap.dataset.url = u;
+gallery.appendChild(wrap);
+});
+document.getElementById('editNewPreview').innerHTML = '';
+document.getElementById('editProductModal').classList.add('active');
+};
+document.getElementById('saveProduct').onclick = async () => {
+if (!window.currentEditId) return showToast('No hay producto seleccionado');
+const updated = {
+nombre: document.getElementById('editName').value.trim(),
+precio: parseFloat(document.getElementById('editPrice').value) || 0,
+descripcion: document.getElementById('editDesc').value.trim(),
+tipo: document.getElementById('editCategory').value,
+type: { normal: document.getElementById('editType').value === 'normal', carrusel: document.getElementById('editType').value === 'carrusel' },
+variantesDisponibles: window.editVariants,
+disponibles: Object.values(window.editVariants).reduce((a, b) => a + b, 0),
+};
+// handle images
+const gallery = document.getElementById('editImagesGallery');
+const remaining = [];
+gallery.querySelectorAll('.img-wrap').forEach(w => { if (!w.dataset.removed) remaining.push(w.dataset.url); });
+const newFiles = Array.from(document.getElementById('editImageFiles').files || []);
+for (const f of newFiles) {
+const url = await uploadImageAndGetURL(f);
+if (url) remaining.push(url);
+}
+const extraUrls = document.getElementById('editImageUrls').value.split(',').map(u => u.trim()).filter(Boolean);
+extraUrls.forEach(u => remaining.push(u));
+if (remaining.length > 0) {
+updated.imagenes = remaining;
+updated.imagen = remaining[0];
+}
+await updateDoc(doc(db, 'productos', window.currentEditId), updated);
+showToast('Producto actualizado');
+closeModal('editProductModal');
+};
+window.deleteProduct = async id => {
+if (confirm('¿Eliminar este producto?')) {
+await deleteDoc(doc(db, 'productos', id));
+showToast('Producto eliminado');
+}
+};
+// Save new product
+document.getElementById('saveNewProduct').onclick = async () => {
+const name = document.getElementById('addName').value.trim();
+const price = parseFloat(document.getElementById('addPrice').value);
+const files = Array.from(document.getElementById('addImageFiles').files || []);
+const urlsInput = document.getElementById('addImage').value.trim();
+const urlList = urlsInput ? urlsInput.split(',').map(u => u.trim()).filter(Boolean) : [];
+const typeValue = document.getElementById('addType').value;
+if (!name || isNaN(price) || !typeValue) return showToast("Faltan datos");
+const uploadedUrls = [];
+for (const f of files) {
+const u = await uploadImageAndGetURL(f);
+if (u) uploadedUrls.push(u);
+}
+const allImages = [...uploadedUrls, ...urlList];
+if (allImages.length === 0) return showToast('Sube al menos una imagen o pega una URL');
+const typeObj = { normal: typeValue === 'normal', carrusel: typeValue === 'carrusel' };
+const producto = {
+nombre: name,
+precio: price,
+descripcion: document.getElementById('addDesc').value.trim(),
+tipo: document.getElementById('addCategory').value,
+type: typeObj,
+imagenes: allImages,
+imagen: allImages[0],
+variantesDisponibles: window.addVariants,
+disponibles: Object.values(window.addVariants).reduce((a, b) => a + b, 0),
+creado: new Date()
+};
+await addDoc(collection(db, 'productos'), producto);
+showToast('¡Producto agregado!');
+closeModal('addProductModal');
+};
+// edit modal image previews
+document.getElementById('editImageFiles').addEventListener('change', e => {
+const files = Array.from(e.target.files || []);
+const wrap = document.getElementById('editNewPreview');
+wrap.innerHTML = '';
+files.forEach(file => {
+const reader = new FileReader();
+const dv = document.createElement('div'); dv.style.width='96px'; dv.style.height='96px'; dv.style.overflow='hidden'; dv.style.borderRadius='8px';
+reader.onload = ev => { const img = document.createElement('img'); img.src = ev.target.result; img.style.width='96px'; img.style.height='96px'; img.style.objectFit='cover'; dv.appendChild(img); };
+reader.readAsDataURL(file);
+wrap.appendChild(dv);
+});
+});
+document.getElementById('addPostBtn').onclick = () => {
+document.getElementById('addProductModal').classList.add('active');
+document.querySelectorAll('#addProductModal input, #addProductModal textarea, #addProductModal select').forEach(i => {
+if (i.type !== 'file') i.value = '';
+});
+document.getElementById('addImageFiles').value = '';
+document.getElementById('addImagesPreview').style.display = 'none';
+window.addVariants = {};
+};
+function showToast(msg) {
+const t = document.getElementById('toast');
+t.textContent = msg;
+t.classList.add('show');
+setTimeout(() => t.classList.remove('show'), 3000);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => e.target === m && closeModal(m.id)));
+document.querySelectorAll('[id^="cancel"]').forEach(b => b.onclick = () => closeModal(b.closest('.modal').id));
+document.getElementById('adminGear').onclick = e => { e.stopPropagation(); document.getElementById('adminDropdown').classList.toggle('show'); };
+document.addEventListener('click', () => document.getElementById('adminDropdown').classList.remove('show'));
+document.getElementById('toggleTextEdit').onclick = () => {
+textEditMode = !textEditMode;
+document.getElementById('textEditControls').classList.toggle('active');
+document.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.toggle('editing'));
+};
+document.getElementById('saveTextChanges').onclick = async () => {
+for (const [key, value] of Object.entries(textChanges)) {
+const [c, d, f] = key.split('|');
+await setDoc(doc(db, c, d), { [f]: value }, { merge: true });
+}
+showToast("Cambios guardados");
+textChanges = {};
+};
+document.getElementById('cancelTextChanges').onclick = () => location.reload();
+document.getElementById('openSocialModal').onclick = () => {
+document.getElementById('socialLinksModal').classList.add('active');
+onSnapshot(doc(db, "links", "social"), snap => {
+if (snap.exists()) {
+const d = snap.data();
+['tiktok','instagram','facebook','x','whatsapp'].forEach(k => document.getElementById(k+'Input').value = d[k] || '');
+}
+});
+};
+document.getElementById('saveSocialLinks').onclick = async () => {
+const links = {
+tiktok: document.getElementById('tiktokInput').value.trim(),
+instagram: document.getElementById('instagramInput').value.trim(),
+facebook: document.getElementById('facebookInput').value.trim(),
+x: document.getElementById('xInput').value.trim(),
+whatsapp: document.getElementById('whatsappInput').value.trim()
+};
+await setDoc(doc(db, "links", "social"), links, { merge: true });
+showToast("Redes guardadas");
+closeModal('socialLinksModal');
+};
+// Logout confirmation (native confirm with Sí/No options)
+document.getElementById('logoutBtn').onclick = () => {
+const ok = confirm('¿Quieres cerrar sesión?\n\nSelecciona Aceptar para cerrar sesión o Cancelar para quedarte.');
+if (ok) {
+localStorage.removeItem('isAdmin');
+window.location.href = 'login.html';
+}
+};
+onSnapshot(doc(db, "textos", "hero"), snap => {
+if (snap.exists() && snap.data().fondo_url) {
+document.getElementById('heroBanner').style.backgroundImage = `url(${snap.data().fondo_url})`;
+}
+});
+loadProductsByType('carrusel', 'newCarousel');
+loadProductsByType('normal', 'productsGrid');
+loadEditableTexts();
+</script>
 </body>
-</html>
+</html>20,3sExpert
