@@ -4,103 +4,210 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pago - Efraín Shop</title>
-  <link rel="stylesheet" href="css/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; padding: 0; background: #f8f8f8; font-family: 'Poppins', sans-serif; }
-    .container { max-width: 800px; margin: 20px auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 15px 20px; text-align: center; font-weight: 800; font-size: 1.4rem; text-transform: uppercase; }
-    .form-section { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .form-section h3 { margin-top: 0; font-size: 1.4rem; text-transform: uppercase; }
-    .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
-    .form-group { flex: 1; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.95rem; }
-    .form-group input, .form-group select { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-    .btn-primary { background: #000; color: #fff; padding: 15px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; font-size: 1.1rem; border: none; }
-    .btn-edit { background: #f0f0f0; color: #000; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; float: right; }
-    .order-summary { background: #f8f8f8; padding: 20px; border-radius: 12px; }
-    .order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; align-items: center; }
-    .order-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px; }
-    .order-total { font-weight: 800; font-size: 1.4rem; margin-top: 15px; text-align: right; }
-    .login-required { text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .login-required h2 { margin-bottom: 15px; }
-    .login-required p { color: #666; margin-bottom: 20px; }
-    .paypal-container { margin: 20px 0; text-align: center; }
-    .paypal-container p { margin-bottom: 15px; font-weight: 600; }
-    .footer { padding: 30px 20px; background: #000; color: #fff; text-align: center; font-size: 0.9rem; margin-top: 40px; }
-    .footer a { color: #fff; text-decoration: underline; }
+    body { 
+      margin: 0; 
+      padding: 0; 
+      background: #f8f8f8; 
+      font-family: 'Poppins', sans-serif; 
+      color: #333;
+    }
+    .container { 
+      max-width: 800px; 
+      margin: 20px auto; 
+      padding: 20px; 
+    }
+    .header { 
+      background: #000; 
+      color: #fff; 
+      padding: 15px 20px; 
+      text-align: center; 
+      font-weight: 800; 
+      font-size: 1.4rem; 
+      text-transform: uppercase; 
+    }
+    .form-section { 
+      background: #fff; 
+      padding: 25px; 
+      border-radius: 12px; 
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+      margin-bottom: 20px; 
+    }
+    .form-section h3 { 
+      margin-top: 0; 
+      font-size: 1.4rem; 
+      text-transform: uppercase; 
+    }
+    .form-row { 
+      display: flex; 
+      gap: 15px; 
+      margin-bottom: 15px; 
+      flex-wrap: wrap; 
+    }
+    .form-group { 
+      flex: 1; 
+      min-width: 200px; 
+    }
+    .form-group label { 
+      display: block; 
+      margin-bottom: 6px; 
+      font-weight: 600; 
+      font-size: 0.95rem; 
+    }
+    .form-group input, 
+    .form-group select { 
+      width: 100%; 
+      padding: 12px; 
+      border: 1.5px solid #ddd; 
+      border-radius: 8px; 
+      font-size: 1rem; 
+      box-sizing: border-box; 
+    }
+    .btn-primary { 
+      background: #000; 
+      color: #fff; 
+      padding: 15px; 
+      text-align: center; 
+      border-radius: 8px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      margin-top: 20px; 
+      width: 100%; 
+      font-size: 1.1rem; 
+      border: none; 
+    }
+    .btn-whatsapp {
+      background: #25D366;
+      color: white;
+      padding: 18px;
+      text-align: center;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 25px auto 15px;
+      width: 100%;
+      max-width: 420px;
+      font-size: 1.25rem;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 4px 15px rgba(37,213,102,0.3);
+    }
+    .btn-whatsapp:hover { 
+      background: #20b858; 
+    }
+    .btn-edit { 
+      background: #f0f0f0; 
+      color: #000; 
+      padding: 8px 12px; 
+      font-size: 0.8rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      float: right; 
+    }
+    .order-summary { 
+      background: #f8f8f8; 
+      padding: 20px; 
+      border-radius: 12px; 
+    }
+    .order-item { 
+      display: flex; 
+      justify-content: space-between; 
+      padding: 10px 0; 
+      border-bottom: 1px solid #eee; 
+      align-items: center; 
+    }
+    .order-total { 
+      font-weight: 800; 
+      font-size: 1.4rem; 
+      margin-top: 15px; 
+      text-align: right; 
+    }
+    .payment-notice {
+      background: #fff3e0;
+      border: 2px solid #ff9800;
+      color: #e65100;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      margin: 25px 0;
+      font-size: 1.15rem;
+      line-height: 1.5;
+    }
+    .payment-notice strong { 
+      font-size: 1.35rem; 
+      display: block; 
+      margin-bottom: 12px; 
+    }
     .success-screen {
-      display: none; text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin: 20px auto; max-width: 600px;
+      text-align: center;
+      padding: 40px 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin: 20px auto;
+      max-width: 600px;
     }
-    .success-screen h2 { color: #28a745; font-size: 1.8rem; margin-bottom: 15px; }
-    .success-screen .order-id { font-size: 1.1rem; color: #333; margin-bottom: 25px; }
-    .success-items { text-align: left; background: #f8f8f8; padding: 15px; border-radius: 8px; margin: 20px 0; }
-    .success-items .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; align-items: center; }
-    .success-items .item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; margin-right: 10px; }
-    .success-items .item:last-child { border-bottom: none; }
-    .success-total { font-weight: 800; font-size: 1.3rem; text-align: right; margin-top: 15px; }
+    .success-screen h2 { 
+      color: #28a745; 
+      font-size: 1.8rem; 
+      margin-bottom: 15px; 
+    }
     .toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: #000; color: #fff; padding: 14px 28px; border-radius: 8px;
-      font-weight: 700; z-index: 9999; opacity: 0; transition: opacity 0.3s;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-    .toast.show { opacity: 1; }
-    .empty-cart-message {
-      text-align: center; padding: 40px 20px; background: #fff; border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-size: 1.1rem; color: #333;
+    .toast.show { 
+      opacity: 1; 
     }
-    .empty-cart-message a { color: #000; font-weight: 600; text-decoration: underline; cursor: pointer; }
-    .empty-cart-message a:hover { color: #555; }
-
-    /* NUEVO: Mensaje si no hay dirección */
-    .address-required {
-      text-align: center; padding: 30px 20px; background: #fff9e6; border: 1px solid #ffd700; border-radius: 12px;
-      margin-bottom: 20px; color: #b8860b; font-weight: 600;
-    }
-    .address-required::before {
-      content: "Warning: ";
-      font-weight: 800;
+    .hidden { 
+      display: none !important; 
     }
   </style>
 </head>
 <body>
-  <div class="header">EFRAÍN SHOP - PAGO SEGURO</div>
+
+  <div class="header">EFRAÍN SHOP - FINALIZAR COMPRA</div>
+
   <div class="container">
 
-    <!-- MENSAJE DE INICIAR SESIÓN -->
-    <div id="loginRequired" class="login-required" style="display:none;">
-      <h2>Inicia sesión para continuar</h2>
-      <p>Necesitas una cuenta para realizar tu compra de forma segura.</p>
-      <button class="btn-primary" id="goToLogin">Iniciar sesión o registrarse</button>
-    </div>
-
-    <!-- CONTENIDO DE PAGO -->
-    <div id="paymentContent" style="display:none;">
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="paymentContent">
 
       <!-- CARRITO VACÍO -->
-      <div id="emptyCartMessage" class="empty-cart-message" style="display:none;">
-        No tienes productos. <a href="index.html">Ir a comprar</a>
+      <div id="emptyCartMessage" class="hidden" style="text-align:center; padding:40px 20px; background:#fff; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+        No tienes productos en el carrito.<br><br>
+        <a href="index.html" style="color:#000; font-weight:bold; text-decoration:underline;">Ir a comprar</a>
       </div>
 
-      <!-- SECCIÓN DE PAGO -->
+      <!-- SECCIÓN PRINCIPAL -->
       <div id="paymentSection">
-
-        <!-- AVISO: DIRECCIÓN REQUERIDA -->
-        <div id="addressRequiredMessage" class="address-required" style="display:none;">
-          Debes guardar tu dirección de envío para continuar con el pago.
-        </div>
 
         <!-- DIRECCIÓN -->
         <div class="form-section">
           <h3>Dirección de Envío</h3>
-          <button class="btn-edit" id="editAddressBtn" style="display:none;">Editar</button>
-          <div id="addressDisplay" style="display:none;">
+          <button class="btn-edit hidden" id="editAddressBtn">Editar</button>
+          
+          <div id="addressDisplay" class="hidden">
             <p><strong>Nombre:</strong> <span id="dispName">-</span></p>
             <p><strong>Teléfono:</strong> <span id="dispPhone">-</span></p>
             <p><strong>Dirección:</strong> <span id="dispAddress">-</span></p>
             <p><strong>Estado:</strong> <span id="dispState">-</span></p>
           </div>
+
           <form id="addressForm">
             <div class="form-row">
               <div class="form-group">
@@ -145,7 +252,7 @@
                 <input type="text" id="phone" placeholder="10 dígitos" maxlength="10" required pattern="\d{10}">
               </div>
             </div>
-            <button type="submit" class="btn-primary">Guardar y Continuar</button>
+            <button type="submit" class="btn-primary">Guardar Dirección y Continuar</button>
           </form>
         </div>
 
@@ -156,70 +263,55 @@
           <div class="order-total" id="orderTotal">Total: $0</div>
         </div>
 
-        <!-- PAGO (solo aparece si hay dirección) -->
-        <div class="form-section" id="paymentMethodSection" style="display:none;">
-          <h3>Método de Pago</h3>
-          <div class="paypal-container">
-            <p>Paga de forma segura con PayPal</p>
-            <div id="paypal-button-container"></div>
+        <!-- PAGO EN PERSONA + WHATSAPP -->
+        <div class="form-section" id="paymentMethodSection" class="hidden">
+          <div class="payment-notice">
+            <strong>PAGO CON TARJETA NO DISPONIBLE</strong>
+            Solo aceptamos pago <strong>en persona</strong><br>
+            (efectivo / transferencia / tarjeta con terminal al momento de entrega)
           </div>
-          <p style="text-align:center; margin-top:20px; color:#666; font-size:0.9rem;">
-            También aceptamos: <strong>Tarjeta de Crédito / Débito</strong> (a través de PayPal)
+
+          <h3 style="text-align:center; margin:25px 0 15px;">Finaliza tu pedido por WhatsApp</h3>
+          
+          <button id="sendToWhatsApp" class="btn-whatsapp">
+            📲 Enviar pedido por WhatsApp
+          </button>
+          
+          <p style="text-align:center; color:#555; font-size:0.9rem; margin-top:15px;">
+            Te contactaremos para coordinar día, lugar y forma de pago
           </p>
         </div>
       </div>
 
-      <!-- ÉXITO -->
-      <div id="successScreen" class="success-screen">
-        <h2>Pago realizado con éxito</h2>
-        <p class="order-id">Tu orden: <strong id="successOrderId"></strong></p>
-        <div class="success-items" id="successItems"></div>
-        <div class="success-total" id="successTotal"></div>
-        <button class="btn-primary" id="goHomeBtn">Ir al Inicio</button>
+      <!-- PANTALLA DE ÉXITO -->
+      <div id="successScreen" class="success-screen hidden">
+        <h2>¡Pedido enviado correctamente!</h2>
+        <p style="font-size:1.1rem; margin:20px 0;">Ya enviamos los detalles a WhatsApp.<br>Pronto nos pondremos en contacto contigo.</p>
+        <button class="btn-primary" onclick="window.location.href='index.html'">Volver al inicio</button>
       </div>
+
     </div>
   </div>
-
-  <footer class="footer">
-    <p>© 2025 Efraín Shop. Todos los derechos reservados.</p>
-    <p><a href="mailto:contacto@efrainshop.com">contacto@efrainshop.com</a> • <a href="https://instagram.com/efrainshop" target="_blank">@efrainshop</a></p>
-  </footer>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- PayPal SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AdB6bEc3xx0Ned5sYc6Wy6prEgKeZQrfMKtfrCU-tIcvrJNgf8og5nlRkbQKfBRxcIHPmfjY8JsWE6zo&currency=MXN&intent=capture"></script>
-
-  <!-- Firebase + Lógica -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBmv4Wtlg295lfsWh1vpDtOHkxMD34vmUE",
-      authDomain: "boutique-buendia.firebaseapp.com",
-      projectId: "boutique-buendia",
-      storageBucket: "boutique-buendia.firebasestorage.app",
-      messagingSenderId: "430651152709",
-      appId: "1:430651152709:web:aaa54eeb8e3ba64c43062c"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
+  <script>
     // === ELEMENTOS ===
-    const loginRequired = document.getElementById('loginRequired');
-    const paymentContent = document.getElementById('paymentContent');
     const emptyCartMessage = document.getElementById('emptyCartMessage');
     const paymentSection = document.getElementById('paymentSection');
     const successScreen = document.getElementById('successScreen');
     const orderItems = document.getElementById('orderItems');
     const orderTotal = document.getElementById('orderTotal');
-    const paypalContainer = document.getElementById('paypal-button-container');
     const paymentMethodSection = document.getElementById('paymentMethodSection');
-    const addressRequiredMessage = document.getElementById('addressRequiredMessage');
+    const addressForm = document.getElementById('addressForm');
+    const addressDisplay = document.getElementById('addressDisplay');
+    const editAddressBtn = document.getElementById('editAddressBtn');
+    const sendToWhatsAppBtn = document.getElementById('sendToWhatsApp');
     const toast = document.getElementById('toast');
+
+    // Número de WhatsApp (formato internacional correcto)
+    const WHATSAPP_NUMBER = "5216622787100"; // +52 662 278 7100
 
     // === TOAST ===
     function showToast(msg) {
@@ -228,57 +320,42 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // === VERIFICAR SESIÓN ===
-    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
-    if (!isLoggedIn) {
-      loginRequired.style.display = 'block';
-      paymentContent.style.display = 'none';
-      localStorage.setItem('redirectAfterLogin', 'pago.html');
-      document.getElementById('goToLogin').onclick = () => window.location.href = 'login.html';
-      throw new Error("No logueado");
-    } else {
-      loginRequired.style.display = 'none';
-      paymentContent.style.display = 'block';
-    }
-
     // === CARRITO ===
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    let savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
+    let total = 0;
+
     if (cart.length === 0) {
-      paymentSection.style.display = 'none';
-      emptyCartMessage.style.display = 'block';
-      throw new Error("Carrito vacío");
+      paymentSection.classList.add('hidden');
+      emptyCartMessage.classList.remove('hidden');
+    } else {
+      emptyCartMessage.classList.add('hidden');
+      paymentSection.classList.remove('hidden');
     }
 
     // === DIRECCIÓN ===
-    let savedAddress = JSON.parse(localStorage.getItem('shippingAddress') || 'null');
-    const addressForm = document.getElementById('addressForm');
-    const addressDisplay = document.getElementById('addressDisplay');
-    const editAddressBtn = document.getElementById('editAddressBtn');
-
     function updateAddressUI() {
       if (savedAddress) {
         document.getElementById('dispName').textContent = savedAddress.name;
         document.getElementById('dispPhone').textContent = savedAddress.phone;
         document.getElementById('dispAddress').textContent = `${savedAddress.street}, ${savedAddress.colonia}, C.P. ${savedAddress.cp}`;
         document.getElementById('dispState').textContent = savedAddress.state;
-        addressForm.style.display = 'none';
-        addressDisplay.style.display = 'block';
-        editAddressBtn.style.display = 'block';
-        addressRequiredMessage.style.display = 'none';
-        paymentMethodSection.style.display = 'block'; // Mostrar PayPal
-        renderPayPalButton(total);
+        
+        addressForm.classList.add('hidden');
+        addressDisplay.classList.remove('hidden');
+        editAddressBtn.classList.remove('hidden');
+        paymentMethodSection.classList.remove('hidden');
       } else {
-        addressForm.style.display = 'block';
-        addressDisplay.style.display = 'none';
-        editAddressBtn.style.display = 'none';
-        addressRequiredMessage.style.display = 'block';
-        paymentMethodSection.style.display = 'none'; // Ocultar PayPal
+        addressForm.classList.remove('hidden');
+        addressDisplay.classList.add('hidden');
+        editAddressBtn.classList.add('hidden');
+        paymentMethodSection.classList.add('hidden');
       }
     }
 
     editAddressBtn.onclick = () => {
-      savedAddress = null;
       localStorage.removeItem('shippingAddress');
+      savedAddress = null;
       updateAddressUI();
     };
 
@@ -295,112 +372,77 @@
       localStorage.setItem('shippingAddress', JSON.stringify(address));
       savedAddress = address;
       updateAddressUI();
-      showToast('Dirección guardada');
+      showToast('Dirección guardada correctamente');
     };
 
     // === CARGAR PRODUCTOS ===
-    let total = 0;
-    async function loadCartItems() {
-      orderItems.innerHTML = '<p>Cargando productos...</p>';
-      const itemsHTML = [];
+    function loadCartItems() {
+      orderItems.innerHTML = '';
+      total = 0;
 
-      for (const item of cart) {
-        try {
-          const docRef = doc(db, "productos", item.id);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            const subtotal = data.precio * item.qty;
-            total += subtotal;
-            itemsHTML.push(`
-              <div class="order-item">
-                <span>
-                  <img src="${data.imagen}" alt="${data.nombre}">
-                  ${data.nombre} x${item.qty}
-                  ${data.descripcion ? `<br><small style="color:#666;">${data.descripcion}</small>` : ''}
-                </span>
-                <span>$${(subtotal).toLocaleString()}</span>
-              </div>
-            `);
-          } else {
-            itemsHTML.push(`<div class="order-item" style="opacity:0.6;">Producto eliminado</div>`);
-          }
-        } catch (err) {
-          itemsHTML.push(`<div class="order-item" style="color:#d00;">Error</div>`);
-        }
+      cart.forEach(item => {
+        const subtotal = item.precio * item.qty;
+        total += subtotal;
+
+        const div = document.createElement('div');
+        div.className = 'order-item';
+        div.innerHTML = `
+          <span>${item.nombre || "Producto"} ×${item.qty}</span>
+          <span>$${subtotal.toLocaleString()}</span>
+        `;
+        orderItems.appendChild(div);
+      });
+
+      orderTotal.textContent = `Total: $${total.toLocaleString()}`;
+      updateAddressUI();
+    }
+
+    // === ENVIAR A WHATSAPP ===
+    function sendOrderToWhatsApp() {
+      if (!savedAddress) {
+        showToast("Primero debes guardar tu dirección");
+        return;
       }
 
-      orderItems.innerHTML = itemsHTML.join('');
-      orderTotal.textContent = `Total: $${total.toLocaleString()}`;
-      updateAddressUI(); // Mostrar u ocultar PayPal
+      let productsText = cart.map(item => 
+        `• ${item.nombre || "Producto"} ×${item.qty} - $${(item.precio * item.qty).toLocaleString()}`
+      ).join('\n');
+
+      const message = 
+`¡Hola! Quiero hacer el siguiente pedido:
+
+*Cliente:* ${savedAddress.name}
+*Teléfono:* ${savedAddress.phone}
+
+*Productos:*
+${productsText}
+
+*Total:* $${total.toLocaleString()} MXN
+
+*Dirección de entrega:*
+${savedAddress.street}, ${savedAddress.colonia}
+C.P. ${savedAddress.cp}
+${savedAddress.state}
+
+Quedo pendiente de indicarme lugar, día y forma de pago.
+¡Gracias! 🙌`;
+
+      const encoded = encodeURIComponent(message);
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
+
+      window.open(url, '_blank');
+
+      setTimeout(() => {
+        paymentSection.classList.add('hidden');
+        successScreen.classList.remove('hidden');
+        
+        // Opcional: limpiar carrito después de enviar
+        // localStorage.removeItem('cart');
+        // localStorage.removeItem('shippingAddress');
+      }, 1800);
     }
 
-    // === PAYPAL ===
-    function renderPayPalButton(totalAmount) {
-      if (!savedAddress || totalAmount <= 0) return;
-
-      // Limpiar botón anterior
-      paypalContainer.innerHTML = '';
-
-      paypal.Buttons({
-        style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'paypal' },
-        createOrder: (data, actions) => {
-          return actions.order.create({
-            purchase_units: [{
-              amount: { value: totalAmount.toFixed(2), currency_code: 'MXN' },
-              description: 'Compra en Efraín Shop',
-              custom_id: `efrain-${Date.now()}`
-            }]
-          });
-        },
-        onApprove: async (data, actions) => {
-          return actions.order.capture().then(async (details) => {
-            const orderData = {
-              userId: localStorage.getItem('userName') || 'anonimo',
-              date: new Date(),
-              total: totalAmount,
-              paymentId: details.id,
-              status: "paid",
-              address: savedAddress,
-              products: cart.map(item => ({
-                id: item.id,
-                name: item.nombre || 'Producto',
-                qty: item.qty,
-                price: item.precio
-              }))
-            };
-
-            try {
-              await setDoc(doc(db, 'orders', details.id), orderData);
-              localStorage.removeItem('cart');
-              localStorage.removeItem('shippingAddress');
-              paymentSection.style.display = 'none';
-              successScreen.style.display = 'block';
-              document.getElementById('successOrderId').textContent = details.id;
-
-              const successItems = document.getElementById('successItems');
-              cart.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'item';
-                div.innerHTML = `
-                  <span>
-                    <img src="${item.imagen}" alt="${item.nombre}">
-                    ${item.nombre} x${item.qty}
-                  </span>
-                  <span>$${(item.precio * item.qty).toLocaleString()}</span>
-                `;
-                successItems.appendChild(div);
-              });
-              document.getElementById('successTotal').textContent = `Total: $${totalAmount.toLocaleString()}`;
-              document.getElementById('goHomeBtn').onclick = () => window.location.href = 'index.html';
-            } catch (err) {
-              showToast('Error al guardar orden');
-            }
-          });
-        },
-        onError: () => showToast('Error en el pago. Intenta de nuevo.')
-      }).render('#paypal-button-container');
-    }
+    sendToWhatsAppBtn.onclick = sendOrderToWhatsApp;
 
     // === INICIAR ===
     loadCartItems();
