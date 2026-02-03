@@ -12,169 +12,15 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #000;
-      color: #e2e8f0;
-      font-family: 'Segoe UI', 'Poppins', sans-serif;
-      height: 100vh;
-    }
-
-    #globeViz {
-      width: 100%;
-      height: 100%;
-    }
-
-    .title-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 70px;
-      background: rgba(10, 15, 35, 0.92);
-      backdrop-filter: blur(12px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      gap: 20px;
-      border-bottom: 1px solid #333;
-    }
-
-    .title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      flex: 1;
-    }
-
-    .btn {
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.6rem;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 50%;
-      transition: all 0.25s;
-    }
-
-    .btn:hover {
-      color: #60a5fa;
-      background: rgba(96, 165, 250, 0.12);
-    }
-
-    .panel {
-      position: absolute;
-      background: rgba(15, 23, 42, 0.90);
-      backdrop-filter: blur(16px);
-      border-radius: 16px;
-      padding: 20px 24px;
-      border: 1px solid rgba(96, 165, 250, 0.25);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      z-index: 10;
-    }
-
-    .legend {
-      bottom: 24px;
-      left: 24px;
-      min-width: 260px;
-    }
-
-    .stats {
-      top: 90px;
-      right: 24px;
-      width: 340px;
-    }
-
-    .stat-big {
-      font-size: 2.6rem;
-      font-weight: 800;
-      color: #60a5fa;
-      margin: 6px 0;
-    }
-
-    .stat-label {
-      color: #94a3b8;
-      font-size: 0.95rem;
-      margin-bottom: 4px;
-    }
-
-    .tooltip {
-      position: absolute;
-      background: rgba(0,0,0,0.94);
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 0.96rem;
-      pointer-events: none;
-      z-index: 1000;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.75);
-      transform: translate(-50%, -140%);
-      max-width: 320px;
-      line-height: 1.45;
-    }
-
-    .hidden { display: none; }
-
-    h3, h4 {
-      margin: 0 0 14px 0;
-      color: #60a5fa;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="title-bar">
-    <button class="btn" onclick="history.back()">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <div class="title">Mapa de Ventas Global - Tumerch.mx</div>
-    <button class="btn" id="refreshBtn" title="Actualizar datos">
-      <i class="fas fa-sync-alt"></i>
-    </button>
-  </div>
-
-  <div id="globeViz"></div>
-
-  <!-- Leyenda -->
-  <div class="panel legend">
-    <h4>Leyenda de Ventas</h4>
-    <div style="margin:10px 0"><i class="fas fa-circle" style="color:#4ade80"></i> 1–5 órdenes</div>
-    <div style="margin:10px 0"><i class="fas fa-circle" style="color:#fbbf24"></i> 6–25 órdenes</div>
-    <div style="margin:10px 0"><i class="fas fa-circle" style="color:#f97316"></i> 26–80 órdenes</div>
-    <div style="margin:10px 0"><i class="fas fa-circle" style="color:#ef4444"></i> 81–200 órdenes</div>
-    <div style="margin:10px 0"><i class="fas fa-circle" style="color:#b91c1c"></i> 200+ órdenes</div>
-  </div>
-
-  <!-- Estadísticas -->
-  <div class="panel stats">
-    <h3>Resumen Global</h3>
-    <div style="margin:18px 0">
-      <div class="stat-label">Total de órdenes</div>
-      <div class="stat-big" id="totalOrders">0</div>
-    </div>
-    <div style="margin:18px 0">
-      <div class="stat-label">Ingresos totales</div>
-      <div class="stat-big" id="totalRevenue">$0</div>
-    </div>
-    <div style="margin:28px 0 12px 0; font-weight:600">Ciudades con más ventas</div>
-    <div id="topCities"></div>
-  </div>
-
-  <div id="tooltip" class="tooltip hidden"></div>
-
+  <!-- Firebase SDK -->
   <script type="module">
-    // ──────────────────────────────────────────────
-    // Firebase Config (usa la misma de tu proyecto)
-    // ──────────────────────────────────────────────
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+    // ──────────────────────────────────────────────
+    // Configuración de Firebase (la misma que usas en todo el proyecto)
+    // ──────────────────────────────────────────────
     const firebaseConfig = {
       apiKey: "AIzaSyBRCq0FuAY5NYBcQFv03WmdmUSehi1L_B4",
       authDomain: "merchct-d059a.firebaseapp.com",
@@ -186,12 +32,50 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Lista de correos de super admins (ajusta según necesites)
+    const SUPER_ADMINS = [
+      "fernando8aparra@gmail.com",
+      "luisatondo28@gmail.com",
+      "rafaalejandrovm@gmail.com",
+      "fpprem184@gmail.com"
+      // agrega aquí todos los correos que tengan acceso completo
+    ];
+
     // ──────────────────────────────────────────────
-    // Cargar datos de ventas
+    // Protección: solo super admins pueden ver esta página
+    // ──────────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("Debes iniciar sesión primero.");
+        location.href = "login.html";
+        return;
+      }
+
+      const email = user.email?.toLowerCase();
+      if (!email || !SUPER_ADMINS.includes(email)) {
+        alert("Acceso denegado. Solo administradores principales pueden ver este mapa.");
+        signOut(auth).then(() => {
+          location.href = "index.html";
+        });
+        return;
+      }
+
+      // Si llegó aquí → es super admin → cargamos los datos
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("content").style.display = "block";
+      loadSalesData();
+    });
+
+    // ──────────────────────────────────────────────
+    // Cargar y procesar todas las órdenes
     // ──────────────────────────────────────────────
     async function loadSalesData() {
+      const loadingEl = document.getElementById("loadingMap");
+      loadingEl.style.display = "flex";
+
       try {
         const ordersSnap = await getDocs(collection(db, "orders"));
         const salesByLocation = {};
@@ -199,22 +83,29 @@
         let totalOrders = 0;
         let totalRevenue = 0;
 
-        ordersSnap.forEach(doc => {
+        ordersSnap.forEach((doc) => {
           const order = doc.data();
 
-          // Campos que probablemente tienes (ajusta nombres si son diferentes)
-          const city = order.shippingAddress?.city ||
-                       order.city ||
-                       order.shipping?.city ||
-                       "Sin ciudad";
+          // Ajusta estos campos según cómo guardas tus órdenes
+          const city =
+            order.shippingAddress?.city ||
+            order.city ||
+            order.shipping?.city ||
+            "Sin ubicación";
 
-          const country = order.shippingAddress?.country ||
-                          order.country ||
-                          "MX";
+          const country =
+            order.shippingAddress?.country ||
+            order.country ||
+            "MX";
 
-          const amount = Number(order.total || order.amount || order.totalAmount || 0);
+          const amount = Number(
+            order.total ||
+            order.amount ||
+            order.totalAmount ||
+            order.grandTotal ||
+            0
+          );
 
-          // Coordenadas si las tienes guardadas
           let lat = order.lat || order.shippingAddress?.lat || null;
           let lng = order.lng || order.shippingAddress?.lng || null;
 
@@ -226,8 +117,8 @@
               country,
               orders: 0,
               revenue: 0,
-              lat: lat,
-              lng: lng
+              lat,
+              lng,
             };
           }
 
@@ -238,48 +129,52 @@
           totalRevenue += amount;
         });
 
-        // Preparar datos para el globo
         const pointsData = Object.values(salesByLocation)
-          .filter(p => p.orders > 0)
-          .map(p => ({
+          .filter((p) => p.orders > 0)
+          .map((p) => ({
             city: p.city,
             country: p.country,
             orders: p.orders,
             revenue: p.revenue,
             lat: p.lat || getApproxLatLng(p.city, p.country).lat,
-            lng: p.lng || getApproxLatLng(p.city, p.country).lng
+            lng: p.lng || getApproxLatLng(p.city, p.country).lng,
           }));
 
         updateStats(totalOrders, totalRevenue, pointsData);
         renderGlobe(pointsData);
 
       } catch (err) {
-        console.error("Error al cargar datos:", err);
-        document.getElementById('totalOrders').textContent = "Error";
-        document.getElementById('totalRevenue').textContent = "Error";
+        console.error("Error al cargar órdenes:", err);
+        document.getElementById("errorMessage").textContent =
+          "No se pudieron cargar los datos. Revisa la consola.";
+        document.getElementById("errorMessage").style.display = "block";
+      } finally {
+        loadingEl.style.display = "none";
       }
     }
 
     // ──────────────────────────────────────────────
-    // Coordenadas aproximadas (fallback) - amplía según necesites
+    // Coordenadas aproximadas (fallback)
     // ──────────────────────────────────────────────
     function getApproxLatLng(city, country) {
-      const map = {
-        "Hermosillo": { lat: 29.07297, lng: -110.95592 },
+      const locations = {
+        Hermosillo: { lat: 29.07297, lng: -110.95592 },
         "Ciudad de México": { lat: 19.4326, lng: -99.1332 },
-        "Guadalajara": { lat: 20.6597, lng: -103.3496 },
-        "Monterrey": { lat: 25.6866, lng: -100.3161 },
-        "Tijuana": { lat: 32.5251, lng: -117.0336 },
-        "Cancún": { lat: 21.1619, lng: -86.8515 },
-        "Mérida": { lat: 20.9674, lng: -89.5926 },
-        "Puebla": { lat: 19.0414, lng: -98.2063 },
-        "León": { lat: 21.1219, lng: -101.7068 },
-        "Querétaro": { lat: 20.5888, lng: -100.3899 },
-        // Agrega más ciudades que tengas en tus pedidos
+        Guadalajara: { lat: 20.6597, lng: -103.3496 },
+        Monterrey: { lat: 25.6866, lng: -100.3161 },
+        Tijuana: { lat: 32.5251, lng: -117.0336 },
+        Cancún: { lat: 21.1619, lng: -86.8515 },
+        Mérida: { lat: 20.9674, lng: -89.5926 },
+        Puebla: { lat: 19.0414, lng: -98.2063 },
+        León: { lat: 21.1219, lng: -101.7068 },
+        Querétaro: { lat: 20.5888, lng: -100.3899 },
+        Chihuahua: { lat: 28.6353, lng: -106.0889 },
+        Culiacán: { lat: 24.8044, lng: -107.494 },
+        // Agrega más ciudades que aparezcan en tus pedidos
       };
 
       const key = city.trim();
-      return map[key] || { lat: 23.0, lng: -102.0 }; // centro aproximado de México
+      return locations[key] || { lat: 23.0, lng: -102.0 }; // centro de México por defecto
     }
 
     // ──────────────────────────────────────────────
@@ -287,83 +182,187 @@
     // ──────────────────────────────────────────────
     function updateStats(totalOrders, totalRevenue, pointsData) {
       document.getElementById("totalOrders").textContent = totalOrders.toLocaleString();
-      document.getElementById("totalRevenue").textContent = "$" + Math.round(totalRevenue).toLocaleString();
+      document.getElementById("totalRevenue").textContent =
+        "$" + Math.round(totalRevenue).toLocaleString();
 
       const top = [...pointsData]
         .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 6);
+        .slice(0, 8);
 
-      document.getElementById("topCities").innerHTML = top.length > 0
-        ? top.map(c => `
-            <div style="margin:8px 0; display:flex; justify-content:space-between; font-size:0.96rem;">
+      const container = document.getElementById("topCities");
+      container.innerHTML = top.length
+        ? top
+            .map(
+              (c) => `
+            <div style="margin:8px 0; display:flex; justify-content:space-between; font-size:0.96rem; color:#e2e8f0;">
               <span>${c.city}${c.country && c.country !== "MX" ? ` (${c.country})` : ""}</span>
               <strong>$${Math.round(c.revenue).toLocaleString()}</strong>
             </div>
-          `).join("")
-        : "<div style='color:#94a3b8; font-style:italic;'>Aún no hay ventas registradas</div>";
+          `
+            )
+            .join("")
+        : '<div style="color:#94a3b8; font-style:italic; text-align:center;">Aún no hay ventas registradas</div>';
     }
 
     // ──────────────────────────────────────────────
-    // Renderizar globo
+    // Renderizar el globo 3D
     // ──────────────────────────────────────────────
     function renderGlobe(pointsData) {
       const globe = Globe()
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-        .pointOfView({ altitude: 2.3, lat: 23, lng: -102 }) // centrado en México
+        .globeImageUrl("//unpkg.com/three-globe/example/img/earth-dark.jpg")
+        .bumpImageUrl("//unpkg.com/three-globe/example/img/earth-topology.png")
+        .backgroundImageUrl("//unpkg.com/three-globe/example/img/night-sky.png")
+        .pointOfView({ altitude: 2.4, lat: 23, lng: -102 }) // centrado en México
         .pointsData(pointsData)
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointAltitude(d => Math.max(0.012, Math.log(d.orders + 1) * 0.09))
-        .pointRadius(d => Math.sqrt(d.orders) * 0.45 + 0.35)
-        .pointColor(d => {
-          if (d.orders <= 5)    return '#4ade80';
-          if (d.orders <= 25)   return '#fbbf24';
-          if (d.orders <= 80)   return '#f97316';
-          if (d.orders <= 200)  return '#ef4444';
-          return '#b91c1c';
+        .pointLat("lat")
+        .pointLng("lng")
+        .pointAltitude((d) => Math.max(0.012, Math.log(d.orders + 1) * 0.1))
+        .pointRadius((d) => Math.sqrt(d.orders) * 0.5 + 0.4)
+        .pointColor((d) => {
+          if (d.orders <= 5) return "#4ade80";
+          if (d.orders <= 25) return "#fbbf24";
+          if (d.orders <= 80) return "#f97316";
+          if (d.orders <= 200) return "#ef4444";
+          return "#b91c1c";
         })
-        .pointLabel(d => `
-          <div style="padding:4px 10px; text-align:center;">
-            <b style="font-size:1.1rem;">${d.city}</b><br/>
-            <span style="color:#94a3b8; font-size:0.9rem;">${d.country || 'MX'}</span><br/><br/>
-            Órdenes: <b>${d.orders.toLocaleString()}</b><br/>
-            Ingresos: <b>$${Math.round(d.revenue).toLocaleString()}</b>
+        .pointLabel((d) => `
+          <div style="padding:6px 12px; text-align:center; min-width:160px;">
+            <div style="font-weight:700; font-size:1.15rem; color:#60a5fa;">${d.city}</div>
+            <div style="color:#94a3b8; font-size:0.9rem; margin:4px 0;">${d.country || "México"}</div>
+            <hr style="border:none; border-top:1px solid #4a5568; margin:8px 0;">
+            <div>Órdenes: <strong>${d.orders.toLocaleString()}</strong></div>
+            <div>Ingresos: <strong>$${Math.round(d.revenue).toLocaleString()}</strong></div>
           </div>
         `)
         .onPointHover((point) => {
-          const tooltip = document.getElementById('tooltip');
+          const tooltip = document.getElementById("tooltip");
           if (point) {
             tooltip.innerHTML = point.pointLabel;
-            tooltip.classList.remove('hidden');
+            tooltip.classList.remove("hidden");
             tooltip.style.left = `${event.clientX}px`;
             tooltip.style.top = `${event.clientY}px`;
           } else {
-            tooltip.classList.add('hidden');
+            tooltip.classList.add("hidden");
           }
         })
-        (document.getElementById('globeViz'));
+        (document.getElementById("globeViz"));
 
-      // Rotación suave automática
+      // Rotación automática suave
       function animate() {
         const pov = globe.pointOfView();
-        globe.pointOfView({ ...pov, lng: pov.lng + 0.13 });
+        globe.pointOfView({ ...pov, lng: pov.lng + 0.14 });
         requestAnimationFrame(animate);
       }
       animate();
     }
 
     // ──────────────────────────────────────────────
-    // Cargar al inicio + botón de refrescar
+    // Eventos
     // ──────────────────────────────────────────────
-    loadSalesData();
-
-    document.getElementById('refreshBtn')?.addEventListener('click', () => {
-      document.getElementById('totalOrders').textContent = "Cargando...";
-      document.getElementById('totalRevenue').textContent = "Cargando...";
+    document.getElementById("refreshBtn")?.addEventListener("click", () => {
+      document.getElementById("totalOrders").textContent = "Cargando...";
+      document.getElementById("totalRevenue").textContent = "Cargando...";
       loadSalesData();
     });
   </script>
+
+  <style>
+    #loading, #loadingMap {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: #60a5fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      z-index: 9999;
+    }
+
+    #errorMessage {
+      position: fixed;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      z-index: 50;
+      display: none;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #333;
+      border-top: 5px solid #60a5fa;
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="loading-spinner"></div>
+    <p>Verificando acceso...</p>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="title-bar">
+      <button class="btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="title">Mapa de Ventas Global - Tumerch.mx</div>
+      <button class="btn" id="refreshBtn" title="Actualizar datos">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+
+    <div id="globeViz"></div>
+
+    <!-- Leyenda -->
+    <div class="panel legend">
+      <h4>Leyenda de Ventas</h4>
+      <div style="margin:10px 0"><i class="fas fa-circle" style="color:#4ade80"></i> 1–5 órdenes</div>
+      <div style="margin:10px 0"><i class="fas fa-circle" style="color:#fbbf24"></i> 6–25 órdenes</div>
+      <div style="margin:10px 0"><i class="fas fa-circle" style="color:#f97316"></i> 26–80 órdenes</div>
+      <div style="margin:10px 0"><i class="fas fa-circle" style="color:#ef4444"></i> 81–200 órdenes</div>
+      <div style="margin:10px 0"><i class="fas fa-circle" style="color:#b91c1c"></i> 200+ órdenes</div>
+    </div>
+
+    <!-- Panel de estadísticas -->
+    <div class="panel stats">
+      <h3>Resumen Global</h3>
+      <div style="margin:18px 0">
+        <div class="stat-label">Total de órdenes</div>
+        <div class="stat-big" id="totalOrders">0</div>
+      </div>
+      <div style="margin:18px 0">
+        <div class="stat-label">Ingresos totales</div>
+        <div class="stat-big" id="totalRevenue">$0</div>
+      </div>
+      <div style="margin:28px 0 12px 0; font-weight:600">Ciudades con más ventas</div>
+      <div id="topCities"></div>
+    </div>
+
+    <div id="tooltip" class="tooltip hidden"></div>
+
+    <div id="loadingMap" style="display:none;">
+      <div class="loading-spinner"></div>
+      <p>Cargando ventas...</p>
+    </div>
+
+    <div id="errorMessage"></div>
+  </div>
+
 </body>
 </html>
